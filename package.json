@@ -37,6 +37,7 @@
     "react-countup": "^6.5.3",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
+    "resend": "^6.6.0",
     "tailwind-merge": "^2.2.0",
     "zustand": "^4.5.7"
   },
