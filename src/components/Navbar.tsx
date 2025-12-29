@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+// En los imports agregar:
+import { NotificationBell } from '@/components/NotificationBell';
+
+// Dentro del Navbar, junto a los otros botones:
+<NotificationBell />
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores";
