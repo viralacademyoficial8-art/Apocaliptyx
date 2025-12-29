@@ -18,14 +18,7 @@ export async function initOneSignal() {
   try {
     await OneSignal.init({
       appId,
-      allowLocalhostAsSecureOrigin: true, // Para desarrollo
-      notifyButton: {
-        enable: false, // Usaremos nuestro propio botón
-      },
-      welcomeNotification: {
-        title: '🔮 Apocaliptics',
-        message: '¡Notificaciones activadas! Te avisaremos de predicciones importantes.',
-      },
+      allowLocalhostAsSecureOrigin: true,
     });
 
     initialized = true;
@@ -47,7 +40,8 @@ export async function requestNotificationPermission(): Promise<boolean> {
 
 export async function isSubscribed(): Promise<boolean> {
   try {
-    return await OneSignal.User.PushSubscription.optedIn;
+    const optedIn = OneSignal.User.PushSubscription.optedIn;
+    return optedIn ?? false;
   } catch {
     return false;
   }
@@ -55,7 +49,8 @@ export async function isSubscribed(): Promise<boolean> {
 
 export async function getPlayerId(): Promise<string | null> {
   try {
-    return await OneSignal.User.PushSubscription.id;
+    const id = OneSignal.User.PushSubscription.id;
+    return id ?? null;
   } catch {
     return null;
   }
@@ -83,29 +78,4 @@ export async function addTags(tags: Record<string, string>) {
   } catch (error) {
     console.error('Error adding tags:', error);
   }
-}
-
-// Enviar notificación desde el servidor (usar en API routes)
-export async function sendNotificationToUser(
-  playerId: string,
-  title: string,
-  message: string,
-  url?: string
-) {
-  const response = await fetch('https://onesignal.com/api/v1/notifications', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
-    },
-    body: JSON.stringify({
-      app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
-      include_player_ids: [playerId],
-      headings: { en: title },
-      contents: { en: message },
-      url: url || 'https://apocaliptyx.vercel.app',
-    }),
-  });
-
-  return response.json();
 }
