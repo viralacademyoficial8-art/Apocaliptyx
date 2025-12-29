@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-// En los imports agregar:
-import { NotificationBell } from '@/components/NotificationBell';
-
-// Dentro del Navbar, junto a los otros botones:
-<NotificationBell />
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores";
 import { NotificationPanel } from "@/components/NotificationPanel";
+import { NotificationBell } from "@/components/NotificationBell";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -32,9 +28,9 @@ export function Navbar() {
   const { t } = useTranslation();
 
   const navItems = [
-    { href: "/dashboard", label: t("nav.home") },       // si quieres, luego creamos clave nav.dashboard
+    { href: "/dashboard", label: t("nav.home") },
     { href: "/tienda", label: t("nav.shop") },
-    { href: "/leaderboard", label: t("nav.rankings") }, // tu ruta es leaderboard pero el texto es rankings
+    { href: "/leaderboard", label: t("nav.rankings") },
     { href: "/foro", label: t("nav.forum") },
     { href: "/crear", label: t("scenarios.create") },
   ];
@@ -93,6 +89,9 @@ export function Navbar() {
               {/* Selector de idioma (siempre visible) */}
               <LanguageSelector variant="default" />
 
+              {/* 🔔 Notification Bell - Push Notifications */}
+              <NotificationBell />
+
               {isAuthenticated && user ? (
                 <>
                   {/* AP Coins (solo sm+) */}
@@ -103,7 +102,7 @@ export function Navbar() {
                     </span>
                   </div>
 
-                  {/* Notificaciones */}
+                  {/* Notificaciones in-app */}
                   <NotificationPanel />
 
                   {/* Dropdown usuario (desktop) */}
