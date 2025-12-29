@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Importar sistema responsive */
+@import "../styles/responsive.css";
+
+/* ===========================
+   VARIABLES DE TEMA
+   =========================== */
+@layer base {
+  /* ========== TEMA CLARO (por defecto) ========== */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 346 77% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 46%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 31% 91%;
+    --input: 214 31% 91%;
+    --ring: 346 77% 49%;
+
+    /* Charts (mantengo los tuyos) */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --radius: 0.5rem;
+
+    /* Colores personalizados Apocaliptics - Light */
+    --apocalypse-bg: 210 40% 98%;
+    --apocalypse-card: 0 0% 100%;
+    --apocalypse-card-hover: 210 40% 96%;
+    --apocalypse-border: 214 31% 91%;
+    --apocalypse-text: 222 47% 11%;
+    --apocalypse-text-muted: 215 16% 46%;
+  }
+
+  /* ========== TEMA OSCURO ========== */
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 346 77% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346 77% 49%;
+
+    /* Charts en dark (mantengo los tuyos) */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    /* Colores personalizados Apocaliptics - Dark */
+    --apocalypse-bg: 240 10% 3.9%;
+    --apocalypse-card: 240 6% 10%;
+    --apocalypse-card-hover: 240 5% 14%;
+    --apocalypse-border: 240 3.7% 15.9%;
+    --apocalypse-text: 0 0% 98%;
+    --apocalypse-text-muted: 240 5% 64.9%;
+  }
+
+  /* ========== TEMA CLARO EXPLÍCITO (.light) ========== */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 346 77% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 46%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 31% 91%;
+    --input: 214 31% 91%;
+    --ring: 346 77% 49%;
+
+    /* Charts (mismos que :root) */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --radius: 0.5rem;
+
+    /* Colores personalizados Apocaliptics - Light */
+    --apocalypse-bg: 210 40% 98%;
+    --apocalypse-card: 0 0% 100%;
+    --apocalypse-card-hover: 210 40% 96%;
+    --apocalypse-border: 214 31% 91%;
+    --apocalypse-text: 222 47% 11%;
+    --apocalypse-text-muted: 215 16% 46%;
+  }
+}
+
+/* ===========================
+   ESTILOS BASE
+   =========================== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* ===========================
+   SCROLLBARS PERSONALIZADOS
+   (mantengo los tuyos igual)
+   =========================== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+
+/* Agregar al final de globals.css */
+
+/* PWA Animations */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out;
+}

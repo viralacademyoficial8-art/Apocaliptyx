@@ -1,0 +1,148 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "none": "Nenhum",
+    "yes": "Sim",
+    "no": "Não",
+    "or": "ou",
+    "and": "e",
+    "more": "Mais",
+    "less": "Menos",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "close": "Fechar",
+    "open": "Abrir",
+    "share": "Compartilhar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "download": "Baixar",
+    "upload": "Enviar",
+    "viewAll": "Ver tudo",
+    "seeMore": "Ver mais",
+    "showLess": "Ver menos"
+  },
+  "nav": {
+    "home": "Início",
+    "scenarios": "Cenários",
+    "rankings": "Rankings",
+    "shop": "Loja",
+    "forum": "Fórum",
+    "profile": "Perfil",
+    "settings": "Configurações",
+    "logout": "Sair",
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "notifications": "Notificações",
+    "messages": "Mensagens"
+  },
+  "auth": {
+    "login": {
+      "title": "Bem-vindo de volta",
+      "subtitle": "Entre na sua conta de profeta",
+      "email": "E-mail",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu a senha?",
+      "rememberMe": "Lembrar de mim",
+      "submit": "Entrar",
+      "noAccount": "Não tem conta?",
+      "registerLink": "Cadastre-se aqui",
+      "orContinueWith": "Ou continue com"
+    },
+    "register": {
+      "title": "Junte-se aos profetas",
+      "subtitle": "Crie sua conta e comece a prever",
+      "username": "Nome de usuário",
+      "email": "E-mail",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha",
+      "acceptTerms": "Aceito os termos e condições",
+      "submit": "Criar conta",
+      "hasAccount": "Já tem conta?",
+      "loginLink": "Entre"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Preveja o futuro",
+      "titleHighlight": "Ganhe recompensas",
+      "subtitle": "Junte-se à comunidade de profetas digitais.",
+      "cta": "Começar agora",
+      "ctaSecondary": "Ver cenários"
+    },
+    "features": {
+      "title": "Como funciona?",
+      "create": { "title": "Crie cenários", "description": "Publique suas previsões" },
+      "compete": { "title": "Compita por eles", "description": "Outros podem roubar seus cenários" },
+      "win": { "title": "Ganhe recompensas", "description": "O holder ganha todo o pool" }
+    },
+    "trending": { "title": "Cenários em alta", "viewAll": "Ver todos" },
+    "categories": {
+      "title": "Explore por categoria",
+      "technology": "Tecnologia",
+      "sports": "Esportes",
+      "economy": "Economia",
+      "politics": "Política",
+      "entertainment": "Entretenimento",
+      "science": "Ciência"
+    },
+    "cta": { "title": "Pronto para prever o futuro?", "button": "Criar conta grátis" }
+  },
+  "scenarios": {
+    "title": "Cenários",
+    "subtitle": "Explore todas as previsões da comunidade",
+    "create": "Criar cenário",
+    "filters": { "all": "Todos", "active": "Ativos", "completed": "Completados", "failed": "Falhados", "mine": "Meus cenários" },
+    "sort": { "latest": "Mais recentes", "popular": "Mais populares", "ending": "Terminando", "price": "Maior preço" },
+    "card": { "holder": "Holder", "currentPrice": "Preço atual", "steal": "Roubar", "daysLeft": "{{days}} dias" }
+  },
+  "rankings": {
+    "title": "Rankings",
+    "subtitle": "Os melhores profetas",
+    "tabs": { "global": "Global", "monthly": "Mensal", "weekly": "Semanal" },
+    "metrics": { "winRate": "Taxa de Vitória", "predictions": "Previsões", "earnings": "Ganhos" }
+  },
+  "shop": {
+    "title": "Loja",
+    "subtitle": "Potencialize suas previsões",
+    "categories": { "all": "Todos", "protection": "Proteção", "power": "Poder", "boost": "Boost", "cosmetic": "Cosmético", "special": "Especial" },
+    "item": { "buy": "Comprar", "owned": "Você tem", "soldOut": "Esgotado" }
+  },
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar perfil",
+    "stats": { "scenarios": "Cenários", "wins": "Vitórias", "winRate": "Taxa de Vitória", "earnings": "Ganhos" },
+    "tabs": { "scenarios": "Cenários", "activity": "Atividade", "achievements": "Conquistas", "inventory": "Inventário" },
+    "settings": { "title": "Configurações", "language": "Idioma", "theme": "Tema", "darkMode": "Modo escuro" }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "markAllRead": "Marcar tudo como lido",
+    "empty": "Sem notificações"
+  },
+  "footer": {
+    "description": "A plataforma de previsões onde profetas competem pelo futuro.",
+    "links": { "about": "Sobre nós", "terms": "Termos", "privacy": "Privacidade", "contact": "Contato" },
+    "copyright": "© {{year}} Apocaliptics. Todos os direitos reservados."
+  },
+  "errors": {
+    "notFound": { "title": "Página não encontrada", "backHome": "Voltar ao início" },
+    "serverError": { "title": "Erro do servidor", "retry": "Tentar novamente" }
+  },
+  "time": {
+    "now": "Agora",
+    "today": "Hoje",
+    "daysAgo": "há {{count}} dias",
+    "inDays": "em {{count}} dias"
+  }
+}

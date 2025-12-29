@@ -1,0 +1,487 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// NEXTAUTH REQUIRED MODELS
+// ============================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// USER MODEL (Extended for Apocaliptics)
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?   // Para login con credenciales
+
+  // Perfil de usuario
+  username      String    @unique
+  displayName   String?
+  bio           String?   @db.Text
+  avatarUrl     String?
+  bannerUrl     String?
+
+  // Estadísticas del juego
+  apCoins       Int       @default(1000)  // Moneda del juego
+  level         Int       @default(1)
+  experience    Int       @default(0)
+  reputation    Int       @default(0)
+
+  // Estadísticas de predicciones
+  totalPredictions   Int @default(0)
+  correctPredictions Int @default(0)
+  totalEarnings      Int @default(0)
+  currentStreak      Int @default(0)
+  bestStreak         Int @default(0)
+
+  // Roles y permisos
+  role          Role      @default(USER)
+  isVerified    Boolean   @default(false)
+  isBanned      Boolean   @default(false)
+  bannedAt      DateTime?
+  bannedReason  String?
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relaciones
+  accounts      Account[]
+  sessions      Session[]
+  scenarios     Scenario[]        @relation("CreatedScenarios")
+  holdings      ScenarioHolding[]
+  transactions  Transaction[]
+  notifications Notification[]
+  followers     Follow[]          @relation("Following")
+  following     Follow[]          @relation("Followers")
+  posts         ForumPost[]
+  comments      Comment[]
+  votes         Vote[]
+  achievements  UserAchievement[]
+  inventory     InventoryItem[]
+
+  @@index([email])
+  @@index([username])
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+// ============================================
+// SCENARIO MODEL (Predicciones)
+// ============================================
+
+model Scenario {
+  id              String         @id @default(cuid())
+  title           String
+  description     String         @db.Text
+  category        Category
+  status          ScenarioStatus @default(ACTIVE)
+
+  // Precios y economía
+  initialPrice    Int
+  currentPrice    Int
+  priceMultiplier Float          @default(1.1)
+  totalPool       Int            @default(0)
+
+  // Fechas
+  deadline        DateTime
+  resolvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Resultado
+  outcome         Boolean?       // true = sucedió, false = no sucedió, null = pendiente
+
+  // Votos
+  votesUp         Int            @default(0)
+  votesDown       Int            @default(0)
+
+  // Imagen
+  imageUrl        String?
+
+  // Relaciones
+  creatorId       String
+  creator         User           @relation("CreatedScenarios", fields: [creatorId], references: [id])
+  currentHolderId String?
+  holdings        ScenarioHolding[]
+  transactions    Transaction[]
+  comments        Comment[]
+  votes           Vote[]
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([category])
+  @@index([deadline])
+}
+
+enum Category {
+  TECNOLOGIA
+  POLITICA
+  DEPORTES
+  FARANDULA
+  GUERRA
+  ECONOMIA
+  SALUD
+  CIENCIA
+  ENTRETENIMIENTO
+  OTROS
+}
+
+enum ScenarioStatus {
+  ACTIVE
+  COMPLETED
+  FAILED
+  CANCELLED
+  PENDING_RESOLUTION
+}
+
+// ============================================
+// SCENARIO HOLDING (Quién tiene cada escenario)
+// ============================================
+
+model ScenarioHolding {
+  id             String   @id @default(cuid())
+
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+
+  scenarioId     String
+  scenario       Scenario @relation(fields: [scenarioId], references: [id])
+
+  purchasePrice  Int
+  purchasedAt    DateTime @default(now())
+  soldAt         DateTime?
+  soldPrice      Int?
+
+  isCurrentHolder Boolean @default(true)
+
+  @@unique([userId, scenarioId, isCurrentHolder])
+  @@index([userId])
+  @@index([scenarioId])
+}
+
+// ============================================
+// TRANSACTION (Historial de transacciones)
+// ============================================
+
+model Transaction {
+  id          String          @id @default(cuid())
+
+  type        TransactionType
+  amount      Int
+  description String?
+
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+
+  scenarioId  String?
+  scenario    Scenario?       @relation(fields: [scenarioId], references: [id])
+
+  createdAt   DateTime        @default(now())
+
+  @@index([userId])
+  @@index([scenarioId])
+  @@index([type])
+}
+
+enum TransactionType {
+  PURCHASE       // Comprar escenario
+  SALE           // Vender/ser robado
+  STEAL          // Robar escenario
+  WIN            // Ganar predicción
+  LOSS           // Perder predicción
+  REWARD         // Recompensa del sistema
+  PURCHASE_COINS // Comprar AP Coins con dinero real
+  DAILY_BONUS    // Bonus diario
+  ACHIEVEMENT    // Logro desbloqueado
+  REFERRAL       // Referido
+}
+
+// ============================================
+// NOTIFICATION
+// ============================================
+
+model Notification {
+  id        String            @id @default(cuid())
+
+  type      NotificationType
+  title     String
+  message   String
+  data      Json?             // Datos adicionales (ej: scenarioId, amount, etc.)
+
+  isRead    Boolean           @default(false)
+
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+
+  createdAt DateTime          @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+enum NotificationType {
+  SCENARIO_STOLEN
+  SCENARIO_WON
+  SCENARIO_LOST
+  NEW_FOLLOWER
+  COMMENT_REPLY
+  ACHIEVEMENT_UNLOCKED
+  LEVEL_UP
+  DAILY_REWARD
+  SYSTEM_ANNOUNCEMENT
+}
+
+// ============================================
+// FOLLOW (Seguidores)
+// ============================================
+
+model Follow {
+  id          String   @id @default(cuid())
+
+  followerId  String
+  follower    User     @relation("Followers", fields: [followerId], references: [id])
+
+  followingId String
+  following   User     @relation("Following", fields: [followingId], references: [id])
+
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+
+// ============================================
+// FORUM POST
+// ============================================
+
+model ForumPost {
+  id        String   @id @default(cuid())
+
+  title     String?
+  content   String   @db.Text
+  imageUrl  String?
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  likes     Int      @default(0)
+
+  comments  Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+}
+
+// ============================================
+// COMMENT
+// ============================================
+
+model Comment {
+  id         String   @id @default(cuid())
+
+  content    String   @db.Text
+
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+
+  // Puede ser comentario en post o en escenario
+  postId     String?
+  post       ForumPost? @relation(fields: [postId], references: [id])
+
+  scenarioId String?
+  scenario   Scenario? @relation(fields: [scenarioId], references: [id])
+
+  // Respuesta a otro comentario
+  parentId   String?
+  parent     Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    Comment[] @relation("CommentReplies")
+
+  likes      Int      @default(0)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([postId])
+  @@index([scenarioId])
+}
+
+// ============================================
+// VOTE (Votos en escenarios)
+// ============================================
+
+model Vote {
+  id         String   @id @default(cuid())
+
+  type       VoteType
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+
+  scenarioId String
+  scenario   Scenario @relation(fields: [scenarioId], references: [id])
+
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, scenarioId])
+  @@index([scenarioId])
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+// ============================================
+// ACHIEVEMENT
+// ============================================
+
+model Achievement {
+  id          String   @id @default(cuid())
+
+  name        String   @unique
+  description String
+  icon        String
+
+  // Requisitos
+  requirement Json     // { type: "predictions", count: 10 }
+
+  // Recompensa
+  rewardCoins Int      @default(0)
+  rewardXp    Int      @default(0)
+
+  users       UserAchievement[]
+
+  createdAt   DateTime @default(now())
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  unlockedAt    DateTime @default(now())
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+// ============================================
+// SHOP ITEM
+// ============================================
+
+model ShopItem {
+  id          String   @id @default(cuid())
+
+  name        String
+  description String
+  imageUrl    String?
+
+  type        ShopItemType
+  price       Int
+
+  // Para items limitados
+  stock       Int?
+  maxPerUser  Int?
+
+  // Efecto del item
+  effect      Json?    // { type: "protection", duration: 24, value: 1 }
+
+  isActive    Boolean  @default(true)
+
+  purchases   InventoryItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum ShopItemType {
+  PROTECTION
+  POWER
+  BOOST
+  COSMETIC
+  SPECIAL
+}
+
+model InventoryItem {
+  id          String   @id @default(cuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  itemId      String
+  item        ShopItem @relation(fields: [itemId], references: [id])
+
+  quantity    Int      @default(1)
+
+  // Para items con duración
+  expiresAt   DateTime?
+  isActive    Boolean  @default(false)
+  activatedAt DateTime?
+
+  purchasedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([itemId])
+}

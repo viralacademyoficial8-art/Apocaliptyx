@@ -1,0 +1,357 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "all": "Todos",
+    "none": "Ninguno",
+    "yes": "Sí",
+    "no": "No",
+    "or": "o",
+    "and": "y",
+    "more": "Más",
+    "less": "Menos",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "share": "Compartir",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "download": "Descargar",
+    "upload": "Subir",
+    "viewAll": "Ver todo",
+    "seeMore": "Ver más",
+    "showLess": "Ver menos"
+  },
+  "nav": {
+    "home": "Inicio",
+    "scenarios": "Escenarios",
+    "rankings": "Rankings",
+    "shop": "Tienda",
+    "forum": "Foro",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "notifications": "Notificaciones",
+    "messages": "Mensajes"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido de vuelta",
+      "subtitle": "Ingresa a tu cuenta de profeta",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "rememberMe": "Recordarme",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿No tienes cuenta?",
+      "registerLink": "Regístrate aquí",
+      "orContinueWith": "O continúa con",
+      "errors": {
+        "invalidCredentials": "Credenciales inválidas",
+        "emailRequired": "El correo es requerido",
+        "passwordRequired": "La contraseña es requerida"
+      }
+    },
+    "register": {
+      "title": "Únete a los profetas",
+      "subtitle": "Crea tu cuenta y empieza a predecir",
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "acceptTerms": "Acepto los términos y condiciones",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "loginLink": "Inicia sesión",
+      "errors": {
+        "usernameRequired": "El nombre de usuario es requerido",
+        "usernameTaken": "Este nombre de usuario ya existe",
+        "emailRequired": "El correo es requerido",
+        "emailInvalid": "Correo inválido",
+        "emailTaken": "Este correo ya está registrado",
+        "passwordRequired": "La contraseña es requerida",
+        "passwordMin": "Mínimo 8 caracteres",
+        "passwordsNoMatch": "Las contraseñas no coinciden",
+        "termsRequired": "Debes aceptar los términos"
+      }
+    },
+    "forgotPassword": {
+      "title": "Recuperar contraseña",
+      "subtitle": "Te enviaremos un enlace para resetear tu contraseña",
+      "email": "Correo electrónico",
+      "submit": "Enviar enlace",
+      "backToLogin": "Volver al login",
+      "emailSent": "Revisa tu correo",
+      "emailSentDesc": "Hemos enviado un enlace de recuperación a tu correo"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Predice el futuro",
+      "titleHighlight": "Gana recompensas",
+      "subtitle": "Únete a la comunidad de profetas digitales. Crea predicciones, compite por escenarios y demuestra tu visión del futuro.",
+      "cta": "Comenzar ahora",
+      "ctaSecondary": "Ver escenarios",
+      "stats": {
+        "users": "Profetas activos",
+        "scenarios": "Escenarios creados",
+        "predictions": "Predicciones hechas",
+        "rewards": "En recompensas"
+      }
+    },
+    "features": {
+      "title": "¿Cómo funciona?",
+      "subtitle": "Apocaliptics es una plataforma donde tus predicciones valen",
+      "create": {
+        "title": "Crea escenarios",
+        "description": "Publica tus predicciones sobre tecnología, deportes, economía y más"
+      },
+      "compete": {
+        "title": "Compite por ellos",
+        "description": "Otros usuarios pueden robar tus escenarios pagando más"
+      },
+      "win": {
+        "title": "Gana recompensas",
+        "description": "Si tu predicción se cumple, el holder gana toda la bolsa acumulada"
+      }
+    },
+    "trending": {
+      "title": "Escenarios en tendencia",
+      "subtitle": "Los escenarios más populares ahora mismo",
+      "viewAll": "Ver todos"
+    },
+    "categories": {
+      "title": "Explora por categoría",
+      "technology": "Tecnología",
+      "sports": "Deportes",
+      "economy": "Economía",
+      "politics": "Política",
+      "entertainment": "Entretenimiento",
+      "science": "Ciencia"
+    },
+    "cta": {
+      "title": "¿Listo para predecir el futuro?",
+      "subtitle": "Únete a miles de profetas y demuestra tu visión",
+      "button": "Crear cuenta gratis"
+    }
+  },
+  "scenarios": {
+    "title": "Escenarios",
+    "subtitle": "Explora todas las predicciones de la comunidad",
+    "createScenario": "Crear escenario",
+    "filters": {
+      "all": "Todos",
+      "active": "Activos",
+      "completed": "Completados",
+      "failed": "Fallidos",
+      "mine": "Mis escenarios"
+    },
+    "sort": {
+      "latest": "Más recientes",
+      "popular": "Más populares",
+      "ending": "Por terminar",
+      "price": "Mayor precio"
+    },
+    "card": {
+      "by": "por",
+      "holder": "Holder",
+      "currentPrice": "Precio actual",
+      "poolSize": "Bolsa",
+      "deadline": "Fecha límite",
+      "votes": "votos",
+      "steal": "Robar",
+      "vote": "Votar",
+      "share": "Compartir",
+      "endsIn": "Termina en",
+      "expired": "Expirado",
+      "daysLeft": "{{days}} días",
+      "hoursLeft": "{{hours}} horas"
+    },
+    "detail": {
+      "description": "Descripción",
+      "history": "Historial",
+      "comments": "Comentarios",
+      "stealThis": "Robar este escenario",
+      "currentHolder": "Holder actual",
+      "creator": "Creador",
+      "created": "Creado",
+      "transfers": "Transferencias",
+      "totalVolume": "Volumen total"
+    },
+    "create": {
+      "title": "Crear nuevo escenario",
+      "titleLabel": "Título de la predicción",
+      "titlePlaceholder": "Ej: Bitcoin superará los $200,000 en 2025",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Explica tu predicción con detalle...",
+      "category": "Categoría",
+      "deadline": "Fecha límite",
+      "initialPrice": "Precio inicial",
+      "submit": "Publicar escenario",
+      "preview": "Vista previa"
+    },
+    "empty": {
+      "title": "No hay escenarios",
+      "subtitle": "Sé el primero en crear una predicción",
+      "cta": "Crear escenario"
+    }
+  },
+  "rankings": {
+    "title": "Rankings",
+    "subtitle": "Los mejores profetas de la plataforma",
+    "tabs": {
+      "global": "Global",
+      "monthly": "Mensual",
+      "weekly": "Semanal"
+    },
+    "metrics": {
+      "winRate": "Win Rate",
+      "predictions": "Predicciones",
+      "earnings": "Ganancias",
+      "streak": "Racha"
+    },
+    "badges": {
+      "top1": "Nostradamus Supremo",
+      "top10": "Oráculo",
+      "top100": "Vidente"
+    },
+    "you": "Tú",
+    "position": "Posición"
+  },
+  "shop": {
+    "title": "Tienda",
+    "subtitle": "Potencia tus predicciones con ítems especiales",
+    "categories": {
+      "all": "Todos",
+      "protection": "Protección",
+      "power": "Poder",
+      "boost": "Boost",
+      "cosmetic": "Cosmético",
+      "special": "Especial"
+    },
+    "item": {
+      "buy": "Comprar",
+      "owned": "Ya lo tienes",
+      "soldOut": "Agotado",
+      "limited": "Limitado",
+      "new": "Nuevo",
+      "featured": "Destacado",
+      "duration": "Duración",
+      "uses": "Usos",
+      "effect": "Efecto"
+    },
+    "cart": {
+      "title": "Carrito",
+      "empty": "Tu carrito está vacío",
+      "total": "Total",
+      "checkout": "Pagar"
+    },
+    "balance": {
+      "title": "Tu balance",
+      "buyCoins": "Comprar AP Coins"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar perfil",
+    "stats": {
+      "scenarios": "Escenarios",
+      "wins": "Victorias",
+      "winRate": "Win Rate",
+      "earnings": "Ganancias",
+      "rank": "Ranking",
+      "joined": "Miembro desde"
+    },
+    "tabs": {
+      "scenarios": "Escenarios",
+      "activity": "Actividad",
+      "achievements": "Logros",
+      "inventory": "Inventario"
+    },
+    "achievements": {
+      "title": "Logros",
+      "locked": "Bloqueado",
+      "unlocked": "Desbloqueado"
+    },
+    "settings": {
+      "title": "Configuración",
+      "account": "Cuenta",
+      "notifications": "Notificaciones",
+      "privacy": "Privacidad",
+      "appearance": "Apariencia",
+      "language": "Idioma",
+      "theme": "Tema",
+      "darkMode": "Modo oscuro",
+      "lightMode": "Modo claro"
+    }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "empty": "No tienes notificaciones",
+    "types": {
+      "steal": "{{user}} robó tu escenario",
+      "win": "¡Tu predicción se cumplió!",
+      "loss": "Tu predicción no se cumplió",
+      "comment": "{{user}} comentó en tu escenario",
+      "follow": "{{user}} te está siguiendo",
+      "mention": "{{user}} te mencionó"
+    }
+  },
+  "footer": {
+    "description": "La plataforma de predicciones donde los profetas compiten por el futuro.",
+    "links": {
+      "about": "Sobre nosotros",
+      "terms": "Términos",
+      "privacy": "Privacidad",
+      "contact": "Contacto",
+      "help": "Ayuda",
+      "blog": "Blog"
+    },
+    "social": {
+      "followUs": "Síguenos"
+    },
+    "copyright": "© {{year}} Apocaliptics. Todos los derechos reservados."
+  },
+  "errors": {
+    "notFound": {
+      "title": "Página no encontrada",
+      "subtitle": "La página que buscas no existe o fue movida",
+      "backHome": "Volver al inicio"
+    },
+    "serverError": {
+      "title": "Error del servidor",
+      "subtitle": "Algo salió mal. Intenta de nuevo más tarde",
+      "retry": "Reintentar"
+    },
+    "unauthorized": {
+      "title": "No autorizado",
+      "subtitle": "No tienes permiso para ver esta página",
+      "login": "Iniciar sesión"
+    }
+  },
+  "time": {
+    "now": "Ahora",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "hace {{count}} días",
+    "weeksAgo": "hace {{count}} semanas",
+    "monthsAgo": "hace {{count}} meses",
+    "yearsAgo": "hace {{count}} años",
+    "inDays": "en {{count}} días",
+    "inHours": "en {{count}} horas",
+    "inMinutes": "en {{count}} minutos"
+  }
+}

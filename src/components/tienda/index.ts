@@ -1,0 +1,10 @@
+export { ShopHero } from './ShopHero';
+export { CategoryTabs } from './CategoryTabs';
+export { ShopFilters } from './ShopFilters';
+export { ShopItemCard } from './ShopItemCard';
+export { ShopItemGrid } from './ShopItemGrid';
+export { FeaturedItems } from './FeaturedItems';
+export { ShopCartSidebar } from './ShopCartSidebar';
+export { PurchaseModal } from './PurchaseModal';
+export { ShopItemDetail } from './ShopItemDetail';
+export { ShopCart } from './ShopCart';

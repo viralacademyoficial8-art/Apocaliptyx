@@ -1,0 +1,148 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "all": "Tous",
+    "none": "Aucun",
+    "yes": "Oui",
+    "no": "Non",
+    "or": "ou",
+    "and": "et",
+    "more": "Plus",
+    "less": "Moins",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "open": "Ouvrir",
+    "share": "Partager",
+    "copy": "Copier",
+    "copied": "Copié",
+    "download": "Télécharger",
+    "upload": "Envoyer",
+    "viewAll": "Voir tout",
+    "seeMore": "Voir plus",
+    "showLess": "Voir moins"
+  },
+  "nav": {
+    "home": "Accueil",
+    "scenarios": "Scénarios",
+    "rankings": "Classements",
+    "shop": "Boutique",
+    "forum": "Forum",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "notifications": "Notifications",
+    "messages": "Messages"
+  },
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous à votre compte",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié?",
+      "rememberMe": "Se souvenir de moi",
+      "submit": "Se connecter",
+      "noAccount": "Pas de compte?",
+      "registerLink": "Inscrivez-vous",
+      "orContinueWith": "Ou continuez avec"
+    },
+    "register": {
+      "title": "Rejoignez les prophètes",
+      "subtitle": "Créez votre compte",
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "acceptTerms": "J'accepte les conditions",
+      "submit": "Créer un compte",
+      "hasAccount": "Déjà un compte?",
+      "loginLink": "Connectez-vous"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Prédisez l'avenir",
+      "titleHighlight": "Gagnez des récompenses",
+      "subtitle": "Rejoignez la communauté des prophètes numériques.",
+      "cta": "Commencer",
+      "ctaSecondary": "Voir les scénarios"
+    },
+    "features": {
+      "title": "Comment ça marche?",
+      "create": { "title": "Créez des scénarios", "description": "Publiez vos prédictions" },
+      "compete": { "title": "Rivalisez pour eux", "description": "D'autres peuvent voler vos scénarios" },
+      "win": { "title": "Gagnez des récompenses", "description": "Le détenteur gagne tout le pool" }
+    },
+    "trending": { "title": "Scénarios tendance", "viewAll": "Voir tout" },
+    "categories": {
+      "title": "Explorer par catégorie",
+      "technology": "Technologie",
+      "sports": "Sports",
+      "economy": "Économie",
+      "politics": "Politique",
+      "entertainment": "Divertissement",
+      "science": "Science"
+    },
+    "cta": { "title": "Prêt à prédire l'avenir?", "button": "Créer un compte gratuit" }
+  },
+  "scenarios": {
+    "title": "Scénarios",
+    "subtitle": "Explorez toutes les prédictions",
+    "create": "Créer un scénario",
+    "filters": { "all": "Tous", "active": "Actifs", "completed": "Terminés", "failed": "Échoués", "mine": "Mes scénarios" },
+    "sort": { "latest": "Plus récents", "popular": "Plus populaires", "ending": "Bientôt terminés", "price": "Prix le plus élevé" },
+    "card": { "holder": "Détenteur", "currentPrice": "Prix actuel", "steal": "Voler", "daysLeft": "{{days}} jours" }
+  },
+  "rankings": {
+    "title": "Classements",
+    "subtitle": "Les meilleurs prophètes",
+    "tabs": { "global": "Global", "monthly": "Mensuel", "weekly": "Hebdomadaire" },
+    "metrics": { "winRate": "Taux de victoire", "predictions": "Prédictions", "earnings": "Gains" }
+  },
+  "shop": {
+    "title": "Boutique",
+    "subtitle": "Boostez vos prédictions",
+    "categories": { "all": "Tous", "protection": "Protection", "power": "Pouvoir", "boost": "Boost", "cosmetic": "Cosmétique", "special": "Spécial" },
+    "item": { "buy": "Acheter", "owned": "Possédé", "soldOut": "Épuisé" }
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Modifier le profil",
+    "stats": { "scenarios": "Scénarios", "wins": "Victoires", "winRate": "Taux de victoire", "earnings": "Gains" },
+    "tabs": { "scenarios": "Scénarios", "activity": "Activité", "achievements": "Succès", "inventory": "Inventaire" },
+    "settings": { "title": "Paramètres", "language": "Langue", "theme": "Thème", "darkMode": "Mode sombre" }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "empty": "Pas de notifications"
+  },
+  "footer": {
+    "description": "La plateforme de prédictions où les prophètes rivalisent.",
+    "links": { "about": "À propos", "terms": "Conditions", "privacy": "Confidentialité", "contact": "Contact" },
+    "copyright": "© {{year}} Apocaliptics. Tous droits réservés."
+  },
+  "errors": {
+    "notFound": { "title": "Page non trouvée", "backHome": "Retour à l'accueil" },
+    "serverError": { "title": "Erreur serveur", "retry": "Réessayer" }
+  },
+  "time": {
+    "now": "Maintenant",
+    "today": "Aujourd'hui",
+    "daysAgo": "il y a {{count}} jours",
+    "inDays": "dans {{count}} jours"
+  }
+}

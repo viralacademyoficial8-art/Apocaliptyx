@@ -1,0 +1,216 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "more": "More",
+    "less": "Less",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "open": "Open",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied",
+    "download": "Download",
+    "upload": "Upload",
+    "viewAll": "View all",
+    "seeMore": "See more",
+    "showLess": "Show less"
+  },
+  "nav": {
+    "home": "Home",
+    "scenarios": "Scenarios",
+    "rankings": "Rankings",
+    "shop": "Shop",
+    "forum": "Forum",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out",
+    "login": "Log in",
+    "register": "Sign up",
+    "notifications": "Notifications",
+    "messages": "Messages"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your prophet account",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up here",
+      "orContinueWith": "Or continue with",
+      "errors": {
+        "invalidCredentials": "Invalid credentials",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required"
+      }
+    },
+    "register": {
+      "title": "Join the prophets",
+      "subtitle": "Create your account and start predicting",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "acceptTerms": "I accept the terms and conditions",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "errors": {
+        "usernameRequired": "Username is required",
+        "usernameTaken": "Username already taken",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Invalid email",
+        "emailTaken": "Email already registered",
+        "passwordRequired": "Password is required",
+        "passwordMin": "Minimum 8 characters",
+        "passwordsNoMatch": "Passwords don't match",
+        "termsRequired": "You must accept the terms"
+      }
+    },
+    "forgotPassword": {
+      "title": "Reset password",
+      "subtitle": "We'll send you a link to reset your password",
+      "email": "Email",
+      "submit": "Send link",
+      "backToLogin": "Back to login",
+      "emailSent": "Check your email",
+      "emailSentDesc": "We've sent a recovery link to your email"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Predict the future",
+      "titleHighlight": "Earn rewards",
+      "subtitle": "Join the community of digital prophets. Create predictions, compete for scenarios and prove your vision of the future.",
+      "cta": "Get started",
+      "ctaSecondary": "View scenarios",
+      "stats": {
+        "users": "Active prophets",
+        "scenarios": "Scenarios created",
+        "predictions": "Predictions made",
+        "rewards": "In rewards"
+      }
+    }
+  },
+  "scenarios": {
+    "title": "Scenarios",
+    "subtitle": "Explore all community predictions",
+    "createScenario": "Create scenario",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "failed": "Failed",
+      "mine": "My scenarios"
+    },
+    "sort": {
+      "latest": "Latest",
+      "popular": "Most popular",
+      "ending": "Ending soon",
+      "price": "Highest price"
+    },
+    "card": {
+      "by": "by",
+      "holder": "Holder",
+      "currentPrice": "Current price",
+      "poolSize": "Pool",
+      "deadline": "Deadline",
+      "votes": "votes",
+      "steal": "Steal",
+      "vote": "Vote",
+      "share": "Share",
+      "endsIn": "Ends in",
+      "expired": "Expired",
+      "daysLeft": "{{days}} days",
+      "hoursLeft": "{{hours}} hours"
+    },
+    "detail": {
+      "description": "Description",
+      "history": "History",
+      "comments": "Comments",
+      "stealThis": "Steal this scenario",
+      "currentHolder": "Current holder",
+      "creator": "Creator",
+      "created": "Created",
+      "transfers": "Transfers",
+      "totalVolume": "Total volume"
+    },
+    "create": {
+      "title": "Create new scenario",
+      "titleLabel": "Prediction title",
+      "titlePlaceholder": "E.g.: Bitcoin will exceed $200,000 in 2025",
+      "description": "Description",
+      "descriptionPlaceholder": "Explain your prediction in detail...",
+      "category": "Category",
+      "deadline": "Deadline",
+      "initialPrice": "Initial price",
+      "submit": "Publish scenario",
+      "preview": "Preview"
+    },
+    "empty": {
+      "title": "No scenarios",
+      "subtitle": "Be the first to create a prediction",
+      "cta": "Create scenario"
+    }
+  },
+  "rankings": {
+    "title": "Rankings",
+    "subtitle": "The best prophets on the platform"
+  },
+  "shop": {
+    "title": "Shop",
+    "subtitle": "Power up your predictions with special items"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit profile"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "empty": "No notifications"
+  },
+  "footer": {
+    "description": "The prediction platform where prophets compete for the future.",
+    "copyright": "© {{year}} Apocaliptics. All rights reserved."
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "subtitle": "The page you're looking for doesn't exist or was moved",
+      "backHome": "Back to home"
+    }
+  },
+  "time": {
+    "now": "Now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "weeksAgo": "{{count}} weeks ago",
+    "monthsAgo": "{{count}} months ago",
+    "yearsAgo": "{{count}} years ago",
+    "inDays": "in {{count}} days",
+    "inHours": "in {{count}} hours",
+    "inMinutes": "in {{count}} minutes"
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "all": "Alle",
+    "none": "Keine",
+    "yes": "Ja",
+    "no": "Nein",
+    "or": "oder",
+    "and": "und",
+    "more": "Mehr",
+    "less": "Weniger",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "close": "Schließen",
+    "open": "Öffnen",
+    "share": "Teilen",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "download": "Herunterladen",
+    "upload": "Hochladen",
+    "viewAll": "Alle anzeigen",
+    "seeMore": "Mehr sehen",
+    "showLess": "Weniger zeigen"
+  },
+  "nav": {
+    "home": "Startseite",
+    "scenarios": "Szenarien",
+    "rankings": "Ranglisten",
+    "shop": "Shop",
+    "forum": "Forum",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "logout": "Abmelden",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "notifications": "Benachrichtigungen",
+    "messages": "Nachrichten"
+  },
+  "auth": {
+    "login": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melde dich bei deinem Konto an",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "forgotPassword": "Passwort vergessen?",
+      "rememberMe": "Angemeldet bleiben",
+      "submit": "Anmelden",
+      "noAccount": "Kein Konto?",
+      "registerLink": "Hier registrieren",
+      "orContinueWith": "Oder fortfahren mit"
+    },
+    "register": {
+      "title": "Werde ein Prophet",
+      "subtitle": "Erstelle dein Konto",
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "acceptTerms": "Ich akzeptiere die AGB",
+      "submit": "Konto erstellen",
+      "hasAccount": "Bereits ein Konto?",
+      "loginLink": "Anmelden"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Sage die Zukunft voraus",
+      "titleHighlight": "Verdiene Belohnungen",
+      "subtitle": "Tritt der Community digitaler Propheten bei.",
+      "cta": "Jetzt starten",
+      "ctaSecondary": "Szenarien ansehen"
+    },
+    "features": {
+      "title": "Wie funktioniert es?",
+      "create": { "title": "Erstelle Szenarien", "description": "Veröffentliche deine Vorhersagen" },
+      "compete": { "title": "Kämpfe darum", "description": "Andere können deine Szenarien stehlen" },
+      "win": { "title": "Gewinne Belohnungen", "description": "Der Halter gewinnt den gesamten Pool" }
+    },
+    "trending": { "title": "Trend-Szenarien", "viewAll": "Alle anzeigen" },
+    "categories": {
+      "title": "Nach Kategorie erkunden",
+      "technology": "Technologie",
+      "sports": "Sport",
+      "economy": "Wirtschaft",
+      "politics": "Politik",
+      "entertainment": "Unterhaltung",
+      "science": "Wissenschaft"
+    },
+    "cta": { "title": "Bereit die Zukunft vorherzusagen?", "button": "Kostenloses Konto erstellen" }
+  },
+  "scenarios": {
+    "title": "Szenarien",
+    "subtitle": "Erkunde alle Vorhersagen",
+    "create": "Szenario erstellen",
+    "filters": { "all": "Alle", "active": "Aktiv", "completed": "Abgeschlossen", "failed": "Fehlgeschlagen", "mine": "Meine Szenarien" },
+    "sort": { "latest": "Neueste", "popular": "Beliebteste", "ending": "Bald endend", "price": "Höchster Preis" },
+    "card": { "holder": "Halter", "currentPrice": "Aktueller Preis", "steal": "Stehlen", "daysLeft": "{{days}} Tage" }
+  },
+  "rankings": {
+    "title": "Ranglisten",
+    "subtitle": "Die besten Propheten",
+    "tabs": { "global": "Global", "monthly": "Monatlich", "weekly": "Wöchentlich" },
+    "metrics": { "winRate": "Gewinnrate", "predictions": "Vorhersagen", "earnings": "Einnahmen" }
+  },
+  "shop": {
+    "title": "Shop",
+    "subtitle": "Verbessere deine Vorhersagen",
+    "categories": { "all": "Alle", "protection": "Schutz", "power": "Kraft", "boost": "Boost", "cosmetic": "Kosmetik", "special": "Spezial" },
+    "item": { "buy": "Kaufen", "owned": "Besitzt du", "soldOut": "Ausverkauft" }
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Profil bearbeiten",
+    "stats": { "scenarios": "Szenarien", "wins": "Siege", "winRate": "Gewinnrate", "earnings": "Einnahmen" },
+    "tabs": { "scenarios": "Szenarien", "activity": "Aktivität", "achievements": "Erfolge", "inventory": "Inventar" },
+    "settings": { "title": "Einstellungen", "language": "Sprache", "theme": "Design", "darkMode": "Dunkelmodus" }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "empty": "Keine Benachrichtigungen"
+  },
+  "footer": {
+    "description": "Die Vorhersage-Plattform, auf der Propheten kämpfen.",
+    "links": { "about": "Über uns", "terms": "AGB", "privacy": "Datenschutz", "contact": "Kontakt" },
+    "copyright": "© {{year}} Apocaliptics. Alle Rechte vorbehalten."
+  },
+  "errors": {
+    "notFound": { "title": "Seite nicht gefunden", "backHome": "Zurück zur Startseite" },
+    "serverError": { "title": "Serverfehler", "retry": "Erneut versuchen" }
+  },
+  "time": {
+    "now": "Jetzt",
+    "today": "Heute",
+    "daysAgo": "vor {{count}} Tagen",
+    "inDays": "in {{count}} Tagen"
+  }
+}

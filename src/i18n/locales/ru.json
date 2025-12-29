@@ -1,0 +1,148 @@
+{
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "all": "Все",
+    "none": "Нет",
+    "yes": "Да",
+    "no": "Нет",
+    "or": "или",
+    "and": "и",
+    "more": "Больше",
+    "less": "Меньше",
+    "back": "Назад",
+    "next": "Далее",
+    "previous": "Назад",
+    "close": "Закрыть",
+    "open": "Открыть",
+    "share": "Поделиться",
+    "copy": "Копировать",
+    "copied": "Скопировано",
+    "download": "Скачать",
+    "upload": "Загрузить",
+    "viewAll": "Смотреть все",
+    "seeMore": "Показать больше",
+    "showLess": "Показать меньше"
+  },
+  "nav": {
+    "home": "Главная",
+    "scenarios": "Сценарии",
+    "rankings": "Рейтинги",
+    "shop": "Магазин",
+    "forum": "Форум",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "login": "Войти",
+    "register": "Регистрация",
+    "notifications": "Уведомления",
+    "messages": "Сообщения"
+  },
+  "auth": {
+    "login": {
+      "title": "С возвращением",
+      "subtitle": "Войдите в свой аккаунт",
+      "email": "Электронная почта",
+      "password": "Пароль",
+      "forgotPassword": "Забыли пароль?",
+      "rememberMe": "Запомнить меня",
+      "submit": "Войти",
+      "noAccount": "Нет аккаунта?",
+      "registerLink": "Зарегистрируйтесь",
+      "orContinueWith": "Или продолжить с"
+    },
+    "register": {
+      "title": "Присоединяйтесь к пророкам",
+      "subtitle": "Создайте аккаунт",
+      "username": "Имя пользователя",
+      "email": "Электронная почта",
+      "password": "Пароль",
+      "confirmPassword": "Подтвердите пароль",
+      "acceptTerms": "Я принимаю условия",
+      "submit": "Создать аккаунт",
+      "hasAccount": "Уже есть аккаунт?",
+      "loginLink": "Войти"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Предсказывай будущее",
+      "titleHighlight": "Получай награды",
+      "subtitle": "Присоединяйся к сообществу цифровых пророков.",
+      "cta": "Начать",
+      "ctaSecondary": "Смотреть сценарии"
+    },
+    "features": {
+      "title": "Как это работает?",
+      "create": { "title": "Создавайте сценарии", "description": "Публикуйте предсказания" },
+      "compete": { "title": "Соревнуйтесь за них", "description": "Другие могут украсть ваши сценарии" },
+      "win": { "title": "Получайте награды", "description": "Держатель получает весь пул" }
+    },
+    "trending": { "title": "Популярные сценарии", "viewAll": "Смотреть все" },
+    "categories": {
+      "title": "Исследуйте по категориям",
+      "technology": "Технологии",
+      "sports": "Спорт",
+      "economy": "Экономика",
+      "politics": "Политика",
+      "entertainment": "Развлечения",
+      "science": "Наука"
+    },
+    "cta": { "title": "Готовы предсказать будущее?", "button": "Создать бесплатный аккаунт" }
+  },
+  "scenarios": {
+    "title": "Сценарии",
+    "subtitle": "Исследуйте все предсказания",
+    "create": "Создать сценарий",
+    "filters": { "all": "Все", "active": "Активные", "completed": "Завершённые", "failed": "Неудачные", "mine": "Мои сценарии" },
+    "sort": { "latest": "Новейшие", "popular": "Популярные", "ending": "Скоро заканчиваются", "price": "Высшая цена" },
+    "card": { "holder": "Держатель", "currentPrice": "Текущая цена", "steal": "Украсть", "daysLeft": "{{days}} дней" }
+  },
+  "rankings": {
+    "title": "Рейтинги",
+    "subtitle": "Лучшие пророки",
+    "tabs": { "global": "Глобальный", "monthly": "Месячный", "weekly": "Недельный" },
+    "metrics": { "winRate": "Процент побед", "predictions": "Предсказания", "earnings": "Заработок" }
+  },
+  "shop": {
+    "title": "Магазин",
+    "subtitle": "Усильте свои предсказания",
+    "categories": { "all": "Все", "protection": "Защита", "power": "Сила", "boost": "Буст", "cosmetic": "Косметика", "special": "Особый" },
+    "item": { "buy": "Купить", "owned": "Уже есть", "soldOut": "Распродано" }
+  },
+  "profile": {
+    "title": "Профиль",
+    "editProfile": "Редактировать профиль",
+    "stats": { "scenarios": "Сценарии", "wins": "Победы", "winRate": "Процент побед", "earnings": "Заработок" },
+    "tabs": { "scenarios": "Сценарии", "activity": "Активность", "achievements": "Достижения", "inventory": "Инвентарь" },
+    "settings": { "title": "Настройки", "language": "Язык", "theme": "Тема", "darkMode": "Тёмный режим" }
+  },
+  "notifications": {
+    "title": "Уведомления",
+    "markAllRead": "Отметить все как прочитанные",
+    "empty": "Нет уведомлений"
+  },
+  "footer": {
+    "description": "Платформа предсказаний, где пророки соревнуются.",
+    "links": { "about": "О нас", "terms": "Условия", "privacy": "Конфиденциальность", "contact": "Контакты" },
+    "copyright": "© {{year}} Apocaliptics. Все права защищены."
+  },
+  "errors": {
+    "notFound": { "title": "Страница не найдена", "backHome": "Вернуться на главную" },
+    "serverError": { "title": "Ошибка сервера", "retry": "Повторить" }
+  },
+  "time": {
+    "now": "Сейчас",
+    "today": "Сегодня",
+    "daysAgo": "{{count}} дней назад",
+    "inDays": "через {{count}} дней"
+  }
+}
