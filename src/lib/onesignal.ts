@@ -8,7 +8,7 @@ export async function initOneSignal() {
   if (initialized) return;
   if (typeof window === 'undefined') return;
 
-  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || 'e8d7db97-26b0-4832-bc24-713132671228';
   
   if (!appId) {
     console.warn('OneSignal App ID not found');
