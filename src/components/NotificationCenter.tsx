@@ -24,7 +24,29 @@ import {
   Swords,
   Shield,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Flame,
+  BadgeCheck,
+  Crown,
+  FileText,
+  Clock,
+  Vote,
+  Package,
+  Sparkles,
+  Send,
+  Coins,
+  Ticket,
+  Medal,
+  BarChart3,
+  Zap,
+  MessageCircle,
+  Heart,
+  AtSign,
+  Reply,
+  Megaphone,
+  Wrench,
+  AlertTriangle,
+  CheckCircle
 } from 'lucide-react';
 
 // Función para formato de tiempo relativo
@@ -54,25 +76,55 @@ function formatTimeAgo(dateString: string): string {
   return `Hace ${diffInYears} ${diffInYears === 1 ? 'año' : 'años'}`;
 }
 
-// Configuración de iconos y colores por tipo
+// Configuración de iconos y colores por tipo (32 tipos)
 const notificationConfig: Record<NotificationType, { 
   icon: React.ElementType; 
   color: string; 
   bgColor: string;
 }> = {
+  // Usuario
+  welcome: { icon: Gift, color: 'text-green-400', bgColor: 'bg-green-500/20' },
+  new_follower: { icon: UserPlus, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
+  daily_login: { icon: Calendar, color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
+  login_streak: { icon: Flame, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
+  level_up: { icon: TrendingUp, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
+  account_verified: { icon: BadgeCheck, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
+  premium_activated: { icon: Crown, color: 'text-amber-400', bgColor: 'bg-amber-500/20' },
+  
+  // Escenarios
+  scenario_created: { icon: FileText, color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
+  scenario_stolen: { icon: Swords, color: 'text-red-400', bgColor: 'bg-red-500/20' },
+  scenario_recovered: { icon: Shield, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' },
   prediction_won: { icon: Trophy, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
   prediction_lost: { icon: Target, color: 'text-red-400', bgColor: 'bg-red-500/20' },
   scenario_resolved: { icon: Check, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
-  scenario_stolen: { icon: Swords, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
-  scenario_recovered: { icon: Shield, color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
-  new_follower: { icon: UserPlus, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
-  achievement_unlocked: { icon: Star, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
-  welcome: { icon: Gift, color: 'text-green-400', bgColor: 'bg-green-500/20' },
+  scenario_expiring: { icon: Clock, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
+  scenario_vote: { icon: Vote, color: 'text-violet-400', bgColor: 'bg-violet-500/20' },
+  
+  // Tienda
   purchase: { icon: ShoppingBag, color: 'text-pink-400', bgColor: 'bg-pink-500/20' },
-  bonus: { icon: Gift, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' },
-  daily_login: { icon: Calendar, color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
-  level_up: { icon: TrendingUp, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
-  system: { icon: AlertCircle, color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
+  item_used: { icon: Sparkles, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
+  gift_received: { icon: Gift, color: 'text-rose-400', bgColor: 'bg-rose-500/20' },
+  coins_received: { icon: Coins, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
+  promo_code: { icon: Ticket, color: 'text-lime-400', bgColor: 'bg-lime-500/20' },
+  
+  // Logros
+  achievement_unlocked: { icon: Star, color: 'text-amber-400', bgColor: 'bg-amber-500/20' },
+  medal_earned: { icon: Medal, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
+  ranking_position: { icon: BarChart3, color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
+  win_streak: { icon: Zap, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
+  
+  // Social
+  comment_received: { icon: MessageCircle, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
+  like_received: { icon: Heart, color: 'text-red-400', bgColor: 'bg-red-500/20' },
+  mention: { icon: AtSign, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
+  comment_reply: { icon: Reply, color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
+  
+  // Sistema
+  system_announcement: { icon: Megaphone, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
+  maintenance: { icon: Wrench, color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
+  account_warning: { icon: AlertTriangle, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
+  account_restored: { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' },
 };
 
 export function NotificationCenter() {
@@ -265,7 +317,7 @@ export function NotificationCenter() {
             ) : (
               <div className="divide-y divide-gray-800/50">
                 {notifications.map((notification) => {
-                  const config = notificationConfig[notification.type] || notificationConfig.system;
+                  const config = notificationConfig[notification.type] || notificationConfig.system_announcement;
                   const Icon = config.icon;
 
                   return (
