@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PWAProvider } from '@/components/pwa';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { SessionProvider } from '@/components/providers/SessionProvider';
 
 export const metadata: Metadata = {
   title: 'Apocaliptics - Predice el Futuro',
@@ -41,11 +42,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Apocaliptics" />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
-        <LanguageProvider>
-          <PWAProvider>
-            {children}
-          </PWAProvider>
-        </LanguageProvider>
+        <SessionProvider>
+          <LanguageProvider>
+            <PWAProvider>
+              {children}
+            </PWAProvider>
+          </LanguageProvider>
+        </SessionProvider>
       </body>
     </html>
   );
