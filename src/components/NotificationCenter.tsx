@@ -20,7 +20,11 @@ import {
   CheckCheck,
   Trash2,
   X,
-  Loader2
+  Loader2,
+  Swords,
+  Shield,
+  Calendar,
+  TrendingUp
 } from 'lucide-react';
 
 // Función para formato de tiempo relativo
@@ -59,11 +63,15 @@ const notificationConfig: Record<NotificationType, {
   prediction_won: { icon: Trophy, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
   prediction_lost: { icon: Target, color: 'text-red-400', bgColor: 'bg-red-500/20' },
   scenario_resolved: { icon: Check, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
+  scenario_stolen: { icon: Swords, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
+  scenario_recovered: { icon: Shield, color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
   new_follower: { icon: UserPlus, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
   achievement_unlocked: { icon: Star, color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
   welcome: { icon: Gift, color: 'text-green-400', bgColor: 'bg-green-500/20' },
   purchase: { icon: ShoppingBag, color: 'text-pink-400', bgColor: 'bg-pink-500/20' },
   bonus: { icon: Gift, color: 'text-emerald-400', bgColor: 'bg-emerald-500/20' },
+  daily_login: { icon: Calendar, color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
+  level_up: { icon: TrendingUp, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
   system: { icon: AlertCircle, color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
 };
 

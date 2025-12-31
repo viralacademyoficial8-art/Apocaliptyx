@@ -5,12 +5,14 @@
 import { signIn, signOut } from "@/lib/auth";
 import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
+import { createServerSupabaseClient } from "@/lib/supabase-server";
 
 // Tipo para respuestas
 type ActionResponse = {
   success: boolean;
   message: string;
   error?: string;
+  userId?: string;
 };
 
 // Login con credenciales
@@ -108,6 +110,12 @@ export async function registerUser(data: {
       password: hashedPassword,
     });
 
+    // Generar un ID temporal para el usuario (en producción vendrá de la DB)
+    const newUserId = `user_${Date.now()}`;
+
+    // 🔔 Crear notificación de bienvenida
+    await createWelcomeNotification(newUserId, data.username);
+
     // Auto-login después del registro
     await signIn("credentials", {
       email: data.email,
@@ -115,7 +123,7 @@ export async function registerUser(data: {
       redirectTo: "/dashboard",
     });
 
-    return { success: true, message: "Registro exitoso" };
+    return { success: true, message: "Registro exitoso", userId: newUserId };
   } catch (error) {
     if (error instanceof AuthError) {
       return {
@@ -140,4 +148,57 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
   // TODO: Implementar con DB
   const mockUsernames = ["admin", "testuser"];
   return mockUsernames.includes(username.toLowerCase());
+}
+
+// ============================================
+// FUNCIONES DE NOTIFICACIÓN (Server-side)
+// ============================================
+
+// Crear notificación de bienvenida
+async function createWelcomeNotification(userId: string, username: string) {
+  try {
+    const supabase = createServerSupabaseClient();
+    
+    await supabase.from("notifications").insert({
+      user_id: userId,
+      type: "welcome",
+      title: "¡Bienvenido a Apocaliptics! 🎉",
+      message: `Hola @${username}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
+      link_url: "/dashboard",
+      is_read: false,
+    } as never);
+    
+    console.log("Notificación de bienvenida creada para:", username);
+  } catch (error) {
+    console.error("Error creando notificación de bienvenida:", error);
+  }
+}
+
+// Crear notificación genérica (para usar en otras partes del servidor)
+export async function createNotification(data: {
+  userId: string;
+  type: string;
+  title: string;
+  message: string;
+  linkUrl?: string;
+  imageUrl?: string;
+}) {
+  try {
+    const supabase = createServerSupabaseClient();
+    
+    await supabase.from("notifications").insert({
+      user_id: data.userId,
+      type: data.type,
+      title: data.title,
+      message: data.message,
+      link_url: data.linkUrl || null,
+      image_url: data.imageUrl || null,
+      is_read: false,
+    } as never);
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error creando notificación:", error);
+    return { success: false, error };
+  }
 }
