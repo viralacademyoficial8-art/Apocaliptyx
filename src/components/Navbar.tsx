@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import { NotificationBell } from "@/components/NotificationBell";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -89,9 +88,6 @@ export function Navbar() {
               {/* Selector de idioma (siempre visible) */}
               <LanguageSelector variant="default" />
 
-              {/* 🔔 Push Notification Bell */}
-              <NotificationBell />
-
               {isAuthenticated && user ? (
                 <>
                   {/* AP Coins (solo sm+) */}
@@ -102,7 +98,7 @@ export function Navbar() {
                     </span>
                   </div>
 
-                  {/* 🔔 Centro de Notificaciones In-App */}
+                  {/* 🔔 Centro de Notificaciones (única campanita) */}
                   <NotificationCenter />
 
                   {/* Dropdown usuario (desktop) */}
