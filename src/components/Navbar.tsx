@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores";
-import { NotificationPanel } from "@/components/NotificationPanel";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { NotificationBell } from "@/components/NotificationBell";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -89,7 +89,7 @@ export function Navbar() {
               {/* Selector de idioma (siempre visible) */}
               <LanguageSelector variant="default" />
 
-              {/* 🔔 Notification Bell - Push Notifications */}
+              {/* 🔔 Push Notification Bell */}
               <NotificationBell />
 
               {isAuthenticated && user ? (
@@ -102,8 +102,8 @@ export function Navbar() {
                     </span>
                   </div>
 
-                  {/* Notificaciones in-app */}
-                  <NotificationPanel />
+                  {/* 🔔 Centro de Notificaciones In-App */}
+                  <NotificationCenter />
 
                   {/* Dropdown usuario (desktop) */}
                   <div className="hidden md:block">
