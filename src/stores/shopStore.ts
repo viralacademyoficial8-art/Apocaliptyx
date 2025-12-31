@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { notificationsService } from '@/services/notifications.service';
 
 // ============================================
 // TYPES
@@ -344,6 +345,10 @@ interface ShopStore {
   isLoading: boolean;
   error: string | null;
 
+  // ID del usuario actual (para notificaciones)
+  currentUserId: string | null;
+  setCurrentUserId: (id: string | null) => void;
+
   filters: {
     search: string;
     category: string;
@@ -395,6 +400,7 @@ export const useShopStore = create<ShopStore>()(
       purchaseHistory: [],
       isLoading: false,
       error: null,
+      currentUserId: null,
 
       filters: {
         search: '',
@@ -407,6 +413,8 @@ export const useShopStore = create<ShopStore>()(
       isCartOpen: false,
       isPurchaseModalOpen: false,
       selectedItem: null,
+
+      setCurrentUserId: (id) => set({ currentUserId: id }),
 
       setItems: (items) => set({ items }),
 
@@ -510,7 +518,7 @@ export const useShopStore = create<ShopStore>()(
       getCartItemCount: () => get().cart.reduce((count, ci) => count + ci.quantity, 0),
 
       purchaseCart: async () => {
-        const { cart, clearCart } = get();
+        const { cart, clearCart, currentUserId } = get();
         set({ isLoading: true, error: null });
 
         try {
@@ -530,6 +538,22 @@ export const useShopStore = create<ShopStore>()(
             isLoading: false,
           }));
 
+          // 🔔 Crear notificaciones para cada item comprado
+          if (currentUserId) {
+            for (const ci of cart) {
+              const totalPrice = ci.item.price * ci.quantity;
+              const itemText = ci.quantity > 1 
+                ? `${ci.quantity}x ${ci.item.name}` 
+                : ci.item.name;
+              
+              await notificationsService.notifyPurchase(
+                currentUserId,
+                itemText,
+                totalPrice
+              );
+            }
+          }
+
           clearCart();
           return true;
         } catch {
@@ -539,6 +563,7 @@ export const useShopStore = create<ShopStore>()(
       },
 
       purchaseItem: async (item, quantity) => {
+        const { currentUserId } = get();
         set({ isLoading: true, error: null });
 
         try {
@@ -558,6 +583,20 @@ export const useShopStore = create<ShopStore>()(
             isLoading: false,
             isPurchaseModalOpen: false,
           }));
+
+          // 🔔 Crear notificación de compra
+          if (currentUserId) {
+            const totalPrice = item.price * quantity;
+            const itemText = quantity > 1 
+              ? `${quantity}x ${item.name}` 
+              : item.name;
+            
+            await notificationsService.notifyPurchase(
+              currentUserId,
+              itemText,
+              totalPrice
+            );
+          }
 
           return true;
         } catch {

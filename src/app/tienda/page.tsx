@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useShopStore } from "@/stores/shopStore";
+import { useAuthStore } from "@/lib/stores";
 import {
   ShopHero,
   CategoryTabs,
@@ -13,8 +15,16 @@ import {
 } from "@/components/tienda";
 
 export default function TiendaPage() {
-  const { setCartOpen, getCartItemCount } = useShopStore();
+  const { setCartOpen, getCartItemCount, setCurrentUserId } = useShopStore();
+  const { user } = useAuthStore();
   const cartItemCount = getCartItemCount();
+
+  // Pasar el userId al store para las notificaciones
+  useEffect(() => {
+    if (user?.id) {
+      setCurrentUserId(user.id);
+    }
+  }, [user?.id, setCurrentUserId]);
 
   return (
     <div className="min-h-screen bg-gray-950">
