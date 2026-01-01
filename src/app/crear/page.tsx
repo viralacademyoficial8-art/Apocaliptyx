@@ -1,10 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
-import { useAuthStore, useScenarioStore } from "@/lib/stores";
+import { useAuthStore } from "@/lib/stores";
+import { scenariosService } from "@/services/scenarios.service";
+import { notificationsService } from "@/services/notifications.service";
 import type { ScenarioCategory } from "@/types";
 import { toast } from "@/components/ui/toast";
+import { Loader2 } from "lucide-react";
 
 const CATEGORIES: { value: ScenarioCategory; label: string }[] = [
   { value: "tecnologia", label: "💻 Tecnología" },
@@ -18,15 +22,16 @@ const CATEGORIES: { value: ScenarioCategory; label: string }[] = [
 ];
 
 export default function CrearPage() {
+  const router = useRouter();
   const { user } = useAuthStore();
-  const { createScenario } = useScenarioStore();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<ScenarioCategory>("otros");
   const [dueDate, setDueDate] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user) {
@@ -39,19 +44,48 @@ export default function CrearPage() {
       return;
     }
 
-    // ✅ FIX: createScenario espera 1 argumento (el payload)
-    createScenario({
-  title,
-  description,
-  category,
-  dueDate: new Date(dueDate).toISOString(), // ✅ string
-});
+    setIsLoading(true);
 
-    toast.success("Escenario creado. Ahora otros profetas podrán robártelo.");
-    setTitle("");
-    setDescription("");
-    setCategory("otros");
-    setDueDate("");
+    try {
+      // Crear escenario en Supabase
+      const newScenario = await scenariosService.create({
+        title,
+        description,
+        category,
+        resolutionDate: new Date(dueDate).toISOString(),
+        creatorId: user.id,
+      });
+
+      if (!newScenario) {
+        toast.error("Error al crear el escenario. Intenta de nuevo.");
+        setIsLoading(false);
+        return;
+      }
+
+      // Crear notificación de escenario creado
+      await notificationsService.notifyScenarioCreated(
+        user.id,
+        title,
+        newScenario.id
+      );
+
+      toast.success("¡Escenario creado exitosamente! 🎉");
+      
+      // Limpiar formulario
+      setTitle("");
+      setDescription("");
+      setCategory("otros");
+      setDueDate("");
+
+      // Redirigir al escenario creado
+      router.push(`/escenario/${newScenario.id}`);
+
+    } catch (error) {
+      console.error("Error creating scenario:", error);
+      toast.error("Error al crear el escenario. Intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,7 +110,8 @@ export default function CrearPage() {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 placeholder:text-zinc-500 focus:border-amber-500"
+              disabled={isLoading}
+              className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 placeholder:text-zinc-500 focus:border-amber-500 disabled:opacity-50"
               placeholder="Ej. ¿Habrá una nueva pandemia global antes de 2030?"
             />
           </div>
@@ -87,7 +122,8 @@ export default function CrearPage() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[120px] w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 placeholder:text-zinc-500 focus:border-amber-500"
+              disabled={isLoading}
+              className="min-h-[120px] w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 placeholder:text-zinc-500 focus:border-amber-500 disabled:opacity-50"
               placeholder="Explica con detalle las condiciones del escenario y qué tendría que pasar exactamente para considerarlo cumplido."
             />
           </div>
@@ -99,7 +135,8 @@ export default function CrearPage() {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ScenarioCategory)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500"
+                disabled={isLoading}
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -117,7 +154,9 @@ export default function CrearPage() {
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500"
+                disabled={isLoading}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
               />
               <p className="mt-1 text-[10px] text-zinc-500">
                 Después de esta fecha, la comunidad juzgará si tu profecía se
@@ -130,21 +169,28 @@ export default function CrearPage() {
           <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent px-3 py-3 text-xs text-amber-100">
             <p className="font-medium">
               Coste de creación:{" "}
-              <span className="font-semibold">200 AP Coins</span>
+              <span className="font-semibold">Gratis (por ahora)</span>
             </p>
             <p className="mt-1 text-[11px] text-amber-100/80">
-              Si tu escenario se hace realidad, recuperarás tu apuesta y ganarás
-              AP Coins extra del pozo. Si no, tu reputación como profeta se verá
-              afectada.
+              Si tu escenario se hace realidad, ganarás AP Coins del pozo de
+              predicciones. ¡Sé un verdadero profeta!
             </p>
           </div>
 
           {/* Botón enviar */}
           <button
             type="submit"
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-6 py-2 text-sm font-semibold text-black shadow-lg shadow-amber-500/30 transition hover:brightness-110"
+            disabled={isLoading || !title || !description || !dueDate}
+            className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-6 py-2 text-sm font-semibold text-black shadow-lg shadow-amber-500/30 transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Lanzar escenario
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Creando escenario...
+              </>
+            ) : (
+              "Lanzar escenario"
+            )}
           </button>
         </form>
       </section>

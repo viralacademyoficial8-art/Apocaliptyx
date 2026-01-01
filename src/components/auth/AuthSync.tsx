@@ -57,10 +57,13 @@ export function AuthSync() {
         syncUser(sessionUser);
       }
     } else if (status === "unauthenticated" && user) {
-      console.log("[AuthSync] Logging out");
-      logout();
+      // Solo hacer logout si NO estamos en la página de registro o login
+      if (!pathname.includes('/registro') && !pathname.includes('/login')) {
+        console.log("[AuthSync] Logging out");
+        logout();
+      }
     }
-  }, [session, status, user, syncUser, logout]);
+  }, [session, status, user, syncUser, logout, pathname]);
 
   // Sincronización adicional: verificar cada segundo por 5 segundos después de montar
   useEffect(() => {

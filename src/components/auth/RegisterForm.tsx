@@ -24,7 +24,6 @@ export function RegisterForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  // Validaciones en tiempo real
   const [validation, setValidation] = useState({
     emailExists: false,
     usernameExists: false,
@@ -37,7 +36,6 @@ export function RegisterForm() {
     setErrorMessage("");
   };
 
-  // Verificar email con debounce
   const handleEmailBlur = async () => {
     if (!formData.email) return;
     setValidation((prev) => ({ ...prev, checkingEmail: true }));
@@ -45,7 +43,6 @@ export function RegisterForm() {
     setValidation((prev) => ({ ...prev, emailExists: exists, checkingEmail: false }));
   };
 
-  // Verificar username con debounce
   const handleUsernameBlur = async () => {
     if (!formData.username || formData.username.length < 3) return;
     setValidation((prev) => ({ ...prev, checkingUsername: true }));
@@ -69,70 +66,13 @@ export function RegisterForm() {
     !validation.emailExists &&
     !validation.usernameExists;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!isFormValid) return;
-
-    setIsLoading(true);
-    setErrorMessage("");
-
-    try {
-      // 1. Registrar usuario via API
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          username: formData.username,
-          name: formData.name,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!result.success) {
-        setErrorMessage(result.message || "Error al registrar");
-        setIsLoading(false);
-        return;
-      }
-
-      // 2. Auto-login después del registro
-      const loginResult = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-
-      if (loginResult?.error) {
-        setErrorMessage("Cuenta creada, pero error al iniciar sesión. Por favor inicia sesión manualmente.");
-        setIsLoading(false);
-        return;
-      }
-
-      // 3. Redirigir al dashboard
-      router.push("/dashboard");
-      router.refresh();
-
-    } catch (error) {
-      console.error("Register error:", error);
-      setErrorMessage("Error al crear la cuenta");
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="w-full max-w-md mx-auto">
-      {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
-        <p className="text-gray-400">
-          Únete a la comunidad de profetas
-        </p>
+        <p className="text-gray-400">Únete a la comunidad de profetas</p>
       </div>
 
-      {/* Bonus Badge */}
       <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg text-center">
         <p className="text-yellow-400 font-bold">🎁 ¡Bono de Bienvenida!</p>
         <p className="text-yellow-300/80 text-sm">
@@ -140,7 +80,6 @@ export function RegisterForm() {
         </p>
       </div>
 
-      {/* Error Message */}
       {errorMessage && (
         <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg flex items-center gap-3 text-red-400">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -148,24 +87,18 @@ export function RegisterForm() {
         </div>
       )}
 
-      {/* Social Buttons */}
       <SocialButtons disabled={isLoading} />
 
-      {/* Divider */}
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-700"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-gray-900 text-gray-400">
-            o regístrate con email
-          </span>
+          <span className="px-4 bg-gray-900 text-gray-400">o regístrate con email</span>
         </div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
+      <div className="space-y-4">
         <div>
           <label className="block text-sm text-gray-400 mb-1">Nombre completo</label>
           <div className="relative">
@@ -175,14 +108,12 @@ export function RegisterForm() {
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
               placeholder="Tu nombre"
-              required
               disabled={isLoading}
               className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
             />
           </div>
         </div>
 
-        {/* Username */}
         <div>
           <label className="block text-sm text-gray-400 mb-1">Nombre de usuario</label>
           <div className="relative">
@@ -193,7 +124,6 @@ export function RegisterForm() {
               onChange={(e) => handleChange("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
               onBlur={handleUsernameBlur}
               placeholder="tu_usuario"
-              required
               minLength={3}
               disabled={isLoading}
               className={`w-full pl-8 pr-10 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
@@ -216,7 +146,6 @@ export function RegisterForm() {
           )}
         </div>
 
-        {/* Email */}
         <div>
           <label className="block text-sm text-gray-400 mb-1">Email</label>
           <div className="relative">
@@ -227,7 +156,6 @@ export function RegisterForm() {
               onChange={(e) => handleChange("email", e.target.value)}
               onBlur={handleEmailBlur}
               placeholder="tu@email.com"
-              required
               disabled={isLoading}
               className={`w-full pl-10 pr-10 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
                 validation.emailExists ? "border-red-500" : "border-gray-700"
@@ -242,7 +170,6 @@ export function RegisterForm() {
           )}
         </div>
 
-        {/* Password */}
         <div>
           <label className="block text-sm text-gray-400 mb-1">Contraseña</label>
           <div className="relative">
@@ -252,7 +179,6 @@ export function RegisterForm() {
               value={formData.password}
               onChange={(e) => handleChange("password", e.target.value)}
               placeholder="••••••••"
-              required
               minLength={6}
               disabled={isLoading}
               className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
@@ -265,7 +191,6 @@ export function RegisterForm() {
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
-          {/* Password Requirements */}
           <div className="mt-2 space-y-1">
             <p className={`text-xs flex items-center gap-1 ${passwordValidation.minLength ? "text-green-400" : "text-gray-500"}`}>
               {passwordValidation.minLength ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
@@ -274,7 +199,6 @@ export function RegisterForm() {
           </div>
         </div>
 
-        {/* Confirm Password */}
         <div>
           <label className="block text-sm text-gray-400 mb-1">Confirmar contraseña</label>
           <div className="relative">
@@ -284,7 +208,6 @@ export function RegisterForm() {
               value={formData.confirmPassword}
               onChange={(e) => handleChange("confirmPassword", e.target.value)}
               placeholder="••••••••"
-              required
               disabled={isLoading}
               className={`w-full pl-10 pr-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
                 formData.confirmPassword && !passwordValidation.matches ? "border-red-500" : "border-gray-700"
@@ -296,7 +219,6 @@ export function RegisterForm() {
           )}
         </div>
 
-        {/* Terms */}
         <div className="flex items-start gap-3">
           <input
             type="checkbox"
@@ -307,20 +229,98 @@ export function RegisterForm() {
           />
           <label htmlFor="terms" className="text-sm text-gray-400">
             Acepto los{" "}
-            <Link href="/terminos" className="text-red-400 hover:text-red-300">
+            <a href="/terminos" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300">
               Términos de Servicio
-            </Link>{" "}
+            </a>{" "}
             y la{" "}
-            <Link href="/privacidad" className="text-red-400 hover:text-red-300">
+            <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300">
               Política de Privacidad
-            </Link>
+            </a>
           </label>
         </div>
 
-        {/* Submit */}
         <button
-          type="submit"
+          type="button"
+          id="register-button"
           disabled={!isFormValid || isLoading}
+          onClick={async () => {
+            console.log("=== BUTTON CLICKED ===");
+            
+            if (!isFormValid) {
+              console.log("Form not valid");
+              return;
+            }
+
+            if (isLoading) {
+              console.log("Already loading");
+              return;
+            }
+
+            // No podemos usar setIsLoading aquí directamente, así que usamos un approach diferente
+            const button = document.getElementById('register-button') as HTMLButtonElement;
+            if (button) {
+              button.disabled = true;
+              button.innerHTML = '<span class="animate-spin">⏳</span> Creando cuenta...';
+            }
+
+            try {
+              console.log("Calling /api/auth/register...");
+              
+              const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: formData.email,
+                  password: formData.password,
+                  username: formData.username,
+                  name: formData.name,
+                }),
+              });
+
+              console.log("Response status:", response.status);
+              
+              const result = await response.json();
+              console.log("Response result:", result);
+
+              if (!result.success) {
+                alert(result.message || "Error al registrar");
+                if (button) {
+                  button.disabled = false;
+                  button.innerHTML = 'Crear Cuenta Gratis';
+                }
+                return;
+              }
+
+              console.log("Registration successful, attempting auto-login...");
+
+              const loginResult = await signIn("credentials", {
+                email: formData.email,
+                password: formData.password,
+                redirect: false,
+              });
+
+              console.log("Login result:", loginResult);
+
+              if (loginResult?.error) {
+                console.log("Auto-login failed, redirecting to login...");
+                alert("Cuenta creada! Por favor inicia sesión.");
+                router.push("/login");
+                return;
+              }
+
+              console.log("Login successful, redirecting to dashboard...");
+              router.push("/dashboard");
+              router.refresh();
+
+            } catch (error) {
+              console.error("Register error:", error);
+              alert("Error al crear la cuenta");
+              if (button) {
+                button.disabled = false;
+                button.innerHTML = 'Crear Cuenta Gratis';
+              }
+            }
+          }}
           className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isLoading ? (
@@ -332,9 +332,8 @@ export function RegisterForm() {
             "Crear Cuenta Gratis"
           )}
         </button>
-      </form>
+      </div>
 
-      {/* Login Link */}
       <p className="mt-6 text-center text-gray-400">
         ¿Ya tienes cuenta?{" "}
         <Link href="/login" className="text-red-400 hover:text-red-300 font-medium">
