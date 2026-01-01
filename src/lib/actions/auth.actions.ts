@@ -65,7 +65,7 @@ export async function logout() {
   await signOut({ redirectTo: "/" });
 }
 
-// Registro de usuario
+// Registro de usuario REAL en Supabase
 export async function registerUser(data: {
   email: string;
   password: string;
@@ -73,8 +73,10 @@ export async function registerUser(data: {
   name: string;
 }): Promise<ActionResponse> {
   try {
+    const supabase = createServerSupabaseClient();
+
     // Validaciones
-    if (!data.email || !data.password || !data.username) {
+    if (!data.email || !data.password || !data.username || !data.name) {
       return {
         success: false,
         message: "Todos los campos son requeridos",
@@ -98,23 +100,94 @@ export async function registerUser(data: {
       };
     }
 
-    // TODO: Verificar si el email o username ya existen en la DB
+    // Verificar si el email ya existe
+    const { data: existingEmail } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", data.email.toLowerCase())
+      .single();
+
+    if (existingEmail) {
+      return {
+        success: false,
+        message: "Este email ya está registrado",
+        error: "email_exists",
+      };
+    }
+
+    // Verificar si el username ya existe
+    const { data: existingUsername } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", data.username.toLowerCase())
+      .single();
+
+    if (existingUsername) {
+      return {
+        success: false,
+        message: "Este nombre de usuario ya está en uso",
+        error: "username_exists",
+      };
+    }
 
     // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    // TODO: Crear usuario en la DB
-    // Por ahora solo simulamos el registro
-    console.log("Usuario registrado:", {
-      ...data,
-      password: hashedPassword,
-    });
+    // Crear usuario en Supabase
+    const { data: newUser, error: userError } = await supabase
+      .from("users")
+      .insert({
+        email: data.email.toLowerCase(),
+        username: data.username.toLowerCase(),
+        display_name: data.name,
+        avatar_url: null,
+        bio: null,
+        role: "USER",
+        ap_coins: 1000, // Bonus de bienvenida
+        level: 1,
+        xp: 0,
+        is_verified: false,
+        is_premium: false,
+        is_banned: false,
+        total_predictions: 0,
+        correct_predictions: 0,
+        total_earnings: 0,
+      } as never)
+      .select()
+      .single();
 
-    // Generar un ID temporal para el usuario (en producción vendrá de la DB)
-    const newUserId = `user_${Date.now()}`;
+    if (userError || !newUser) {
+      console.error("Error creating user:", userError);
+      return {
+        success: false,
+        message: "Error al crear el usuario",
+        error: "db_error",
+      };
+    }
+
+    // Guardar contraseña hasheada en user_auth
+    const { error: authError } = await supabase
+      .from("user_auth")
+      .insert({
+        user_id: newUser.id,
+        password_hash: hashedPassword,
+      } as never);
+
+    if (authError) {
+      console.error("Error saving password:", authError);
+      // Eliminar el usuario si no se pudo guardar la contraseña
+      await supabase.from("users").delete().eq("id", newUser.id);
+      return {
+        success: false,
+        message: "Error al guardar las credenciales",
+        error: "auth_error",
+      };
+    }
 
     // 🔔 Crear notificación de bienvenida
-    await createWelcomeNotification(newUserId, data.username);
+    await createWelcomeNotification(newUser.id, data.username);
+
+    console.log("Usuario registrado exitosamente:", newUser.email);
 
     // Auto-login después del registro
     await signIn("credentials", {
@@ -123,31 +196,56 @@ export async function registerUser(data: {
       redirectTo: "/dashboard",
     });
 
-    return { success: true, message: "Registro exitoso", userId: newUserId };
+    return { 
+      success: true, 
+      message: "Registro exitoso", 
+      userId: newUser.id 
+    };
   } catch (error) {
+    console.error("Register error:", error);
     if (error instanceof AuthError) {
       return {
         success: false,
-        message: "Error al registrar usuario",
+        message: "Error al iniciar sesión automáticamente",
         error: "auth_error",
       };
     }
-    throw error;
+    throw error; // Re-throw para redirect después del auto-login
   }
 }
 
 // Verificar si un email ya existe
 export async function checkEmailExists(email: string): Promise<boolean> {
-  // TODO: Implementar con DB
-  const mockEmails = ["admin@apocaliptics.com", "user@test.com"];
-  return mockEmails.includes(email);
+  try {
+    const supabase = createServerSupabaseClient();
+    
+    const { data } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email.toLowerCase())
+      .single();
+
+    return !!data;
+  } catch {
+    return false;
+  }
 }
 
 // Verificar si un username ya existe
 export async function checkUsernameExists(username: string): Promise<boolean> {
-  // TODO: Implementar con DB
-  const mockUsernames = ["admin", "testuser"];
-  return mockUsernames.includes(username.toLowerCase());
+  try {
+    const supabase = createServerSupabaseClient();
+    
+    const { data } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", username.toLowerCase())
+      .single();
+
+    return !!data;
+  } catch {
+    return false;
+  }
 }
 
 // ============================================

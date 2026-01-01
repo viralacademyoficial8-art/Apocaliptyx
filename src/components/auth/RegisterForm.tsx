@@ -3,12 +3,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { registerUser, checkEmailExists, checkUsernameExists } from "@/lib/actions/auth.actions";
+import { signIn } from "next-auth/react";
+import { checkEmailExists, checkUsernameExists } from "@/lib/actions/auth.actions";
 import { SocialButtons } from "./SocialButtons";
 import { Mail, Lock, Eye, EyeOff, User, Loader2, AlertCircle, Check, X } from "lucide-react";
 
 export function RegisterForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -75,19 +78,46 @@ export function RegisterForm() {
     setErrorMessage("");
 
     try {
-      const result = await registerUser({
-        email: formData.email,
-        password: formData.password,
-        username: formData.username,
-        name: formData.name,
+      // 1. Registrar usuario via API
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          username: formData.username,
+          name: formData.name,
+        }),
       });
 
+      const result = await response.json();
+
       if (!result.success) {
-        setErrorMessage(result.message);
+        setErrorMessage(result.message || "Error al registrar");
         setIsLoading(false);
+        return;
       }
+
+      // 2. Auto-login después del registro
+      const loginResult = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (loginResult?.error) {
+        setErrorMessage("Cuenta creada, pero error al iniciar sesión. Por favor inicia sesión manualmente.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. Redirigir al dashboard
+      router.push("/dashboard");
+      router.refresh();
+
     } catch (error) {
-      // Redirect esperado
+      console.error("Register error:", error);
+      setErrorMessage("Error al crear la cuenta");
       setIsLoading(false);
     }
   };
