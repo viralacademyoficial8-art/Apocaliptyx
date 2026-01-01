@@ -2,6 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 
+// Cliente sin tipos estrictos
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -42,9 +43,6 @@ export interface PurchaseResult {
 }
 
 class ShopService {
-  /**
-   * Obtener todos los items activos de la tienda
-   */
   async getItems(): Promise<ShopItemFromDB[]> {
     try {
       const { data, error } = await supabase
@@ -58,16 +56,13 @@ class ShopService {
         return [];
       }
 
-      return data as ShopItemFromDB[];
+      return data || [];
     } catch (error) {
       console.error("Error in getItems:", error);
       return [];
     }
   }
 
-  /**
-   * Obtener un item por ID
-   */
   async getItemById(itemId: string): Promise<ShopItemFromDB | null> {
     try {
       const { data, error } = await supabase
@@ -81,16 +76,13 @@ class ShopService {
         return null;
       }
 
-      return data as ShopItemFromDB;
+      return data;
     } catch (error) {
       console.error("Error in getItemById:", error);
       return null;
     }
   }
 
-  /**
-   * Comprar un item - descuenta AP Coins y añade al inventario
-   */
   async purchaseItem(
     userId: string,
     itemId: string,
@@ -113,11 +105,11 @@ class ShopService {
         return { success: false, error: "Stock insuficiente" };
       }
 
-      // 3. Calcular precio total (usar discount_price si existe)
+      // 3. Calcular precio total
       const unitPrice = item.discount_price || item.price;
       const totalPrice = unitPrice * quantity;
 
-      // 4. Obtener usuario y verificar balance
+      // 4. Obtener usuario
       const { data: user, error: userError } = await supabase
         .from("users")
         .select("ap_coins")
@@ -134,14 +126,14 @@ class ShopService {
 
       // 5. Verificar límite por usuario
       if (item.max_per_user !== null) {
-        const { data: existingInventory } = await supabase
+        const { data: existing } = await supabase
           .from("user_inventory")
           .select("quantity")
           .eq("user_id", userId)
           .eq("item_id", itemId)
-          .single();
+          .maybeSingle();
 
-        const currentQuantity = existingInventory?.quantity || 0;
+        const currentQuantity = existing?.quantity || 0;
         if (currentQuantity + quantity > item.max_per_user) {
           return {
             success: false,
@@ -150,7 +142,7 @@ class ShopService {
         }
       }
 
-      // 6. Descontar AP Coins del usuario
+      // 6. Descontar AP Coins
       const newBalance = user.ap_coins - totalPrice;
       const { error: updateError } = await supabase
         .from("users")
@@ -162,7 +154,7 @@ class ShopService {
         return { success: false, error: "Error al procesar el pago" };
       }
 
-      // 7. Registrar la compra
+      // 7. Registrar compra
       const { error: purchaseError } = await supabase
         .from("user_purchases")
         .insert({
@@ -174,7 +166,6 @@ class ShopService {
 
       if (purchaseError) {
         console.error("Error recording purchase:", purchaseError);
-        // Revertir el balance si falla
         await supabase
           .from("users")
           .update({ ap_coins: user.ap_coins })
@@ -182,22 +173,20 @@ class ShopService {
         return { success: false, error: "Error al registrar la compra" };
       }
 
-      // 8. Añadir al inventario (o actualizar cantidad)
+      // 8. Añadir al inventario
       const { data: existingItem } = await supabase
         .from("user_inventory")
         .select("id, quantity")
         .eq("user_id", userId)
         .eq("item_id", itemId)
-        .single();
+        .maybeSingle();
 
       if (existingItem) {
-        // Actualizar cantidad
         await supabase
           .from("user_inventory")
           .update({ quantity: existingItem.quantity + quantity })
           .eq("id", existingItem.id);
       } else {
-        // Insertar nuevo
         await supabase.from("user_inventory").insert({
           user_id: userId,
           item_id: itemId,
@@ -205,7 +194,7 @@ class ShopService {
         });
       }
 
-      // 9. Actualizar stock del item (si no es ilimitado)
+      // 9. Actualizar stock
       if (item.stock !== null) {
         await supabase
           .from("shop_items")
@@ -220,17 +209,11 @@ class ShopService {
     }
   }
 
-  /**
-   * Obtener inventario del usuario
-   */
   async getUserInventory(userId: string): Promise<UserInventoryItem[]> {
     try {
       const { data, error } = await supabase
         .from("user_inventory")
-        .select(`
-          *,
-          item:shop_items(*)
-        `)
+        .select("*, item:shop_items(*)")
         .eq("user_id", userId)
         .gt("quantity", 0)
         .order("acquired_at", { ascending: false });
@@ -240,24 +223,18 @@ class ShopService {
         return [];
       }
 
-      return data as UserInventoryItem[];
+      return data || [];
     } catch (error) {
       console.error("Error in getUserInventory:", error);
       return [];
     }
   }
 
-  /**
-   * Obtener historial de compras del usuario
-   */
   async getPurchaseHistory(userId: string): Promise<any[]> {
     try {
       const { data, error } = await supabase
         .from("user_purchases")
-        .select(`
-          *,
-          item:shop_items(name, type, rarity, icon)
-        `)
+        .select("*, item:shop_items(name, type, rarity, icon)")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -274,9 +251,6 @@ class ShopService {
     }
   }
 
-  /**
-   * Usar un item del inventario
-   */
   async useItem(userId: string, itemId: string): Promise<{ success: boolean; error?: string }> {
     try {
       const { data: inventoryItem, error } = await supabase
@@ -294,17 +268,14 @@ class ShopService {
         return { success: false, error: "No te quedan unidades de este item" };
       }
 
-      // Reducir cantidad
       const newQuantity = inventoryItem.quantity - 1;
       
       if (newQuantity === 0) {
-        // Eliminar del inventario
         await supabase
           .from("user_inventory")
           .delete()
           .eq("id", inventoryItem.id);
       } else {
-        // Actualizar cantidad
         await supabase
           .from("user_inventory")
           .update({ quantity: newQuantity })
@@ -318,9 +289,6 @@ class ShopService {
     }
   }
 
-  /**
-   * Equipar/desequipar un item cosmético
-   */
   async toggleEquip(
     userId: string,
     itemId: string
