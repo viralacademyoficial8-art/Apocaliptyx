@@ -18,37 +18,68 @@ import {
   Skull,
   Bell,
   Tag,
-  MessageSquare, // 👈 Foro
-  ShoppingBag,   // 👈 Ítems NUEVO
+  MessageSquare,
+  ShoppingBag,
+  Trophy,
+  Store,
+  LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePermissions } from '@/hooks/usePermissions';
+import { Permission } from '@/types/roles';
 
-const menuItems = [
+interface MenuItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: number;
+  permission?: Permission; // Permiso requerido para ver este item
+}
+
+interface MenuSection {
+  title: string;
+  items: MenuItem[];
+}
+
+// Menú completo con permisos requeridos
+const allMenuItems: MenuSection[] = [
   {
     title: 'Principal',
     items: [
-      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/admin/usuarios', label: 'Usuarios', icon: Users },
-      { href: '/admin/escenarios', label: 'Escenarios', icon: FileText },
-      { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, badge: 23 },
-      { href: '/admin/anuncios', label: 'Anuncios', icon: Bell },
-      { href: '/admin/promociones', label: 'Promociones', icon: Tag },
-      { href: '/admin/foro', label: 'Foro', icon: MessageSquare }, // Foro
-      { href: '/admin/items', label: 'Ítems', icon: ShoppingBag },  // 👈 NUEVO ENLACE
+      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
+      { href: '/admin/usuarios', label: 'Usuarios', icon: Users, permission: 'admin.users.view' },
+      { href: '/admin/escenarios', label: 'Escenarios', icon: FileText, permission: 'admin.scenarios.view' },
+      { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, badge: 23, permission: 'admin.reports.view' },
+      { href: '/admin/foro', label: 'Foro', icon: MessageSquare, permission: 'admin.scenarios.view' },
+    ],
+  },
+  {
+    title: 'Tienda',
+    items: [
+      { href: '/admin/tienda', label: 'Tienda', icon: Store, permission: 'admin.shop.view' },
+      { href: '/admin/items', label: 'Ítems', icon: ShoppingBag, permission: 'admin.shop.view' },
+      { href: '/admin/promociones', label: 'Promociones', icon: Tag, permission: 'admin.shop.edit' },
+      { href: '/admin/logros', label: 'Logros', icon: Trophy, permission: 'admin.shop.edit' },
+    ],
+  },
+  {
+    title: 'Comunicación',
+    items: [
+      { href: '/admin/anuncios', label: 'Anuncios', icon: Bell, permission: 'admin.notifications.send' },
     ],
   },
   {
     title: 'Finanzas',
     items: [
-      { href: '/admin/transacciones', label: 'Transacciones', icon: CreditCard },
-      { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+      { href: '/admin/transacciones', label: 'Transacciones', icon: CreditCard, permission: 'admin.analytics.view' },
+      { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, permission: 'admin.analytics.view' },
     ],
   },
   {
     title: 'Sistema',
     items: [
-      { href: '/admin/configuracion', label: 'Configuración', icon: Settings },
-      { href: '/admin/logs', label: 'Logs', icon: ScrollText },
+      { href: '/admin/configuracion', label: 'Configuración', icon: Settings, permission: 'admin.settings.view' },
+      { href: '/admin/logs', label: 'Logs', icon: ScrollText, permission: 'admin.logs.view' },
     ],
   },
 ];
@@ -56,6 +87,25 @@ const menuItems = [
 export function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { can, role, roleName, roleIcon, roleColor, isAdmin } = usePermissions();
+
+  // Filtrar menú según permisos del usuario
+  const filteredMenuItems = allMenuItems
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => {
+        // Si no requiere permiso, mostrar siempre
+        if (!item.permission) return true;
+        // Si requiere permiso, verificar
+        return can(item.permission);
+      }),
+    }))
+    .filter((section) => section.items.length > 0); // Eliminar secciones vacías
+
+  // Si no es admin, no mostrar nada
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <aside
@@ -64,6 +114,7 @@ export function AdminSidebar() {
         collapsed ? 'w-16' : 'w-64',
       )}
     >
+      {/* Header */}
       <div
         className={cn(
           'h-16 flex items-center border-b border-border px-4',
@@ -89,8 +140,25 @@ export function AdminSidebar() {
         </button>
       </div>
 
-      <nav className="p-3 space-y-6 overflow-y-auto h-[calc(100%-8rem)]">
-        {menuItems.map((section) => (
+      {/* Badge de rol */}
+      {!collapsed && (
+        <div className="px-4 py-3 border-b border-border">
+          <div className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-lg',
+            roleColor.bg
+          )}>
+            <span className="text-lg">{roleIcon}</span>
+            <div>
+              <p className={cn('text-sm font-medium', roleColor.text)}>{roleName}</p>
+              <p className="text-xs text-muted-foreground">Rol activo</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Navegación */}
+      <nav className="p-3 space-y-6 overflow-y-auto h-[calc(100%-12rem)]">
+        {filteredMenuItems.map((section) => (
           <div key={section.title}>
             {!collapsed && (
               <h3 className="text-xs font-semibold text-muted-foreground uppercase mb-2 px-3">
@@ -109,11 +177,12 @@ export function AdminSidebar() {
                         'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all',
                         isActive
                           ? 'bg-purple-600 text-white'
-                          : 'text-muted-foreground hover:bg-muted',
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                         collapsed && 'justify-center',
                       )}
+                      title={collapsed ? item.label : undefined}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-5 h-5 flex-shrink-0" />
                       {!collapsed && (
                         <>
                           <span className="flex-1">{item.label}</span>
@@ -133,6 +202,7 @@ export function AdminSidebar() {
         ))}
       </nav>
 
+      {/* Footer */}
       <div
         className={cn(
           'absolute bottom-0 left-0 right-0 p-3 border-t border-border',
@@ -142,9 +212,10 @@ export function AdminSidebar() {
         <Link
           href="/dashboard"
           className={cn(
-            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted',
+            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground',
             collapsed && 'justify-center',
           )}
+          title={collapsed ? 'Volver a Apocaliptics' : undefined}
         >
           <Skull className="w-5 h-5" />
           {!collapsed && <span>Volver a Apocaliptics</span>}

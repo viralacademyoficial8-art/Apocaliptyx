@@ -1,6 +1,6 @@
 // src/types/roles.ts
 
-export type UserRole = 'USER' | 'STAFF' | 'MODERATOR' | 'SUPER_ADMIN';
+export type UserRole = 'USER' | 'STAFF' | 'MODERATOR' | 'SUPER_ADMIN' | 'ADMIN';
 
 // Permisos disponibles en la plataforma
 export type Permission =
@@ -101,6 +101,37 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'scenarios.unlimited',
     'bypass.limits',
   ],
+
+  // ADMIN es alias de SUPER_ADMIN (mismos permisos)
+  ADMIN: [
+    'admin.access',
+    'admin.dashboard',
+    'admin.users.view',
+    'admin.users.edit',
+    'admin.users.ban',
+    'admin.users.delete',
+    'admin.users.change_role',
+    'admin.scenarios.view',
+    'admin.scenarios.edit',
+    'admin.scenarios.delete',
+    'admin.scenarios.resolve',
+    'admin.reports.view',
+    'admin.reports.resolve',
+    'admin.shop.view',
+    'admin.shop.edit',
+    'admin.shop.create',
+    'admin.shop.delete',
+    'admin.notifications.send',
+    'admin.settings.view',
+    'admin.settings.edit',
+    'admin.analytics.view',
+    'admin.logs.view',
+    'coins.infinite',
+    'shop.free',
+    'premium.free',
+    'scenarios.unlimited',
+    'bypass.limits',
+  ],
 };
 
 // Nombres amigables de los roles
@@ -109,6 +140,7 @@ export const ROLE_NAMES: Record<UserRole, string> = {
   STAFF: 'Staff',
   MODERATOR: 'Moderador',
   SUPER_ADMIN: 'Administrador',
+  ADMIN: 'Administrador',
 };
 
 // Colores de los roles
@@ -133,6 +165,11 @@ export const ROLE_COLORS: Record<UserRole, { bg: string; text: string; border: s
     text: 'text-red-400',
     border: 'border-red-500',
   },
+  ADMIN: {
+    bg: 'bg-red-500/20',
+    text: 'text-red-400',
+    border: 'border-red-500',
+  },
 };
 
 // Iconos de los roles (emoji)
@@ -141,6 +178,7 @@ export const ROLE_ICONS: Record<UserRole, string> = {
   STAFF: '🛠️',
   MODERATOR: '🛡️',
   SUPER_ADMIN: '👑',
+  ADMIN: '👑',
 };
 
 // Jerarquía de roles (mayor número = más poder)
@@ -149,6 +187,7 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
   STAFF: 1,
   MODERATOR: 2,
   SUPER_ADMIN: 3,
+  ADMIN: 3,
 };
 
 // Funciones de utilidad
@@ -169,7 +208,7 @@ export function canManageRole(managerRole: UserRole, targetRole: UserRole): bool
 }
 
 export function isAdminRole(role: UserRole): boolean {
-  return role === 'STAFF' || role === 'MODERATOR' || role === 'SUPER_ADMIN';
+  return role === 'STAFF' || role === 'MODERATOR' || role === 'SUPER_ADMIN' || role === 'ADMIN';
 }
 
 export function hasInfiniteCoins(role: UserRole): boolean {

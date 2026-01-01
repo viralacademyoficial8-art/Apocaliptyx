@@ -12,13 +12,14 @@ import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/SearchBar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
+import { usePermissions } from "@/hooks/usePermissions";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function Navbar() {
@@ -28,6 +29,7 @@ export function Navbar() {
   const { user, isAuthenticated, logout, login } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const { hasInfiniteCoins, isAdmin, roleName, roleIcon, roleColor } = usePermissions();
 
   // Determinar si está autenticado (priorizar session de NextAuth)
   const isLoggedIn = status === "authenticated" && !!session?.user;
@@ -40,6 +42,7 @@ export function Navbar() {
     displayName: session.user.name || "Usuario",
     avatarUrl: session.user.image || "",
     apCoins: session.user.apCoins || 1000,
+    role: session.user.role || "USER",
   } : null);
 
   // Sincronizar Zustand si hay session pero no user
@@ -61,6 +64,7 @@ export function Navbar() {
         followers: 0,
         following: 0,
         createdAt: new Date(),
+        role: sessionUser.role || "USER",
       });
     }
   }, [status, session, user, login]);
@@ -120,6 +124,24 @@ export function Navbar() {
                   </Link>
                 );
               })}
+              
+              {/* Link al panel de admin (solo para roles con acceso) */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className={`
+                    px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
+                    ${
+                      pathname.startsWith("/admin")
+                        ? "bg-red-500/20 text-red-400"
+                        : "text-red-400/70 hover:text-red-400 hover:bg-red-500/10"
+                    }
+                  `}
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+              )}
             </div>
 
             {/* Zona derecha */}
@@ -130,11 +152,24 @@ export function Navbar() {
               {isLoggedIn && currentUser ? (
                 <>
                   {/* AP Coins (solo sm+) */}
-                  <div className="hidden sm:flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-lg">
+                  <div className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
+                    hasInfiniteCoins 
+                      ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30' 
+                      : 'bg-muted'
+                  }`}>
                     <Flame className="w-4 h-4 text-yellow-500" />
-                    <span className="font-bold text-yellow-400 text-sm">
-                      {(currentUser.apCoins || 0).toLocaleString("es-MX")}
-                    </span>
+                    {hasInfiniteCoins ? (
+                      <div className="flex items-center gap-1">
+                        <Infinity className="w-5 h-5 text-yellow-400" />
+                        <span className="text-xs text-yellow-500/70 font-medium">
+                          {roleIcon}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="font-bold text-yellow-400 text-sm">
+                        {(currentUser.apCoins || 0).toLocaleString("es-MX")}
+                      </span>
+                    )}
                   </div>
 
                   {/* 🔔 Centro de Notificaciones (única campanita) */}
@@ -145,17 +180,32 @@ export function Navbar() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 hover:bg-muted rounded-lg px-2 py-1.5 transition-colors">
-                          <Avatar className="w-8 h-8 border-2 border-border">
-                            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.username} />
-                            <AvatarFallback className="text-sm bg-gradient-to-br from-purple-600 to-pink-600">
-                              {currentUser.username?.substring(0, 2).toUpperCase() || "US"}
-                            </AvatarFallback>
-                          </Avatar>
+                          <div className="relative">
+                            <Avatar className={`w-8 h-8 border-2 ${isAdmin ? 'border-yellow-500' : 'border-border'}`}>
+                              <AvatarImage src={currentUser.avatarUrl} alt={currentUser.username} />
+                              <AvatarFallback className="text-sm bg-gradient-to-br from-purple-600 to-pink-600">
+                                {currentUser.username?.substring(0, 2).toUpperCase() || "US"}
+                              </AvatarFallback>
+                            </Avatar>
+                            {/* Badge de rol para admin */}
+                            {isAdmin && (
+                              <span className="absolute -bottom-1 -right-1 text-xs">
+                                {roleIcon}
+                              </span>
+                            )}
+                          </div>
                           <div className="hidden lg:block text-left">
-                            <div className="text-sm font-semibold text-foreground">
+                            <div className="text-sm font-semibold text-foreground flex items-center gap-1">
                               {currentUser.displayName ?? currentUser.username}
                             </div>
-                            <div className="text-xs text-muted-foreground">@{currentUser.username}</div>
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              @{currentUser.username}
+                              {isAdmin && (
+                                <span className={`ml-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${roleColor.bg} ${roleColor.text}`}>
+                                  {roleName}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <ChevronDown className="w-4 h-4 text-muted-foreground hidden lg:block" />
                         </button>
@@ -164,15 +214,28 @@ export function Navbar() {
                       <DropdownMenuContent align="end" className="w-56 bg-card border border-border">
                         {/* Header manual */}
                         <div className="px-3 py-2 border-b border-border">
-                          <p className="text-sm font-medium text-foreground">
-                            {currentUser.displayName ?? currentUser.username}
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-foreground">
+                              {currentUser.displayName ?? currentUser.username}
+                            </p>
+                            {isAdmin && (
+                              <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${roleColor.bg} ${roleColor.text}`}>
+                                {roleIcon} {roleName}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground">@{currentUser.username}</p>
                           <div className="flex items-center gap-1 mt-2">
                             <Flame className="w-3 h-3 text-yellow-500" />
-                            <span className="text-xs font-semibold text-yellow-400">
-                              {(currentUser.apCoins || 0).toLocaleString("es-MX")} AP Coins
-                            </span>
+                            {hasInfiniteCoins ? (
+                              <span className="text-xs font-semibold text-yellow-400 flex items-center gap-1">
+                                <Infinity className="w-4 h-4" /> AP Coins Infinitas
+                              </span>
+                            ) : (
+                              <span className="text-xs font-semibold text-yellow-400">
+                                {(currentUser.apCoins || 0).toLocaleString("es-MX")} AP Coins
+                              </span>
+                            )}
                           </div>
                         </div>
 
@@ -192,6 +255,20 @@ export function Navbar() {
                           <Settings className="mr-2 h-4 w-4" />
                           {t("nav.settings")}
                         </DropdownMenuItem>
+
+                        {/* Link al admin panel */}
+                        {isAdmin && (
+                          <>
+                            <div className="my-1 h-px bg-border" />
+                            <DropdownMenuItem
+                              onClick={() => router.push("/admin")}
+                              className="cursor-pointer hover:bg-red-500/10 text-red-400"
+                            >
+                              <Shield className="mr-2 h-4 w-4" />
+                              Panel de Admin
+                            </DropdownMenuItem>
+                          </>
+                        )}
 
                         {/* Separador manual */}
                         <div className="my-1 h-px bg-border" />

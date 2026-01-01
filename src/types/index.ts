@@ -4,7 +4,7 @@
 // Roles de Usuario
 // =========================
 
-export type UserRole = 'USER' | 'STAFF' | 'MODERATOR' | 'SUPER_ADMIN';
+export type UserRole = 'USER' | 'STAFF' | 'MODERATOR' | 'SUPER_ADMIN' | 'ADMIN';
 
 // =========================
 // Niveles de Profeta
