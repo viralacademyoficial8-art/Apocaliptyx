@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { shopService, ShopItemFromDB } from '@/services/shop.service';
 import { notificationsService } from '@/services/notifications.service';
 
 // ============================================
@@ -18,25 +19,18 @@ export interface ShopItem {
   rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
   price: number;
   originalPrice?: number;
-  stock: number | null; // null = ilimitado
+  stock: number | null;
   maxPerUser: number | null;
   isActive: boolean;
   isFeatured: boolean;
   isNew: boolean;
   isOnSale: boolean;
   saleEndsAt?: string;
-  effects?: ItemEffect[];
+  effects?: any[];
   tags: string[];
   purchaseCount: number;
   rating: number;
   reviews: number;
-}
-
-export interface ItemEffect {
-  type: string;
-  value: number;
-  duration?: number; // en horas
-  description: string;
 }
 
 export interface CartItem {
@@ -54,285 +48,34 @@ export interface PurchaseHistory {
 }
 
 // ============================================
-// MOCK DATA
+// HELPER: Convert DB item to Store item
 // ============================================
 
-const mockShopItems: ShopItem[] = [
-  {
-    id: '1',
-    name: 'Escudo de Protección',
-    description: 'Protege tu escenario contra robos durante 24 horas.',
-    longDescription:
-      'El Escudo de Protección crea una barrera impenetrable alrededor de tu escenario más valioso. Durante 24 horas, ningún otro profeta podrá robarte ese escenario, dándote tiempo para asegurar tu inversión.',
-    imageUrl: null,
-    type: 'PROTECTION',
-    rarity: 'COMMON',
-    price: 500,
-    stock: null,
-    maxPerUser: 10,
-    isActive: true,
-    isFeatured: false,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'protection', value: 1, duration: 24, description: 'Protege 1 escenario por 24h' }],
-    tags: ['defensa', 'seguridad', 'escudo'],
-    purchaseCount: 15420,
-    rating: 4.5,
-    reviews: 342,
-  },
-  {
-    id: '2',
-    name: 'Escudo Legendario',
-    description: 'Protección total durante 72 horas para todos tus escenarios.',
-    longDescription:
-      'El Escudo Legendario es la defensa definitiva. Protege TODOS tus escenarios activos durante 72 horas completas. Ideal para cuando tienes múltiples inversiones importantes.',
-    imageUrl: null,
-    type: 'PROTECTION',
-    rarity: 'LEGENDARY',
-    price: 5000,
-    originalPrice: 7500,
-    stock: 50,
-    maxPerUser: 2,
-    isActive: true,
-    isFeatured: true,
-    isNew: false,
-    isOnSale: true,
-    saleEndsAt: '2025-01-15T00:00:00Z',
-    effects: [{ type: 'protection_all', value: 100, duration: 72, description: 'Protege TODOS tus escenarios por 72h' }],
-    tags: ['defensa', 'premium', 'legendario'],
-    purchaseCount: 234,
-    rating: 4.9,
-    reviews: 89,
-  },
-
-  {
-    id: '3',
-    name: 'Multiplicador x2',
-    description: 'Duplica las ganancias de tu próxima predicción correcta.',
-    longDescription:
-      'Activa este multiplicador antes de que se resuelva un escenario. Si aciertas, tus ganancias se duplicarán automáticamente. ¡El riesgo vale la pena!',
-    imageUrl: null,
-    type: 'BOOST',
-    rarity: 'RARE',
-    price: 1000,
-    stock: null,
-    maxPerUser: 5,
-    isActive: true,
-    isFeatured: true,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'multiplier', value: 2, description: 'x2 ganancias en próxima predicción correcta' }],
-    tags: ['boost', 'ganancias', 'multiplicador'],
-    purchaseCount: 8932,
-    rating: 4.7,
-    reviews: 567,
-  },
-  {
-    id: '4',
-    name: 'Multiplicador x5',
-    description: '¡Quintuplica tus ganancias! Solo para los más arriesgados.',
-    longDescription:
-      'El multiplicador más potente disponible. Quintuplica las ganancias de tu próxima predicción correcta. Úsalo sabiamente en escenarios donde tengas alta confianza.',
-    imageUrl: null,
-    type: 'BOOST',
-    rarity: 'EPIC',
-    price: 3500,
-    stock: 100,
-    maxPerUser: 2,
-    isActive: true,
-    isFeatured: false,
-    isNew: true,
-    isOnSale: false,
-    effects: [{ type: 'multiplier', value: 5, description: 'x5 ganancias en próxima predicción correcta' }],
-    tags: ['boost', 'premium', 'épico'],
-    purchaseCount: 1205,
-    rating: 4.8,
-    reviews: 156,
-  },
-
-  {
-    id: '5',
-    name: 'Visión del Oráculo',
-    description: 'Revela las estadísticas ocultas de cualquier escenario.',
-    longDescription:
-      'Usa la Visión del Oráculo para ver información privilegiada: quién más está invirtiendo, tendencias de votos en tiempo real, y probabilidades calculadas por nuestro algoritmo.',
-    imageUrl: null,
-    type: 'POWER',
-    rarity: 'RARE',
-    price: 750,
-    stock: null,
-    maxPerUser: 20,
-    isActive: true,
-    isFeatured: false,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'reveal_stats', value: 1, description: 'Revela estadísticas de 1 escenario' }],
-    tags: ['poder', 'información', 'estrategia'],
-    purchaseCount: 6543,
-    rating: 4.3,
-    reviews: 234,
-  },
-  {
-    id: '6',
-    name: 'Robo Silencioso',
-    description: 'Roba un escenario sin que el dueño reciba notificación.',
-    longDescription:
-      'El Robo Silencioso te permite tomar un escenario de otro usuario sin que este reciba la notificación habitual. Perfecto para movimientos estratégicos sorpresa.',
-    imageUrl: null,
-    type: 'POWER',
-    rarity: 'EPIC',
-    price: 2000,
-    stock: 200,
-    maxPerUser: 3,
-    isActive: true,
-    isFeatured: true,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'silent_steal', value: 1, description: 'Robo sin notificación' }],
-    tags: ['poder', 'robo', 'sigilo'],
-    purchaseCount: 2341,
-    rating: 4.6,
-    reviews: 178,
-  },
-
-  {
-    id: '7',
-    name: 'Marco Dorado',
-    description: 'Un elegante marco dorado para tu avatar de perfil.',
-    longDescription:
-      'Destaca entre la multitud con este exclusivo marco dorado. Se mostrará alrededor de tu avatar en tu perfil, comentarios, y en el leaderboard.',
-    imageUrl: null,
-    type: 'COSMETIC',
-    rarity: 'RARE',
-    price: 2500,
-    stock: null,
-    maxPerUser: 1,
-    isActive: true,
-    isFeatured: false,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'avatar_frame', value: 1, description: 'Marco dorado permanente' }],
-    tags: ['cosmético', 'avatar', 'prestigio'],
-    purchaseCount: 4521,
-    rating: 4.4,
-    reviews: 289,
-  },
-  {
-    id: '8',
-    name: 'Título: Profeta Supremo',
-    description: 'Muestra el título exclusivo Profeta Supremo en tu perfil.',
-    longDescription:
-      'Solo los verdaderos visionarios merecen este título. Aparecerá debajo de tu nombre en todo el sitio, mostrando tu estatus de élite.',
-    imageUrl: null,
-    type: 'COSMETIC',
-    rarity: 'LEGENDARY',
-    price: 10000,
-    stock: 100,
-    maxPerUser: 1,
-    isActive: true,
-    isFeatured: true,
-    isNew: true,
-    isOnSale: false,
-    effects: [{ type: 'title', value: 1, description: 'Título exclusivo permanente' }],
-    tags: ['cosmético', 'título', 'legendario', 'exclusivo'],
-    purchaseCount: 47,
-    rating: 5.0,
-    reviews: 23,
-  },
-  {
-    id: '9',
-    name: 'Efecto de Entrada: Llamas',
-    description: 'Efecto de llamas cuando entras al chat o foro.',
-    longDescription:
-      'Haz una entrada dramática. Cada vez que publiques en el foro o entres al chat, tu mensaje aparecerá con un espectacular efecto de llamas.',
-    imageUrl: null,
-    type: 'COSMETIC',
-    rarity: 'EPIC',
-    price: 3000,
-    stock: null,
-    maxPerUser: 1,
-    isActive: true,
-    isFeatured: false,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'entry_effect', value: 1, description: 'Efecto de llamas en mensajes' }],
-    tags: ['cosmético', 'efecto', 'animación'],
-    purchaseCount: 1876,
-    rating: 4.2,
-    reviews: 145,
-  },
-
-  {
-    id: '10',
-    name: 'Cofre Misterioso',
-    description: '¿Qué habrá dentro? Puede contener items raros o legendarios.',
-    longDescription:
-      'Abre el Cofre Misterioso y descubre su contenido. Puede contener desde items comunes hasta legendarios. ¡La suerte está de tu lado!',
-    imageUrl: null,
-    type: 'SPECIAL',
-    rarity: 'RARE',
-    price: 1500,
-    stock: null,
-    maxPerUser: null,
-    isActive: true,
-    isFeatured: true,
-    isNew: false,
-    isOnSale: false,
-    effects: [{ type: 'random_item', value: 1, description: 'Item aleatorio (común a legendario)' }],
-    tags: ['especial', 'aleatorio', 'sorpresa'],
-    purchaseCount: 12453,
-    rating: 4.1,
-    reviews: 892,
-  },
-
-  {
-    id: '11',
-    name: 'Pack Iniciado',
-    description: 'Todo lo que necesitas para empezar: 2 escudos + 2 multiplicadores.',
-    longDescription:
-      'El pack perfecto para nuevos profetas. Incluye 2 Escudos de Protección y 2 Multiplicadores x2. Ahorra un 20% comprando el pack.',
-    imageUrl: null,
-    type: 'BUNDLE',
-    rarity: 'COMMON',
-    price: 2400,
-    originalPrice: 3000,
-    stock: null,
-    maxPerUser: 1,
-    isActive: true,
-    isFeatured: false,
-    isNew: false,
-    isOnSale: true,
-    effects: [{ type: 'bundle', value: 4, description: '2x Escudo + 2x Multiplicador x2' }],
-    tags: ['bundle', 'pack', 'ahorro', 'principiante'],
-    purchaseCount: 3421,
-    rating: 4.6,
-    reviews: 234,
-  },
-  {
-    id: '12',
-    name: 'Pack Apocalipsis',
-    description: 'El pack definitivo: Escudo Legendario + x5 Mult + Marco Dorado + más.',
-    longDescription:
-      'Para los verdaderos coleccionistas. Incluye: 1 Escudo Legendario, 1 Multiplicador x5, 1 Marco Dorado, 3 Visiones del Oráculo, y 5000 AP Coins de bonus.',
-    imageUrl: null,
-    type: 'BUNDLE',
-    rarity: 'LEGENDARY',
-    price: 15000,
-    originalPrice: 25000,
-    stock: 25,
-    maxPerUser: 1,
-    isActive: true,
-    isFeatured: true,
-    isNew: true,
-    isOnSale: true,
-    saleEndsAt: '2025-01-01T00:00:00Z',
-    effects: [{ type: 'bundle_premium', value: 1, description: 'Pack completo + 5000 AP bonus' }],
-    tags: ['bundle', 'premium', 'legendario', 'limitado'],
-    purchaseCount: 12,
-    rating: 5.0,
-    reviews: 8,
-  },
-];
+function mapDBItemToStoreItem(dbItem: ShopItemFromDB): ShopItem {
+  return {
+    id: dbItem.id,
+    name: dbItem.name,
+    description: dbItem.description,
+    longDescription: dbItem.long_description || undefined,
+    imageUrl: dbItem.image_url,
+    type: dbItem.type as ShopItem['type'],
+    rarity: dbItem.rarity as ShopItem['rarity'],
+    price: dbItem.price,
+    originalPrice: dbItem.original_price || undefined,
+    stock: dbItem.stock,
+    maxPerUser: dbItem.max_per_user,
+    isActive: dbItem.is_active,
+    isFeatured: dbItem.is_featured,
+    isNew: dbItem.is_new,
+    isOnSale: dbItem.is_on_sale,
+    saleEndsAt: dbItem.sale_ends_at || undefined,
+    effects: dbItem.effects || undefined,
+    tags: dbItem.tags || [],
+    purchaseCount: dbItem.purchase_count || 0,
+    rating: dbItem.rating || 0,
+    reviews: dbItem.reviews_count || 0,
+  };
+}
 
 // ============================================
 // STORE INTERFACE
@@ -345,7 +88,6 @@ interface ShopStore {
   isLoading: boolean;
   error: string | null;
 
-  // ID del usuario actual (para notificaciones)
   currentUserId: string | null;
   setCurrentUserId: (id: string | null) => void;
 
@@ -361,7 +103,10 @@ interface ShopStore {
   isPurchaseModalOpen: boolean;
   selectedItem: ShopItem | null;
 
+  // Data loading
+  loadItems: () => Promise<void>;
   setItems: (items: ShopItem[]) => void;
+  
   getItemById: (id: string) => ShopItem | undefined;
   getFilteredItems: () => ShopItem[];
   getFeaturedItems: () => ShopItem[];
@@ -374,8 +119,8 @@ interface ShopStore {
   getCartTotal: () => number;
   getCartItemCount: () => number;
 
-  purchaseCart: () => Promise<boolean>;
-  purchaseItem: (item: ShopItem, quantity: number) => Promise<boolean>;
+  purchaseCart: () => Promise<{ success: boolean; newBalance?: number; error?: string }>;
+  purchaseItem: (item: ShopItem, quantity: number) => Promise<{ success: boolean; newBalance?: number; error?: string }>;
 
   setFilters: (filters: Partial<ShopStore['filters']>) => void;
   resetFilters: () => void;
@@ -395,7 +140,7 @@ interface ShopStore {
 export const useShopStore = create<ShopStore>()(
   persist(
     (set, get) => ({
-      items: mockShopItems,
+      items: [],
       cart: [],
       purchaseHistory: [],
       isLoading: false,
@@ -415,6 +160,19 @@ export const useShopStore = create<ShopStore>()(
       selectedItem: null,
 
       setCurrentUserId: (id) => set({ currentUserId: id }),
+
+      // Cargar items desde Supabase
+      loadItems: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const dbItems = await shopService.getItems();
+          const items = dbItems.map(mapDBItemToStoreItem);
+          set({ items, isLoading: false });
+        } catch (error) {
+          console.error('Error loading shop items:', error);
+          set({ error: 'Error al cargar la tienda', isLoading: false });
+        }
+      },
 
       setItems: (items) => set({ items }),
 
@@ -517,57 +275,93 @@ export const useShopStore = create<ShopStore>()(
 
       getCartItemCount: () => get().cart.reduce((count, ci) => count + ci.quantity, 0),
 
+      // Comprar todo el carrito - REAL con Supabase
       purchaseCart: async () => {
         const { cart, clearCart, currentUserId } = get();
+        
+        if (!currentUserId) {
+          return { success: false, error: 'Debes iniciar sesión para comprar' };
+        }
+
+        if (cart.length === 0) {
+          return { success: false, error: 'El carrito está vacío' };
+        }
+
         set({ isLoading: true, error: null });
 
         try {
-          await new Promise((resolve) => setTimeout(resolve, 900));
+          let lastNewBalance = 0;
+          const purchases: PurchaseHistory[] = [];
 
-          const purchases: PurchaseHistory[] = cart.map((ci) => ({
-            id: `${Date.now()}-${ci.item.id}`,
-            itemId: ci.item.id,
-            itemName: ci.item.name,
-            price: ci.item.price,
-            quantity: ci.quantity,
-            purchasedAt: new Date().toISOString(),
-          }));
+          // Procesar cada item del carrito
+          for (const cartItem of cart) {
+            const result = await shopService.purchaseItem(
+              currentUserId,
+              cartItem.item.id,
+              cartItem.quantity
+            );
+
+            if (!result.success) {
+              set({ isLoading: false, error: result.error });
+              return { success: false, error: result.error };
+            }
+
+            lastNewBalance = result.newBalance || 0;
+
+            // Registrar en historial local
+            purchases.push({
+              id: `${Date.now()}-${cartItem.item.id}`,
+              itemId: cartItem.item.id,
+              itemName: cartItem.item.name,
+              price: cartItem.item.price,
+              quantity: cartItem.quantity,
+              purchasedAt: new Date().toISOString(),
+            });
+
+            // Crear notificación
+            const totalPrice = cartItem.item.price * cartItem.quantity;
+            const itemText = cartItem.quantity > 1 
+              ? `${cartItem.quantity}x ${cartItem.item.name}` 
+              : cartItem.item.name;
+            
+            await notificationsService.notifyPurchase(
+              currentUserId,
+              itemText,
+              totalPrice
+            );
+          }
 
           set((state) => ({
             purchaseHistory: [...purchases, ...state.purchaseHistory],
             isLoading: false,
           }));
 
-          // 🔔 Crear notificaciones para cada item comprado
-          if (currentUserId) {
-            for (const ci of cart) {
-              const totalPrice = ci.item.price * ci.quantity;
-              const itemText = ci.quantity > 1 
-                ? `${ci.quantity}x ${ci.item.name}` 
-                : ci.item.name;
-              
-              await notificationsService.notifyPurchase(
-                currentUserId,
-                itemText,
-                totalPrice
-              );
-            }
-          }
-
           clearCart();
-          return true;
-        } catch {
+          return { success: true, newBalance: lastNewBalance };
+        } catch (error) {
+          console.error('Error purchasing cart:', error);
           set({ error: 'Error al procesar la compra', isLoading: false });
-          return false;
+          return { success: false, error: 'Error al procesar la compra' };
         }
       },
 
+      // Comprar un item directamente - REAL con Supabase
       purchaseItem: async (item, quantity) => {
         const { currentUserId } = get();
+        
+        if (!currentUserId) {
+          return { success: false, error: 'Debes iniciar sesión para comprar' };
+        }
+
         set({ isLoading: true, error: null });
 
         try {
-          await new Promise((resolve) => setTimeout(resolve, 700));
+          const result = await shopService.purchaseItem(currentUserId, item.id, quantity);
+
+          if (!result.success) {
+            set({ isLoading: false, error: result.error });
+            return { success: false, error: result.error };
+          }
 
           const purchase: PurchaseHistory = {
             id: `${Date.now()}-${item.id}`,
@@ -584,24 +378,21 @@ export const useShopStore = create<ShopStore>()(
             isPurchaseModalOpen: false,
           }));
 
-          // 🔔 Crear notificación de compra
-          if (currentUserId) {
-            const totalPrice = item.price * quantity;
-            const itemText = quantity > 1 
-              ? `${quantity}x ${item.name}` 
-              : item.name;
-            
-            await notificationsService.notifyPurchase(
-              currentUserId,
-              itemText,
-              totalPrice
-            );
-          }
+          // Crear notificación
+          const totalPrice = item.price * quantity;
+          const itemText = quantity > 1 ? `${quantity}x ${item.name}` : item.name;
+          
+          await notificationsService.notifyPurchase(
+            currentUserId,
+            itemText,
+            totalPrice
+          );
 
-          return true;
-        } catch {
+          return { success: true, newBalance: result.newBalance };
+        } catch (error) {
+          console.error('Error purchasing item:', error);
           set({ error: 'Error al procesar la compra', isLoading: false });
-          return false;
+          return { success: false, error: 'Error al procesar la compra' };
         }
       },
 

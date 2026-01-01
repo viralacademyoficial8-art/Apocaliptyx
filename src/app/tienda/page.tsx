@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useShopStore } from "@/stores/shopStore";
 import { useAuthStore } from "@/lib/stores";
+import { Navbar } from "@/components/Navbar";
 import {
   ShopHero,
   CategoryTabs,
@@ -15,11 +16,16 @@ import {
 } from "@/components/tienda";
 
 export default function TiendaPage() {
-  const { setCartOpen, getCartItemCount, setCurrentUserId } = useShopStore();
+  const { setCartOpen, getCartItemCount, setCurrentUserId, loadItems } = useShopStore();
   const { user } = useAuthStore();
   const cartItemCount = getCartItemCount();
 
-  // Pasar el userId al store para las notificaciones
+  // Cargar items de Supabase al montar
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
+
+  // Pasar el userId al store para las compras
   useEffect(() => {
     if (user?.id) {
       setCurrentUserId(user.id);
@@ -28,6 +34,8 @@ export default function TiendaPage() {
 
   return (
     <div className="min-h-screen bg-gray-950">
+      <Navbar />
+      
       {/* Floating Cart Button */}
       <button
         onClick={() => setCartOpen(true)}
