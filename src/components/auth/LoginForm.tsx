@@ -3,13 +3,14 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { loginWithCredentials } from "@/lib/actions/auth.actions";
+import { signIn } from "next-auth/react";
 import { SocialButtons } from "./SocialButtons";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 export function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const error = searchParams.get("error");
@@ -28,15 +29,28 @@ export function LoginForm() {
     setErrorMessage("");
 
     try {
-      const result = await loginWithCredentials(email, password, callbackUrl);
-      
-      if (!result.success) {
-        setErrorMessage(result.message);
+      // Usar signIn del cliente con redirect: false
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setErrorMessage("Credenciales inválidas");
         setIsLoading(false);
+        return;
+      }
+
+      if (result?.ok) {
+        // Login exitoso - redirigir manualmente
+        // Esto permite que el cliente actualice la sesión antes del redirect
+        router.push(callbackUrl);
+        router.refresh(); // Forzar refresh de la página
       }
     } catch (error) {
-      // El redirect lanza un error, lo cual es esperado
-      // Si llegamos aquí sin redirect, hubo un error real
+      console.error("Login error:", error);
+      setErrorMessage("Error al iniciar sesión");
       setIsLoading(false);
     }
   };
