@@ -18,6 +18,7 @@ import {
   mockForumComments,
 } from "@/lib/mock-data";
 import { safeGetItem, safeSetItem } from "@/lib/utils";
+import { notificationsService } from "@/services/notifications.service";
 
 //
 // ----------------------------------------------------
@@ -211,8 +212,10 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
   async createScenario({ title, description, category, dueDate }) {
     const { user } = useAuthStore.getState();
 
+    const scenarioId = `scenario_${Date.now()}`;
+
     const newScenario: Scenario = {
-      id: `scenario_${Date.now()}`,
+      id: scenarioId,
       title,
       description,
       category,
@@ -239,6 +242,15 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
       safeSetItem("scenarios", stored);
     } catch {
       console.warn("No se pudo guardar escenarios");
+    }
+
+    // 🔔 Crear notificación de escenario creado
+    if (user?.id) {
+      await notificationsService.notifyScenarioCreated(
+        user.id,
+        title,
+        scenarioId
+      );
     }
   },
 }));
