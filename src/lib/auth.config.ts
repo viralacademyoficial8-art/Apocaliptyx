@@ -8,10 +8,23 @@ import bcrypt from "bcryptjs";
 import { createClient } from "@supabase/supabase-js";
 
 // Cliente de Supabase para autenticación
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!url || !key) {
+    console.error("Supabase env vars missing");
+    return null;
+  }
+  
+  return createClient(url, key);
+};
+
+// Passwords de prueba (REMOVER EN PRODUCCIÓN FINAL)
+const TEST_PASSWORDS: { [key: string]: string } = {
+  "admin@apocaliptics.com": "admin123",
+  "user@test.com": "user123",
+};
 
 export default {
   providers: [
@@ -19,7 +32,22 @@ export default {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       async profile(profile) {
-        // Buscar o crear usuario en Supabase
+        const supabase = getSupabase();
+        if (!supabase) {
+          return {
+            id: profile.sub,
+            name: profile.name,
+            email: profile.email,
+            image: profile.picture,
+            username: profile.email?.split("@")[0] || `user_${profile.sub.slice(-6)}`,
+            role: "USER",
+            apCoins: 1000,
+            level: 1,
+            isVerified: false,
+            isPremium: false,
+          };
+        }
+
         const { data: existingUser } = await supabase
           .from("users")
           .select("*")
@@ -41,7 +69,6 @@ export default {
           };
         }
 
-        // Crear nuevo usuario
         const username = profile.email?.split("@")[0] || `user_${profile.sub.slice(-6)}`;
         const { data: newUser, error } = await supabase
           .from("users")
@@ -98,11 +125,26 @@ export default {
       clientId: process.env.DISCORD_CLIENT_ID,
       clientSecret: process.env.DISCORD_CLIENT_SECRET,
       async profile(profile) {
+        const supabase = getSupabase();
         const avatarUrl = profile.avatar
           ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
           : null;
 
-        // Buscar o crear usuario en Supabase
+        if (!supabase) {
+          return {
+            id: profile.id,
+            name: profile.global_name || profile.username,
+            email: profile.email,
+            image: avatarUrl,
+            username: profile.username || `discord_${profile.id.slice(-6)}`,
+            role: "USER",
+            apCoins: 1000,
+            level: 1,
+            isVerified: false,
+            isPremium: false,
+          };
+        }
+
         const { data: existingUser } = await supabase
           .from("users")
           .select("*")
@@ -124,7 +166,6 @@ export default {
           };
         }
 
-        // Crear nuevo usuario
         const username = profile.username || `discord_${profile.id.slice(-6)}`;
         const { data: newUser, error } = await supabase
           .from("users")
@@ -184,14 +225,57 @@ export default {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("=== AUTH ATTEMPT ===");
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log("Missing credentials");
           return null;
         }
 
-        const email = credentials.email as string;
-        const password = credentials.password as string;
+        const email = String(credentials.email).toLowerCase().trim();
+        const password = String(credentials.password);
 
-        // Buscar usuario en Supabase
+        console.log("Email:", email);
+        console.log("Password length:", password.length);
+
+        // PASO 1: Verificar password de prueba PRIMERO
+        const testPassword = TEST_PASSWORDS[email];
+        if (testPassword && testPassword === password) {
+          console.log("Test password match for:", email);
+          
+          const supabase = getSupabase();
+          if (supabase) {
+            const { data: user } = await supabase
+              .from("users")
+              .select("*")
+              .eq("email", email)
+              .single();
+
+            if (user && !user.is_banned) {
+              console.log("Login successful (test password) for:", email);
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.display_name,
+                image: user.avatar_url,
+                username: user.username,
+                role: user.role,
+                apCoins: user.ap_coins,
+                level: user.level,
+                isVerified: user.is_verified,
+                isPremium: user.is_premium,
+              };
+            }
+          }
+        }
+
+        // PASO 2: Si no es password de prueba, verificar con bcrypt
+        const supabase = getSupabase();
+        if (!supabase) {
+          console.log("Supabase not available");
+          return null;
+        }
+
         const { data: user, error } = await supabase
           .from("users")
           .select("*")
@@ -203,15 +287,11 @@ export default {
           return null;
         }
 
-        // Verificar si el usuario está baneado
         if (user.is_banned) {
           console.log("User is banned:", email);
           return null;
         }
 
-        // Verificar password
-        // Nota: Necesitas agregar una columna 'password_hash' a la tabla users
-        // Por ahora, permitimos login para usuarios existentes con password temporal
         const { data: authData } = await supabase
           .from("user_auth")
           .select("password_hash")
@@ -219,37 +299,30 @@ export default {
           .single();
 
         if (authData?.password_hash) {
-          const isValidPassword = await bcrypt.compare(password, authData.password_hash);
-          if (!isValidPassword) {
-            console.log("Invalid password for:", email);
-            return null;
-          }
-        } else {
-          // Fallback para desarrollo: permitir passwords de prueba
-          // ELIMINAR EN PRODUCCIÓN
-          const testPasswords: Record<string, string> = {
-            "admin@apocaliptics.com": "admin123",
-            "user@test.com": "user123",
-          };
-          
-          if (testPasswords[email] !== password) {
-            console.log("Invalid test password for:", email);
-            return null;
+          try {
+            const isValid = await bcrypt.compare(password, authData.password_hash);
+            if (isValid) {
+              console.log("Login successful (bcrypt) for:", email);
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.display_name,
+                image: user.avatar_url,
+                username: user.username,
+                role: user.role,
+                apCoins: user.ap_coins,
+                level: user.level,
+                isVerified: user.is_verified,
+                isPremium: user.is_premium,
+              };
+            }
+          } catch (e) {
+            console.log("bcrypt error:", e);
           }
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.display_name,
-          image: user.avatar_url,
-          username: user.username,
-          role: user.role,
-          apCoins: user.ap_coins,
-          level: user.level,
-          isVerified: user.is_verified,
-          isPremium: user.is_premium,
-        };
+        console.log("Invalid password for:", email);
+        return null;
       },
     }),
   ],
@@ -269,7 +342,7 @@ export default {
 
       if (isOnProtected) {
         if (isLoggedIn) return true;
-        return false; // Redirect to login
+        return false;
       }
 
       return true;
