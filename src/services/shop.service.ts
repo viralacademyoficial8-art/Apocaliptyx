@@ -11,25 +11,17 @@ export interface ShopItemFromDB {
   id: string;
   name: string;
   description: string;
-  long_description: string | null;
-  image_url: string | null;
+  icon: string | null;
   type: string;
   rarity: string;
   price: number;
-  original_price: number | null;
+  discount_price: number | null;
   stock: number | null;
   max_per_user: number | null;
   is_active: boolean;
-  is_featured: boolean;
-  is_new: boolean;
-  is_on_sale: boolean;
-  sale_ends_at: string | null;
   effects: any[] | null;
-  tags: string[];
-  purchase_count: number;
-  rating: number;
-  reviews_count: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface UserInventoryItem {
@@ -59,7 +51,7 @@ class ShopService {
         .from("shop_items")
         .select("*")
         .eq("is_active", true)
-        .order("purchase_count", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching shop items:", error);
@@ -69,30 +61,6 @@ class ShopService {
       return data as ShopItemFromDB[];
     } catch (error) {
       console.error("Error in getItems:", error);
-      return [];
-    }
-  }
-
-  /**
-   * Obtener items destacados
-   */
-  async getFeaturedItems(): Promise<ShopItemFromDB[]> {
-    try {
-      const { data, error } = await supabase
-        .from("shop_items")
-        .select("*")
-        .eq("is_active", true)
-        .eq("is_featured", true)
-        .order("purchase_count", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching featured items:", error);
-        return [];
-      }
-
-      return data as ShopItemFromDB[];
-    } catch (error) {
-      console.error("Error in getFeaturedItems:", error);
       return [];
     }
   }
@@ -145,8 +113,9 @@ class ShopService {
         return { success: false, error: "Stock insuficiente" };
       }
 
-      // 3. Calcular precio total
-      const totalPrice = item.price * quantity;
+      // 3. Calcular precio total (usar discount_price si existe)
+      const unitPrice = item.discount_price || item.price;
+      const totalPrice = unitPrice * quantity;
 
       // 4. Obtener usuario y verificar balance
       const { data: user, error: userError } = await supabase
@@ -244,12 +213,6 @@ class ShopService {
           .eq("id", itemId);
       }
 
-      // 10. Actualizar contador de compras
-      await supabase
-        .from("shop_items")
-        .update({ purchase_count: (item.purchase_count || 0) + quantity })
-        .eq("id", itemId);
-
       return { success: true, newBalance };
     } catch (error) {
       console.error("Error in purchaseItem:", error);
@@ -293,7 +256,7 @@ class ShopService {
         .from("user_purchases")
         .select(`
           *,
-          item:shop_items(name, type, rarity, image_url)
+          item:shop_items(name, type, rarity, icon)
         `)
         .eq("user_id", userId)
         .order("created_at", { ascending: false })

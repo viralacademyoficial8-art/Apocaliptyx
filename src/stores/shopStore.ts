@@ -13,11 +13,11 @@ export interface ShopItem {
   id: string;
   name: string;
   description: string;
-  longDescription?: string;
-  imageUrl: string | null;
+  icon: string | null;
   type: 'PROTECTION' | 'POWER' | 'BOOST' | 'COSMETIC' | 'SPECIAL' | 'BUNDLE';
   rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
   price: number;
+  discountPrice?: number;
   originalPrice?: number;
   stock: number | null;
   maxPerUser: number | null;
@@ -28,6 +28,8 @@ export interface ShopItem {
   saleEndsAt?: string;
   effects?: any[];
   tags: string[];
+  imageUrl: string | null;
+  longDescription?: string;
   purchaseCount: number;
   rating: number;
   reviews: number;
@@ -52,28 +54,31 @@ export interface PurchaseHistory {
 // ============================================
 
 function mapDBItemToStoreItem(dbItem: ShopItemFromDB): ShopItem {
+  const hasDiscount = dbItem.discount_price !== null && dbItem.discount_price < dbItem.price;
+  
   return {
     id: dbItem.id,
     name: dbItem.name,
     description: dbItem.description,
-    longDescription: dbItem.long_description || undefined,
-    imageUrl: dbItem.image_url,
+    icon: dbItem.icon,
     type: dbItem.type as ShopItem['type'],
     rarity: dbItem.rarity as ShopItem['rarity'],
     price: dbItem.price,
-    originalPrice: dbItem.original_price || undefined,
+    discountPrice: dbItem.discount_price || undefined,
+    originalPrice: hasDiscount ? dbItem.price : undefined,
     stock: dbItem.stock,
     maxPerUser: dbItem.max_per_user,
     isActive: dbItem.is_active,
-    isFeatured: dbItem.is_featured,
-    isNew: dbItem.is_new,
-    isOnSale: dbItem.is_on_sale,
-    saleEndsAt: dbItem.sale_ends_at || undefined,
+    isFeatured: dbItem.rarity === 'LEGENDARY' || dbItem.rarity === 'EPIC',
+    isNew: false, // No tenemos esta columna, default false
+    isOnSale: hasDiscount,
     effects: dbItem.effects || undefined,
-    tags: dbItem.tags || [],
-    purchaseCount: dbItem.purchase_count || 0,
-    rating: dbItem.rating || 0,
-    reviews: dbItem.reviews_count || 0,
+    tags: [],
+    imageUrl: null,
+    longDescription: undefined,
+    purchaseCount: 0,
+    rating: 0,
+    reviews: 0,
   };
 }
 
@@ -95,7 +100,7 @@ interface ShopStore {
     search: string;
     category: string;
     rarity: string;
-    sortBy: 'popular' | 'price_asc' | 'price_desc' | 'newest' | 'rating';
+    sortBy: 'popular' | 'price_asc' | 'price_desc' | 'newest';
     showOnSale: boolean;
   };
 
@@ -110,7 +115,6 @@ interface ShopStore {
   getItemById: (id: string) => ShopItem | undefined;
   getFilteredItems: () => ShopItem[];
   getFeaturedItems: () => ShopItem[];
-  getItemsByCategory: (category: string) => ShopItem[];
 
   addToCart: (item: ShopItem, quantity?: number) => void;
   removeFromCart: (itemId: string) => void;
@@ -187,8 +191,7 @@ export const useShopStore = create<ShopStore>()(
           filtered = filtered.filter(
             (item) =>
               item.name.toLowerCase().includes(search) ||
-              item.description.toLowerCase().includes(search) ||
-              item.tags.some((tag) => tag.toLowerCase().includes(search))
+              item.description.toLowerCase().includes(search)
           );
         }
 
@@ -206,28 +209,28 @@ export const useShopStore = create<ShopStore>()(
 
         switch (filters.sortBy) {
           case 'price_asc':
-            filtered.sort((a, b) => a.price - b.price);
+            filtered.sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price));
             break;
           case 'price_desc':
-            filtered.sort((a, b) => b.price - a.price);
+            filtered.sort((a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price));
             break;
           case 'newest':
-            filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-            break;
-          case 'rating':
-            filtered.sort((a, b) => b.rating - a.rating);
-            break;
           case 'popular':
           default:
-            filtered.sort((a, b) => b.purchaseCount - a.purchaseCount);
+            // Mantener orden original (por created_at desc)
+            break;
         }
 
         return filtered;
       },
 
-      getFeaturedItems: () => get().items.filter((item) => item.isFeatured && item.isActive),
-
-      getItemsByCategory: (category) => get().items.filter((item) => item.type === category && item.isActive),
+      getFeaturedItems: () => {
+        const { items } = get();
+        // Retornar items legendarios o épicos como destacados
+        return items.filter((item) => 
+          item.isActive && (item.rarity === 'LEGENDARY' || item.rarity === 'EPIC')
+        );
+      },
 
       addToCart: (item, quantity = 1) => {
         set((state) => {
@@ -271,7 +274,10 @@ export const useShopStore = create<ShopStore>()(
 
       clearCart: () => set({ cart: [] }),
 
-      getCartTotal: () => get().cart.reduce((total, ci) => total + ci.item.price * ci.quantity, 0),
+      getCartTotal: () => get().cart.reduce((total, ci) => {
+        const price = ci.item.discountPrice || ci.item.price;
+        return total + price * ci.quantity;
+      }, 0),
 
       getCartItemCount: () => get().cart.reduce((count, ci) => count + ci.quantity, 0),
 
@@ -309,17 +315,18 @@ export const useShopStore = create<ShopStore>()(
             lastNewBalance = result.newBalance || 0;
 
             // Registrar en historial local
+            const price = cartItem.item.discountPrice || cartItem.item.price;
             purchases.push({
               id: `${Date.now()}-${cartItem.item.id}`,
               itemId: cartItem.item.id,
               itemName: cartItem.item.name,
-              price: cartItem.item.price,
+              price: price,
               quantity: cartItem.quantity,
               purchasedAt: new Date().toISOString(),
             });
 
             // Crear notificación
-            const totalPrice = cartItem.item.price * cartItem.quantity;
+            const totalPrice = price * cartItem.quantity;
             const itemText = cartItem.quantity > 1 
               ? `${cartItem.quantity}x ${cartItem.item.name}` 
               : cartItem.item.name;
@@ -363,11 +370,12 @@ export const useShopStore = create<ShopStore>()(
             return { success: false, error: result.error };
           }
 
+          const price = item.discountPrice || item.price;
           const purchase: PurchaseHistory = {
             id: `${Date.now()}-${item.id}`,
             itemId: item.id,
             itemName: item.name,
-            price: item.price,
+            price: price,
             quantity,
             purchasedAt: new Date().toISOString(),
           };
@@ -379,7 +387,7 @@ export const useShopStore = create<ShopStore>()(
           }));
 
           // Crear notificación
-          const totalPrice = item.price * quantity;
+          const totalPrice = price * quantity;
           const itemText = quantity > 1 ? `${quantity}x ${item.name}` : item.name;
           
           await notificationsService.notifyPurchase(
