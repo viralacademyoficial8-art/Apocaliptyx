@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/lib/stores";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { MobileMenu } from "@/components/MobileMenu";
@@ -18,13 +19,51 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, isAuthenticated, logout, login } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
+
+  // Determinar si está autenticado (priorizar session de NextAuth)
+  const isLoggedIn = status === "authenticated" && !!session?.user;
+  
+  // Usar datos de Zustand si existen, sino de la session
+  const currentUser = user || (session?.user ? {
+    id: session.user.id || "",
+    email: session.user.email || "",
+    username: session.user.username || session.user.email?.split("@")[0] || "user",
+    displayName: session.user.name || "Usuario",
+    avatarUrl: session.user.image || "",
+    apCoins: session.user.apCoins || 1000,
+  } : null);
+
+  // Sincronizar Zustand si hay session pero no user
+  useEffect(() => {
+    if (status === "authenticated" && session?.user && !user) {
+      const sessionUser = session.user;
+      login({
+        id: sessionUser.id || "",
+        email: sessionUser.email || "",
+        username: sessionUser.username || sessionUser.email?.split("@")[0] || "user",
+        displayName: sessionUser.name || "Usuario",
+        avatarUrl: sessionUser.image || "",
+        prophetLevel: "vidente",
+        reputationScore: 0,
+        apCoins: sessionUser.apCoins || 1000,
+        scenariosCreated: 0,
+        scenariosWon: 0,
+        winRate: 0,
+        followers: 0,
+        following: 0,
+        createdAt: new Date(),
+      });
+    }
+  }, [status, session, user, login]);
 
   const navItems = [
     { href: "/dashboard", label: t("nav.home") },
@@ -34,9 +73,9 @@ export function Navbar() {
     { href: "/crear", label: t("scenarios.create") },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     logout();
-    router.push("/");
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
@@ -46,7 +85,7 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link
-              href={isAuthenticated ? "/dashboard" : "/"}
+              href={isLoggedIn ? "/dashboard" : "/"}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <Skull className="w-7 h-7 sm:w-8 sm:h-8 text-red-500" />
@@ -88,13 +127,13 @@ export function Navbar() {
               {/* Selector de idioma (siempre visible) */}
               <LanguageSelector variant="default" />
 
-              {isAuthenticated && user ? (
+              {isLoggedIn && currentUser ? (
                 <>
                   {/* AP Coins (solo sm+) */}
                   <div className="hidden sm:flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-lg">
                     <Flame className="w-4 h-4 text-yellow-500" />
                     <span className="font-bold text-yellow-400 text-sm">
-                      {user.apCoins.toLocaleString("es-MX")}
+                      {(currentUser.apCoins || 0).toLocaleString("es-MX")}
                     </span>
                   </div>
 
@@ -107,16 +146,16 @@ export function Navbar() {
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 hover:bg-muted rounded-lg px-2 py-1.5 transition-colors">
                           <Avatar className="w-8 h-8 border-2 border-border">
-                            <AvatarImage src={user.avatarUrl} alt={user.username} />
+                            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.username} />
                             <AvatarFallback className="text-sm bg-gradient-to-br from-purple-600 to-pink-600">
-                              {user.username.substring(0, 2).toUpperCase()}
+                              {currentUser.username?.substring(0, 2).toUpperCase() || "US"}
                             </AvatarFallback>
                           </Avatar>
                           <div className="hidden lg:block text-left">
                             <div className="text-sm font-semibold text-foreground">
-                              {user.displayName ?? user.username}
+                              {currentUser.displayName ?? currentUser.username}
                             </div>
-                            <div className="text-xs text-muted-foreground">@{user.username}</div>
+                            <div className="text-xs text-muted-foreground">@{currentUser.username}</div>
                           </div>
                           <ChevronDown className="w-4 h-4 text-muted-foreground hidden lg:block" />
                         </button>
@@ -126,20 +165,20 @@ export function Navbar() {
                         {/* Header manual */}
                         <div className="px-3 py-2 border-b border-border">
                           <p className="text-sm font-medium text-foreground">
-                            {user.displayName ?? user.username}
+                            {currentUser.displayName ?? currentUser.username}
                           </p>
-                          <p className="text-xs text-muted-foreground">@{user.username}</p>
+                          <p className="text-xs text-muted-foreground">@{currentUser.username}</p>
                           <div className="flex items-center gap-1 mt-2">
                             <Flame className="w-3 h-3 text-yellow-500" />
                             <span className="text-xs font-semibold text-yellow-400">
-                              {user.apCoins.toLocaleString("es-MX")} AP Coins
+                              {(currentUser.apCoins || 0).toLocaleString("es-MX")} AP Coins
                             </span>
                           </div>
                         </div>
 
                         {/* Opciones */}
                         <DropdownMenuItem
-                          onClick={() => router.push(`/perfil/${user.username}`)}
+                          onClick={() => router.push(`/perfil/${currentUser.username}`)}
                           className="cursor-pointer hover:bg-muted"
                         >
                           <User className="mr-2 h-4 w-4" />
