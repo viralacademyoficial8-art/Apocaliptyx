@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -8,6 +8,7 @@ import { useAuthStore } from "@/lib/stores";
 import { profileService, UserProfileFromDB, UserStatsFromDB } from "@/services/profile.service";
 import { predictionsService } from "@/services/predictions.service";
 import { scenariosService } from "@/services/scenarios.service";
+import { shopService, UserInventoryItem } from "@/services/shop.service";
 import {
   Loader2,
   User,
@@ -17,26 +18,57 @@ import {
   Target,
   TrendingUp,
   Coins,
-  Users,
   Settings,
-  Edit,
   CheckCircle,
   Star,
+  Package,
+  Shield,
+  Zap,
+  Eye,
+  Sparkles,
+  Gift,
+  Box,
 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import Link from "next/link";
 
+// Iconos por tipo de item
+const typeIcons: Record<string, React.ElementType> = {
+  PROTECTION: Shield,
+  BOOST: Zap,
+  POWER: Eye,
+  COSMETIC: Sparkles,
+  SPECIAL: Gift,
+  BUNDLE: Box,
+};
+
+// Colores por rareza
+const rarityColors: Record<string, string> = {
+  COMMON: "border-gray-500 bg-gray-500/10",
+  RARE: "border-blue-500 bg-blue-500/10",
+  EPIC: "border-purple-500 bg-purple-500/10",
+  LEGENDARY: "border-yellow-500 bg-yellow-500/10",
+};
+
+const rarityTextColors: Record<string, string> = {
+  COMMON: "text-gray-400",
+  RARE: "text-blue-400",
+  EPIC: "text-purple-400",
+  LEGENDARY: "text-yellow-400",
+};
+
 export default function PerfilPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
 
   const [profile, setProfile] = useState<UserProfileFromDB | null>(null);
   const [stats, setStats] = useState<UserStatsFromDB | null>(null);
   const [predictions, setPredictions] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
+  const [inventory, setInventory] = useState<UserInventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "predictions" | "scenarios">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "inventory" | "predictions" | "scenarios">("overview");
 
   // Esperar hidratación de Zustand
   useEffect(() => {
@@ -44,48 +76,52 @@ export default function PerfilPage() {
   }, []);
 
   // Cargar datos del perfil
+  const loadProfile = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+
+      // Cargar perfil
+      const profileData = await profileService.getById(user.id);
+      if (profileData) {
+        setProfile(profileData);
+      }
+
+      // Cargar estadísticas
+      const statsData = await profileService.getStats(user.id);
+      setStats(statsData);
+
+      // Cargar predicciones recientes
+      const predictionsData = await predictionsService.getByUserId(user.id);
+      setPredictions(predictionsData.slice(0, 10));
+
+      // Cargar escenarios creados
+      const scenariosData = await scenariosService.getByCreator(user.id);
+      setScenarios(scenariosData.slice(0, 10));
+
+      // Cargar inventario
+      const inventoryData = await shopService.getUserInventory(user.id);
+      setInventory(inventoryData);
+
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      toast.error("Error al cargar el perfil");
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id]);
+
   useEffect(() => {
-    // No hacer nada hasta que se hidrate
     if (!hydrated) return;
 
-    // Si no hay usuario después de hidratar, redirigir
     if (!user?.id) {
       router.push("/login");
       return;
     }
 
-    async function loadProfile() {
-      try {
-        setLoading(true);
-
-        // Cargar perfil
-        const profileData = await profileService.getById(user!.id);
-        if (profileData) {
-          setProfile(profileData);
-        }
-
-        // Cargar estadísticas
-        const statsData = await profileService.getStats(user!.id);
-        setStats(statsData);
-
-        // Cargar predicciones recientes
-        const predictionsData = await predictionsService.getByUserId(user!.id);
-        setPredictions(predictionsData.slice(0, 10));
-
-        // Cargar escenarios creados
-        const scenariosData = await scenariosService.getByCreator(user!.id);
-        setScenarios(scenariosData.slice(0, 10));
-
-      } catch (error) {
-        console.error("Error loading profile:", error);
-        toast.error("Error al cargar el perfil");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadProfile();
-  }, [hydrated, user?.id, router]);
+  }, [hydrated, user?.id, router, loadProfile]);
 
   // Mostrar loading mientras se hidrata o carga
   if (!hydrated || loading) {
@@ -122,7 +158,6 @@ export default function PerfilPage() {
   if (!profile) return null;
 
   // Calcular XP para el siguiente nivel (simulado)
-  const xpToNextLevel = profile.level * 1000;
   const xpProgress = ((profile.xp % 1000) / 1000) * 100;
 
   return (
@@ -273,16 +308,16 @@ export default function PerfilPage() {
             <p className="text-xl font-bold">{stats?.followingCount || 0}</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Rol</p>
-            <p className="text-xl font-bold capitalize">{profile.role.toLowerCase()}</p>
+            <p className="text-sm text-gray-400 mb-1">Items en inventario</p>
+            <p className="text-xl font-bold text-pink-400">{inventory.length}</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-800 pb-4">
+        <div className="flex gap-2 mb-6 border-b border-gray-800 pb-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "overview"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -291,8 +326,19 @@ export default function PerfilPage() {
             Resumen
           </button>
           <button
+            onClick={() => setActiveTab("inventory")}
+            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-2 ${
+              activeTab === "inventory"
+                ? "bg-purple-500 text-white"
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            Inventario ({inventory.length})
+          </button>
+          <button
             onClick={() => setActiveTab("predictions")}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "predictions"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -302,7 +348,7 @@ export default function PerfilPage() {
           </button>
           <button
             onClick={() => setActiveTab("scenarios")}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "scenarios"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -390,6 +436,104 @@ export default function PerfilPage() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Tab Inventario */}
+        {activeTab === "inventory" && (
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Package className="w-5 h-5 text-purple-400" />
+                Mi Inventario
+              </h3>
+              <Link
+                href="/tienda"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Ir a la Tienda
+              </Link>
+            </div>
+
+            {inventory.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 mb-4">Tu inventario está vacío</p>
+                <p className="text-gray-500 text-sm mb-6">
+                  Compra items en la tienda para potenciar tus predicciones
+                </p>
+                <Link
+                  href="/tienda"
+                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg inline-flex items-center gap-2"
+                >
+                  <Sparkles className="w-5 h-5" />
+                  Explorar Tienda
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {inventory.map((inv) => {
+                  const item = inv.item;
+                  if (!item) return null;
+
+                  const rarity = item.rarity || "COMMON";
+                  const Icon = typeIcons[item.type] || Package;
+
+                  return (
+                    <div
+                      key={inv.id}
+                      className={`relative border-2 rounded-xl p-4 ${rarityColors[rarity]} transition-all hover:scale-[1.02]`}
+                    >
+                      {/* Badge cantidad */}
+                      {inv.quantity > 1 && (
+                        <span className="absolute -top-2 -right-2 w-7 h-7 bg-purple-600 text-white text-sm font-bold rounded-full flex items-center justify-center">
+                          x{inv.quantity}
+                        </span>
+                      )}
+
+                      {/* Equipado badge */}
+                      {inv.is_equipped && (
+                        <span className="absolute top-2 left-2 px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">
+                          Equipado
+                        </span>
+                      )}
+
+                      {/* Icono */}
+                      <div className="flex justify-center mb-3 mt-2">
+                        <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center text-2xl">
+                          {item.icon || <Icon className="w-7 h-7 text-gray-400" />}
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="text-center">
+                        <h4 className="font-bold text-white text-sm mb-1">
+                          {item.name}
+                        </h4>
+                        <p className={`text-xs font-medium mb-2 ${rarityTextColors[rarity]}`}>
+                          {rarity}
+                        </p>
+                        <p className="text-xs text-gray-400 line-clamp-2">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {inventory.length > 0 && (
+              <div className="mt-6 text-center">
+                <Link
+                  href="/inventario"
+                  className="text-purple-400 hover:text-purple-300 text-sm"
+                >
+                  Ver inventario completo →
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
