@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useShopStore } from "@/stores/shopStore";
-import { useAuthStore } from "@/lib/stores";
 import { Navbar } from "@/components/Navbar";
 import {
   ShopHero,
@@ -16,21 +15,13 @@ import {
 } from "@/components/tienda";
 
 export default function TiendaPage() {
-  const { setCartOpen, getCartItemCount, setCurrentUserId, loadItems } = useShopStore();
-  const { user } = useAuthStore();
+  const { setCartOpen, getCartItemCount, loadItems } = useShopStore();
   const cartItemCount = getCartItemCount();
 
   // Cargar items de Supabase al montar
   useEffect(() => {
     loadItems();
   }, [loadItems]);
-
-  // Pasar el userId al store para las compras
-  useEffect(() => {
-    if (user?.id) {
-      setCurrentUserId(user.id);
-    }
-  }, [user?.id, setCurrentUserId]);
 
   return (
     <div className="min-h-screen bg-gray-950">

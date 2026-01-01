@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { shopService, ShopItemFromDB } from '@/services/shop.service';
 import { notificationsService } from '@/services/notifications.service';
+import { useAuthStore } from '@/lib/stores';
 
 // ============================================
 // TYPES
@@ -63,23 +64,48 @@ function mapDBItemToStoreItem(dbItem: ShopItemFromDB): ShopItem {
     icon: dbItem.icon,
     type: dbItem.type as ShopItem['type'],
     rarity: dbItem.rarity as ShopItem['rarity'],
-    price: dbItem.price,
-    discountPrice: dbItem.discount_price || undefined,
+    price: hasDiscount ? dbItem.discount_price! : dbItem.price,
+    discountPrice: hasDiscount ? dbItem.discount_price! : undefined,
     originalPrice: hasDiscount ? dbItem.price : undefined,
     stock: dbItem.stock,
     maxPerUser: dbItem.max_per_user,
     isActive: dbItem.is_active,
     isFeatured: dbItem.rarity === 'LEGENDARY' || dbItem.rarity === 'EPIC',
-    isNew: false, // No tenemos esta columna, default false
+    isNew: false,
     isOnSale: hasDiscount,
     effects: dbItem.effects || undefined,
     tags: [],
     imageUrl: null,
     longDescription: undefined,
     purchaseCount: 0,
-    rating: 0,
+    rating: 4.5,
     reviews: 0,
   };
+}
+
+// ============================================
+// HELPER: Get current user ID from auth store
+// ============================================
+
+function getCurrentUserId(): string | null {
+  // Intentar obtener del store de Zustand
+  const authState = useAuthStore.getState();
+  if (authState.user?.id) {
+    return authState.user.id;
+  }
+  
+  // Fallback: obtener de localStorage
+  try {
+    const stored = localStorage.getItem('apocaliptics-auth');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed?.state?.user?.id || null;
+    }
+  } catch (e) {
+    console.error('Error reading auth from localStorage:', e);
+  }
+  
+  return null;
 }
 
 // ============================================
@@ -92,9 +118,6 @@ interface ShopStore {
   purchaseHistory: PurchaseHistory[];
   isLoading: boolean;
   error: string | null;
-
-  currentUserId: string | null;
-  setCurrentUserId: (id: string | null) => void;
 
   filters: {
     search: string;
@@ -149,7 +172,6 @@ export const useShopStore = create<ShopStore>()(
       purchaseHistory: [],
       isLoading: false,
       error: null,
-      currentUserId: null,
 
       filters: {
         search: '',
@@ -162,8 +184,6 @@ export const useShopStore = create<ShopStore>()(
       isCartOpen: false,
       isPurchaseModalOpen: false,
       selectedItem: null,
-
-      setCurrentUserId: (id) => set({ currentUserId: id }),
 
       // Cargar items desde Supabase
       loadItems: async () => {
@@ -209,15 +229,14 @@ export const useShopStore = create<ShopStore>()(
 
         switch (filters.sortBy) {
           case 'price_asc':
-            filtered.sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price));
+            filtered.sort((a, b) => a.price - b.price);
             break;
           case 'price_desc':
-            filtered.sort((a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price));
+            filtered.sort((a, b) => b.price - a.price);
             break;
           case 'newest':
           case 'popular':
           default:
-            // Mantener orden original (por created_at desc)
             break;
         }
 
@@ -226,7 +245,6 @@ export const useShopStore = create<ShopStore>()(
 
       getFeaturedItems: () => {
         const { items } = get();
-        // Retornar items legendarios o épicos como destacados
         return items.filter((item) => 
           item.isActive && (item.rarity === 'LEGENDARY' || item.rarity === 'EPIC')
         );
@@ -274,16 +292,16 @@ export const useShopStore = create<ShopStore>()(
 
       clearCart: () => set({ cart: [] }),
 
-      getCartTotal: () => get().cart.reduce((total, ci) => {
-        const price = ci.item.discountPrice || ci.item.price;
-        return total + price * ci.quantity;
-      }, 0),
+      getCartTotal: () => get().cart.reduce((total, ci) => total + ci.item.price * ci.quantity, 0),
 
       getCartItemCount: () => get().cart.reduce((count, ci) => count + ci.quantity, 0),
 
       // Comprar todo el carrito - REAL con Supabase
       purchaseCart: async () => {
-        const { cart, clearCart, currentUserId } = get();
+        const { cart, clearCart } = get();
+        const currentUserId = getCurrentUserId();
+        
+        console.log('[ShopStore] purchaseCart called, userId:', currentUserId);
         
         if (!currentUserId) {
           return { success: false, error: 'Debes iniciar sesión para comprar' };
@@ -299,13 +317,16 @@ export const useShopStore = create<ShopStore>()(
           let lastNewBalance = 0;
           const purchases: PurchaseHistory[] = [];
 
-          // Procesar cada item del carrito
           for (const cartItem of cart) {
+            console.log('[ShopStore] Purchasing item:', cartItem.item.name, 'for user:', currentUserId);
+            
             const result = await shopService.purchaseItem(
               currentUserId,
               cartItem.item.id,
               cartItem.quantity
             );
+
+            console.log('[ShopStore] Purchase result:', result);
 
             if (!result.success) {
               set({ isLoading: false, error: result.error });
@@ -314,19 +335,17 @@ export const useShopStore = create<ShopStore>()(
 
             lastNewBalance = result.newBalance || 0;
 
-            // Registrar en historial local
-            const price = cartItem.item.discountPrice || cartItem.item.price;
             purchases.push({
               id: `${Date.now()}-${cartItem.item.id}`,
               itemId: cartItem.item.id,
               itemName: cartItem.item.name,
-              price: price,
+              price: cartItem.item.price,
               quantity: cartItem.quantity,
               purchasedAt: new Date().toISOString(),
             });
 
             // Crear notificación
-            const totalPrice = price * cartItem.quantity;
+            const totalPrice = cartItem.item.price * cartItem.quantity;
             const itemText = cartItem.quantity > 1 
               ? `${cartItem.quantity}x ${cartItem.item.name}` 
               : cartItem.item.name;
@@ -344,6 +363,10 @@ export const useShopStore = create<ShopStore>()(
           }));
 
           clearCart();
+          
+          // Actualizar AP Coins en el auth store
+          useAuthStore.getState().updateApCoins(lastNewBalance);
+          
           return { success: true, newBalance: lastNewBalance };
         } catch (error) {
           console.error('Error purchasing cart:', error);
@@ -354,7 +377,9 @@ export const useShopStore = create<ShopStore>()(
 
       // Comprar un item directamente - REAL con Supabase
       purchaseItem: async (item, quantity) => {
-        const { currentUserId } = get();
+        const currentUserId = getCurrentUserId();
+        
+        console.log('[ShopStore] purchaseItem called, userId:', currentUserId);
         
         if (!currentUserId) {
           return { success: false, error: 'Debes iniciar sesión para comprar' };
@@ -363,19 +388,22 @@ export const useShopStore = create<ShopStore>()(
         set({ isLoading: true, error: null });
 
         try {
+          console.log('[ShopStore] Calling shopService.purchaseItem for:', item.name);
+          
           const result = await shopService.purchaseItem(currentUserId, item.id, quantity);
+
+          console.log('[ShopStore] Purchase result:', result);
 
           if (!result.success) {
             set({ isLoading: false, error: result.error });
             return { success: false, error: result.error };
           }
 
-          const price = item.discountPrice || item.price;
           const purchase: PurchaseHistory = {
             id: `${Date.now()}-${item.id}`,
             itemId: item.id,
             itemName: item.name,
-            price: price,
+            price: item.price,
             quantity,
             purchasedAt: new Date().toISOString(),
           };
@@ -387,7 +415,7 @@ export const useShopStore = create<ShopStore>()(
           }));
 
           // Crear notificación
-          const totalPrice = price * quantity;
+          const totalPrice = item.price * quantity;
           const itemText = quantity > 1 ? `${quantity}x ${item.name}` : item.name;
           
           await notificationsService.notifyPurchase(
@@ -395,6 +423,9 @@ export const useShopStore = create<ShopStore>()(
             itemText,
             totalPrice
           );
+          
+          // Actualizar AP Coins en el auth store
+          useAuthStore.getState().updateApCoins(result.newBalance || 0);
 
           return { success: true, newBalance: result.newBalance };
         } catch (error) {

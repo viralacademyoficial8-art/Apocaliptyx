@@ -10,7 +10,7 @@ import type {
   ForumComment,
   CreatePostInput,
   CreateCommentInput,
-  Notification, // 👈 usamos directamente el tipo Notification del dominio
+  Notification,
 } from "@/types";
 import {
   mockScenarios,
@@ -32,6 +32,7 @@ interface AuthState {
   login: (user: User) => void;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
+  updateApCoins: (newBalance: number) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -55,10 +56,17 @@ export const useAuthStore = create<AuthState>()(
         const updatedUser = { ...currentUser, ...data };
         set({ user: updatedUser });
       },
+
+      updateApCoins: (newBalance) => {
+        const currentUser = get().user;
+        if (!currentUser) return;
+
+        const updatedUser = { ...currentUser, apCoins: newBalance };
+        set({ user: updatedUser });
+      },
     }),
     {
       name: "apocaliptics-auth",
-      // opcional: si quieres mantener el store más limpio
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
@@ -73,8 +81,6 @@ export const useAuthStore = create<AuthState>()(
 // 2) NOTIFICATION STORE
 // ----------------------------------------------------
 //
-// Usamos Notification del dominio:
-// { id, type, title, message, relatedUserId?, relatedScenarioId?, read, createdAt }
 
 interface NotificationStoreState {
   notifications: Notification[];
@@ -194,7 +200,6 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // Simulación de llamada a API
       await new Promise((r) => setTimeout(r, 400));
 
       set({
@@ -231,7 +236,6 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
 
     set({ scenarios: updated });
 
-    // Guardar en localStorage de forma segura
     try {
       const raw = safeGetItem("scenarios");
       let stored: Scenario[] = [];
@@ -244,7 +248,6 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
       console.warn("No se pudo guardar escenarios");
     }
 
-    // 🔔 Crear notificación de escenario creado
     if (user?.id) {
       await notificationsService.notifyScenarioCreated(
         user.id,
@@ -271,7 +274,6 @@ export const useItemStore = create<ItemStoreState>(() => ({
 
   async buyItem(item: any) {
     console.log("buyItem llamado con:", item);
-    // Aquí luego conectamos monedas, inventario, etc.
   },
 }));
 
@@ -571,13 +573,13 @@ interface SearchFilters {
 interface SearchState {
   query: string;
   filters: SearchFilters;
-  results: any[]; // puedes cambiar a Scenario[] si ya tienes ese tipo
+  results: any[];
   isSearching: boolean;
   recentSearches: string[];
   setQuery: (query: string) => void;
   setFilters: (filters: Partial<SearchFilters>) => void;
   resetFilters: () => void;
-  search: (scenarios: any[]) => void; // igual, cámbialo a Scenario[] si quieres
+  search: (scenarios: any[]) => void;
   addRecentSearch: (query: string) => void;
   clearRecentSearches: () => void;
 }
@@ -614,7 +616,6 @@ export const useSearchStore = create<SearchState>()(
 
         let results = [...scenarios];
 
-        // Filtrar por query (título, descripción, usuario actual)
         if (query.trim()) {
           const lowerQuery = query.toLowerCase().trim();
           results = results.filter((s: any) => {
@@ -630,24 +631,20 @@ export const useSearchStore = create<SearchState>()(
           });
         }
 
-        // Filtrar por categoría
         if (filters.category !== "all") {
           results = results.filter((s: any) => s.category === filters.category);
         }
 
-        // Filtrar por estado
         if (filters.status !== "all") {
           results = results.filter((s: any) => s.status === filters.status);
         }
 
-        // Filtrar por rango de precio
         results = results.filter(
           (s: any) =>
             s.currentPrice >= filters.priceRange.min &&
             s.currentPrice <= filters.priceRange.max
         );
 
-        // Ordenar resultados
         switch (filters.sortBy) {
           case "recent":
             results.sort(
