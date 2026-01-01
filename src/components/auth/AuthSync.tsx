@@ -6,6 +6,7 @@ import { useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/lib/stores";
 import { usePathname } from "next/navigation";
+import type { UserRole } from "@/types";
 
 export function AuthSync() {
   const { data: session, status, update } = useSession();
@@ -31,6 +32,8 @@ export function AuthSync() {
       followers: 0,
       following: 0,
       createdAt: new Date(),
+      // Incluir el rol del usuario
+      role: (sessionUser.role as UserRole) || 'USER',
     });
   }, [login]);
 
@@ -53,7 +56,7 @@ export function AuthSync() {
       
       // Sincronizar si no hay usuario o si el ID cambió
       if (!user || user.id !== sessionUser.id) {
-        console.log("[AuthSync] Syncing user:", sessionUser.email);
+        console.log("[AuthSync] Syncing user:", sessionUser.email, "Role:", sessionUser.role);
         syncUser(sessionUser);
       }
     } else if (status === "unauthenticated" && user) {

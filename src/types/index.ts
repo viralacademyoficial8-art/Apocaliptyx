@@ -1,6 +1,12 @@
 // src/types/index.ts
 
 // =========================
+// Roles de Usuario
+// =========================
+
+export type UserRole = 'USER' | 'STAFF' | 'MODERATOR' | 'SUPER_ADMIN';
+
+// =========================
 // Niveles de Profeta
 // =========================
 
@@ -55,6 +61,8 @@ export interface User {
   followers: number;
   following: number;
   createdAt: Date;
+  // Nuevo campo de rol
+  role?: UserRole;
 }
 
 // =========================
@@ -144,10 +152,6 @@ export interface UserItem {
   quantity: number;
   expiresAt: Date | null;
 }
-
-// =========================
-// Notificaciones
-// =========================
 
 // =========================
 // Notificaciones

@@ -8,6 +8,9 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+// Roles con AP Coins infinitas
+const INFINITE_COINS_ROLES = ['SUPER_ADMIN', 'STAFF', 'MODERATOR'];
+
 export interface ShopItemFromDB {
   id: string;
   name: string;
@@ -39,6 +42,7 @@ export interface PurchaseResult {
   success: boolean;
   error?: string;
   newBalance?: number;
+  wasFree?: boolean; // Indica si fue gratis por ser admin/staff
 }
 
 class ShopService {
@@ -99,19 +103,15 @@ class ShopService {
         return { success: false, error: "Item no encontrado" };
       }
 
-      // 2. Verificar stock
+      // 2. Verificar stock (aplica para todos)
       if (item.stock !== null && item.stock < quantity) {
         return { success: false, error: "Stock insuficiente" };
       }
 
-      // 3. Calcular precio total
-      const unitPrice = item.discount_price || item.price;
-      const totalPrice = unitPrice * quantity;
-
-      // 4. Obtener usuario
+      // 3. Obtener usuario con su rol
       const { data: user, error: userError } = await supabase
         .from("users")
-        .select("ap_coins")
+        .select("ap_coins, role")
         .eq("id", userId)
         .single();
 
@@ -119,11 +119,19 @@ class ShopService {
         return { success: false, error: "Usuario no encontrado" };
       }
 
-      if (user.ap_coins < totalPrice) {
+      // 4. Verificar si tiene AP Coins infinitas
+      const hasInfiniteCoins = INFINITE_COINS_ROLES.includes(user.role);
+      
+      // 5. Calcular precio total
+      const unitPrice = item.discount_price || item.price;
+      const totalPrice = unitPrice * quantity;
+
+      // 6. Verificar balance (solo si NO tiene coins infinitas)
+      if (!hasInfiniteCoins && user.ap_coins < totalPrice) {
         return { success: false, error: "AP Coins insuficientes" };
       }
 
-      // 5. Verificar límite por usuario
+      // 7. Verificar límite por usuario (aplica para todos)
       if (item.max_per_user !== null) {
         const { data: existing } = await supabase
           .from("user_inventory")
@@ -141,38 +149,45 @@ class ShopService {
         }
       }
 
-      // 6. Descontar AP Coins
-      const newBalance = user.ap_coins - totalPrice;
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ ap_coins: newBalance, updated_at: new Date().toISOString() })
-        .eq("id", userId);
+      // 8. Descontar AP Coins (solo si NO tiene coins infinitas)
+      let newBalance = user.ap_coins;
+      
+      if (!hasInfiniteCoins) {
+        newBalance = user.ap_coins - totalPrice;
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ ap_coins: newBalance, updated_at: new Date().toISOString() })
+          .eq("id", userId);
 
-      if (updateError) {
-        console.error("Error updating user balance:", updateError);
-        return { success: false, error: "Error al procesar el pago" };
+        if (updateError) {
+          console.error("Error updating user balance:", updateError);
+          return { success: false, error: "Error al procesar el pago" };
+        }
       }
 
-      // 7. Registrar compra
+      // 9. Registrar compra (con precio 0 si es gratis)
       const { error: purchaseError } = await supabase
         .from("user_purchases")
         .insert({
           user_id: userId,
           item_id: itemId,
           quantity: quantity,
-          price_paid: totalPrice,
+          price_paid: hasInfiniteCoins ? 0 : totalPrice,
         });
 
       if (purchaseError) {
         console.error("Error recording purchase:", purchaseError);
-        await supabase
-          .from("users")
-          .update({ ap_coins: user.ap_coins })
-          .eq("id", userId);
+        // Revertir el balance si falla (solo si se descontó)
+        if (!hasInfiniteCoins) {
+          await supabase
+            .from("users")
+            .update({ ap_coins: user.ap_coins })
+            .eq("id", userId);
+        }
         return { success: false, error: "Error al registrar la compra" };
       }
 
-      // 8. Añadir al inventario
+      // 10. Añadir al inventario
       const { data: existingItem } = await supabase
         .from("user_inventory")
         .select("id, quantity")
@@ -193,7 +208,7 @@ class ShopService {
         });
       }
 
-      // 9. Actualizar stock
+      // 11. Actualizar stock (aplica para todos)
       if (item.stock !== null) {
         await supabase
           .from("shop_items")
@@ -201,7 +216,11 @@ class ShopService {
           .eq("id", itemId);
       }
 
-      return { success: true, newBalance };
+      return { 
+        success: true, 
+        newBalance,
+        wasFree: hasInfiniteCoins 
+      };
     } catch (error) {
       console.error("Error in purchaseItem:", error);
       return { success: false, error: "Error al procesar la compra" };

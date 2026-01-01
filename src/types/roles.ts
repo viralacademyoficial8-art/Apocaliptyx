@@ -1,0 +1,181 @@
+// src/types/roles.ts
+
+export type UserRole = 'USER' | 'STAFF' | 'MODERATOR' | 'SUPER_ADMIN';
+
+// Permisos disponibles en la plataforma
+export type Permission =
+  // Panel Admin
+  | 'admin.access'              // Acceder al panel de admin
+  | 'admin.dashboard'           // Ver dashboard de admin
+  | 'admin.users.view'          // Ver lista de usuarios
+  | 'admin.users.edit'          // Editar usuarios
+  | 'admin.users.ban'           // Banear usuarios
+  | 'admin.users.delete'        // Eliminar usuarios
+  | 'admin.users.change_role'   // Cambiar roles de usuarios
+  | 'admin.scenarios.view'      // Ver todos los escenarios
+  | 'admin.scenarios.edit'      // Editar escenarios
+  | 'admin.scenarios.delete'    // Eliminar escenarios
+  | 'admin.scenarios.resolve'   // Resolver escenarios
+  | 'admin.reports.view'        // Ver reportes
+  | 'admin.reports.resolve'     // Resolver reportes
+  | 'admin.shop.view'           // Ver tienda admin
+  | 'admin.shop.edit'           // Editar items de tienda
+  | 'admin.shop.create'         // Crear items de tienda
+  | 'admin.shop.delete'         // Eliminar items de tienda
+  | 'admin.notifications.send'  // Enviar notificaciones masivas
+  | 'admin.settings.view'       // Ver configuración
+  | 'admin.settings.edit'       // Editar configuración
+  | 'admin.analytics.view'      // Ver analytics
+  | 'admin.logs.view'           // Ver logs del sistema
+  // Privilegios especiales
+  | 'coins.infinite'            // AP Coins infinitas (no se descuentan)
+  | 'shop.free'                 // Compras gratis
+  | 'premium.free'              // Premium gratis
+  | 'scenarios.unlimited'       // Crear escenarios ilimitados
+  | 'bypass.limits';            // Saltarse límites de la plataforma
+
+// Configuración de permisos por rol
+export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
+  // Usuario normal - sin permisos de admin
+  USER: [],
+
+  // Staff - acceso limitado al panel de admin
+  STAFF: [
+    'admin.access',
+    'admin.dashboard',
+    'admin.users.view',
+    'admin.scenarios.view',
+    'admin.reports.view',
+    'admin.reports.resolve',
+    'admin.shop.view',
+    'coins.infinite',
+    'shop.free',
+  ],
+
+  // Moderador - más permisos que staff
+  MODERATOR: [
+    'admin.access',
+    'admin.dashboard',
+    'admin.users.view',
+    'admin.users.edit',
+    'admin.users.ban',
+    'admin.scenarios.view',
+    'admin.scenarios.edit',
+    'admin.scenarios.resolve',
+    'admin.reports.view',
+    'admin.reports.resolve',
+    'admin.shop.view',
+    'admin.notifications.send',
+    'coins.infinite',
+    'shop.free',
+    'premium.free',
+  ],
+
+  // Super Admin - todos los permisos
+  SUPER_ADMIN: [
+    'admin.access',
+    'admin.dashboard',
+    'admin.users.view',
+    'admin.users.edit',
+    'admin.users.ban',
+    'admin.users.delete',
+    'admin.users.change_role',
+    'admin.scenarios.view',
+    'admin.scenarios.edit',
+    'admin.scenarios.delete',
+    'admin.scenarios.resolve',
+    'admin.reports.view',
+    'admin.reports.resolve',
+    'admin.shop.view',
+    'admin.shop.edit',
+    'admin.shop.create',
+    'admin.shop.delete',
+    'admin.notifications.send',
+    'admin.settings.view',
+    'admin.settings.edit',
+    'admin.analytics.view',
+    'admin.logs.view',
+    'coins.infinite',
+    'shop.free',
+    'premium.free',
+    'scenarios.unlimited',
+    'bypass.limits',
+  ],
+};
+
+// Nombres amigables de los roles
+export const ROLE_NAMES: Record<UserRole, string> = {
+  USER: 'Usuario',
+  STAFF: 'Staff',
+  MODERATOR: 'Moderador',
+  SUPER_ADMIN: 'Administrador',
+};
+
+// Colores de los roles
+export const ROLE_COLORS: Record<UserRole, { bg: string; text: string; border: string }> = {
+  USER: {
+    bg: 'bg-gray-500/20',
+    text: 'text-gray-400',
+    border: 'border-gray-500',
+  },
+  STAFF: {
+    bg: 'bg-blue-500/20',
+    text: 'text-blue-400',
+    border: 'border-blue-500',
+  },
+  MODERATOR: {
+    bg: 'bg-purple-500/20',
+    text: 'text-purple-400',
+    border: 'border-purple-500',
+  },
+  SUPER_ADMIN: {
+    bg: 'bg-red-500/20',
+    text: 'text-red-400',
+    border: 'border-red-500',
+  },
+};
+
+// Iconos de los roles (emoji)
+export const ROLE_ICONS: Record<UserRole, string> = {
+  USER: '👤',
+  STAFF: '🛠️',
+  MODERATOR: '🛡️',
+  SUPER_ADMIN: '👑',
+};
+
+// Jerarquía de roles (mayor número = más poder)
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+  USER: 0,
+  STAFF: 1,
+  MODERATOR: 2,
+  SUPER_ADMIN: 3,
+};
+
+// Funciones de utilidad
+export function hasPermission(role: UserRole, permission: Permission): boolean {
+  return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;
+}
+
+export function hasAnyPermission(role: UserRole, permissions: Permission[]): boolean {
+  return permissions.some(p => hasPermission(role, p));
+}
+
+export function hasAllPermissions(role: UserRole, permissions: Permission[]): boolean {
+  return permissions.every(p => hasPermission(role, p));
+}
+
+export function canManageRole(managerRole: UserRole, targetRole: UserRole): boolean {
+  return ROLE_HIERARCHY[managerRole] > ROLE_HIERARCHY[targetRole];
+}
+
+export function isAdminRole(role: UserRole): boolean {
+  return role === 'STAFF' || role === 'MODERATOR' || role === 'SUPER_ADMIN';
+}
+
+export function hasInfiniteCoins(role: UserRole): boolean {
+  return hasPermission(role, 'coins.infinite');
+}
+
+export function hasFreeShop(role: UserRole): boolean {
+  return hasPermission(role, 'shop.free');
+}
