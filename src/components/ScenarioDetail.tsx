@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Scenario } from "@/types";
 import { useAuthStore, useScenarioStore } from "@/lib/stores";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -18,12 +18,17 @@ import {
   Target,
   AlertTriangle,
   TrendingUp,
+  ThumbsUp,
+  ThumbsDown,
+  Check,
+  Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { getCategoryColor, calculateTimeLeft } from "@/lib/utils";
+import { predictionsService, type PredictionType, type Prediction } from "@/services/predictions.service";
 
 interface ScenarioDetailProps {
   scenario: Scenario;
@@ -44,6 +49,12 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
   const { user } = useAuthStore();
   const scenarioStore = useScenarioStore();
   const [isStealing, setIsStealing] = useState(false);
+  
+  // Estados para votación
+  const [isVoting, setIsVoting] = useState(false);
+  const [userPrediction, setUserPrediction] = useState<Prediction | null>(null);
+  const [voteCounts, setVoteCounts] = useState({ yes: 0, no: 0 });
+  const [loadingVotes, setLoadingVotes] = useState(true);
 
   // ⬇️ Fallbacks seguros para usernames
   const creatorUsername = scenario.creatorUsername ?? "profeta_anonimo";
@@ -65,12 +76,41 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
   const currentPrice = scenario.currentPrice ?? 0;
   const totalPot = scenario.totalPot ?? 0;
   const transferCount = scenario.transferCount ?? 0;
-  const votesYes = scenario.votes?.yes ?? 0;
-  const votesNo = scenario.votes?.no ?? 0;
 
   const timeLeft = calculateTimeLeft(dueDate);
   const categoryLabel =
     CATEGORY_LABELS[scenario.category] ?? scenario.category;
+
+  // Cargar votos y predicción del usuario
+  useEffect(() => {
+    const loadVotesData = async () => {
+      setLoadingVotes(true);
+      try {
+        // Cargar conteo de votos
+        const counts = await predictionsService.countVotes(scenario.id);
+        setVoteCounts(counts);
+
+        // Si hay usuario, cargar su predicción
+        if (user?.id) {
+          const prediction = await predictionsService.getUserPrediction(user.id, scenario.id);
+          setUserPrediction(prediction);
+        }
+      } catch (error) {
+        console.error('Error loading votes:', error);
+      } finally {
+        setLoadingVotes(false);
+      }
+    };
+
+    loadVotesData();
+  }, [scenario.id, user?.id]);
+
+  // Usar votos de la base de datos o del escenario
+  const votesYes = voteCounts.yes || (scenario.votes?.yes ?? 0);
+  const votesNo = voteCounts.no || (scenario.votes?.no ?? 0);
+  const totalVotes = votesYes + votesNo || 1;
+  const yesPct = (votesYes / totalVotes) * 100;
+  const noPct = (votesNo / totalVotes) * 100;
 
   const canSteal = () => {
     if (!user) return false;
@@ -85,6 +125,72 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
     if (lockUntil && new Date() < lockUntil) return false;
     if (user.apCoins < currentPrice) return false;
     return true;
+  };
+
+  const canVote = () => {
+    if (!user) return false;
+    if (userPrediction) return false; // Ya votó
+    if (scenario.status !== "active") return false;
+    return true;
+  };
+
+  const handleVote = async (vote: PredictionType) => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para votar");
+      router.push("/login");
+      return;
+    }
+
+    if (!canVote()) {
+      if (userPrediction) {
+        toast.error("Ya has votado en este escenario");
+      } else {
+        toast.error("No puedes votar en este escenario");
+      }
+      return;
+    }
+
+    setIsVoting(true);
+    try {
+      const result = await predictionsService.voteWithNotification({
+        userId: user.id,
+        username: user.username,
+        scenarioId: scenario.id,
+        scenarioTitle: scenario.title,
+        scenarioOwnerId: scenario.currentHolderId || scenario.creatorId || '',
+        prediction: vote,
+        amount: 0, // Por ahora sin apuesta, solo voto
+      });
+
+      if (result.success) {
+        toast.success(`¡Votaste "${vote === 'YES' ? 'Sí' : 'No'}"!`);
+        
+        // Actualizar estado local
+        setUserPrediction({
+          id: 'temp',
+          user_id: user.id,
+          scenario_id: scenario.id,
+          prediction: vote,
+          amount: 0,
+          status: 'PENDING',
+          profit: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+        
+        // Actualizar conteo de votos
+        setVoteCounts(prev => ({
+          yes: vote === 'YES' ? prev.yes + 1 : prev.yes,
+          no: vote === 'NO' ? prev.no + 1 : prev.no,
+        }));
+      } else {
+        toast.error(result.error || "Error al votar");
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Error al votar");
+    } finally {
+      setIsVoting(false);
+    }
   };
 
   const handleSteal = async () => {
@@ -164,10 +270,6 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
         return null;
     }
   };
-
-  const totalVotes = votesYes + votesNo || 1; // evitar división entre 0
-  const yesPct = (votesYes / totalVotes) * 100;
-  const noPct = (votesNo / totalVotes) * 100;
 
   return (
     <div className="space-y-6">
@@ -333,23 +435,25 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
             </div>
           </div>
 
-          {/* Voting */}
+          {/* Voting Section */}
           <div className="bg-gray-800/50 rounded-lg p-4 mb-6 border border-gray-700">
             <h3 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
               <Target className="w-4 h-4" />
               ¿Crees que se cumplirá?
             </h3>
-            <div className="flex gap-4">
+            
+            {/* Barras de progreso */}
+            <div className="flex gap-4 mb-4">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-green-400 font-semibold">Sí</span>
                   <span className="text-sm text-gray-400">
-                    {votesYes} votos
+                    {loadingVotes ? '...' : `${votesYes} votos`}
                   </span>
                 </div>
                 <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-green-500 transition-all"
+                    className="h-full bg-green-500 transition-all duration-500"
                     style={{ width: `${yesPct}%` }}
                   />
                 </div>
@@ -358,17 +462,77 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-red-400 font-semibold">No</span>
                   <span className="text-sm text-gray-400">
-                    {votesNo} votos
+                    {loadingVotes ? '...' : `${votesNo} votos`}
                   </span>
                 </div>
                 <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-red-500 transition-all"
+                    className="h-full bg-red-500 transition-all duration-500"
                     style={{ width: `${noPct}%` }}
                   />
                 </div>
               </div>
             </div>
+
+            {/* Botones de votar o estado del voto */}
+            {userPrediction ? (
+              // Usuario ya votó
+              <div className="flex items-center justify-center gap-2 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                <Check className="w-5 h-5 text-purple-400" />
+                <span className="text-purple-400 font-medium">
+                  Votaste: {userPrediction.prediction === 'YES' ? '✅ Sí' : '❌ No'}
+                </span>
+              </div>
+            ) : scenario.status === 'active' ? (
+              // Puede votar
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => handleVote('YES')}
+                  disabled={isVoting || !user}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3"
+                >
+                  {isVoting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ThumbsUp className="w-5 h-5 mr-2" />
+                      Sí, se cumplirá
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => handleVote('NO')}
+                  disabled={isVoting || !user}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3"
+                >
+                  {isVoting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      <ThumbsDown className="w-5 h-5 mr-2" />
+                      No, no se cumplirá
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : (
+              // Escenario no activo
+              <div className="text-center text-gray-500 py-2">
+                Este escenario ya no acepta votos
+              </div>
+            )}
+
+            {!user && scenario.status === 'active' && (
+              <p className="text-center text-gray-500 text-sm mt-3">
+                <button 
+                  onClick={() => router.push('/login')}
+                  className="text-purple-400 hover:underline"
+                >
+                  Inicia sesión
+                </button>
+                {' '}para votar
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}
