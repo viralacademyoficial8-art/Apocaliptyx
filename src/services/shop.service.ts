@@ -31,8 +31,7 @@ export interface UserInventoryItem {
   item_id: string;
   quantity: number;
   is_equipped: boolean;
-  acquired_at: string;
-  expires_at: string | null;
+  purchased_at: string;
   item?: ShopItemFromDB;
 }
 
@@ -216,7 +215,7 @@ class ShopService {
         .select("*, item:shop_items(*)")
         .eq("user_id", userId)
         .gt("quantity", 0)
-        .order("acquired_at", { ascending: false });
+        .order("purchased_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching user inventory:", error);
