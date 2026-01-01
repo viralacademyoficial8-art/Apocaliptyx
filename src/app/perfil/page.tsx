@@ -28,42 +28,52 @@ import Link from "next/link";
 
 export default function PerfilPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
 
   const [profile, setProfile] = useState<UserProfileFromDB | null>(null);
   const [stats, setStats] = useState<UserStatsFromDB | null>(null);
   const [predictions, setPredictions] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hydrated, setHydrated] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "predictions" | "scenarios">("overview");
+
+  // Esperar hidratación de Zustand
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   // Cargar datos del perfil
   useEffect(() => {
-    async function loadProfile() {
-      if (!user?.id) {
-        router.push("/login");
-        return;
-      }
+    // No hacer nada hasta que se hidrate
+    if (!hydrated) return;
 
+    // Si no hay usuario después de hidratar, redirigir
+    if (!user?.id) {
+      router.push("/login");
+      return;
+    }
+
+    async function loadProfile() {
       try {
         setLoading(true);
 
         // Cargar perfil
-        const profileData = await profileService.getById(user.id);
+        const profileData = await profileService.getById(user!.id);
         if (profileData) {
           setProfile(profileData);
         }
 
         // Cargar estadísticas
-        const statsData = await profileService.getStats(user.id);
+        const statsData = await profileService.getStats(user!.id);
         setStats(statsData);
 
         // Cargar predicciones recientes
-        const predictionsData = await predictionsService.getByUserId(user.id);
+        const predictionsData = await predictionsService.getByUserId(user!.id);
         setPredictions(predictionsData.slice(0, 10));
 
         // Cargar escenarios creados
-        const scenariosData = await scenariosService.getByCreator(user.id);
+        const scenariosData = await scenariosService.getByCreator(user!.id);
         setScenarios(scenariosData.slice(0, 10));
 
       } catch (error) {
@@ -75,9 +85,10 @@ export default function PerfilPage() {
     }
 
     loadProfile();
-  }, [user?.id, router]);
+  }, [hydrated, user?.id, router]);
 
-  if (loading) {
+  // Mostrar loading mientras se hidrata o carga
+  if (!hydrated || loading) {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
         <Navbar />
@@ -89,7 +100,7 @@ export default function PerfilPage() {
     );
   }
 
-  if (!profile) {
+  if (!profile && !loading) {
     return (
       <div className="min-h-screen bg-gray-950 text-white">
         <Navbar />
@@ -107,6 +118,8 @@ export default function PerfilPage() {
       </div>
     );
   }
+
+  if (!profile) return null;
 
   // Calcular XP para el siguiente nivel (simulado)
   const xpToNextLevel = profile.level * 1000;
