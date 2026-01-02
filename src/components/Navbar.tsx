@@ -70,12 +70,13 @@ export function Navbar() {
   }, [status, session, user, login]);
 
   const navItems = [
-    { href: "/dashboard", label: t("nav.home") },
-    { href: "/tienda", label: t("nav.shop") },
-    { href: "/leaderboard", label: t("nav.rankings") },
-    { href: "/foro", label: t("nav.forum") },
-    { href: "/crear", label: t("scenarios.create") },
-  ];
+  { href: "/dashboard", label: t("nav.home") },
+  { href: "/explorar", label: "Escenarios" },
+  { href: "/tienda", label: t("nav.shop") },
+  { href: "/leaderboard", label: t("nav.rankings") },
+  { href: "/foro", label: t("nav.forum") },
+  { href: "/crear", label: t("scenarios.create") },
+];
 
   const handleLogout = async () => {
     logout();
