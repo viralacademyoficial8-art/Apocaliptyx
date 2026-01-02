@@ -18,6 +18,9 @@ const adminRoutes = ["/admin"];
 // Rutas públicas (no requieren auth)
 const publicRoutes = ["/", "/login", "/registro", "/about", "/faq"];
 
+// Roles que pueden acceder al panel de admin
+const adminRoles = ["ADMIN", "SUPER_ADMIN", "STAFF", "MODERATOR"];
+
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
@@ -44,12 +47,12 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Si está en ruta admin y no es admin, redirigir a dashboard
+  // Si está en ruta admin y no tiene rol de admin, redirigir a dashboard
   if (isAdminRoute) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", nextUrl));
     }
-    if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
+    if (!userRole || !adminRoles.includes(userRole)) {
       return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
   }
