@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function MensajesPage() {
+function MensajesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
@@ -425,5 +425,19 @@ export default function MensajesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MensajesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+        </div>
+      }
+    >
+      <MensajesContent />
+    </Suspense>
   );
 }
