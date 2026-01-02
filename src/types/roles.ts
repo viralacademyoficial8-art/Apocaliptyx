@@ -27,6 +27,10 @@ export type Permission =
   | 'admin.settings.edit'       // Editar configuración
   | 'admin.analytics.view'      // Ver analytics
   | 'admin.logs.view'           // Ver logs del sistema
+  | 'admin.promos.view'         // Ver promociones
+  | 'admin.promos.create'       // Crear promociones
+  | 'admin.promos.edit'         // Editar promociones
+  | 'admin.promos.delete'       // Eliminar promociones
   // Privilegios especiales
   | 'coins.infinite'            // AP Coins infinitas (no se descuentan)
   | 'shop.free'                 // Compras gratis
@@ -48,6 +52,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'admin.reports.view',
     'admin.reports.resolve',
     'admin.shop.view',
+    'admin.promos.view',
     'coins.infinite',
     'shop.free',
   ],
@@ -65,6 +70,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'admin.reports.view',
     'admin.reports.resolve',
     'admin.shop.view',
+    'admin.promos.view',
+    'admin.promos.create',
+    'admin.promos.edit',
     'admin.notifications.send',
     'coins.infinite',
     'shop.free',
@@ -90,6 +98,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'admin.shop.edit',
     'admin.shop.create',
     'admin.shop.delete',
+    'admin.promos.view',
+    'admin.promos.create',
+    'admin.promos.edit',
+    'admin.promos.delete',
     'admin.notifications.send',
     'admin.settings.view',
     'admin.settings.edit',
@@ -121,6 +133,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'admin.shop.edit',
     'admin.shop.create',
     'admin.shop.delete',
+    'admin.promos.view',
+    'admin.promos.create',
+    'admin.promos.edit',
+    'admin.promos.delete',
     'admin.notifications.send',
     'admin.settings.view',
     'admin.settings.edit',
