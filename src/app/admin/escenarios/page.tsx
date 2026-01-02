@@ -31,19 +31,19 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const STATUS_COLORS: Record<string, string> = {
-  active: 'bg-green-500/20 text-green-400',
-  pending: 'bg-yellow-500/20 text-yellow-400',
-  completed: 'bg-blue-500/20 text-blue-400',
-  failed: 'bg-red-500/20 text-red-400',
-  cancelled: 'bg-gray-500/20 text-gray-400',
+  ACTIVE: 'bg-green-500/20 text-green-400',
+  DRAFT: 'bg-yellow-500/20 text-yellow-400',
+  RESOLVED: 'bg-blue-500/20 text-blue-400',
+  CLOSED: 'bg-purple-500/20 text-purple-400',
+  CANCELLED: 'bg-gray-500/20 text-gray-400',
 };
 
 const STATUS_NAMES: Record<string, string> = {
-  active: 'Activo',
-  pending: 'Pendiente',
-  completed: 'Completado',
-  failed: 'Fallido',
-  cancelled: 'Cancelado',
+  ACTIVE: 'Activo',
+  DRAFT: 'Borrador',
+  RESOLVED: 'Resuelto',
+  CLOSED: 'Cerrado',
+  CANCELLED: 'Cancelado',
 };
 
 const CATEGORY_NAMES: Record<string, string> = {
@@ -55,6 +55,9 @@ const CATEGORY_NAMES: Record<string, string> = {
   economia: '💰 Economía',
   salud: '🏥 Salud',
   otros: '📦 Otros',
+  Crypto: '🪙 Crypto',
+  Deportes: '⚽ Deportes',
+  Tecnología: '💻 Tecnología',
 };
 
 export default function AdminEscenariosPage() {
@@ -152,8 +155,8 @@ export default function AdminEscenariosPage() {
   const totalPages = Math.ceil(total / limit);
 
   // Stats
-  const activeCount = scenarios.filter(s => s.status === 'active').length;
-  const completedCount = scenarios.filter(s => s.status === 'completed').length;
+  const activeCount = scenarios.filter(s => s.status === 'ACTIVE').length;
+  const resolvedCount = scenarios.filter(s => s.status === 'RESOLVED').length;
   const featuredCount = scenarios.filter(s => s.is_featured).length;
 
   return (
@@ -194,8 +197,8 @@ export default function AdminEscenariosPage() {
                 <Clock className="w-5 h-5 text-purple-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{completedCount}</p>
-                <p className="text-xs text-muted-foreground">Completados</p>
+                <p className="text-2xl font-bold">{resolvedCount}</p>
+                <p className="text-xs text-muted-foreground">Resueltos</p>
               </div>
             </div>
           </div>
@@ -230,11 +233,11 @@ export default function AdminEscenariosPage() {
             className="px-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="all">Todos los estados</option>
-            <option value="active">Activos</option>
-            <option value="pending">Pendientes</option>
-            <option value="completed">Completados</option>
-            <option value="failed">Fallidos</option>
-            <option value="cancelled">Cancelados</option>
+            <option value="ACTIVE">Activos</option>
+            <option value="DRAFT">Borradores</option>
+            <option value="RESOLVED">Resueltos</option>
+            <option value="CLOSED">Cerrados</option>
+            <option value="CANCELLED">Cancelados</option>
           </select>
           <select
             value={categoryFilter}
@@ -300,7 +303,7 @@ export default function AdminEscenariosPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[scenario.status] || STATUS_COLORS.active}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[scenario.status] || 'bg-gray-500/20 text-gray-400'}`}>
                           {STATUS_NAMES[scenario.status] || scenario.status}
                         </span>
                       </td>
@@ -352,15 +355,15 @@ export default function AdminEscenariosPage() {
                               
                               <div className="h-px bg-border my-1" />
                               
-                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'active')}>
+                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'ACTIVE')}>
                                 <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
                                 Marcar Activo
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'completed')}>
+                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'RESOLVED')}>
                                 <CheckCircle className="w-4 h-4 mr-2 text-blue-400" />
-                                Marcar Completado
+                                Marcar Resuelto
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'cancelled')}>
+                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'CANCELLED')}>
                                 <XCircle className="w-4 h-4 mr-2 text-gray-400" />
                                 Cancelar
                               </DropdownMenuItem>
