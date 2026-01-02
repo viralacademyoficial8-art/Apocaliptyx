@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { useAuthStore } from '@/lib/stores';
-import type { User } from '@/types';
+import { createClient } from '@supabase/supabase-js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,12 +16,19 @@ import {
   User as UserIcon,
   ArrowLeft,
   Zap,
+  Loader2,
+  CheckCircle,
 } from 'lucide-react';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function RegistroPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -49,6 +55,12 @@ export default function RegistroPage() {
       return;
     }
 
+    // Validar que username solo tenga caracteres permitidos
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      toast.error('El nombre de usuario solo puede contener letras, números y guiones bajos');
+      return;
+    }
+
     if (formData.password.length < 6) {
       toast.error('La contraseña debe tener al menos 6 caracteres');
       return;
@@ -60,37 +72,139 @@ export default function RegistroPage() {
     }
 
     setLoading(true);
+
     try {
-      const newUser: User = {
-        id: `user_${Date.now()}`,
-        username: formData.username,
-        displayName: formData.username,
-        email: formData.email,
-        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+      // Verificar si el username ya existe
+      const { data: existingUsername } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', formData.username.toLowerCase())
+        .single();
+
+      if (existingUsername) {
+        toast.error('Este nombre de usuario ya está en uso');
+        setLoading(false);
+        return;
+      }
+
+      // Verificar si el email ya existe
+      const { data: existingEmail } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', formData.email.toLowerCase())
+        .single();
+
+      if (existingEmail) {
+        toast.error('Este email ya está registrado');
+        setLoading(false);
+        return;
+      }
+
+      // 1. Crear usuario en Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email.toLowerCase(),
+        password: formData.password,
+        options: {
+          data: {
+            username: formData.username.toLowerCase(),
+            display_name: formData.username,
+          },
+        },
+      });
+
+      if (authError) {
+        console.error('Auth error:', authError);
+        if (authError.message.includes('already registered')) {
+          toast.error('Este email ya está registrado');
+        } else {
+          toast.error(authError.message || 'Error al crear la cuenta');
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (!authData.user) {
+        toast.error('Error al crear la cuenta');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Crear perfil en tabla users
+      const { error: profileError } = await supabase.from('users').insert({
+        id: authData.user.id,
+        email: formData.email.toLowerCase(),
+        username: formData.username.toLowerCase(),
+        display_name: formData.username,
+        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
           formData.username
         )}&backgroundColor=0f172a`,
-        prophetLevel: 'monividente',
-        reputationScore: 0,
-        apCoins: 1000, // bono de bienvenida
-        scenariosCreated: 0,
-        scenariosWon: 0,
-        winRate: 0,
-        followers: 0,
-        following: 0,
-        createdAt: new Date(),
-      };
+        role: 'USER',
+        ap_coins: 1000, // Bono de bienvenida
+        level: 1,
+        xp: 0,
+        is_verified: false,
+        is_premium: false,
+        is_banned: false,
+        total_predictions: 0,
+        correct_predictions: 0,
+        total_earnings: 0,
+      });
 
-      // Simulamos "registro" guardando al usuario en el store
-      login(newUser);
-      toast.success('¡Cuenta creada! Bienvenido a Apocaliptics');
-      router.push('/dashboard');
+      if (profileError) {
+        console.error('Profile error:', profileError);
+        // Si falla crear el perfil, el auth.config.ts lo creará en el primer login
+      }
+
+      // 3. Crear notificación de bienvenida
+      await supabase.from('notifications').insert({
+        user_id: authData.user.id,
+        type: 'welcome',
+        title: '¡Bienvenido a Apocaliptics!',
+        message: 'Tu cuenta ha sido creada. Recibiste 1,000 AP Coins de bono de bienvenida. ¡Comienza a predecir el futuro!',
+        is_read: false,
+      });
+
+      setSuccess(true);
+      toast.success('¡Cuenta creada exitosamente!');
+
+      // Redirigir al login después de 2 segundos
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+
     } catch (error) {
-      console.error('[RegistroPage] Error al crear la cuenta', error);
-      toast.error('Error al crear la cuenta');
+      console.error('Registration error:', error);
+      toast.error('Error al crear la cuenta. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Pantalla de éxito
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-950 to-black text-white flex flex-col items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-gray-900/70 border-gray-800 backdrop-blur-sm shadow-xl p-8 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-green-500/20 rounded-full">
+              <CheckCircle className="w-16 h-16 text-green-500" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold mb-4">¡Cuenta Creada!</h1>
+          <p className="text-gray-400 mb-6">
+            Tu cuenta ha sido creada exitosamente. Revisa tu email para confirmar tu cuenta y luego inicia sesión.
+          </p>
+          <div className="flex items-center justify-center gap-2 text-yellow-400 mb-6">
+            <Zap className="w-5 h-5" />
+            <span className="font-semibold">+1,000 AP Coins de bienvenida</span>
+          </div>
+          <p className="text-sm text-gray-500">
+            Redirigiendo al login...
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-red-950 to-black text-white flex flex-col">
@@ -171,8 +285,12 @@ export default function RegistroPage() {
                     className="pl-9 sm:pl-10 bg-gray-800 border-gray-700 focus:border-red-500 text-sm"
                     required
                     minLength={3}
+                    disabled={loading}
                   />
                 </div>
+                <p className="text-xs text-gray-500">
+                  Solo letras, números y guiones bajos
+                </p>
               </div>
 
               {/* Email */}
@@ -192,6 +310,7 @@ export default function RegistroPage() {
                     }
                     className="pl-9 sm:pl-10 bg-gray-800 border-gray-700 focus:border-red-500 text-sm"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -214,6 +333,7 @@ export default function RegistroPage() {
                     className="pl-9 sm:pl-10 bg-gray-800 border-gray-700 focus:border-red-500 text-sm"
                     required
                     minLength={6}
+                    disabled={loading}
                   />
                 </div>
                 <p className="text-xs text-gray-500">
@@ -244,6 +364,7 @@ export default function RegistroPage() {
                     }
                     className="pl-9 sm:pl-10 bg-gray-800 border-gray-700 focus:border-red-500 text-sm"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -256,7 +377,7 @@ export default function RegistroPage() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-t-2 border-b-2 border-white" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Creando cuenta...
                   </span>
                 ) : (
@@ -264,6 +385,18 @@ export default function RegistroPage() {
                 )}
               </Button>
             </form>
+
+            {/* Terms */}
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Al registrarte, aceptas nuestros{' '}
+              <Link href="/terminos" className="text-red-400 hover:text-red-300">
+                Términos de Servicio
+              </Link>{' '}
+              y{' '}
+              <Link href="/privacidad" className="text-red-400 hover:text-red-300">
+                Política de Privacidad
+              </Link>
+            </p>
 
             {/* Divider */}
             <div className="relative my-5 sm:my-6">
