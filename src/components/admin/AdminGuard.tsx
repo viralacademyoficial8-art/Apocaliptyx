@@ -13,7 +13,7 @@ interface AdminGuardProps {
   children: React.ReactNode;
   requiredPermission?: Permission;
   requiredPermissions?: Permission[];
-  requireAll?: boolean; // true = necesita TODOS los permisos, false = necesita AL MENOS UNO
+  requireAll?: boolean;
   fallback?: React.ReactNode;
 }
 
@@ -26,20 +26,42 @@ export function AdminGuard({
 }: AdminGuardProps) {
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
-  const { can, canAny, canAll, canAccessAdmin, role } = usePermissions();
-  const [isChecking, setIsChecking] = useState(true);
+  const { can, canAny, canAll, canAccessAdmin, role, isAdmin } = usePermissions();
+  const [hydrated, setHydrated] = useState(false);
 
+  // Esperar hidratación del store
   useEffect(() => {
-    // Esperar a que se hidrate el store
-    const timer = setTimeout(() => {
-      setIsChecking(false);
-    }, 100);
+    // Verificar si ya hay datos en localStorage
+    const checkHydration = () => {
+      try {
+        const stored = localStorage.getItem('apocaliptics-auth');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed?.state?.user) {
+            setHydrated(true);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Error checking hydration:', e);
+      }
+      
+      // Si no hay datos o hay error, esperar un poco más
+      setTimeout(() => setHydrated(true), 500);
+    };
 
-    return () => clearTimeout(timer);
+    checkHydration();
   }, []);
 
-  // Mostrar loading mientras se verifica
-  if (isChecking) {
+  // Debug logs
+  useEffect(() => {
+    if (hydrated) {
+      console.log('[AdminGuard] Hydrated - User:', user?.email, 'Role:', role, 'isAdmin:', isAdmin, 'canAccessAdmin:', canAccessAdmin);
+    }
+  }, [hydrated, user, role, isAdmin, canAccessAdmin]);
+
+  // Mostrar loading mientras se hidrata
+  if (!hydrated) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -49,12 +71,18 @@ export function AdminGuard({
 
   // Si no está autenticado, redirigir a login
   if (!isAuthenticated || !user) {
+    console.log('[AdminGuard] Not authenticated, redirecting to login');
     router.push('/login');
-    return null;
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      </div>
+    );
   }
 
-  // Verificar acceso al panel de admin
-  if (!canAccessAdmin) {
+  // Verificar acceso al panel de admin usando isAdmin directamente
+  if (!isAdmin && !canAccessAdmin) {
+    console.log('[AdminGuard] No admin access, showing denied');
     if (fallback) return <>{fallback}</>;
     
     return (
@@ -63,6 +91,7 @@ export function AdminGuard({
           <ShieldOff className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h1>
           <p className="text-gray-400 mb-6">No tienes permisos para acceder a esta sección.</p>
+          <p className="text-gray-500 text-sm mb-4">Tu rol: {role}</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white"
@@ -107,6 +136,7 @@ export function AdminGuard({
     }
   }
 
+  console.log('[AdminGuard] Access granted');
   return <>{children}</>;
 }
 
