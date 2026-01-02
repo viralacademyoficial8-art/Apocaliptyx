@@ -108,13 +108,14 @@ class ChatService {
           .single();
 
         // Obtener último mensaje
-        const { data: lastMessage } = await supabase
+        const { data: lastMessages } = await supabase
           .from('messages')
           .select('*')
           .eq('conversation_id', conv.id)
           .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
+        
+        const lastMessage = lastMessages?.[0] || null;
 
         // Contar mensajes no leídos
         const { count } = await supabase
