@@ -2,15 +2,26 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSearchStore, useScenarioStore } from '@/lib/stores';
+import { createClient } from '@supabase/supabase-js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, X, Clock, TrendingUp, Loader2 } from 'lucide-react';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface SearchBarProps {
   variant?: 'navbar' | 'full';
   autoFocus?: boolean;
   onSearch?: () => void;
+}
+
+interface QuickResult {
+  id: string;
+  title: string;
+  category: string;
 }
 
 export function SearchBar({
@@ -22,27 +33,28 @@ export function SearchBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const {
-    query,
-    setQuery,
-    recentSearches,
-    addRecentSearch,
-    search,
-    isSearching,
-  } = useSearchStore();
-  const { scenarios } = useScenarioStore();
-
+  const [localQuery, setLocalQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [localQuery, setLocalQuery] = useState(query);
+  const [isSearching, setIsSearching] = useState(false);
+  const [quickResults, setQuickResults] = useState<QuickResult[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
-  // Mock de trending
+  // Trending searches (estos podrían venir de la DB también)
   const trendingSearches = [
-    'Bitcoin 2025',
+    'Bitcoin',
     'Elecciones',
-    'IA superinteligente',
-    'Mundial 2026',
-    'Tesla',
+    'IA',
+    'Deportes',
+    'Crypto',
   ];
+
+  // Cargar búsquedas recientes
+  useEffect(() => {
+    const saved = localStorage.getItem('recentSearches');
+    if (saved) {
+      setRecentSearches(JSON.parse(saved));
+    }
+  }, []);
 
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
@@ -61,13 +73,47 @@ export function SearchBar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Búsqueda rápida mientras escribe (debounced)
+  useEffect(() => {
+    if (!localQuery.trim() || localQuery.length < 2) {
+      setQuickResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const { data } = await supabase
+          .from('scenarios')
+          .select('id, title, category')
+          .eq('status', 'ACTIVE')
+          .or(`title.ilike.%${localQuery}%,description.ilike.%${localQuery}%`)
+          .limit(5);
+
+        setQuickResults(data || []);
+      } catch (error) {
+        console.error('Quick search error:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [localQuery]);
+
+  // Guardar búsqueda reciente
+  const saveRecentSearch = (query: string) => {
+    if (!query.trim()) return;
+    const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  };
+
   const handleSearch = (searchQuery?: string) => {
     const finalQuery = searchQuery ?? localQuery;
     if (!finalQuery.trim()) return;
 
-    setQuery(finalQuery);
-    addRecentSearch(finalQuery);
-    search(scenarios);
+    saveRecentSearch(finalQuery);
     setIsOpen(false);
 
     if (onSearch) onSearch();
@@ -85,13 +131,13 @@ export function SearchBar({
 
   const handleClear = () => {
     setLocalQuery('');
-    setQuery('');
+    setQuickResults([]);
     inputRef.current?.focus();
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setLocalQuery(suggestion);
-    handleSearch(suggestion);
+  const handleResultClick = (scenarioId: string) => {
+    setIsOpen(false);
+    router.push(`/escenario/${scenarioId}`);
   };
 
   // 🌐 Variante NAVBAR
@@ -123,10 +169,45 @@ export function SearchBar({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden min-w-[300px]"
           >
+            {/* Resultados rápidos */}
+            {localQuery.length >= 2 && (
+              <div className="p-3 border-b border-border">
+                {isSearching ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
+                  </div>
+                ) : quickResults.length > 0 ? (
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium text-muted-foreground">Resultados</span>
+                    {quickResults.map((result) => (
+                      <button
+                        key={result.id}
+                        onClick={() => handleResultClick(result.id)}
+                        className="w-full text-left px-2 py-2 text-sm rounded hover:bg-muted transition-colors"
+                      >
+                        <div className="font-medium line-clamp-1">{result.title}</div>
+                        <div className="text-xs text-muted-foreground">{result.category}</div>
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => handleSearch()}
+                      className="w-full text-center text-sm text-purple-400 hover:text-purple-300 py-2"
+                    >
+                      Ver todos los resultados →
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-2">
+                    No se encontraron resultados
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Recientes */}
-            {recentSearches.length > 0 && (
+            {recentSearches.length > 0 && !localQuery && (
               <div className="p-3 border-b border-border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
@@ -138,7 +219,7 @@ export function SearchBar({
                   {recentSearches.slice(0, 3).map((searchText, i) => (
                     <button
                       key={i}
-                      onClick={() => handleSuggestionClick(searchText)}
+                      onClick={() => handleSearch(searchText)}
                       className="w-full text-left px-2 py-1.5 text-sm rounded hover:bg-muted transition-colors"
                     >
                       {searchText}
@@ -149,23 +230,25 @@ export function SearchBar({
             )}
 
             {/* Trending */}
-            <div className="p-3">
-              <span className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2">
-                <TrendingUp className="w-3 h-3" />
-                Trending
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {trendingSearches.map((trend, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSuggestionClick(trend)}
-                    className="px-2 py-1 text-xs bg-muted hover:bg-purple-500/20 hover:text-purple-400 rounded-full transition-colors"
-                  >
-                    {trend}
-                  </button>
-                ))}
+            {!localQuery && (
+              <div className="p-3">
+                <span className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2">
+                  <TrendingUp className="w-3 h-3" />
+                  Trending
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {trendingSearches.map((trend, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSearch(trend)}
+                      className="px-2 py-1 text-xs bg-muted hover:bg-purple-500/20 hover:text-purple-400 rounded-full transition-colors"
+                    >
+                      {trend}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
