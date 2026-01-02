@@ -1,8 +1,13 @@
 // src/app/api/auth/register/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { createClient } from "@supabase/supabase-js";
+
+// Usar service_role para poder crear usuarios en auth.users
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // Necesitas esta variable de entorno
+);
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,11 +40,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar si el email ya existe
+    const emailLower = email.toLowerCase().trim();
+    const usernameLower = username.toLowerCase().trim();
+
+    // Verificar si el email ya existe en nuestra tabla users
     const { data: existingEmail } = await supabase
       .from("users")
       .select("id")
-      .eq("email", email.toLowerCase())
+      .eq("email", emailLower)
       .single();
 
     if (existingEmail) {
@@ -53,7 +61,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUsername } = await supabase
       .from("users")
       .select("id")
-      .eq("username", username.toLowerCase())
+      .eq("username", usernameLower)
       .single();
 
     if (existingUsername) {
@@ -63,15 +71,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash de la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // 1. Crear usuario en Supabase Auth
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email: emailLower,
+      password: password,
+      email_confirm: true, // Auto-confirmar email
+      user_metadata: {
+        username: usernameLower,
+        display_name: name,
+      },
+    });
 
-    // Crear usuario en Supabase
+    if (authError || !authData.user) {
+      console.error("Error creating auth user:", authError);
+      return NextResponse.json(
+        { success: false, message: authError?.message || "Error al crear el usuario" },
+        { status: 500 }
+      );
+    }
+
+    // 2. Crear perfil en nuestra tabla users con el mismo ID
     const { data: newUser, error: userError } = await supabase
       .from("users")
       .insert({
-        email: email.toLowerCase(),
-        username: username.toLowerCase(),
+        id: authData.user.id, // Usar el mismo ID de auth.users
+        email: emailLower,
+        username: usernameLower,
         display_name: name,
         avatar_url: null,
         bio: null,
@@ -90,37 +115,21 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (userError || !newUser) {
-      console.error("Error creating user:", userError);
+      console.error("Error creating user profile:", userError);
+      // Si falla crear el perfil, eliminar el usuario de auth
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       return NextResponse.json(
-        { success: false, message: "Error al crear el usuario" },
+        { success: false, message: "Error al crear el perfil de usuario" },
         { status: 500 }
       );
     }
 
-    // Guardar contraseña hasheada en user_auth
-    const { error: authError } = await supabase
-      .from("user_auth")
-      .insert({
-        user_id: newUser.id,
-        password_hash: hashedPassword,
-      });
-
-    if (authError) {
-      console.error("Error saving password:", authError);
-      // Eliminar el usuario si no se pudo guardar la contraseña
-      await supabase.from("users").delete().eq("id", newUser.id);
-      return NextResponse.json(
-        { success: false, message: "Error al guardar las credenciales" },
-        { status: 500 }
-      );
-    }
-
-    // 🔔 Crear notificación de bienvenida
+    // 3. Crear notificación de bienvenida
     await supabase.from("notifications").insert({
       user_id: newUser.id,
       type: "welcome",
       title: "¡Bienvenido a Apocaliptics! 🎉",
-      message: `Hola @${username}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
+      message: `Hola @${usernameLower}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
       link_url: "/dashboard",
       is_read: false,
     });

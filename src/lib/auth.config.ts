@@ -4,7 +4,6 @@ import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import Discord from "next-auth/providers/discord";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { createClient } from "@supabase/supabase-js";
 
 // Cliente de Supabase para autenticación
@@ -20,10 +19,17 @@ const getSupabase = () => {
   return createClient(url, key);
 };
 
-// Passwords de prueba (REMOVER EN PRODUCCIÓN FINAL)
-const TEST_PASSWORDS: { [key: string]: string } = {
-  "admin@apocaliptics.com": "admin123",
-  "user@test.com": "user123",
+// Cliente admin de Supabase (para verificar contraseñas)
+const getSupabaseAdmin = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    console.error("Supabase admin env vars missing");
+    return null;
+  }
+  
+  return createClient(url, key);
 };
 
 export default {
@@ -236,55 +242,77 @@ export default {
         const password = String(credentials.password);
 
         console.log("Email:", email);
-        console.log("Password length:", password.length);
 
-        // PASO 1: Verificar password de prueba PRIMERO
-        const testPassword = TEST_PASSWORDS[email];
-        if (testPassword && testPassword === password) {
-          console.log("Test password match for:", email);
-          
-          const supabase = getSupabase();
-          if (supabase) {
-            const { data: user } = await supabase
-              .from("users")
-              .select("*")
-              .eq("email", email)
-              .single();
-
-            if (user && !user.is_banned) {
-              console.log("Login successful (test password) for:", email);
-              return {
-                id: user.id,
-                email: user.email,
-                name: user.display_name,
-                image: user.avatar_url,
-                username: user.username,
-                role: user.role,
-                apCoins: user.ap_coins,
-                level: user.level,
-                isVerified: user.is_verified,
-                isPremium: user.is_premium,
-              };
-            }
-          }
-        }
-
-        // PASO 2: Si no es password de prueba, verificar con bcrypt
         const supabase = getSupabase();
         if (!supabase) {
           console.log("Supabase not available");
           return null;
         }
 
-        const { data: user, error } = await supabase
+        // Autenticar con Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (authError || !authData.user) {
+          console.log("Supabase auth error:", authError?.message);
+          return null;
+        }
+
+        console.log("Supabase auth successful for:", email);
+
+        // Obtener datos del usuario de nuestra tabla users
+        const { data: user, error: userError } = await supabase
           .from("users")
           .select("*")
-          .eq("email", email)
+          .eq("id", authData.user.id)
           .single();
 
-        if (error || !user) {
-          console.log("User not found:", email);
-          return null;
+        if (userError || !user) {
+          console.log("User profile not found, creating...");
+          
+          // Si no existe el perfil, crearlo
+          const { data: newUser, error: createError } = await supabase
+            .from("users")
+            .insert({
+              id: authData.user.id,
+              email: email,
+              username: email.split("@")[0],
+              display_name: authData.user.user_metadata?.display_name || email.split("@")[0],
+              avatar_url: null,
+              role: "USER",
+              ap_coins: 1000,
+              level: 1,
+              xp: 0,
+              is_verified: false,
+              is_premium: false,
+              is_banned: false,
+              total_predictions: 0,
+              correct_predictions: 0,
+              total_earnings: 0,
+            })
+            .select()
+            .single();
+
+          if (createError || !newUser) {
+            console.log("Error creating user profile:", createError);
+            return null;
+          }
+
+          console.log("Login successful (new profile) for:", email);
+          return {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.display_name,
+            image: newUser.avatar_url,
+            username: newUser.username,
+            role: newUser.role,
+            apCoins: newUser.ap_coins,
+            level: newUser.level,
+            isVerified: newUser.is_verified,
+            isPremium: newUser.is_premium,
+          };
         }
 
         if (user.is_banned) {
@@ -292,37 +320,19 @@ export default {
           return null;
         }
 
-        const { data: authData } = await supabase
-          .from("user_auth")
-          .select("password_hash")
-          .eq("user_id", user.id)
-          .single();
-
-        if (authData?.password_hash) {
-          try {
-            const isValid = await bcrypt.compare(password, authData.password_hash);
-            if (isValid) {
-              console.log("Login successful (bcrypt) for:", email);
-              return {
-                id: user.id,
-                email: user.email,
-                name: user.display_name,
-                image: user.avatar_url,
-                username: user.username,
-                role: user.role,
-                apCoins: user.ap_coins,
-                level: user.level,
-                isVerified: user.is_verified,
-                isPremium: user.is_premium,
-              };
-            }
-          } catch (e) {
-            console.log("bcrypt error:", e);
-          }
-        }
-
-        console.log("Invalid password for:", email);
-        return null;
+        console.log("Login successful for:", email, "Role:", user.role);
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.display_name,
+          image: user.avatar_url,
+          username: user.username,
+          role: user.role,
+          apCoins: user.ap_coins,
+          level: user.level,
+          isVerified: user.is_verified,
+          isPremium: user.is_premium,
+        };
       },
     }),
   ],
