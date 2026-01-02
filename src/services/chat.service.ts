@@ -47,26 +47,29 @@ class ChatService {
 
   // Obtener o crear conversación entre dos usuarios
   async getOrCreateConversation(userId1: string, userId2: string): Promise<Conversation | null> {
-    // Ordenar IDs para consistencia
-    const [p1, p2] = [userId1, userId2].sort();
-
-    // Buscar conversación existente
-    const { data: existing } = await supabase
+    // Buscar conversación existente (en cualquier orden de participantes)
+    const { data: existing, error: searchError } = await supabase
       .from('conversations')
       .select('*')
-      .or(`and(participant_1.eq.${p1},participant_2.eq.${p2}),and(participant_1.eq.${p2},participant_2.eq.${p1})`)
-      .single();
+      .or(`participant_1.eq.${userId1},participant_1.eq.${userId2}`)
+      .or(`participant_2.eq.${userId1},participant_2.eq.${userId2}`);
 
-    if (existing) {
-      return existing;
+    // Filtrar para encontrar la conversación correcta
+    const conversation = existing?.find(conv => 
+      (conv.participant_1 === userId1 && conv.participant_2 === userId2) ||
+      (conv.participant_1 === userId2 && conv.participant_2 === userId1)
+    );
+
+    if (conversation) {
+      return conversation;
     }
 
     // Crear nueva conversación
     const { data, error } = await supabase
       .from('conversations')
       .insert({
-        participant_1: p1,
-        participant_2: p2,
+        participant_1: userId1,
+        participant_2: userId2,
       })
       .select()
       .single();
