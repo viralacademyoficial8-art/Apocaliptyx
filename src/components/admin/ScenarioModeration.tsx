@@ -1,392 +1,423 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Star, StarOff, Eye, CheckCircle, XCircle, ShieldAlert } from 'lucide-react';
-import { useAdminStore, AdminScenario } from '@/stores/adminStore';
-import { AdminDataTable } from './AdminDataTable';
-import { AdminModal } from './AdminModal';
-import { StatCard, StatsGrid } from './AdminStats';
+import { useEffect, useState, useCallback } from 'react';
+import { AdminHeader } from '@/components/admin';
+import { PermissionGate } from '@/components/admin/AdminGuard';
+import { adminService, ScenarioData } from '@/services/admin.service';
+import { 
+  Search,
+  MoreVertical,
+  Eye,
+  Star,
+  StarOff,
+  Trash2,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Flame,
+  Users
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
-export function ScenarioModeration() {
-  const {
-    scenarios,
-    scenarioFilters,
-    setScenarioFilters,
-    approveScenario,
-    rejectScenario,
-    featureScenario,
-    resolveScenario,
-    cancelScenario,
-  } = useAdminStore();
+const STATUS_COLORS: Record<string, string> = {
+  active: 'bg-green-500/20 text-green-400',
+  pending: 'bg-yellow-500/20 text-yellow-400',
+  completed: 'bg-blue-500/20 text-blue-400',
+  failed: 'bg-red-500/20 text-red-400',
+  cancelled: 'bg-gray-500/20 text-gray-400',
+};
 
-  const [openDetails, setOpenDetails] = useState(false);
-  const [openReject, setOpenReject] = useState(false);
-  const [openResolve, setOpenResolve] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
-  const [selected, setSelected] = useState<AdminScenario | null>(null);
+const STATUS_NAMES: Record<string, string> = {
+  active: 'Activo',
+  pending: 'Pendiente',
+  completed: 'Completado',
+  failed: 'Fallido',
+  cancelled: 'Cancelado',
+};
 
-  const filtered = useMemo(() => {
-    const q = scenarioFilters.search.toLowerCase().trim();
-    return scenarios
-      .filter(s => {
-        const matchQ = !q || s.title.toLowerCase().includes(q) || s.description.toLowerCase().includes(q);
-        const matchCat = scenarioFilters.category === 'all' || s.category === scenarioFilters.category;
-        const matchStatus = scenarioFilters.status === 'all' || s.status === scenarioFilters.status;
-        return matchQ && matchCat && matchStatus;
-      })
-      .sort((a, b) => {
-        if (scenarioFilters.sortBy === 'pool') return b.totalPool - a.totalPool;
-        if (scenarioFilters.sortBy === 'reports') return b.reportCount - a.reportCount;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+const CATEGORY_NAMES: Record<string, string> = {
+  tecnologia: '💻 Tecnología',
+  politica: '🏛️ Política',
+  deportes: '⚽ Deportes',
+  farandula: '🎬 Farándula',
+  guerra: '⚔️ Guerra',
+  economia: '💰 Economía',
+  salud: '🏥 Salud',
+  otros: '📦 Otros',
+};
+
+export default function AdminEscenariosPage() {
+  const [scenarios, setScenarios] = useState<ScenarioData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioData | null>(null);
+  
+  const limit = 10;
+
+  const loadScenarios = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await adminService.getScenarios({
+        limit,
+        offset: (page - 1) * limit,
+        search: search || undefined,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        category: categoryFilter !== 'all' ? categoryFilter : undefined,
       });
-  }, [scenarios, scenarioFilters]);
+      setScenarios(result.scenarios);
+      setTotal(result.total);
+    } catch (error) {
+      console.error('Error loading scenarios:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, statusFilter, categoryFilter, limit]);
 
-  const stats = useMemo(() => {
-    const total = scenarios.length;
-    const active = scenarios.filter(s => s.status === 'ACTIVE').length;
-    const pending = scenarios.filter(s => s.status === 'PENDING_APPROVAL').length;
-    const reported = scenarios.filter(s => s.reportCount > 0).length;
-    return { total, active, pending, reported };
-  }, [scenarios]);
+  useEffect(() => {
+    loadScenarios();
+  }, [loadScenarios]);
 
-  const columns = [
-    {
-      key: 'title',
-      header: 'Escenario',
-      render: (s: AdminScenario) => (
-        <div className="space-y-1">
-          <div className="font-medium text-white">{s.title}</div>
-          <div className="text-xs text-gray-500 line-clamp-1">{s.description}</div>
-        </div>
-      ),
-    },
-    { key: 'category', header: 'Categoría' },
-    {
-      key: 'status',
-      header: 'Estado',
-      render: (s: AdminScenario) => (
-        <span
-          className={[
-            'text-xs px-2 py-1 rounded-full border',
-            s.status === 'ACTIVE' ? 'bg-green-500/10 text-green-300 border-green-700/40'
-              : s.status === 'PENDING_APPROVAL' ? 'bg-yellow-500/10 text-yellow-300 border-yellow-700/40'
-              : s.status === 'COMPLETED' ? 'bg-blue-500/10 text-blue-300 border-blue-700/40'
-              : 'bg-gray-500/10 text-gray-300 border-gray-700/40',
-          ].join(' ')}
-        >
-          {s.status}
-        </span>
-      ),
-    },
-    {
-      key: 'pool',
-      header: 'Pool',
-      render: (s: AdminScenario) => <span className="text-gray-300">{s.totalPool.toLocaleString()}</span>,
-    },
-    {
-      key: 'currentPrice',
-      header: 'Precio',
-      render: (s: AdminScenario) => <span className="text-gray-300">{s.currentPrice.toLocaleString()}</span>,
-    },
-    {
-      key: 'reportCount',
-      header: 'Reportes',
-      render: (s: AdminScenario) => (
-        <span className={s.reportCount > 0 ? 'text-red-300' : 'text-gray-400'}>
-          {s.reportCount}
-        </span>
-      ),
-    },
-    {
-      key: 'isFeatured',
-      header: 'Destacado',
-      render: (s: AdminScenario) => (
-        <span className={s.isFeatured ? 'text-yellow-300' : 'text-gray-500'}>
-          {s.isFeatured ? 'Sí' : 'No'}
-        </span>
-      ),
-    },
-  ] as const;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page !== 1) {
+        setPage(1);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, page]);
 
-  const Filters = (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <select
-        value={scenarioFilters.category}
-        onChange={(e) => setScenarioFilters({ category: e.target.value })}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-      >
-        <option value="all">Todas las categorías</option>
-        <option value="ECONOMIA">ECONOMIA</option>
-        <option value="DEPORTES">DEPORTES</option>
-        <option value="TECNOLOGIA">TECNOLOGIA</option>
-        <option value="POLITICA">POLITICA</option>
-        <option value="ENTRETENIMIENTO">ENTRETENIMIENTO</option>
-        <option value="OTROS">OTROS</option>
-      </select>
-
-      <select
-        value={scenarioFilters.status}
-        onChange={(e) => setScenarioFilters({ status: e.target.value })}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-      >
-        <option value="all">Todos los estados</option>
-        <option value="ACTIVE">ACTIVE</option>
-        <option value="PENDING_APPROVAL">PENDING_APPROVAL</option>
-        <option value="PENDING_RESOLUTION">PENDING_RESOLUTION</option>
-        <option value="COMPLETED">COMPLETED</option>
-        <option value="FAILED">FAILED</option>
-        <option value="CANCELLED">CANCELLED</option>
-      </select>
-
-      <select
-        value={scenarioFilters.sortBy}
-        onChange={(e) => setScenarioFilters({ sortBy: e.target.value })}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-      >
-        <option value="createdAt">Orden: Fecha</option>
-        <option value="pool">Orden: Pool</option>
-        <option value="reports">Orden: Reportes</option>
-      </select>
-    </div>
-  );
-
-  const openScenarioDetails = (s: AdminScenario) => {
-    setSelected(s);
-    setOpenDetails(true);
+  const handleToggleFeatured = async (scenarioId: string, currentFeatured: boolean) => {
+    setActionLoading(scenarioId);
+    const result = await adminService.updateScenario(scenarioId, { is_featured: !currentFeatured } as any);
+    if (result.success) {
+      loadScenarios();
+    } else {
+      alert(result.error);
+    }
+    setActionLoading(null);
   };
 
-  const openScenarioReject = (s: AdminScenario) => {
-    setSelected(s);
-    setRejectReason('');
-    setOpenReject(true);
+  const handleToggleHot = async (scenarioId: string, currentHot: boolean) => {
+    setActionLoading(scenarioId);
+    const result = await adminService.updateScenario(scenarioId, { is_hot: !currentHot } as any);
+    if (result.success) {
+      loadScenarios();
+    } else {
+      alert(result.error);
+    }
+    setActionLoading(null);
   };
 
-  const openScenarioResolve = (s: AdminScenario) => {
-    setSelected(s);
-    setOpenResolve(true);
+  const handleChangeStatus = async (scenarioId: string, newStatus: string) => {
+    setActionLoading(scenarioId);
+    const result = await adminService.updateScenario(scenarioId, { status: newStatus } as any);
+    if (result.success) {
+      loadScenarios();
+    } else {
+      alert(result.error);
+    }
+    setActionLoading(null);
   };
+
+  const handleDelete = async (scenarioId: string) => {
+    if (!confirm('¿Estás seguro de eliminar este escenario? Esta acción no se puede deshacer.')) {
+      return;
+    }
+    
+    setActionLoading(scenarioId);
+    const result = await adminService.deleteScenario(scenarioId);
+    if (result.success) {
+      loadScenarios();
+    } else {
+      alert(result.error);
+    }
+    setActionLoading(null);
+  };
+
+  const totalPages = Math.ceil(total / limit);
+
+  // Stats
+  const activeCount = scenarios.filter(s => s.status === 'active').length;
+  const completedCount = scenarios.filter(s => s.status === 'completed').length;
+  const featuredCount = scenarios.filter(s => s.is_featured).length;
 
   return (
-    <div className="space-y-6">
-      <StatsGrid>
-        <StatCard title="Total" value={stats.total} icon={ShieldAlert} />
-        <StatCard title="Activos" value={stats.active} icon={CheckCircle} />
-        <StatCard title="Pendientes" value={stats.pending} icon={Eye} />
-        <StatCard title="Reportados" value={stats.reported} icon={XCircle} />
-      </StatsGrid>
-
-      <AdminDataTable
-        data={filtered}
-        columns={columns as any}
-        getItemId={(s) => s.id}
-        searchPlaceholder="Buscar escenarios..."
-        onSearch={(q) => setScenarioFilters({ search: q })}
-        filters={Filters}
-        actions={(s: AdminScenario) => (
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={() => openScenarioDetails(s)}
-              className="p-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
-              title="Ver"
-            >
-              <Eye className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => featureScenario(s.id, !s.isFeatured)}
-              className="p-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
-              title={s.isFeatured ? 'Quitar destacado' : 'Destacar'}
-            >
-              {s.isFeatured ? <StarOff className="w-4 h-4" /> : <Star className="w-4 h-4" />}
-            </button>
-
-            {s.status === 'PENDING_APPROVAL' && (
-              <>
-                <button
-                  onClick={() => approveScenario(s.id)}
-                  className="p-2 rounded-lg bg-green-600/20 text-green-300 hover:bg-green-600/30"
-                  title="Aprobar"
-                >
-                  <CheckCircle className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => openScenarioReject(s)}
-                  className="p-2 rounded-lg bg-red-600/20 text-red-300 hover:bg-red-600/30"
-                  title="Rechazar"
-                >
-                  <XCircle className="w-4 h-4" />
-                </button>
-              </>
-            )}
-
-            {s.status === 'PENDING_RESOLUTION' && (
-              <button
-                onClick={() => openScenarioResolve(s)}
-                className="p-2 rounded-lg bg-blue-600/20 text-blue-300 hover:bg-blue-600/30"
-                title="Resolver"
-              >
-                <CheckCircle className="w-4 h-4" />
-              </button>
-            )}
-
-            {s.status === 'ACTIVE' && s.reportCount >= 10 && (
-              <button
-                onClick={() => cancelScenario(s.id, 'Demasiados reportes')}
-                className="p-2 rounded-lg bg-red-600/20 text-red-300 hover:bg-red-600/30"
-                title="Cancelar"
-              >
-                <XCircle className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        )}
+    <div className="min-h-screen">
+      <AdminHeader 
+        title="Gestión de Escenarios" 
+        subtitle={`${total} escenarios en total`}
       />
 
-      {/* Details */}
-      <AdminModal
-        isOpen={openDetails}
-        onClose={() => setOpenDetails(false)}
-        title="Detalles del escenario"
-        size="lg"
-        footer={
-          selected ? (
-            <>
-              <button
-                onClick={() => setOpenDetails(false)}
-                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700"
-              >
-                Cerrar
-              </button>
-              {selected.status === 'PENDING_RESOLUTION' && (
-                <button
-                  onClick={() => { setOpenDetails(false); openScenarioResolve(selected); }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500"
-                >
-                  Resolver
-                </button>
-              )}
-            </>
-          ) : null
-        }
-      >
-        {selected && (
-          <div className="space-y-4 text-gray-300">
-            <div>
-              <div className="text-white font-semibold text-lg">{selected.title}</div>
-              <div className="text-sm text-gray-500">{selected.description}</div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Categoría</div>
-                <div className="text-white">{selected.category}</div>
+      <div className="p-6 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div className="bg-card border border-border rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <Eye className="w-5 h-5 text-blue-400" />
               </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Estado</div>
-                <div className="text-white">{selected.status}</div>
-              </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Pool</div>
-                <div className="text-white">{selected.totalPool.toLocaleString()}</div>
-              </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Precio actual</div>
-                <div className="text-white">{selected.currentPrice.toLocaleString()}</div>
-              </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Votos</div>
-                <div className="text-white">{selected.votesUp} ↑ / {selected.votesDown} ↓</div>
-              </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Reportes</div>
-                <div className="text-white">{selected.reportCount}</div>
+              <div>
+                <p className="text-2xl font-bold">{total}</p>
+                <p className="text-xs text-muted-foreground">Total</p>
               </div>
             </div>
           </div>
-        )}
-      </AdminModal>
-
-      {/* Reject */}
-      <AdminModal
-        isOpen={openReject}
-        onClose={() => setOpenReject(false)}
-        title="Rechazar escenario"
-        size="md"
-        footer={
-          <>
-            <button
-              onClick={() => setOpenReject(false)}
-              className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                if (!selected) return;
-                rejectScenario(selected.id, rejectReason || 'No cumple lineamientos');
-                setOpenReject(false);
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500"
-            >
-              Rechazar
-            </button>
-          </>
-        }
-      >
-        <div className="space-y-3">
-          <p className="text-gray-300 text-sm">
-            Escribe una razón (mock). Después lo conectamos al backend.
-          </p>
-          <textarea
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            className="w-full min-h-[120px] px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-            placeholder="Razón de rechazo..."
-          />
+          <div className="bg-card border border-border rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/20 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{activeCount}</p>
+                <p className="text-xs text-muted-foreground">Activos</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-500/20 rounded-lg">
+                <Clock className="w-5 h-5 text-purple-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{completedCount}</p>
+                <p className="text-xs text-muted-foreground">Completados</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-yellow-500/20 rounded-lg">
+                <Star className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{featuredCount}</p>
+                <p className="text-xs text-muted-foreground">Destacados</p>
+              </div>
+            </div>
+          </div>
         </div>
-      </AdminModal>
 
-      {/* Resolve */}
-      <AdminModal
-        isOpen={openResolve}
-        onClose={() => setOpenResolve(false)}
-        title="Resolver escenario"
-        size="md"
-        footer={
-          <>
-            <button
-              onClick={() => setOpenResolve(false)}
-              className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                if (!selected) return;
-                resolveScenario(selected.id, true);
-                setOpenResolve(false);
-              }}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
-            >
-              Sucedió (✅)
-            </button>
-            <button
-              onClick={() => {
-                if (!selected) return;
-                resolveScenario(selected.id, false);
-                setOpenResolve(false);
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500"
-            >
-              No sucedió (❌)
-            </button>
-          </>
-        }
-      >
-        <p className="text-gray-300 text-sm">
-          Resolver manualmente (mock). Marca si el escenario se cumplió o falló.
-        </p>
-      </AdminModal>
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Buscar por título o descripción..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="all">Todos los estados</option>
+            <option value="active">Activos</option>
+            <option value="pending">Pendientes</option>
+            <option value="completed">Completados</option>
+            <option value="failed">Fallidos</option>
+            <option value="cancelled">Cancelados</option>
+          </select>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="all">Todas las categorías</option>
+            <option value="tecnologia">Tecnología</option>
+            <option value="politica">Política</option>
+            <option value="deportes">Deportes</option>
+            <option value="farandula">Farándula</option>
+            <option value="guerra">Guerra</option>
+            <option value="economia">Economía</option>
+            <option value="salud">Salud</option>
+            <option value="otros">Otros</option>
+          </select>
+        </div>
+
+        {/* Table */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+            </div>
+          ) : scenarios.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              No se encontraron escenarios
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Escenario</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Categoría</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Estado</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Pool</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Creado</th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scenarios.map((scenario) => (
+                    <tr key={scenario.id} className="border-b border-border hover:bg-muted/20 transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="max-w-xs">
+                          <p className="font-medium truncate flex items-center gap-2">
+                            {scenario.is_featured && <Star className="w-4 h-4 text-yellow-400 flex-shrink-0" />}
+                            {scenario.is_hot && <Flame className="w-4 h-4 text-orange-400 flex-shrink-0" />}
+                            {scenario.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">{scenario.description}</p>
+                          {scenario.creator && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              por @{scenario.creator.username}
+                            </p>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="text-sm">
+                          {CATEGORY_NAMES[scenario.category] || scenario.category}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[scenario.status] || STATUS_COLORS.active}`}>
+                          {STATUS_NAMES[scenario.status] || scenario.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1">
+                          <Flame className="w-4 h-4 text-yellow-400" />
+                          <span className="font-medium text-yellow-400">
+                            {(scenario.total_pool || 0).toLocaleString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {scenario.participant_count || 0} participantes
+                        </p>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {formatDistanceToNow(new Date(scenario.created_at), { addSuffix: true, locale: es })}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" disabled={actionLoading === scenario.id}>
+                              {actionLoading === scenario.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <MoreVertical className="w-4 h-4" />
+                              )}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <PermissionGate permission="admin.scenarios.edit">
+                              <DropdownMenuItem onClick={() => handleToggleFeatured(scenario.id, scenario.is_featured)}>
+                                {scenario.is_featured ? (
+                                  <>
+                                    <StarOff className="w-4 h-4 mr-2" />
+                                    Quitar destacado
+                                  </>
+                                ) : (
+                                  <>
+                                    <Star className="w-4 h-4 mr-2" />
+                                    Destacar
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleToggleHot(scenario.id, scenario.is_hot)}>
+                                <Flame className="w-4 h-4 mr-2" />
+                                {scenario.is_hot ? 'Quitar Hot 🔥' : 'Marcar Hot 🔥'}
+                              </DropdownMenuItem>
+                              
+                              <div className="h-px bg-border my-1" />
+                              
+                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'active')}>
+                                <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+                                Marcar Activo
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'completed')}>
+                                <CheckCircle className="w-4 h-4 mr-2 text-blue-400" />
+                                Marcar Completado
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'cancelled')}>
+                                <XCircle className="w-4 h-4 mr-2 text-gray-400" />
+                                Cancelar
+                              </DropdownMenuItem>
+                            </PermissionGate>
+
+                            <PermissionGate permission="admin.scenarios.delete">
+                              <div className="h-px bg-border my-1" />
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(scenario.id)}
+                                className="text-red-400"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Eliminar
+                              </DropdownMenuItem>
+                            </PermissionGate>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                Mostrando {((page - 1) * limit) + 1} - {Math.min(page * limit, total)} de {total}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-sm">
+                  Página {page} de {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

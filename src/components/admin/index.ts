@@ -32,7 +32,7 @@ export { AdminModal } from './AdminModal';
 export { StatCard, StatsGrid } from './AdminStats';
 
 export { UserManagement } from './UserManagement';
-export { ScenarioModeration } from './ScenarioModeration';
+// ScenarioModeration ya no se usa - la página tiene su propia implementación
 export { ReportsPanel } from './ReportsPanel';
 export { AnalyticsDashboard } from './AnalyticsDashboard';
 export { ShopManagement } from './ShopManagement';
