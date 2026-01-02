@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { publicProfileService, PublicProfile } from '@/services/publicProfile.service';
+import { chatService } from '@/services/chat.service';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
@@ -48,12 +49,35 @@ export default function PublicProfilePage() {
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('general');
   const [predictions, setPredictions] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
 
   const isOwnProfile = currentUser?.username?.toLowerCase() === username?.toLowerCase();
+
+  // Iniciar chat con usuario
+  const handleStartChat = async () => {
+    if (!currentUser?.id || !profile?.id) {
+      router.push('/login');
+      return;
+    }
+
+    setChatLoading(true);
+    try {
+      const conversation = await chatService.getOrCreateConversation(currentUser.id, profile.id);
+      if (conversation) {
+        router.push(`/mensajes?conv=${conversation.id}`);
+      } else {
+        toast.error('Error al iniciar la conversación');
+      }
+    } catch (error) {
+      toast.error('Error al iniciar la conversación');
+    } finally {
+      setChatLoading(false);
+    }
+  };
 
   // Cargar perfil
   const loadProfile = useCallback(async () => {
@@ -251,8 +275,16 @@ export default function PublicProfilePage() {
                     </>
                   )}
                 </button>
-                <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
-                  <MessageCircle className="w-5 h-5" />
+                <button 
+                  onClick={handleStartChat}
+                  disabled={chatLoading}
+                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {chatLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <MessageCircle className="w-5 h-5" />
+                  )}
                 </button>
                 <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
                   <MoreHorizontal className="w-5 h-5" />
