@@ -1,169 +1,139 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  AdminHeader,
-  AnnouncementForm,
-  AnnouncementsList,
-  StatsCard,
-} from '@/components/admin';
-import { mockAnnouncements, Announcement } from '@/lib/admin-data';
-import { Button } from '@/components/ui/button';
-import { Plus, Bell, Eye, MousePointer } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
+import { createClient } from '@supabase/supabase-js';
+import { 
+  Bell, 
+  Loader2, 
+  Info, 
+  AlertTriangle, 
+  CheckCircle, 
+  XCircle,
+  Megaphone
+} from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
-export default function AdminAnuncios() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>(mockAnnouncements);
-  const [showForm, setShowForm] = useState(false);
-  const [editingAnnouncement, setEditingAnnouncement] =
-    useState<Announcement | undefined>();
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-  // Stats
-  const activeCount = announcements.filter((a) => a.status === 'active').length;
-  const totalViews = announcements.reduce((sum, a) => sum + a.stats.views, 0);
-  const totalClicks = announcements.reduce((sum, a) => sum + a.stats.clicks, 0);
-  const avgCTR =
-    totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(1) : '0';
+interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  is_pinned: boolean;
+  created_at: string;
+}
 
-  const handleSave = (data: Partial<Announcement>) => {
-    if (editingAnnouncement) {
-      setAnnouncements((prev) =>
-        prev.map((a) =>
-          a.id === editingAnnouncement.id ? { ...a, ...data } : a,
-        ),
-      );
-    } else {
-      const newAnnouncement: Announcement = {
-        id: `ann-${Date.now()}`,
-        title: data.title || '',
-        message: data.message || '',
-        type: data.type || 'info',
-        priority: data.priority || 'medium',
-        target: data.target || 'all',
-        channels: data.channels || ['notification'],
-        status: data.status || 'draft',
-        scheduledAt: data.scheduledAt,
-        expiresAt: data.expiresAt,
-        createdBy: 'admin',
-        createdAt: new Date().toISOString(),
-        stats: { views: 0, clicks: 0, dismissals: 0 },
-      };
-      setAnnouncements((prev) => [newAnnouncement, ...prev]);
-    }
-    setShowForm(false);
-    setEditingAnnouncement(undefined);
-  };
+const TYPE_CONFIG: Record<string, { icon: any; color: string; bg: string }> = {
+  INFO: { icon: Info, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+  SUCCESS: { icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/30' },
+  WARNING: { icon: AlertTriangle, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
+  ERROR: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+};
 
-  const handleEdit = (announcement: Announcement) => {
-    setEditingAnnouncement(announcement);
-    setShowForm(true);
-  };
+export default function AnunciosPage() {
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDelete = (announcement: Announcement) => {
-    setAnnouncements((prev) => prev.filter((a) => a.id !== announcement.id));
-    toast.success('Anuncio eliminado');
-  };
+  useEffect(() => {
+    const loadAnnouncements = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('is_pinned', { ascending: false })
+          .order('created_at', { ascending: false });
 
-  const handleDuplicate = (announcement: Announcement) => {
-    const duplicate: Announcement = {
-      ...announcement,
-      id: `ann-${Date.now()}`,
-      title: `${announcement.title} (copia)`,
-      status: 'draft',
-      createdAt: new Date().toISOString(),
-      stats: { views: 0, clicks: 0, dismissals: 0 },
+        if (error) throw error;
+        setAnnouncements(data || []);
+      } catch (error) {
+        console.error('Error loading announcements:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-    setAnnouncements((prev) => [duplicate, ...prev]);
-    toast.success('Anuncio duplicado');
-  };
 
-  const handleToggleStatus = (announcement: Announcement) => {
-    const newStatus = announcement.status === 'active' ? 'draft' : 'active';
-    setAnnouncements((prev) =>
-      prev.map((a) =>
-        a.id === announcement.id ? { ...a, status: newStatus } : a,
-      ),
-    );
-    toast.success(
-      newStatus === 'active' ? 'Anuncio activado' : 'Anuncio pausado',
-    );
-  };
+    loadAnnouncements();
+  }, []);
 
   return (
-    <div className="min-h-screen">
-      <AdminHeader
-        title="Anuncios y Notificaciones"
-        subtitle="Comunícate con tus usuarios"
-      />
+    <div className="min-h-screen bg-gray-950 text-white">
+      <Navbar />
 
-      <div className="p-6 space-y-6">
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <StatsCard
-            title="Anuncios Activos"
-            value={activeCount}
-            icon={Bell}
-            iconColor="text-green-400"
-            iconBgColor="bg-green-500/20"
-          />
-          <StatsCard
-            title="Total Vistas"
-            value={totalViews.toLocaleString()}
-            icon={Eye}
-            iconColor="text-blue-400"
-            iconBgColor="bg-blue-500/20"
-          />
-          <StatsCard
-            title="Total Clicks"
-            value={totalClicks.toLocaleString()}
-            icon={MousePointer}
-            iconColor="text-purple-400"
-            iconBgColor="bg-purple-500/20"
-          />
-          <StatsCard
-            title="CTR Promedio"
-            value={`${avgCTR}%`}
-            icon={MousePointer}
-            iconColor="text-yellow-400"
-            iconBgColor="bg-yellow-500/20"
-          />
+      <main className="container mx-auto px-4 py-8 max-w-3xl">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-3 bg-purple-500/20 rounded-xl">
+            <Megaphone className="w-8 h-8 text-purple-400" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">Anuncios</h1>
+            <p className="text-gray-400">Noticias y actualizaciones de Apocaliptics</p>
+          </div>
         </div>
 
-        {/* Botón nuevo anuncio */}
-        {!showForm && (
-          <Button
-            onClick={() => setShowForm(true)}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nuevo Anuncio
-          </Button>
-        )}
+        {/* Content */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+            <span className="ml-3 text-gray-400">Cargando anuncios...</span>
+          </div>
+        ) : announcements.length === 0 ? (
+          <div className="text-center py-20">
+            <Bell className="w-16 h-16 text-gray-700 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-400 mb-2">No hay anuncios</h2>
+            <p className="text-gray-500">
+              Cuando haya novedades, las verás aquí
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {announcements.map((announcement) => {
+              const config = TYPE_CONFIG[announcement.type] || TYPE_CONFIG.INFO;
+              const Icon = config.icon;
 
-        {/* Formulario */}
-        {showForm && (
-          <AnnouncementForm
-            announcement={editingAnnouncement}
-            onSave={handleSave}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingAnnouncement(undefined);
-            }}
-          />
+              return (
+                <div
+                  key={announcement.id}
+                  className={`border rounded-xl p-5 ${config.bg} transition-all hover:scale-[1.01]`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`p-2 rounded-lg ${config.bg}`}>
+                      <Icon className={`w-6 h-6 ${config.color}`} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-lg">{announcement.title}</h3>
+                        {announcement.is_pinned && (
+                          <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">
+                            📌 Fijado
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-300 mb-3">{announcement.content}</p>
+                      <p className="text-sm text-gray-500">
+                        {formatDistanceToNow(new Date(announcement.created_at), { 
+                          addSuffix: true, 
+                          locale: es 
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         )}
+      </main>
 
-        {/* Lista */}
-        <div>
-          <h2 className="text-lg font-semibold mb-4">Historial de Anuncios</h2>
-          <AnnouncementsList
-            announcements={announcements}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onDuplicate={handleDuplicate}
-            onToggleStatus={handleToggleStatus}
-          />
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }
