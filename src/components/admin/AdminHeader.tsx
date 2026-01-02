@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, Search, Settings, LogOut, Shield, ChevronDown, X, Loader2 } from 'lucide-react';
+import { Bell, Search, Settings, LogOut, ChevronDown, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@supabase/supabase-js';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -45,7 +45,6 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
 
   // Cargar usuario actual
   useEffect(() => {
@@ -85,7 +84,7 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     }
   };
 
- useEffect(() => {
+  useEffect(() => {
     if (user?.id) {
       loadNotifications();
     }
@@ -125,16 +124,14 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Buscar en usuarios
       router.push(`/admin/usuarios?search=${encodeURIComponent(searchQuery)}`);
       setSearchQuery('');
-      setShowSearch(false);
     }
   };
 
-  const initials = user?.display_name?.substring(0, 2).toUpperCase() || 
-                   user?.username?.substring(0, 2).toUpperCase() || 
-                   'AD';
+  const displayName = user?.display_name || user?.username || 'Admin';
+  const username = user?.username || 'admin';
+  const initials = displayName.substring(0, 2).toUpperCase();
 
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
@@ -250,9 +247,7 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
                 <AvatarFallback className="bg-purple-600">{initials}</AvatarFallback>
               </Avatar>
               <div className="hidden md:block text-left">
-                <div className="text-sm font-medium">
-                  {user?.display_name || user?.username || 'Admin'}
-                </div>
+                <div className="text-sm font-medium">{displayName}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                   <span>{roleIcon}</span> {roleName}
                 </div>
@@ -263,8 +258,8 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
 
           <DropdownMenuContent align="end" className="w-48 bg-card border-border">
             <div className="px-3 py-2 border-b border-border">
-              <p className="text-sm font-medium">{user?.display_name || user?.username}</p>
-              <p className="text-xs text-muted-foreground">@{user?.username}</p>
+              <p className="text-sm font-medium">{displayName}</p>
+              <p className="text-xs text-muted-foreground">@{username}</p>
             </div>
             <DropdownMenuItem onClick={() => router.push('/admin/configuracion')}>
               <Settings className="w-4 h-4 mr-2" />
