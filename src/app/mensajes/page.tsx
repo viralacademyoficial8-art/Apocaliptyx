@@ -68,14 +68,16 @@ function MensajesContent() {
       // Marcar como leídos
       if (userId) {
         await chatService.markAsRead(conversationId, userId);
-        loadConversations(); // Actualizar contadores
+        // Actualizar contadores sin crear ciclo
+        const updatedConversations = await chatService.getConversations(userId);
+        setConversations(updatedConversations);
       }
     } catch (error) {
       console.error('Error loading messages:', error);
     } finally {
       setLoadingMessages(false);
     }
-  }, [userId, loadConversations]);
+  }, [userId]);
 
   // Cargar conversaciones al inicio
   useEffect(() => {
@@ -89,17 +91,18 @@ function MensajesContent() {
     }
   }, [userId, status, router, loadConversations]);
 
-  // Manejar parámetro de conversación en URL
+  // Manejar parámetro de conversación en URL (solo al cargar)
   useEffect(() => {
     const convId = searchParams.get('conv');
-    if (convId && conversations.length > 0) {
+    if (convId && conversations.length > 0 && !selectedConversation) {
       const conv = conversations.find(c => c.id === convId);
       if (conv) {
         setSelectedConversation(conv);
         loadMessages(convId);
       }
     }
-  }, [searchParams, conversations, loadMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, conversations.length]);
 
   // Suscribirse a mensajes en tiempo real
   useEffect(() => {
