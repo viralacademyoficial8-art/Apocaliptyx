@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,10 +18,14 @@ const supabase = createClient(
 );
 
 export function ConfigProfile() {
+  const { data: session } = useSession();
   const { user, updateProfile } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  
+  // Obtener el ID del usuario (de session o store)
+  const userId: string | undefined = session?.user?.id || user?.id;
   
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -37,12 +42,12 @@ export function ConfigProfile() {
   // Cargar datos del usuario desde Supabase
   useEffect(() => {
     const loadUserData = async () => {
-      if (!user?.id) return;
+      if (!userId) return;
 
       const { data, error } = await supabase
         .from('users')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (data) {
@@ -58,14 +63,14 @@ export function ConfigProfile() {
     };
 
     loadUserData();
-  }, [user?.id]);
+  }, [userId]);
 
   // Subir imagen a Supabase Storage
   const uploadImage = async (
     file: File,
     bucket: 'avatars' | 'banners'
   ): Promise<string | null> => {
-    if (!user?.id) return null;
+    if (!userId) return null;
 
     // Validar tamaño (máx 5MB)
     if (file.size > 5 * 1024 * 1024) {
@@ -80,7 +85,7 @@ export function ConfigProfile() {
     }
 
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
 
     try {
       // Eliminar imagen anterior si existe
@@ -181,7 +186,7 @@ export function ConfigProfile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user?.id) {
+    if (!userId) {
       toast.error('No estás autenticado');
       return;
     }
@@ -200,12 +205,12 @@ export function ConfigProfile() {
 
     try {
       // Verificar si el username ya existe (si cambió)
-      if (formData.username.toLowerCase() !== user.username?.toLowerCase()) {
+      if (formData.username.toLowerCase() !== user?.username?.toLowerCase()) {
         const { data: existingUser } = await supabase
           .from('users')
           .select('id')
           .eq('username', formData.username.toLowerCase())
-          .neq('id', user.id)
+          .neq('id', userId)
           .single();
 
         if (existingUser) {
@@ -226,7 +231,7 @@ export function ConfigProfile() {
           banner_url: formData.bannerUrl,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', userId);
 
       if (error) {
         console.error('Update error:', error);

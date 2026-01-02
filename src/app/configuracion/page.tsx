@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { ConfigProfile } from '@/components/ConfigProfile';
@@ -17,27 +18,39 @@ import {
   Palette,
   ArrowLeft,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 
 type ConfigSection = 'profile' | 'notifications' | 'security' | 'appearance';
 
 export default function ConfiguracionPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
-  const [activeSection, setActiveSection] =
-    useState<ConfigSection>('profile');
+  const { data: session, status } = useSession();
+  const { user } = useAuthStore();
+  const [activeSection, setActiveSection] = useState<ConfigSection>('profile');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Redirigir si no está autenticado (después de que cargue la sesión)
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/');
+    if (status === 'unauthenticated') {
+      router.push('/login');
     }
-  }, [isAuthenticated, router]);
+  }, [status, router]);
 
-  if (!user) {
+  // Mostrar loading mientras se verifica la sesión
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      </div>
+    );
+  }
+
+  // Si no hay sesión, mostrar loading (mientras redirige)
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
       </div>
     );
   }
