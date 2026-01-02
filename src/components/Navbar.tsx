@@ -75,7 +75,7 @@ export function Navbar() {
   { href: "/tienda", label: t("nav.shop") },
   { href: "/leaderboard", label: t("nav.rankings") },
   { href: "/foro", label: t("nav.forum") },
-  { href: "/crear", label: t("scenarios.create") },
+  { href: "/crear", label: "Crear Escenario" },
 ];
 
   const handleLogout = async () => {
