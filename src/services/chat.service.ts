@@ -33,6 +33,9 @@ export interface Message {
   content: string;
   is_read: boolean;
   created_at: string;
+  file_url?: string;
+  file_type?: string;
+  file_name?: string;
   // Joined data
   sender?: {
     id: string;
@@ -157,8 +160,13 @@ class ChatService {
     return data || [];
   }
 
-  // Enviar mensaje
-  async sendMessage(conversationId: string, senderId: string, content: string): Promise<Message | null> {
+  // Enviar mensaje (con o sin archivo)
+  async sendMessage(
+    conversationId: string, 
+    senderId: string, 
+    content: string,
+    file?: { url: string; type: string; name: string }
+  ): Promise<Message | null> {
     const { data, error } = await supabase
       .from('messages')
       .insert({
@@ -166,6 +174,9 @@ class ChatService {
         sender_id: senderId,
         content: content.trim(),
         is_read: false,
+        file_url: file?.url || null,
+        file_type: file?.type || null,
+        file_name: file?.name || null,
       })
       .select(`
         *,
@@ -294,6 +305,51 @@ class ChatService {
       .eq('id', conversationId);
 
     return !error;
+  }
+
+  // Subir archivo al chat
+  async uploadFile(file: File, senderId: string): Promise<{ url: string; type: string; name: string } | null> {
+    // Validar tamaño (máx 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      console.error('File too large');
+      return null;
+    }
+
+    // Determinar tipo de archivo
+    let fileType = 'document';
+    if (file.type.startsWith('image/')) fileType = 'image';
+    else if (file.type.startsWith('video/')) fileType = 'video';
+    else if (file.type.startsWith('audio/')) fileType = 'audio';
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${senderId}-${Date.now()}.${fileExt}`;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('chat-files')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        return null;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('chat-files')
+        .getPublicUrl(fileName);
+
+      return {
+        url: urlData.publicUrl,
+        type: fileType,
+        name: file.name,
+      };
+    } catch (error) {
+      console.error('Upload error:', error);
+      return null;
+    }
   }
 }
 
