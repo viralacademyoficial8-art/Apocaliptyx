@@ -112,17 +112,17 @@ class AdminService {
         .from("scenarios")
         .select("*", { count: "exact", head: true });
 
-      // Escenarios activos
+      // Escenarios activos (ACTIVE en mayúsculas)
       const { count: activeScenarios } = await supabase
         .from("scenarios")
         .select("*", { count: "exact", head: true })
-        .eq("status", "active");
+        .eq("status", "ACTIVE");
 
-      // Escenarios completados
+      // Escenarios completados (RESOLVED en mayúsculas)
       const { count: completedScenarios } = await supabase
         .from("scenarios")
         .select("*", { count: "exact", head: true })
-        .eq("status", "completed");
+        .eq("status", "RESOLVED");
 
       // Volumen total (suma de total_pool)
       const { data: volumeData } = await supabase
@@ -155,7 +155,7 @@ class AdminService {
         activeScenarios: activeScenarios || 0,
         completedScenarios: completedScenarios || 0,
         totalVolume,
-        pendingReports: 0, // TODO: Implementar tabla de reportes
+        pendingReports: 0,
         totalTransactions: totalTransactions || 0,
         totalShopItems: totalShopItems || 0,
         totalNotifications: totalNotifications || 0,
@@ -314,9 +314,10 @@ class AdminService {
     try {
       const { limit = 20, offset = 0, search, status, category } = options || {};
 
+      // Consulta simple sin join
       let query = supabase
         .from("scenarios")
-        .select("*, creator:users!creator_id(username, display_name)", { count: "exact" });
+        .select("*", { count: "exact" });
 
       if (search) {
         query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
@@ -327,7 +328,7 @@ class AdminService {
       }
 
       if (category && category !== "all") {
-        query = query.eq("category", category);
+        query = query.ilike("category", category);
       }
 
       query = query.order("created_at", { ascending: false });
@@ -414,10 +415,10 @@ class AdminService {
         });
       }
 
-      // Escenarios recientes
+      // Escenarios recientes (sin join)
       const { data: recentScenarios } = await supabase
         .from("scenarios")
-        .select("id, title, created_at, creator:users!creator_id(username, avatar_url)")
+        .select("id, title, created_at, creator_id")
         .order("created_at", { ascending: false })
         .limit(5);
 
@@ -429,18 +430,14 @@ class AdminService {
             title: "Nuevo escenario creado",
             description: scenario.title,
             timestamp: scenario.created_at,
-            user: scenario.creator ? {
-              username: scenario.creator.username,
-              avatar_url: scenario.creator.avatar_url,
-            } : undefined,
           });
         });
       }
 
-      // Compras recientes
+      // Compras recientes (sin join)
       const { data: recentPurchases } = await supabase
         .from("user_purchases")
-        .select("id, quantity, price_paid, created_at, user:users!user_id(username, avatar_url), item:shop_items!item_id(name)")
+        .select("id, quantity, price_paid, created_at")
         .order("created_at", { ascending: false })
         .limit(5);
 
@@ -450,12 +447,8 @@ class AdminService {
             id: `purchase-${purchase.id}`,
             type: "purchase",
             title: "Nueva compra",
-            description: `${purchase.item?.name || 'Item'} x${purchase.quantity}`,
+            description: `Compra x${purchase.quantity} por ${purchase.price_paid} AP`,
             timestamp: purchase.created_at,
-            user: purchase.user ? {
-              username: purchase.user.username,
-              avatar_url: purchase.user.avatar_url,
-            } : undefined,
           });
         });
       }
