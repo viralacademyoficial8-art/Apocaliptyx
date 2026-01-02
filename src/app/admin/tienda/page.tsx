@@ -52,11 +52,10 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 const RARITY_COLORS: Record<string, string> = {
-  common: 'bg-gray-500/20 text-gray-400',
-  uncommon: 'bg-green-500/20 text-green-400',
-  rare: 'bg-blue-500/20 text-blue-400',
-  epic: 'bg-purple-500/20 text-purple-400',
-  legendary: 'bg-yellow-500/20 text-yellow-400',
+  COMMON: 'bg-gray-500/20 text-gray-400',
+  RARE: 'bg-blue-500/20 text-blue-400',
+  EPIC: 'bg-purple-500/20 text-purple-400',
+  LEGENDARY: 'bg-yellow-500/20 text-yellow-400',
 };
 
 export default function AdminTiendaPage() {
@@ -72,7 +71,7 @@ export default function AdminTiendaPage() {
     name: '',
     description: '',
     type: 'BOOST',
-    rarity: 'common',
+    rarity: 'COMMON',
     price: 100,
     original_price: 0,
     stock: '',
@@ -146,7 +145,7 @@ export default function AdminTiendaPage() {
       name: '',
       description: '',
       type: 'BOOST',
-      rarity: 'common',
+      rarity: 'COMMON',
       price: 100,
       original_price: 0,
       stock: '',
@@ -480,11 +479,10 @@ export default function AdminTiendaPage() {
                     onChange={(e) => setFormData(f => ({ ...f, rarity: e.target.value }))}
                     className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="common">Común</option>
-                    <option value="uncommon">Poco común</option>
-                    <option value="rare">Raro</option>
-                    <option value="epic">Épico</option>
-                    <option value="legendary">Legendario</option>
+                    <option value="COMMON">Común</option>
+                    <option value="RARE">Raro</option>
+                    <option value="EPIC">Épico</option>
+                    <option value="LEGENDARY">Legendario</option>
                   </select>
                 </div>
               </div>
