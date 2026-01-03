@@ -40,6 +40,7 @@
     "react-onesignal": "^3.4.4",
     "resend": "^6.6.0",
     "tailwind-merge": "^2.2.0",
+    "web-push": "^3.6.7",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
@@ -49,6 +50,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.4.19",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",

@@ -4,7 +4,9 @@
 
 import { useEffect, useState } from 'react';
 import { Bell, BellOff, Loader2, Check } from 'lucide-react';
-import { initOneSignal, requestNotificationPermission, isSubscribed } from '@/lib/onesignal';
+import { pushNotificationsService } from '@/services/pushNotifications.service';
+import { useAuthStore } from '@/lib/stores';
+import toast from 'react-hot-toast';
 
 interface PushNotificationManagerProps {
   showButton?: boolean;
@@ -15,40 +17,93 @@ export function PushNotificationManager({
   showButton = true,
   className = ''
 }: PushNotificationManagerProps) {
-  const [permission, setPermission] = useState<'default' | 'granted' | 'denied'>('default');
+  const { user } = useAuthStore();
+  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>('default');
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     async function init() {
-      await initOneSignal();
-      setInitialized(true);
+      // Verificar si el navegador soporta push
+      if (!pushNotificationsService.isSupported()) {
+        setPermission('unsupported');
+        setInitialized(true);
+        return;
+      }
+
+      // Registrar service worker
+      await pushNotificationsService.registerServiceWorker();
       
-      // Verificar estado actual
-      if ('Notification' in window) {
-        setPermission(Notification.permission);
+      // Verificar estado actual del permiso
+      setPermission(pushNotificationsService.getPermissionState());
+      
+      // Verificar si el usuario está suscrito
+      if (user?.id) {
+        const sub = await pushNotificationsService.isSubscribed(user.id);
+        setSubscribed(sub);
       }
       
-      const sub = await isSubscribed();
-      setSubscribed(sub);
+      setInitialized(true);
     }
 
     init();
-  }, []);
+  }, [user?.id]);
 
   const handleEnableNotifications = async () => {
+    if (!user?.id) {
+      toast.error('Debes iniciar sesión para activar notificaciones');
+      return;
+    }
+
     setLoading(true);
     try {
-      const granted = await requestNotificationPermission();
-      if (granted) {
+      const success = await pushNotificationsService.subscribe(user.id);
+      
+      if (success) {
         setPermission('granted');
         setSubscribed(true);
+        toast.success('¡Notificaciones activadas! 🔔');
+        
+        // Mostrar notificación de prueba
+        setTimeout(() => {
+          pushNotificationsService.showLocalNotification(
+            '¡Bienvenido a Apocaliptics! 🎉',
+            {
+              body: 'Ahora recibirás notificaciones de mensajes, likes y más.',
+              icon: '/icon-192x192.png',
+            }
+          );
+        }, 1000);
       } else {
-        setPermission('denied');
+        const currentPermission = pushNotificationsService.getPermissionState();
+        setPermission(currentPermission);
+        
+        if (currentPermission === 'denied') {
+          toast.error('Notificaciones bloqueadas. Habilítalas en la configuración del navegador.');
+        } else {
+          toast.error('No se pudieron activar las notificaciones');
+        }
       }
     } catch (error) {
       console.error('Error enabling notifications:', error);
+      toast.error('Error al activar notificaciones');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisableNotifications = async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    try {
+      await pushNotificationsService.unsubscribe(user.id);
+      setSubscribed(false);
+      toast.success('Notificaciones desactivadas');
+    } catch (error) {
+      console.error('Error disabling notifications:', error);
+      toast.error('Error al desactivar notificaciones');
     } finally {
       setLoading(false);
     }
@@ -57,14 +112,34 @@ export function PushNotificationManager({
   if (!showButton) return null;
   if (!initialized) return null;
 
+  // No soportado
+  if (permission === 'unsupported') {
+    return (
+      <button
+        disabled
+        className={`flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed ${className}`}
+        title="Tu navegador no soporta notificaciones push"
+      >
+        <BellOff className="w-4 h-4" />
+        <span className="text-sm">No soportado</span>
+      </button>
+    );
+  }
+
   // Ya suscrito
   if (subscribed && permission === 'granted') {
     return (
       <button
-        disabled
-        className={`flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-lg cursor-default ${className}`}
+        onClick={handleDisableNotifications}
+        disabled={loading}
+        className={`flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors ${className}`}
+        title="Clic para desactivar notificaciones"
       >
-        <Check className="w-4 h-4" />
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Check className="w-4 h-4" />
+        )}
         <span className="text-sm">Notificaciones activas</span>
       </button>
     );
