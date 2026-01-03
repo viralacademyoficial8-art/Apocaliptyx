@@ -169,18 +169,6 @@ export function LoginForm() {
           Regístrate gratis
         </Link>
       </p>
-
-      {/* Demo Credentials */}
-      <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-        <p className="text-xs text-gray-500 text-center mb-2">
-          Credenciales de prueba:
-        </p>
-        <p className="text-xs text-gray-400 text-center">
-          <code className="bg-gray-700 px-1 rounded">admin@apocaliptics.com</code>
-          {" / "}
-          <code className="bg-gray-700 px-1 rounded">admin123</code>
-        </p>
-      </div>
     </div>
   );
 }
