@@ -83,6 +83,33 @@ export interface CreateCommentInput {
 }
 
 class ForumService {
+  // ==================== HELPER: Enviar notificación ====================
+  
+  private async sendNotification(
+    userId: string,
+    type: string,
+    title: string,
+    message: string,
+    linkUrl: string,
+    imageUrl?: string
+  ): Promise<void> {
+    try {
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: userId,
+          type,
+          title,
+          message,
+          link_url: linkUrl,
+          image_url: imageUrl || null,
+          is_read: false,
+        });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  }
+
   // ==================== POSTS ====================
 
   async getPosts(options?: {
@@ -269,7 +296,7 @@ class ForumService {
       // Incrementar contador
       const { data: post } = await supabase
         .from('forum_posts')
-        .select('likes_count')
+        .select('likes_count, author_id, title, content')
         .eq('id', postId)
         .single();
 
@@ -279,6 +306,27 @@ class ForumService {
         .from('forum_posts')
         .update({ likes_count: newCount })
         .eq('id', postId);
+
+      // 🔔 NOTIFICACIÓN: Like en post (solo si no es el propio autor)
+      if (post && post.author_id !== userId) {
+        const { data: liker } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .eq('id', userId)
+          .single();
+
+        if (liker) {
+          const postTitle = post.title || post.content.substring(0, 30) + '...';
+          await this.sendNotification(
+            post.author_id,
+            'like_received',
+            'Nuevo Like ❤️',
+            `A @${liker.username} le gustó tu publicación "${postTitle}"`,
+            `/foro`,
+            liker.avatar_url
+          );
+        }
+      }
 
       return { liked: true, likesCount: newCount };
     }
@@ -340,6 +388,61 @@ class ForumService {
 
     // Incrementar contador de comentarios en el post
     await supabase.rpc('increment_comments_count', { post_id: input.post_id });
+
+    // 🔔 NOTIFICACIÓN: Comentario en post
+    const { data: post } = await supabase
+      .from('forum_posts')
+      .select('author_id, title, content')
+      .eq('id', input.post_id)
+      .single();
+
+    if (post && post.author_id !== userId) {
+      const { data: commenter } = await supabase
+        .from('users')
+        .select('username, avatar_url')
+        .eq('id', userId)
+        .single();
+
+      if (commenter) {
+        const postTitle = post.title || post.content.substring(0, 30) + '...';
+        await this.sendNotification(
+          post.author_id,
+          'comment_received',
+          'Nuevo Comentario 💬',
+          `@${commenter.username} comentó en tu publicación "${postTitle}"`,
+          `/foro`,
+          commenter.avatar_url
+        );
+      }
+    }
+
+    // 🔔 NOTIFICACIÓN: Respuesta a comentario (si es reply)
+    if (input.parent_id) {
+      const { data: parentComment } = await supabase
+        .from('forum_comments')
+        .select('author_id')
+        .eq('id', input.parent_id)
+        .single();
+
+      if (parentComment && parentComment.author_id !== userId) {
+        const { data: replier } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .eq('id', userId)
+          .single();
+
+        if (replier) {
+          await this.sendNotification(
+            parentComment.author_id,
+            'comment_reply',
+            'Nueva Respuesta 💬',
+            `@${replier.username} respondió a tu comentario`,
+            `/foro`,
+            replier.avatar_url
+          );
+        }
+      }
+    }
 
     return data;
   }
@@ -407,7 +510,7 @@ class ForumService {
 
       const { data: comment } = await supabase
         .from('forum_comments')
-        .select('likes_count')
+        .select('likes_count, author_id, content')
         .eq('id', commentId)
         .single();
 
@@ -417,6 +520,27 @@ class ForumService {
         .from('forum_comments')
         .update({ likes_count: newCount })
         .eq('id', commentId);
+
+      // 🔔 NOTIFICACIÓN: Like en comentario
+      if (comment && comment.author_id !== userId) {
+        const { data: liker } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .eq('id', userId)
+          .single();
+
+        if (liker) {
+          const commentPreview = comment.content.substring(0, 30) + '...';
+          await this.sendNotification(
+            comment.author_id,
+            'like_received',
+            'Nuevo Like ❤️',
+            `A @${liker.username} le gustó tu comentario "${commentPreview}"`,
+            `/foro`,
+            liker.avatar_url
+          );
+        }
+      }
 
       return { liked: true, likesCount: newCount };
     }

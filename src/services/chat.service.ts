@@ -197,6 +197,60 @@ class ChatService {
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversationId);
 
+    // Obtener el receptor y enviar notificación
+    try {
+      const { data: conversation } = await supabase
+        .from('conversations')
+        .select('participant_1, participant_2')
+        .eq('id', conversationId)
+        .single();
+
+      if (conversation) {
+        const receiverId = conversation.participant_1 === senderId 
+          ? conversation.participant_2 
+          : conversation.participant_1;
+
+        // Obtener info del sender
+        const { data: senderInfo } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .eq('id', senderId)
+          .single();
+
+        if (receiverId && senderInfo) {
+          // Verificar que el receptor no tenga silenciado al sender
+          const { data: muteCheck } = await supabase
+            .from('user_mutes')
+            .select('id')
+            .eq('muter_id', receiverId)
+            .eq('muted_id', senderId)
+            .single();
+
+          // Solo enviar notificación si no está silenciado
+          if (!muteCheck) {
+            const messagePreview = content.length > 50 
+              ? content.substring(0, 50) + '...' 
+              : content;
+            
+            await supabase
+              .from('notifications')
+              .insert({
+                user_id: receiverId,
+                type: 'message_received',
+                title: `💬 Mensaje de @${senderInfo.username}`,
+                message: file ? '📎 Te envió un archivo' : messagePreview,
+                image_url: senderInfo.avatar_url,
+                link_url: `/mensajes?conv=${conversationId}`,
+                is_read: false,
+              });
+          }
+        }
+      }
+    } catch (notifError) {
+      console.error('Error sending message notification:', notifError);
+      // No bloquear el envío del mensaje si falla la notificación
+    }
+
     return data;
   }
 
