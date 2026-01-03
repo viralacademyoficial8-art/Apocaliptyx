@@ -7,11 +7,27 @@ import { Footer } from "@/components/Footer";
 import { useAuthStore } from "@/lib/stores";
 import { scenariosService } from "@/services/scenarios.service";
 import { predictionsService, Prediction } from "@/services/predictions.service";
+import { createClient } from "@supabase/supabase-js";
 import { 
   Loader2, ArrowLeft, Clock, Users, Flame, 
-  TrendingUp, TrendingDown, AlertCircle, Share2, Flag
+  TrendingUp, TrendingDown, AlertCircle, Share2, Flag, X
 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+// Razones de reporte para escenarios
+const REPORT_REASONS = [
+  { id: 'duplicate', label: 'Escenario duplicado' },
+  { id: 'inappropriate', label: 'Contenido inapropiado' },
+  { id: 'misleading', label: 'Información engañosa' },
+  { id: 'spam', label: 'Spam o publicidad' },
+  { id: 'impossible', label: 'Imposible de verificar' },
+  { id: 'other', label: 'Otro motivo' },
+];
 
 interface ScenarioData {
   id: string;
@@ -50,6 +66,12 @@ export default function EscenarioPage() {
   const [selectedVote, setSelectedVote] = useState<"YES" | "NO" | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [userPrediction, setUserPrediction] = useState<Prediction | null>(null);
+
+  // Estado para reportar
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDescription, setReportDescription] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
 
   const scenarioId = params.id as string;
 
@@ -138,6 +160,43 @@ export default function EscenarioPage() {
       toast.error("Error al votar");
     } finally {
       setIsVoting(false);
+    }
+  };
+
+  // Manejar reporte
+  const handleReport = async () => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para reportar");
+      router.push("/login");
+      return;
+    }
+
+    if (!reportReason) {
+      toast.error("Selecciona un motivo");
+      return;
+    }
+
+    setReportLoading(true);
+    try {
+      await supabase
+        .from('scenario_reports')
+        .insert({
+          reporter_id: user.id,
+          scenario_id: scenarioId,
+          reason: reportReason,
+          description: reportDescription,
+          status: 'pending',
+        });
+
+      toast.success("Reporte enviado. Nuestro equipo lo revisará pronto.");
+      setShowReportModal(false);
+      setReportReason('');
+      setReportDescription('');
+    } catch (error) {
+      console.error("Error reporting scenario:", error);
+      toast.error("Error al enviar el reporte");
+    } finally {
+      setReportLoading(false);
     }
   };
 
@@ -411,13 +470,101 @@ export default function EscenarioPage() {
             Compartir
           </button>
           <button
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-gray-400"
+            onClick={() => setShowReportModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors text-gray-400"
           >
             <Flag className="w-4 h-4" />
             Reportar
           </button>
         </div>
       </main>
+
+      {/* Modal de Reporte */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Flag className="w-5 h-5 text-red-400" />
+                Reportar escenario
+              </h2>
+              <button
+                onClick={() => setShowReportModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">
+                  ¿Por qué quieres reportar este escenario?
+                </label>
+                <div className="space-y-2">
+                  {REPORT_REASONS.map((reason) => (
+                    <button
+                      key={reason.id}
+                      onClick={() => setReportReason(reason.id)}
+                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
+                        reportReason === reason.id
+                          ? 'bg-purple-500/20 border-purple-500 text-purple-400'
+                          : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                      }`}
+                    >
+                      {reason.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">
+                  Detalles adicionales (opcional)
+                </label>
+                <textarea
+                  value={reportDescription}
+                  onChange={(e) => setReportDescription(e.target.value)}
+                  placeholder="Proporciona más información sobre el problema..."
+                  rows={3}
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  maxLength={500}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {reportDescription.length}/500 caracteres
+                </p>
+              </div>
+              
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    setReportReason('');
+                    setReportDescription('');
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleReport}
+                  disabled={!reportReason || reportLoading}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {reportLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    'Enviar reporte'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
