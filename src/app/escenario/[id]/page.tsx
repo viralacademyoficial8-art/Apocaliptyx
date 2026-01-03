@@ -178,7 +178,8 @@ export default function EscenarioPage() {
 
     setReportLoading(true);
     try {
-      await supabase
+      // Guardar el reporte
+      const { data: reportData } = await supabase
         .from('scenario_reports')
         .insert({
           reporter_id: user.id,
@@ -186,7 +187,45 @@ export default function EscenarioPage() {
           reason: reportReason,
           description: reportDescription,
           status: 'pending',
+        })
+        .select()
+        .single();
+
+      // Notificación para el usuario que reporta
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: user.id,
+          type: 'system',
+          title: '📋 Reporte enviado',
+          message: `Tu reporte sobre "${scenario?.title?.substring(0, 30)}..." ha sido recibido. Lo revisaremos pronto.`,
+          link_url: `/escenario/${scenarioId}`,
+          is_read: false,
         });
+
+      // Obtener todos los admins para notificarles
+      const { data: admins } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'admin');
+
+      // Notificación para cada admin
+      if (admins && admins.length > 0) {
+        const reasonLabel = REPORT_REASONS.find(r => r.id === reportReason)?.label || reportReason;
+        
+        const adminNotifications = admins.map(admin => ({
+          user_id: admin.id,
+          type: 'system',
+          title: '🚨 Nuevo reporte de escenario',
+          message: `@${user.username} reportó: "${scenario?.title?.substring(0, 25)}..." - Motivo: ${reasonLabel}`,
+          link_url: '/admin/reportes',
+          is_read: false,
+        }));
+
+        await supabase
+          .from('notifications')
+          .insert(adminNotifications);
+      }
 
       toast.success("Reporte enviado. Nuestro equipo lo revisará pronto.");
       setShowReportModal(false);
