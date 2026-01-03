@@ -22,6 +22,7 @@ import {
   X,
   Smile,
   Download,
+  Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -60,6 +61,9 @@ function MensajesContent() {
   
   // Estado para emojis
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
+  // Estado para eliminar mensaje
+  const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -69,6 +73,32 @@ function MensajesContent() {
   // Scroll al último mensaje
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Eliminar mensaje
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!userId) return;
+    
+    setDeletingMessageId(messageId);
+    try {
+      const result = await chatService.deleteMessage(messageId, userId);
+      
+      if (result.success) {
+        // Actualizar el mensaje en la lista
+        setMessages(prev => prev.map(m => 
+          m.id === messageId 
+            ? { ...m, is_deleted: true, content: 'Este mensaje fue eliminado', file_url: undefined }
+            : m
+        ));
+        toast.success('Mensaje eliminado');
+      } else {
+        toast.error(result.error || 'Error al eliminar');
+      }
+    } catch (error) {
+      toast.error('Error al eliminar el mensaje');
+    } finally {
+      setDeletingMessageId(null);
+    }
   };
 
   // Cargar conversaciones
@@ -287,63 +317,102 @@ function MensajesContent() {
 
   // Renderizar contenido del mensaje
   const renderMessageContent = (message: Message, isOwn: boolean) => {
+    const deleteCheck = isOwn && !message.is_deleted ? chatService.canDeleteMessage(message, userId || '') : { canDelete: false };
+    const canDelete = deleteCheck.canDelete;
+    const timeLeft = 'timeLeft' in deleteCheck ? deleteCheck.timeLeft : 0;
+    
     return (
-      <div className={`
-        max-w-[75%] rounded-2xl overflow-hidden
-        ${isOwn ? 'bg-purple-600 rounded-br-md' : 'bg-gray-800 rounded-bl-md'}
-      `}>
-        {/* Archivo adjunto */}
-        {message.file_url && (
-          <div className="relative">
-            {message.file_type === 'image' ? (
-              <a href={message.file_url} target="_blank" rel="noopener noreferrer">
-                <img 
-                  src={message.file_url} 
-                  alt={message.file_name || 'Imagen'} 
-                  className="max-w-full max-h-64 object-cover cursor-pointer hover:opacity-90"
-                />
-              </a>
-            ) : message.file_type === 'video' ? (
-              <video 
-                src={message.file_url} 
-                controls 
-                className="max-w-full max-h-64"
-              />
+      <div className="group relative">
+        {/* Botón de eliminar (solo mensajes propios dentro del tiempo límite) */}
+        {canDelete && (
+          <button
+            onClick={() => handleDeleteMessage(message.id)}
+            disabled={deletingMessageId === message.id}
+            className={`
+              absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 rounded-full
+              bg-gray-800 hover:bg-red-600 text-gray-400 hover:text-white
+              opacity-0 group-hover:opacity-100 transition-all
+              ${deletingMessageId === message.id ? 'opacity-100' : ''}
+            `}
+            title={`Eliminar (${Math.floor((timeLeft || 0) / 60)}:${String((timeLeft || 0) % 60).padStart(2, '0')} restantes)`}
+          >
+            {deletingMessageId === message.id ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <a 
-                href={message.file_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={`flex items-center gap-3 p-3 ${isOwn ? 'bg-purple-700' : 'bg-gray-700'} hover:opacity-80`}
-              >
-                {getFileIcon(message.file_type || 'document')}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{message.file_name || 'Archivo'}</p>
-                  <p className="text-xs opacity-70">Clic para descargar</p>
+              <Trash2 className="w-4 h-4" />
+            )}
+          </button>
+        )}
+        
+        <div className={`
+          max-w-[75%] rounded-2xl overflow-hidden
+          ${message.is_deleted 
+            ? 'bg-gray-800/50 border border-gray-700' 
+            : isOwn ? 'bg-purple-600 rounded-br-md' : 'bg-gray-800 rounded-bl-md'
+          }
+        `}>
+          {/* Mensaje eliminado */}
+          {message.is_deleted ? (
+            <p className="text-sm text-gray-500 italic px-4 py-2">
+              🗑️ Este mensaje fue eliminado
+            </p>
+          ) : (
+            <>
+              {/* Archivo adjunto */}
+              {message.file_url && (
+                <div className="relative">
+                  {message.file_type === 'image' ? (
+                    <a href={message.file_url} target="_blank" rel="noopener noreferrer">
+                      <img 
+                        src={message.file_url} 
+                        alt={message.file_name || 'Imagen'} 
+                        className="max-w-full max-h-64 object-cover cursor-pointer hover:opacity-90"
+                      />
+                    </a>
+                  ) : message.file_type === 'video' ? (
+                    <video 
+                      src={message.file_url} 
+                      controls 
+                      className="max-w-full max-h-64"
+                    />
+                  ) : (
+                    <a 
+                      href={message.file_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={`flex items-center gap-3 p-3 ${isOwn ? 'bg-purple-700' : 'bg-gray-700'} hover:opacity-80`}
+                    >
+                      {getFileIcon(message.file_type || 'document')}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{message.file_name || 'Archivo'}</p>
+                        <p className="text-xs opacity-70">Clic para descargar</p>
+                      </div>
+                      <Download className="w-4 h-4" />
+                    </a>
+                  )}
                 </div>
-                <Download className="w-4 h-4" />
-              </a>
+              )}
+
+              {/* Texto del mensaje */}
+              {message.content && !message.content.startsWith('📎') && (
+                <p className="text-sm whitespace-pre-wrap break-words px-4 py-2">
+                  {message.content}
+                </p>
+              )}
+            </>
+          )}
+
+          {/* Hora y estado */}
+          <div className={`flex items-center gap-1 px-4 pb-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+            <span className="text-xs text-gray-400">
+              {formatDistanceToNow(new Date(message.created_at), { addSuffix: false, locale: es })}
+            </span>
+            {isOwn && !message.is_deleted && (
+              message.is_read 
+                ? <CheckCheck className="w-3 h-3 text-blue-400" />
+                : <Check className="w-3 h-3 text-gray-400" />
             )}
           </div>
-        )}
-
-        {/* Texto del mensaje */}
-        {message.content && !message.content.startsWith('📎') && (
-          <p className="text-sm whitespace-pre-wrap break-words px-4 py-2">
-            {message.content}
-          </p>
-        )}
-
-        {/* Hora y estado */}
-        <div className={`flex items-center gap-1 px-4 pb-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-          <span className="text-xs text-gray-400">
-            {formatDistanceToNow(new Date(message.created_at), { addSuffix: false, locale: es })}
-          </span>
-          {isOwn && (
-            message.is_read 
-              ? <CheckCheck className="w-3 h-3 text-blue-400" />
-              : <Check className="w-3 h-3 text-gray-400" />
-          )}
         </div>
       </div>
     );

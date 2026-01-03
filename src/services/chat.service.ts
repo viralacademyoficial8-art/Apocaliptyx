@@ -32,6 +32,8 @@ export interface Message {
   sender_id: string;
   content: string;
   is_read: boolean;
+  is_deleted?: boolean;
+  deleted_at?: string;
   created_at: string;
   file_url?: string;
   file_type?: string;
@@ -350,6 +352,83 @@ class ChatService {
       console.error('Upload error:', error);
       return null;
     }
+  }
+
+  // Eliminar mensaje (solo dentro del tiempo límite - 5 minutos)
+  async deleteMessage(messageId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+    // Obtener el mensaje
+    const { data: message, error: fetchError } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('id', messageId)
+      .single();
+
+    if (fetchError || !message) {
+      return { success: false, error: 'Mensaje no encontrado' };
+    }
+
+    // Verificar que el usuario es el autor
+    if (message.sender_id !== userId) {
+      return { success: false, error: 'No puedes eliminar este mensaje' };
+    }
+
+    // Verificar tiempo límite (5 minutos = 300000 ms)
+    const messageTime = new Date(message.created_at).getTime();
+    const now = Date.now();
+    const timeDiff = now - messageTime;
+    const timeLimit = 5 * 60 * 1000; // 5 minutos
+
+    if (timeDiff > timeLimit) {
+      const minutesAgo = Math.floor(timeDiff / 60000);
+      return { 
+        success: false, 
+        error: `Solo puedes eliminar mensajes dentro de los primeros 5 minutos. Este mensaje fue enviado hace ${minutesAgo} minutos.` 
+      };
+    }
+
+    // Marcar como eliminado
+    const { error: updateError } = await supabase
+      .from('messages')
+      .update({ 
+        is_deleted: true, 
+        deleted_at: new Date().toISOString(),
+        content: 'Este mensaje fue eliminado',
+        file_url: null,
+        file_type: null,
+        file_name: null,
+      })
+      .eq('id', messageId);
+
+    if (updateError) {
+      return { success: false, error: 'Error al eliminar el mensaje' };
+    }
+
+    return { success: true };
+  }
+
+  // Verificar si un mensaje puede ser eliminado
+  canDeleteMessage(message: Message, userId: string): { canDelete: boolean; timeLeft?: number } {
+    if (message.sender_id !== userId) {
+      return { canDelete: false };
+    }
+
+    if (message.is_deleted) {
+      return { canDelete: false };
+    }
+
+    const messageTime = new Date(message.created_at).getTime();
+    const now = Date.now();
+    const timeDiff = now - messageTime;
+    const timeLimit = 5 * 60 * 1000; // 5 minutos
+
+    if (timeDiff > timeLimit) {
+      return { canDelete: false };
+    }
+
+    return { 
+      canDelete: true, 
+      timeLeft: Math.ceil((timeLimit - timeDiff) / 1000) // segundos restantes
+    };
   }
 }
 
