@@ -15,6 +15,7 @@ export interface CreateScenarioInput {
   resolutionDate: string;
   creatorId: string;
   imageUrl?: string;
+  contentHash?: string;
 }
 
 export interface ScenarioFromDB {
@@ -38,6 +39,7 @@ export interface ScenarioFromDB {
   resolved_at: string | null;
   created_at: string;
   updated_at: string;
+  content_hash?: string;
 }
 
 class ScenariosService {
@@ -54,6 +56,7 @@ class ScenariosService {
           description: input.description,
           category: input.category,
           image_url: input.imageUrl || null,
+          content_hash: input.contentHash || null,
           status: "ACTIVE",
           result: null,
           total_pool: 0,
