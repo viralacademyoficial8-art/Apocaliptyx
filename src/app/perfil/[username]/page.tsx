@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { publicProfileService, PublicProfile } from '@/services/publicProfile.service';
 import { chatService } from '@/services/chat.service';
+import { createClient } from '@supabase/supabase-js';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
@@ -34,8 +35,41 @@ import {
   Eye,
   Users,
   BarChart3,
+  Copy,
+  Flag,
+  Ban,
+  BellOff,
+  Bell,
+  UserX,
+  Share2,
 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+// Razones de reporte
+const REPORT_REASONS = [
+  { id: 'spam', label: 'Spam o publicidad' },
+  { id: 'harassment', label: 'Acoso o bullying' },
+  { id: 'inappropriate', label: 'Contenido inapropiado' },
+  { id: 'impersonation', label: 'Suplantación de identidad' },
+  { id: 'scam', label: 'Estafa o fraude' },
+  { id: 'other', label: 'Otro motivo' },
+];
 
 type TabType = 'general' | 'predictions' | 'scenarios' | 'activity';
 
@@ -54,6 +88,14 @@ export default function PublicProfilePage() {
   const [predictions, setPredictions] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
+  
+  // Estados para menú de opciones
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDescription, setReportDescription] = useState('');
+  const [reportLoading, setReportLoading] = useState(false);
 
   const isOwnProfile = currentUser?.username?.toLowerCase() === username?.toLowerCase();
 
@@ -78,6 +120,168 @@ export default function PublicProfilePage() {
       setChatLoading(false);
     }
   };
+
+  // Copiar link del perfil
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/perfil/${profile?.username}`;
+    navigator.clipboard.writeText(url);
+    toast.success('¡Link copiado al portapapeles!');
+  };
+
+  // Compartir perfil
+  const handleShare = async () => {
+    const url = `${window.location.origin}/perfil/${profile?.username}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Perfil de ${profile?.display_name || profile?.username}`,
+          text: `Mira el perfil de ${profile?.display_name || profile?.username} en Apocaliptics`,
+          url: url,
+        });
+      } catch (error) {
+        handleCopyLink();
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
+
+  // Verificar estados de bloqueo y silencio
+  const checkBlockMuteStatus = useCallback(async () => {
+    if (!currentUser?.id || !profile?.id) return;
+
+    // Verificar bloqueo
+    const { data: blockData } = await supabase
+      .from('user_blocks')
+      .select('id')
+      .eq('blocker_id', currentUser.id)
+      .eq('blocked_id', profile.id)
+      .single();
+    setIsBlocked(!!blockData);
+
+    // Verificar silencio
+    const { data: muteData } = await supabase
+      .from('user_mutes')
+      .select('id')
+      .eq('muter_id', currentUser.id)
+      .eq('muted_id', profile.id)
+      .single();
+    setIsMuted(!!muteData);
+  }, [currentUser?.id, profile?.id]);
+
+  // Bloquear/Desbloquear usuario
+  const handleToggleBlock = async () => {
+    if (!currentUser?.id || !profile?.id) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      if (isBlocked) {
+        // Desbloquear
+        await supabase
+          .from('user_blocks')
+          .delete()
+          .eq('blocker_id', currentUser.id)
+          .eq('blocked_id', profile.id);
+        setIsBlocked(false);
+        toast.success('Usuario desbloqueado');
+      } else {
+        // Bloquear
+        await supabase
+          .from('user_blocks')
+          .insert({
+            blocker_id: currentUser.id,
+            blocked_id: profile.id,
+          });
+        setIsBlocked(true);
+        // También dejar de seguir si lo seguía
+        if (isFollowing) {
+          await publicProfileService.unfollow(currentUser.id, profile.id);
+          setIsFollowing(false);
+          setProfile(prev => prev ? { ...prev, followers_count: prev.followers_count - 1 } : null);
+        }
+        toast.success('Usuario bloqueado');
+      }
+    } catch (error) {
+      toast.error('Error al procesar la solicitud');
+    }
+  };
+
+  // Silenciar/Desilenciar usuario
+  const handleToggleMute = async () => {
+    if (!currentUser?.id || !profile?.id) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      if (isMuted) {
+        // Desilenciar
+        await supabase
+          .from('user_mutes')
+          .delete()
+          .eq('muter_id', currentUser.id)
+          .eq('muted_id', profile.id);
+        setIsMuted(false);
+        toast.success('Usuario desilenciado');
+      } else {
+        // Silenciar
+        await supabase
+          .from('user_mutes')
+          .insert({
+            muter_id: currentUser.id,
+            muted_id: profile.id,
+          });
+        setIsMuted(true);
+        toast.success('Usuario silenciado. No recibirás notificaciones de este usuario.');
+      }
+    } catch (error) {
+      toast.error('Error al procesar la solicitud');
+    }
+  };
+
+  // Enviar reporte
+  const handleReport = async () => {
+    if (!currentUser?.id || !profile?.id) {
+      router.push('/login');
+      return;
+    }
+
+    if (!reportReason) {
+      toast.error('Selecciona un motivo');
+      return;
+    }
+
+    setReportLoading(true);
+    try {
+      await supabase
+        .from('user_reports')
+        .insert({
+          reporter_id: currentUser.id,
+          reported_id: profile.id,
+          reason: reportReason,
+          description: reportDescription,
+          status: 'pending',
+        });
+
+      toast.success('Reporte enviado. Nuestro equipo lo revisará pronto.');
+      setShowReportModal(false);
+      setReportReason('');
+      setReportDescription('');
+    } catch (error) {
+      toast.error('Error al enviar el reporte');
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
+  // Cargar estados de bloqueo/silencio cuando se carga el perfil
+  useEffect(() => {
+    if (profile?.id && currentUser?.id && !isOwnProfile) {
+      checkBlockMuteStatus();
+    }
+  }, [profile?.id, currentUser?.id, isOwnProfile, checkBlockMuteStatus]);
 
   // Cargar perfil
   const loadProfile = useCallback(async () => {
@@ -277,8 +481,9 @@ export default function PublicProfilePage() {
                 </button>
                 <button 
                   onClick={handleStartChat}
-                  disabled={chatLoading}
+                  disabled={chatLoading || isBlocked}
                   className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                  title={isBlocked ? 'Usuario bloqueado' : 'Enviar mensaje'}
                 >
                   {chatLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -286,9 +491,82 @@ export default function PublicProfilePage() {
                     <MessageCircle className="w-5 h-5" />
                   )}
                 </button>
-                <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
-                  <MoreHorizontal className="w-5 h-5" />
-                </button>
+                
+                {/* Menú de opciones */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+                      <MoreHorizontal className="w-5 h-5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-800">
+                    {/* Compartir */}
+                    <DropdownMenuItem 
+                      onClick={handleShare}
+                      className="cursor-pointer hover:bg-gray-800"
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Compartir perfil
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem 
+                      onClick={handleCopyLink}
+                      className="cursor-pointer hover:bg-gray-800"
+                    >
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copiar link
+                    </DropdownMenuItem>
+                    
+                    <div className="my-1 h-px bg-gray-800" />
+                    
+                    {/* Silenciar */}
+                    <DropdownMenuItem 
+                      onClick={handleToggleMute}
+                      className="cursor-pointer hover:bg-gray-800"
+                    >
+                      {isMuted ? (
+                        <>
+                          <Bell className="mr-2 h-4 w-4" />
+                          Desilenciar usuario
+                        </>
+                      ) : (
+                        <>
+                          <BellOff className="mr-2 h-4 w-4" />
+                          Silenciar usuario
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    
+                    {/* Bloquear */}
+                    <DropdownMenuItem 
+                      onClick={handleToggleBlock}
+                      className={`cursor-pointer ${isBlocked ? 'hover:bg-gray-800' : 'hover:bg-red-500/10 text-red-400'}`}
+                    >
+                      {isBlocked ? (
+                        <>
+                          <UserX className="mr-2 h-4 w-4" />
+                          Desbloquear usuario
+                        </>
+                      ) : (
+                        <>
+                          <Ban className="mr-2 h-4 w-4" />
+                          Bloquear usuario
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                    
+                    <div className="my-1 h-px bg-gray-800" />
+                    
+                    {/* Reportar */}
+                    <DropdownMenuItem 
+                      onClick={() => setShowReportModal(true)}
+                      className="cursor-pointer hover:bg-red-500/10 text-red-400"
+                    >
+                      <Flag className="mr-2 h-4 w-4" />
+                      Reportar usuario
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             )}
           </div>
@@ -590,6 +868,86 @@ export default function PublicProfilePage() {
           )}
         </div>
       </main>
+
+      {/* Modal de Reporte */}
+      <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Flag className="w-5 h-5 text-red-400" />
+              Reportar a @{profile.username}
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">
+                ¿Por qué quieres reportar a este usuario?
+              </label>
+              <div className="space-y-2">
+                {REPORT_REASONS.map((reason) => (
+                  <button
+                    key={reason.id}
+                    onClick={() => setReportReason(reason.id)}
+                    className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
+                      reportReason === reason.id
+                        ? 'bg-purple-500/20 border-purple-500 text-purple-400'
+                        : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                    }`}
+                  >
+                    {reason.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <label className="text-sm text-gray-400 mb-2 block">
+                Detalles adicionales (opcional)
+              </label>
+              <textarea
+                value={reportDescription}
+                onChange={(e) => setReportDescription(e.target.value)}
+                placeholder="Proporciona más información sobre el problema..."
+                rows={3}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                maxLength={500}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                {reportDescription.length}/500 caracteres
+              </p>
+            </div>
+            
+            <div className="flex gap-3 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowReportModal(false);
+                  setReportReason('');
+                  setReportDescription('');
+                }}
+                className="flex-1 border-gray-700"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleReport}
+                disabled={!reportReason || reportLoading}
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                {reportLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  'Enviar reporte'
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
