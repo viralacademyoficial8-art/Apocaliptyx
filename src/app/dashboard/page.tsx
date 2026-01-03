@@ -260,7 +260,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
 
   return (
     <div 
-      onClick={() => router.push(`/escenarios/${scenario.id}`)}
+      onClick={() => router.push(`/escenario/${scenario.id}`)}
       className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 hover:border-purple-500/50 hover:bg-zinc-900 transition-all cursor-pointer group"
     >
       {/* Category & Hot badge */}
