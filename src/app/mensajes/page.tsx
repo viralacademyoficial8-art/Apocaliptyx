@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
 import { chatService, Conversation, Message } from '@/services/chat.service';
+import { OnlineStatus, PresenceTracker } from '@/components/OnlineStatus';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -432,6 +433,9 @@ function MensajesContent() {
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
+      
+      {/* Tracker de presencia del usuario actual */}
+      {userId && <PresenceTracker userId={userId} />}
 
       <div className="container mx-auto px-0 sm:px-4 py-0 sm:py-6">
         <div className="bg-gray-900 border border-gray-800 rounded-none sm:rounded-xl overflow-hidden h-[calc(100vh-4rem)] sm:h-[calc(100vh-8rem)]">
@@ -490,6 +494,12 @@ function MensajesContent() {
                             </span>
                           )}
                         </div>
+                        {/* Indicador de estado online */}
+                        {conv.other_user?.id && (
+                          <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
+                            <OnlineStatus userId={conv.other_user.id} size="sm" />
+                          </div>
+                        )}
                         {conv.unread_count && conv.unread_count > 0 && (
                           <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full text-xs flex items-center justify-center font-bold">
                             {conv.unread_count > 9 ? '9+' : conv.unread_count}
@@ -533,20 +543,31 @@ function MensajesContent() {
                       href={`/perfil/${selectedConversation.other_user?.username}`}
                       className="flex items-center gap-3 flex-1 hover:opacity-80"
                     >
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
-                        {selectedConversation.other_user?.avatar_url ? (
-                          <img src={selectedConversation.other_user.avatar_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="font-bold">
-                            {(selectedConversation.other_user?.display_name || '?')[0].toUpperCase()}
-                          </span>
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
+                          {selectedConversation.other_user?.avatar_url ? (
+                            <img src={selectedConversation.other_user.avatar_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="font-bold">
+                              {(selectedConversation.other_user?.display_name || '?')[0].toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        {/* Indicador de estado online */}
+                        {selectedConversation.other_user?.id && (
+                          <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
+                            <OnlineStatus userId={selectedConversation.other_user.id} size="sm" />
+                          </div>
                         )}
                       </div>
                       <div>
                         <p className="font-semibold">
                           {selectedConversation.other_user?.display_name || selectedConversation.other_user?.username}
                         </p>
-                        <p className="text-xs text-gray-400">@{selectedConversation.other_user?.username}</p>
+                        {/* Estado online con texto */}
+                        {selectedConversation.other_user?.id && (
+                          <OnlineStatus userId={selectedConversation.other_user.id} showText size="sm" />
+                        )}
                       </div>
                     </Link>
                   </div>
