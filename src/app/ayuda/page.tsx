@@ -336,7 +336,7 @@ export default function AyudaPage() {
               Habla con nuestro equipo de soporte en tiempo real. Disponible de Lunes a Viernes, 9am - 6pm (CST).
             </p>
             <Link 
-              href="/chat"
+              href="/soporte"
               className="block w-full py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors text-center"
             >
               Iniciar Chat
@@ -365,24 +365,24 @@ export default function AyudaPage() {
           </div>
         </div>
 
-        {/* FAQ Link */}
+        {/* Bottom CTA */}
         <div className="mt-12 text-center">
           <p className="text-gray-400 mb-4">¿No encontraste lo que buscabas?</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              href="/faq"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
+              href="/soporte"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors"
             >
-              <HelpCircle className="w-5 h-5" />
-              Ver Preguntas Frecuentes
+              <MessageCircle className="w-5 h-5" />
+              Abrir Ticket de Soporte
             </Link>
-            <Link
-              href="/contacto"
+            <a
+              href="mailto:contacto@apocaliptyx.com"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
             >
               <Mail className="w-5 h-5" />
-              Contactar Soporte
-            </Link>
+              Enviar Email
+            </a>
           </div>
         </div>
       </main>
