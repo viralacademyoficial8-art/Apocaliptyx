@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function Navbar() {
@@ -173,7 +173,7 @@ export function Navbar() {
                     )}
                   </div>
 
-                  {/* 🔔 Centro de Notificaciones (única campanita) */}
+                  {/* Centro de Notificaciones (única campanita) */}
                   <NotificationCenter />
 
                   {/* Dropdown usuario (desktop) */}
@@ -255,6 +255,27 @@ export function Navbar() {
                         >
                           <Settings className="mr-2 h-4 w-4" />
                           {t("nav.settings")}
+                        </DropdownMenuItem>
+
+                        {/* Separador */}
+                        <div className="my-1 h-px bg-border" />
+
+                        {/* Centro de Ayuda */}
+                        <DropdownMenuItem
+                          onClick={() => router.push("/ayuda")}
+                          className="cursor-pointer hover:bg-muted"
+                        >
+                          <HelpCircle className="mr-2 h-4 w-4" />
+                          Centro de Ayuda
+                        </DropdownMenuItem>
+
+                        {/* Soporte Técnico */}
+                        <DropdownMenuItem
+                          onClick={() => router.push("/soporte")}
+                          className="cursor-pointer hover:bg-purple-500/10 text-purple-400"
+                        >
+                          <MessageCircle className="mr-2 h-4 w-4" />
+                          Soporte Técnico
                         </DropdownMenuItem>
 
                         {/* Link al admin panel */}
