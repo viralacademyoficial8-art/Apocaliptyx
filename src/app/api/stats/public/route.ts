@@ -2,12 +2,6 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export const revalidate = 60; // Revalidar cada 60 segundos
 
@@ -23,15 +17,16 @@ export async function GET() {
       },
     });
 
-    // Obtener conteo de escenarios desde Supabase
-    const { count: scenariosCount } = await supabase
-      .from("scenarios")
-      .select("*", { count: "exact", head: true });
+    // Obtener conteo de escenarios
+    const scenariosCount = await prisma.scenario.count();
 
-    // Obtener total de predicciones (participaciones en escenarios)
-    const { count: predictionsCount } = await supabase
-      .from("scenario_participants")
-      .select("*", { count: "exact", head: true });
+    // Obtener conteo de posts del foro como "actividad"
+    let activityCount = 0;
+    try {
+      activityCount = await prisma.forumPost.count();
+    } catch {
+      activityCount = 0;
+    }
 
     // Formatear números
     const formatNumber = (num: number): string => {
@@ -54,12 +49,12 @@ export async function GET() {
         raw: totalCoins._sum.apCoins || 0,
       },
       scenarios: {
-        value: formatNumber(scenariosCount || 0),
-        raw: scenariosCount || 0,
+        value: formatNumber(scenariosCount),
+        raw: scenariosCount,
       },
       predictions: {
-        value: formatNumber(predictionsCount || 0),
-        raw: predictionsCount || 0,
+        value: formatNumber(activityCount),
+        raw: activityCount,
       },
     };
 
