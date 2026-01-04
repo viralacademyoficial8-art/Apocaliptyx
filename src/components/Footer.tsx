@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Skull,
@@ -11,6 +11,9 @@ import {
   MessageCircle,
   MapPin,
   Flame,
+  Users,
+  Target,
+  TrendingUp,
 } from 'lucide-react';
 
 type FooterDict = {
@@ -26,6 +29,8 @@ type FooterDict = {
   labels: {
     bolsaTotal: string;
     profetas: string;
+    escenarios: string;
+    predicciones: string;
     newsletterTitle: string;
     newsletterSubtitle: string;
     newsletterPlaceholder: string;
@@ -33,6 +38,7 @@ type FooterDict = {
     rights: string;
     madeWith: string;
     global: string;
+    version: string;
   };
 
   links: {
@@ -50,15 +56,18 @@ const DICT: Record<string, FooterDict> = {
       'La plataforma de predicciones donde los profetas digitales compiten por demostrar quién puede ver el futuro. ¿Tienes lo que se necesita?',
     headings: { plataforma: 'Plataforma', soporte: 'Soporte', legal: 'Legal', empresa: 'Empresa' },
     labels: {
-      bolsaTotal: 'Bolsa Total',
+      bolsaTotal: 'AP Coins en Juego',
       profetas: 'Profetas',
+      escenarios: 'Escenarios',
+      predicciones: 'Predicciones',
       newsletterTitle: 'Suscríbete a nuestro newsletter',
       newsletterSubtitle: 'Recibe las mejores predicciones y novedades directamente en tu correo.',
       newsletterPlaceholder: 'tu@email.com',
       newsletterButton: 'Suscribirse',
       rights: 'Todos los derechos reservados.',
-      madeWith: 'Hecho con 💀 para profetas digitales',
-      global: 'Global',
+      madeWith: 'Hecho con',
+      global: 'para profetas de todo el mundo',
+      version: 'v1.0.0',
     },
     links: {
       plataforma: [
@@ -71,7 +80,7 @@ const DICT: Record<string, FooterDict> = {
       soporte: [
         { href: '/ayuda', label: 'Centro de Ayuda' },
         { href: '/faq', label: 'Preguntas Frecuentes' },
-        { href: '/contacto', label: 'Contacto' },
+        { href: '/soporte', label: 'Soporte Técnico' },
         { href: '/reportar', label: 'Reportar Problema' },
       ],
       legal: [
@@ -89,7 +98,7 @@ const DICT: Record<string, FooterDict> = {
       compact: [
         { href: '/terminos-y-condiciones', label: 'Términos' },
         { href: '/politica-de-privacidad', label: 'Privacidad' },
-        { href: '/contacto', label: 'Contacto' },
+        { href: '/soporte', label: 'Soporte' },
       ],
     },
   },
@@ -99,15 +108,18 @@ const DICT: Record<string, FooterDict> = {
       'The prediction platform where digital prophets compete to prove who can see the future. Do you have what it takes?',
     headings: { plataforma: 'Platform', soporte: 'Support', legal: 'Legal', empresa: 'Company' },
     labels: {
-      bolsaTotal: 'Total Pool',
+      bolsaTotal: 'AP Coins in Play',
       profetas: 'Prophets',
+      escenarios: 'Scenarios',
+      predicciones: 'Predictions',
       newsletterTitle: 'Subscribe to our newsletter',
       newsletterSubtitle: 'Get the best predictions and updates straight to your inbox.',
       newsletterPlaceholder: 'you@email.com',
       newsletterButton: 'Subscribe',
       rights: 'All rights reserved.',
-      madeWith: 'Made with 💀 for digital prophets',
-      global: 'Global',
+      madeWith: 'Made with',
+      global: 'for prophets worldwide',
+      version: 'v1.0.0',
     },
     links: {
       plataforma: [
@@ -120,7 +132,7 @@ const DICT: Record<string, FooterDict> = {
       soporte: [
         { href: '/ayuda', label: 'Help Center' },
         { href: '/faq', label: 'FAQ' },
-        { href: '/contacto', label: 'Contact' },
+        { href: '/soporte', label: 'Technical Support' },
         { href: '/reportar', label: 'Report an Issue' },
       ],
       legal: [
@@ -138,7 +150,7 @@ const DICT: Record<string, FooterDict> = {
       compact: [
         { href: '/terminos-y-condiciones', label: 'Terms' },
         { href: '/politica-de-privacidad', label: 'Privacy' },
-        { href: '/contacto', label: 'Contact' },
+        { href: '/soporte', label: 'Support' },
       ],
     },
   },
@@ -148,15 +160,18 @@ const DICT: Record<string, FooterDict> = {
       'A plataforma de previsões onde profetas digitais competem para provar quem vê o futuro. Você tem o que é preciso?',
     headings: { plataforma: 'Plataforma', soporte: 'Suporte', legal: 'Legal', empresa: 'Empresa' },
     labels: {
-      bolsaTotal: 'Bolsa Total',
+      bolsaTotal: 'AP Coins em Jogo',
       profetas: 'Profetas',
+      escenarios: 'Cenários',
+      predicciones: 'Previsões',
       newsletterTitle: 'Assine nossa newsletter',
       newsletterSubtitle: 'Receba as melhores previsões e novidades no seu e-mail.',
       newsletterPlaceholder: 'seu@email.com',
       newsletterButton: 'Assinar',
       rights: 'Todos os direitos reservados.',
-      madeWith: 'Feito com 💀 para profetas digitais',
-      global: 'Global',
+      madeWith: 'Feito com',
+      global: 'para profetas do mundo todo',
+      version: 'v1.0.0',
     },
     links: {
       plataforma: [
@@ -169,7 +184,7 @@ const DICT: Record<string, FooterDict> = {
       soporte: [
         { href: '/ayuda', label: 'Central de Ajuda' },
         { href: '/faq', label: 'Perguntas Frequentes' },
-        { href: '/contacto', label: 'Contato' },
+        { href: '/soporte', label: 'Suporte Técnico' },
         { href: '/reportar', label: 'Reportar Problema' },
       ],
       legal: [
@@ -187,7 +202,7 @@ const DICT: Record<string, FooterDict> = {
       compact: [
         { href: '/terminos-y-condiciones', label: 'Termos' },
         { href: '/politica-de-privacidad', label: 'Privacidade' },
-        { href: '/contacto', label: 'Contato' },
+        { href: '/soporte', label: 'Suporte' },
       ],
     },
   },
@@ -197,15 +212,18 @@ const DICT: Record<string, FooterDict> = {
       "La plateforme de prédictions où les prophètes numériques se battent pour prouver qui voit l'avenir. Es-tu prêt ?",
     headings: { plataforma: 'Plateforme', soporte: 'Support', legal: 'Mentions', empresa: 'Entreprise' },
     labels: {
-      bolsaTotal: 'Cagnotte Totale',
+      bolsaTotal: 'AP Coins en Jeu',
       profetas: 'Prophètes',
+      escenarios: 'Scénarios',
+      predicciones: 'Prédictions',
       newsletterTitle: 'Abonne-toi à notre newsletter',
       newsletterSubtitle: 'Reçois les meilleures prédictions et actus directement par e-mail.',
       newsletterPlaceholder: 'toi@email.com',
       newsletterButton: "S'abonner",
       rights: 'Tous droits réservés.',
-      madeWith: 'Fait avec 💀 pour les prophètes numériques',
-      global: 'Global',
+      madeWith: 'Fait avec',
+      global: 'pour les prophètes du monde entier',
+      version: 'v1.0.0',
     },
     links: {
       plataforma: [
@@ -218,7 +236,7 @@ const DICT: Record<string, FooterDict> = {
       soporte: [
         { href: '/ayuda', label: "Centre d'aide" },
         { href: '/faq', label: 'FAQ' },
-        { href: '/contacto', label: 'Contact' },
+        { href: '/soporte', label: 'Support Technique' },
         { href: '/reportar', label: 'Signaler un problème' },
       ],
       legal: [
@@ -236,7 +254,7 @@ const DICT: Record<string, FooterDict> = {
       compact: [
         { href: '/terminos-y-condiciones', label: 'Conditions' },
         { href: '/politica-de-privacidad', label: 'Confidentialité' },
-        { href: '/contacto', label: 'Contact' },
+        { href: '/soporte', label: 'Support' },
       ],
     },
   },
@@ -246,15 +264,18 @@ const DICT: Record<string, FooterDict> = {
       'Die Vorhersageplattform, auf der digitale Propheten darum kämpfen zu beweisen, wer die Zukunft sieht. Hast du das Zeug dazu?',
     headings: { plataforma: 'Plattform', soporte: 'Support', legal: 'Rechtliches', empresa: 'Unternehmen' },
     labels: {
-      bolsaTotal: 'Gesamtpool',
+      bolsaTotal: 'AP Coins im Spiel',
       profetas: 'Propheten',
+      escenarios: 'Szenarien',
+      predicciones: 'Vorhersagen',
       newsletterTitle: 'Newsletter abonnieren',
       newsletterSubtitle: 'Erhalte die besten Vorhersagen und Updates direkt per E-Mail.',
       newsletterPlaceholder: 'du@email.com',
       newsletterButton: 'Abonnieren',
       rights: 'Alle Rechte vorbehalten.',
-      madeWith: 'Gemacht mit 💀 für digitale Propheten',
-      global: 'Global',
+      madeWith: 'Gemacht mit',
+      global: 'für Propheten weltweit',
+      version: 'v1.0.0',
     },
     links: {
       plataforma: [
@@ -267,7 +288,7 @@ const DICT: Record<string, FooterDict> = {
       soporte: [
         { href: '/ayuda', label: 'Hilfezentrum' },
         { href: '/faq', label: 'FAQ' },
-        { href: '/contacto', label: 'Kontakt' },
+        { href: '/soporte', label: 'Technischer Support' },
         { href: '/reportar', label: 'Problem melden' },
       ],
       legal: [
@@ -285,56 +306,7 @@ const DICT: Record<string, FooterDict> = {
       compact: [
         { href: '/terminos-y-condiciones', label: 'Bedingungen' },
         { href: '/politica-de-privacidad', label: 'Datenschutz' },
-        { href: '/contacto', label: 'Kontakt' },
-      ],
-    },
-  },
-
-  ru: {
-    description:
-      'Платформа прогнозов, где цифровые пророки соревнуются, чтобы доказать, кто видит будущее. Готов?',
-    headings: { plataforma: 'Платформа', soporte: 'Поддержка', legal: 'Право', empresa: 'Компания' },
-    labels: {
-      bolsaTotal: 'Общий банк',
-      profetas: 'Пророки',
-      newsletterTitle: 'Подпишись на рассылку',
-      newsletterSubtitle: 'Получай лучшие прогнозы и новости прямо на почту.',
-      newsletterPlaceholder: 'you@email.com',
-      newsletterButton: 'Подписаться',
-      rights: 'Все права защищены.',
-      madeWith: 'Сделано с 💀 для цифровых пророков',
-      global: 'Global',
-    },
-    links: {
-      plataforma: [
-        { href: '/dashboard', label: 'Сценарии' },
-        { href: '/leaderboard', label: 'Лидеры' },
-        { href: '/tienda', label: 'Магазин' },
-        { href: '/foro', label: 'Сообщество' },
-        { href: '/crear', label: 'Создать сценарий' },
-      ],
-      soporte: [
-        { href: '/ayuda', label: 'Центр помощи' },
-        { href: '/faq', label: 'FAQ' },
-        { href: '/contacto', label: 'Контакт' },
-        { href: '/reportar', label: 'Сообщить о проблеме' },
-      ],
-      legal: [
-        { href: '/terminos-y-condiciones', label: 'Условия' },
-        { href: '/politica-de-privacidad', label: 'Политика конфиденциальности' },
-        { href: '/cookies', label: 'Cookie-политика' },
-        { href: '/reglas', label: 'Правила сообщества' },
-      ],
-      empresa: [
-        { href: '/about', label: 'О нас' },
-        { href: '/blog', label: 'Блог' },
-        { href: '/prensa', label: 'Пресса' },
-        { href: '/careers', label: 'Карьера' },
-      ],
-      compact: [
-        { href: '/terminos-y-condiciones', label: 'Условия' },
-        { href: '/politica-de-privacidad', label: 'Конфиденциальность' },
-        { href: '/contacto', label: 'Контакт' },
+        { href: '/soporte', label: 'Support' },
       ],
     },
   },
@@ -344,11 +316,39 @@ function getDict(lang: string): FooterDict {
   return DICT[lang] ?? DICT.es;
 }
 
+interface PublicStats {
+  users: { value: string; raw: number };
+  totalPool: { value: string; raw: number };
+  scenarios: { value: string; raw: number };
+  predictions: { value: string; raw: number };
+}
+
 export function Footer() {
   const { language } = useLanguage();
   const t = useMemo(() => getDict(language), [language]);
-
   const currentYear = new Date().getFullYear();
+  
+  const [stats, setStats] = useState<PublicStats>({
+    users: { value: "...", raw: 0 },
+    totalPool: { value: "...", raw: 0 },
+    scenarios: { value: "...", raw: 0 },
+    predictions: { value: "...", raw: 0 },
+  });
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/stats/public");
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    }
+    fetchStats();
+  }, []);
 
   const socialLinks = [
     { href: 'https://twitter.com/apocaliptics', icon: Twitter, label: 'Twitter' },
@@ -374,21 +374,37 @@ export function Footer() {
 
             <p className="text-gray-400 text-sm mb-6 max-w-xs">{t.description}</p>
 
-            {/* Stats rápidos */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-lg">
-                <Flame className="w-4 h-4 text-yellow-500" />
-                <div>
-                  <div className="text-xs text-gray-500">{t.labels.bolsaTotal}</div>
-                  <div className="text-sm font-bold text-yellow-400">2.5M AP</div>
+            {/* Stats en tiempo real */}
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+                <Flame className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-xs text-gray-500 truncate">{t.labels.bolsaTotal}</div>
+                  <div className="text-sm font-bold text-yellow-400">{stats.totalPool.value} AP</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-900 px-3 py-2 rounded-lg">
-                <Skull className="w-4 h-4 text-purple-500" />
-                <div>
-                  <div className="text-xs text-gray-500">{t.labels.profetas}</div>
-                  <div className="text-sm font-bold text-purple-400">12,847</div>
+              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+                <Users className="w-4 h-4 text-purple-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-xs text-gray-500 truncate">{t.labels.profetas}</div>
+                  <div className="text-sm font-bold text-purple-400">{stats.users.value}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+                <Target className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-xs text-gray-500 truncate">{t.labels.escenarios}</div>
+                  <div className="text-sm font-bold text-blue-400">{stats.scenarios.value}</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+                <TrendingUp className="w-4 h-4 text-green-500 flex-shrink-0" />
+                <div className="min-w-0">
+                  <div className="text-xs text-gray-500 truncate">{t.labels.predicciones}</div>
+                  <div className="text-sm font-bold text-green-400">{stats.predictions.value}</div>
                 </div>
               </div>
             </div>
@@ -403,7 +419,7 @@ export function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-900 hover:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+                    className="w-10 h-10 bg-gray-900 hover:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-gray-800"
                     aria-label={social.label}
                   >
                     <Icon className="w-5 h-5" />
@@ -506,21 +522,35 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Copyright */}
-      <div className="border-t border-gray-800">
+      {/* Copyright - Mejorado */}
+      <div className="border-t border-gray-800 bg-gray-900/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-gray-500 text-sm text-center sm:text-left">
-              © {currentYear} Apocaliptics. {t.labels.rights}
-            </p>
+            {/* Copyright */}
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <span>© {currentYear}</span>
+              <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+                Apocaliptics
+              </Link>
+              <span className="hidden sm:inline">•</span>
+              <span className="hidden sm:inline">{t.labels.rights}</span>
+            </div>
 
-            <div className="flex items-center gap-4 text-sm">
+            {/* Centro */}
+            <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-500">{t.labels.madeWith}</span>
-              <span className="text-gray-700">|</span>
-              <div className="flex items-center gap-1 text-gray-400">
-                <MapPin className="w-3 h-3" />
-                <span>{t.labels.global}</span>
+              <Skull className="w-4 h-4 text-red-500" />
+              <span className="text-gray-500">{t.labels.global}</span>
+            </div>
+
+            {/* Derecha */}
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-1.5 text-gray-500">
+                <MapPin className="w-3.5 h-3.5" />
+                <span>CDMX, México</span>
               </div>
+              <span className="text-gray-700">•</span>
+              <span className="text-gray-600 font-mono text-xs">{t.labels.version}</span>
             </div>
           </div>
         </div>
