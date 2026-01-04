@@ -75,8 +75,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/reportar', label: 'Reportar Problema' },
       ],
       legal: [
-        { href: '/terminos', label: 'Términos de Servicio' },
-        { href: '/privacidad', label: 'Política de Privacidad' },
+        { href: '/terminos-y-condiciones', label: 'Términos de Servicio' },
+        { href: '/politica-de-privacidad', label: 'Política de Privacidad' },
         { href: '/cookies', label: 'Política de Cookies' },
         { href: '/reglas', label: 'Reglas de la Comunidad' },
       ],
@@ -87,8 +87,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/careers', label: 'Trabaja con Nosotros' },
       ],
       compact: [
-        { href: '/terminos', label: 'Términos' },
-        { href: '/privacidad', label: 'Privacidad' },
+        { href: '/terminos-y-condiciones', label: 'Términos' },
+        { href: '/politica-de-privacidad', label: 'Privacidad' },
         { href: '/contacto', label: 'Contacto' },
       ],
     },
@@ -124,8 +124,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/reportar', label: 'Report an Issue' },
       ],
       legal: [
-        { href: '/terminos', label: 'Terms of Service' },
-        { href: '/privacidad', label: 'Privacy Policy' },
+        { href: '/terminos-y-condiciones', label: 'Terms of Service' },
+        { href: '/politica-de-privacidad', label: 'Privacy Policy' },
         { href: '/cookies', label: 'Cookie Policy' },
         { href: '/reglas', label: 'Community Rules' },
       ],
@@ -136,8 +136,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/careers', label: 'Careers' },
       ],
       compact: [
-        { href: '/terminos', label: 'Terms' },
-        { href: '/privacidad', label: 'Privacy' },
+        { href: '/terminos-y-condiciones', label: 'Terms' },
+        { href: '/politica-de-privacidad', label: 'Privacy' },
         { href: '/contacto', label: 'Contact' },
       ],
     },
@@ -173,8 +173,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/reportar', label: 'Reportar Problema' },
       ],
       legal: [
-        { href: '/terminos', label: 'Termos de Serviço' },
-        { href: '/privacidad', label: 'Política de Privacidade' },
+        { href: '/terminos-y-condiciones', label: 'Termos de Serviço' },
+        { href: '/politica-de-privacidad', label: 'Política de Privacidade' },
         { href: '/cookies', label: 'Política de Cookies' },
         { href: '/reglas', label: 'Regras da Comunidade' },
       ],
@@ -185,8 +185,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/careers', label: 'Carreiras' },
       ],
       compact: [
-        { href: '/terminos', label: 'Termos' },
-        { href: '/privacidad', label: 'Privacidade' },
+        { href: '/terminos-y-condiciones', label: 'Termos' },
+        { href: '/politica-de-privacidad', label: 'Privacidade' },
         { href: '/contacto', label: 'Contato' },
       ],
     },
@@ -194,7 +194,7 @@ const DICT: Record<string, FooterDict> = {
 
   fr: {
     description:
-      'La plateforme de prédictions où les prophètes numériques se battent pour prouver qui voit l’avenir. Es-tu prêt ?',
+      "La plateforme de prédictions où les prophètes numériques se battent pour prouver qui voit l'avenir. Es-tu prêt ?",
     headings: { plataforma: 'Plateforme', soporte: 'Support', legal: 'Mentions', empresa: 'Entreprise' },
     labels: {
       bolsaTotal: 'Cagnotte Totale',
@@ -222,8 +222,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/reportar', label: 'Signaler un problème' },
       ],
       legal: [
-        { href: '/terminos', label: "Conditions d'utilisation" },
-        { href: '/privacidad', label: 'Politique de confidentialité' },
+        { href: '/terminos-y-condiciones', label: "Conditions d'utilisation" },
+        { href: '/politica-de-privacidad', label: 'Politique de confidentialité' },
         { href: '/cookies', label: 'Politique des cookies' },
         { href: '/reglas', label: 'Règles de la communauté' },
       ],
@@ -234,8 +234,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/careers', label: 'Carrières' },
       ],
       compact: [
-        { href: '/terminos', label: 'Conditions' },
-        { href: '/privacidad', label: 'Confidentialité' },
+        { href: '/terminos-y-condiciones', label: 'Conditions' },
+        { href: '/politica-de-privacidad', label: 'Confidentialité' },
         { href: '/contacto', label: 'Contact' },
       ],
     },
@@ -271,8 +271,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/reportar', label: 'Problem melden' },
       ],
       legal: [
-        { href: '/terminos', label: 'Nutzungsbedingungen' },
-        { href: '/privacidad', label: 'Datenschutz' },
+        { href: '/terminos-y-condiciones', label: 'Nutzungsbedingungen' },
+        { href: '/politica-de-privacidad', label: 'Datenschutz' },
         { href: '/cookies', label: 'Cookie-Richtlinie' },
         { href: '/reglas', label: 'Community-Regeln' },
       ],
@@ -283,8 +283,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/careers', label: 'Karriere' },
       ],
       compact: [
-        { href: '/terminos', label: 'Bedingungen' },
-        { href: '/privacidad', label: 'Datenschutz' },
+        { href: '/terminos-y-condiciones', label: 'Bedingungen' },
+        { href: '/politica-de-privacidad', label: 'Datenschutz' },
         { href: '/contacto', label: 'Kontakt' },
       ],
     },
@@ -320,8 +320,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/reportar', label: 'Сообщить о проблеме' },
       ],
       legal: [
-        { href: '/terminos', label: 'Условия' },
-        { href: '/privacidad', label: 'Политика конфиденциальности' },
+        { href: '/terminos-y-condiciones', label: 'Условия' },
+        { href: '/politica-de-privacidad', label: 'Политика конфиденциальности' },
         { href: '/cookies', label: 'Cookie-политика' },
         { href: '/reglas', label: 'Правила сообщества' },
       ],
@@ -332,8 +332,8 @@ const DICT: Record<string, FooterDict> = {
         { href: '/careers', label: 'Карьера' },
       ],
       compact: [
-        { href: '/terminos', label: 'Условия' },
-        { href: '/privacidad', label: 'Конфиденциальность' },
+        { href: '/terminos-y-condiciones', label: 'Условия' },
+        { href: '/politica-de-privacidad', label: 'Конфиденциальность' },
         { href: '/contacto', label: 'Контакт' },
       ],
     },
