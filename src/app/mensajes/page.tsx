@@ -10,7 +10,9 @@ import {
   Message,
   ChatFilter,
   TypingUser,
-  MessageReaction
+  MessageReaction,
+  GroupInvitation,
+  UserInfo
 } from '@/services/chat.service';
 import { OnlineStatus, PresenceTracker } from '@/components/OnlineStatus';
 import { formatDistanceToNow } from 'date-fns';
@@ -45,6 +47,13 @@ import {
   LogOut,
   Crown,
   Hash,
+  Link2,
+  Copy,
+  CheckCircle,
+  UserCheck,
+  UserX,
+  RefreshCw,
+  ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -124,6 +133,20 @@ function MensajesContent() {
   const [showSearchInChat, setShowSearchInChat] = useState(false);
   const [searchInChatQuery, setSearchInChatQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Message[]>([]);
+
+  // Sistema de invitaciones
+  const [showAddMembers, setShowAddMembers] = useState(false);
+  const [followingUsers, setFollowingUsers] = useState<UserInfo[]>([]);
+  const [loadingFollowing, setLoadingFollowing] = useState(false);
+  const [invitingUserId, setInvitingUserId] = useState<string | null>(null);
+  const [pendingInvitations, setPendingInvitations] = useState<GroupInvitation[]>([]);
+  const [showInvitations, setShowInvitations] = useState(false);
+
+  // Enlace de invitación
+  const [showInviteLink, setShowInviteLink] = useState(false);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [loadingInviteLink, setLoadingInviteLink] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -492,6 +515,133 @@ function MensajesContent() {
     }
     setShowChatMenu(false);
   };
+
+  // ============================================
+  // FUNCIONES DE INVITACIONES
+  // ============================================
+
+  const loadFollowingUsers = async () => {
+    if (!userId) return;
+    setLoadingFollowing(true);
+    try {
+      const users = await chatService.getFollowing(userId);
+      // Filtrar usuarios que ya son miembros del grupo
+      const memberIds = selectedConversation?.members?.map(m => m.user_id) || [];
+      const filtered = users.filter(u => !memberIds.includes(u.id));
+      setFollowingUsers(filtered);
+    } catch (error) {
+      console.error('Error loading following:', error);
+    } finally {
+      setLoadingFollowing(false);
+    }
+  };
+
+  const loadPendingInvitations = async () => {
+    if (!userId) return;
+    try {
+      const invitations = await chatService.getPendingInvitations(userId);
+      setPendingInvitations(invitations);
+    } catch (error) {
+      console.error('Error loading invitations:', error);
+    }
+  };
+
+  const handleInviteUser = async (invitedUserId: string) => {
+    if (!userId || !selectedConversation) return;
+
+    setInvitingUserId(invitedUserId);
+    try {
+      const result = await chatService.inviteToGroup(
+        selectedConversation.id,
+        invitedUserId,
+        userId
+      );
+
+      if (result.success) {
+        toast.success('Invitación enviada');
+        // Remover de la lista
+        setFollowingUsers(prev => prev.filter(u => u.id !== invitedUserId));
+      } else {
+        toast.error(result.error || 'Error al enviar invitación');
+      }
+    } catch (error) {
+      toast.error('Error al enviar invitación');
+    } finally {
+      setInvitingUserId(null);
+    }
+  };
+
+  const handleRespondInvitation = async (invitationId: string, accept: boolean) => {
+    if (!userId) return;
+
+    try {
+      const result = await chatService.respondToInvitation(invitationId, userId, accept);
+
+      if (result.success) {
+        toast.success(accept ? '¡Te uniste al grupo!' : 'Invitación rechazada');
+        setPendingInvitations(prev => prev.filter(inv => inv.id !== invitationId));
+
+        if (accept && result.conversationId) {
+          loadConversations();
+        }
+      } else {
+        toast.error(result.error || 'Error');
+      }
+    } catch (error) {
+      toast.error('Error al responder');
+    }
+  };
+
+  const handleGetInviteLink = async () => {
+    if (!userId || !selectedConversation) return;
+
+    setLoadingInviteLink(true);
+    try {
+      const link = await chatService.getInviteLink(selectedConversation.id, userId);
+      if (link) {
+        setInviteLink(link);
+        setShowInviteLink(true);
+      } else {
+        toast.error('Solo el admin puede obtener el enlace');
+      }
+    } catch (error) {
+      toast.error('Error al obtener enlace');
+    } finally {
+      setLoadingInviteLink(false);
+    }
+  };
+
+  const handleCopyInviteLink = () => {
+    if (!inviteLink) return;
+    navigator.clipboard.writeText(inviteLink);
+    setCopiedLink(true);
+    toast.success('Enlace copiado');
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const handleRegenerateLink = async () => {
+    if (!userId || !selectedConversation) return;
+
+    setLoadingInviteLink(true);
+    try {
+      const newLink = await chatService.regenerateInviteLink(selectedConversation.id, userId);
+      if (newLink) {
+        setInviteLink(newLink);
+        toast.success('Nuevo enlace generado');
+      }
+    } catch (error) {
+      toast.error('Error al regenerar enlace');
+    } finally {
+      setLoadingInviteLink(false);
+    }
+  };
+
+  // Cargar invitaciones pendientes
+  useEffect(() => {
+    if (userId) {
+      loadPendingInvitations();
+    }
+  }, [userId]);
 
   // ============================================
   // RENDER HELPERS
@@ -1015,13 +1165,39 @@ function MensajesContent() {
                           </button>
 
                           {selectedConversation.type === 'group' && (
-                            <button
-                              onClick={handleLeaveGroup}
-                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-600/20 text-red-400 transition-colors border-t border-gray-700"
-                            >
-                              <LogOut className="w-4 h-4" />
-                              <span>Salir del grupo</span>
-                            </button>
+                            <>
+                              <div className="border-t border-gray-700" />
+                              <button
+                                onClick={() => {
+                                  loadFollowingUsers();
+                                  setShowAddMembers(true);
+                                  setShowChatMenu(false);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
+                              >
+                                <UserPlus className="w-4 h-4" />
+                                <span>Agregar miembros</span>
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  handleGetInviteLink();
+                                  setShowChatMenu(false);
+                                }}
+                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
+                              >
+                                <Link2 className="w-4 h-4" />
+                                <span>Enlace de invitación</span>
+                              </button>
+
+                              <button
+                                onClick={handleLeaveGroup}
+                                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-600/20 text-red-400 transition-colors border-t border-gray-700"
+                              >
+                                <LogOut className="w-4 h-4" />
+                                <span>Salir del grupo</span>
+                              </button>
+                            </>
                           )}
                         </div>
                       )}
@@ -1317,6 +1493,235 @@ function MensajesContent() {
                   'Crear grupo'
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================ */}
+      {/* MODAL AGREGAR MIEMBROS */}
+      {/* ============================================ */}
+      {showAddMembers && selectedConversation?.type === 'group' && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-purple-400" />
+                Agregar miembros
+              </h2>
+              <button onClick={() => setShowAddMembers(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 text-sm text-gray-400 border-b border-gray-800">
+              Invita a personas que sigues a unirse a "{selectedConversation.group_name}"
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-2">
+              {loadingFollowing ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+                </div>
+              ) : followingUsers.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>No hay usuarios disponibles para invitar</p>
+                  <p className="text-xs mt-1">Sigue a más personas para poder invitarlas</p>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {followingUsers.map(user => (
+                    <div
+                      key={user.id}
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800/50"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden">
+                        {user.avatar_url ? (
+                          <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-lg font-bold">
+                            {user.display_name?.[0] || user.username[0]}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{user.display_name || user.username}</p>
+                        <p className="text-xs text-gray-500">@{user.username}</p>
+                      </div>
+                      <button
+                        onClick={() => handleInviteUser(user.id)}
+                        disabled={invitingUserId === user.id}
+                        className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {invitingUserId === user.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <UserPlus className="w-4 h-4" />
+                            Invitar
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-gray-800">
+              <button
+                onClick={() => {
+                  setShowAddMembers(false);
+                  handleGetInviteLink();
+                }}
+                className="w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                <Link2 className="w-4 h-4" />
+                Obtener enlace de invitación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================ */}
+      {/* MODAL ENLACE DE INVITACIÓN */}
+      {/* ============================================ */}
+      {showInviteLink && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md">
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Link2 className="w-5 h-5 text-purple-400" />
+                Enlace de invitación
+              </h2>
+              <button onClick={() => setShowInviteLink(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <p className="text-sm text-gray-400">
+                Comparte este enlace para que otros puedan unirse al grupo
+              </p>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={inviteLink || ''}
+                  readOnly
+                  className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm"
+                />
+                <button
+                  onClick={handleCopyInviteLink}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors"
+                >
+                  {copiedLink ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                </button>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRegenerateLink}
+                  disabled={loadingInviteLink}
+                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                >
+                  {loadingInviteLink ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4" />
+                      Regenerar enlace
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500 text-center">
+                Cualquier persona con este enlace podrá unirse al grupo
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================ */}
+      {/* BANNER INVITACIONES PENDIENTES */}
+      {/* ============================================ */}
+      {pendingInvitations.length > 0 && !showInvitations && (
+        <div className="fixed bottom-4 right-4 z-40">
+          <button
+            onClick={() => setShowInvitations(true)}
+            className="px-4 py-3 bg-purple-600 hover:bg-purple-700 rounded-xl shadow-lg flex items-center gap-2 animate-pulse"
+          >
+            <Users className="w-5 h-5" />
+            <span className="font-medium">{pendingInvitations.length} invitación{pendingInvitations.length > 1 ? 'es' : ''} pendiente{pendingInvitations.length > 1 ? 's' : ''}</span>
+          </button>
+        </div>
+      )}
+
+      {/* ============================================ */}
+      {/* MODAL INVITACIONES PENDIENTES */}
+      {/* ============================================ */}
+      {showInvitations && pendingInvitations.length > 0 && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-400" />
+                Invitaciones a grupos
+              </h2>
+              <button onClick={() => setShowInvitations(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-2">
+              {pendingInvitations.map(inv => (
+                <div
+                  key={inv.id}
+                  className="p-4 rounded-lg bg-gray-800/50 mb-2"
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {inv.group?.group_avatar ? (
+                        <img src={inv.group.group_avatar} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <Users className="w-6 h-6" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">{inv.group?.group_name}</p>
+                      <p className="text-sm text-gray-400">
+                        <span className="text-purple-400">@{inv.inviter?.username}</span> te invitó
+                      </p>
+                      {inv.group?.members_count && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          {inv.group.members_count} miembro{inv.group.members_count !== 1 ? 's' : ''}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleRespondInvitation(inv.id, false)}
+                      className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <UserX className="w-4 h-4" />
+                      Rechazar
+                    </button>
+                    <button
+                      onClick={() => handleRespondInvitation(inv.id, true)}
+                      className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <UserCheck className="w-4 h-4" />
+                      Unirse
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
