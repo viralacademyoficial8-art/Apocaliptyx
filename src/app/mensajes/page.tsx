@@ -4,7 +4,14 @@ import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
-import { chatService, Conversation, Message } from '@/services/chat.service';
+import {
+  chatService,
+  Conversation,
+  Message,
+  ChatFilter,
+  TypingUser,
+  MessageReaction
+} from '@/services/chat.service';
 import { OnlineStatus, PresenceTracker } from '@/components/OnlineStatus';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -24,11 +31,28 @@ import {
   Smile,
   Download,
   Trash2,
+  Star,
+  StarOff,
+  Archive,
+  BellOff,
+  Bell,
+  Users,
+  Plus,
+  MoreVertical,
+  Reply,
+  UserPlus,
+  Settings,
+  LogOut,
+  Crown,
+  Hash,
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 
-// Emojis populares
+// Emojis para reacciones rápidas
+const QUICK_REACTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍'];
+
+// Emojis populares para el picker
 const EMOJI_LIST = [
   '😀', '😂', '🤣', '😊', '😍', '🥰', '😘', '😜', '🤪', '😎',
   '🥳', '🤩', '😇', '🤔', '🤗', '😏', '😈', '👻', '💀', '🎃',
@@ -36,8 +60,15 @@ const EMOJI_LIST = [
   '👍', '👎', '👊', '✊', '🤞', '✌️', '🤟', '👋', '🙏', '💪',
   '🔥', '⭐', '✨', '💫', '🌟', '💯', '💢', '💥', '💦', '💨',
   '🎉', '🎊', '🎁', '🏆', '🥇', '🎮', '🎯', '🎲', '🃏', '🎰',
-  '📱', '💻', '🖥️', '📷', '🎬', '🎵', '🎧', '🎤', '📺', '📻',
-  '🚀', '✈️', '🚗', '🏠', '🌍', '🌙', '☀️', '⛈️', '🌈', '🌸',
+];
+
+// Filtros disponibles
+const FILTERS: { key: ChatFilter; label: string; icon: React.ReactNode }[] = [
+  { key: 'all', label: 'Todos', icon: <MessageCircle className="w-4 h-4" /> },
+  { key: 'unread', label: 'No leídos', icon: <Hash className="w-4 h-4" /> },
+  { key: 'favorites', label: 'Favoritos', icon: <Star className="w-4 h-4" /> },
+  { key: 'groups', label: 'Grupos', icon: <Users className="w-4 h-4" /> },
+  { key: 'archived', label: 'Archivados', icon: <Archive className="w-4 h-4" /> },
 ];
 
 function MensajesContent() {
@@ -45,7 +76,9 @@ function MensajesContent() {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const userId = session?.user?.id;
+  const username = session?.user?.name || '';
 
+  // Estados principales
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -54,94 +87,99 @@ function MensajesContent() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Estado para archivos
+
+  // Filtro activo
+  const [activeFilter, setActiveFilter] = useState<ChatFilter>('all');
+
+  // Archivos
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  
-  // Estado para emojis
+
+  // Emojis
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  
-  // Estado para eliminar mensaje
+
+  // Eliminar mensaje
   const [deletingMessageId, setDeletingMessageId] = useState<string | null>(null);
 
+  // Typing indicator
+  const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
+
+  // Responder mensaje
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+
+  // Reacciones
+  const [showReactionsFor, setShowReactionsFor] = useState<string | null>(null);
+
+  // Menú de opciones
+  const [showChatMenu, setShowChatMenu] = useState(false);
+
+  // Modal crear grupo
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [groupName, setGroupName] = useState('');
+  const [groupDescription, setGroupDescription] = useState('');
+  const [creatingGroup, setCreatingGroup] = useState(false);
+
+  // Búsqueda en chat
+  const [showSearchInChat, setShowSearchInChat] = useState(false);
+  const [searchInChatQuery, setSearchInChatQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Message[]>([]);
+
+  // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const chatMenuRef = useRef<HTMLDivElement>(null);
 
-  // Scroll al último mensaje
+  // ============================================
+  // FUNCIONES PRINCIPALES
+  // ============================================
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Eliminar mensaje
-  const handleDeleteMessage = async (messageId: string) => {
-    if (!userId) return;
-    
-    setDeletingMessageId(messageId);
-    try {
-      const result = await chatService.deleteMessage(messageId, userId);
-      
-      if (result.success) {
-        // Actualizar el mensaje en la lista
-        setMessages(prev => prev.map(m => 
-          m.id === messageId 
-            ? { ...m, is_deleted: true, content: 'Este mensaje fue eliminado', file_url: undefined }
-            : m
-        ));
-        toast.success('Mensaje eliminado');
-      } else {
-        toast.error(result.error || 'Error al eliminar');
-      }
-    } catch (error) {
-      toast.error('Error al eliminar el mensaje');
-    } finally {
-      setDeletingMessageId(null);
-    }
-  };
-
-  // Cargar conversaciones
   const loadConversations = useCallback(async () => {
     if (!userId) return;
-    
+
     try {
-      const data = await chatService.getConversations(userId);
+      const data = await chatService.getConversations(userId, activeFilter);
       setConversations(data);
     } catch (error) {
       console.error('Error loading conversations:', error);
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, activeFilter]);
 
-  // Cargar mensajes de una conversación
   const loadMessages = useCallback(async (conversationId: string) => {
     setLoadingMessages(true);
     try {
       const data = await chatService.getMessages(conversationId);
       setMessages(data);
-      
+
       if (userId) {
         await chatService.markAsRead(conversationId, userId);
-        const updatedConversations = await chatService.getConversations(userId);
-        setConversations(updatedConversations);
+        loadConversations();
       }
     } catch (error) {
       console.error('Error loading messages:', error);
     } finally {
       setLoadingMessages(false);
     }
-  }, [userId]);
+  }, [userId, loadConversations]);
 
-  // Cargar conversaciones al inicio
+  // ============================================
+  // EFFECTS
+  // ============================================
+
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
       return;
     }
-    
+
     if (userId) {
       loadConversations();
     }
@@ -157,8 +195,7 @@ function MensajesContent() {
         loadMessages(convId);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, conversations.length]);
+  }, [searchParams, conversations, selectedConversation, loadMessages]);
 
   // Suscribirse a mensajes en tiempo real
   useEffect(() => {
@@ -172,10 +209,25 @@ function MensajesContent() {
           return [...prev, newMsg];
         });
         scrollToBottom();
-        
+
         if (newMsg.sender_id !== userId) {
           chatService.markAsRead(selectedConversation.id, userId!);
         }
+      }
+    );
+
+    return () => unsubscribe();
+  }, [selectedConversation, userId]);
+
+  // Suscribirse a typing indicator
+  useEffect(() => {
+    if (!selectedConversation) return;
+
+    const unsubscribe = chatService.subscribeToTyping(
+      selectedConversation.id,
+      (users) => {
+        // Filtrar al usuario actual
+        setTypingUsers(users.filter(u => u.user_id !== userId));
       }
     );
 
@@ -187,11 +239,14 @@ function MensajesContent() {
     scrollToBottom();
   }, [messages]);
 
-  // Cerrar emoji picker al hacer click fuera
+  // Cerrar menús al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
         setShowEmojiPicker(false);
+      }
+      if (chatMenuRef.current && !chatMenuRef.current.contains(event.target as Node)) {
+        setShowChatMenu(false);
       }
     };
 
@@ -199,12 +254,14 @@ function MensajesContent() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Manejar selección de archivo
+  // ============================================
+  // HANDLERS
+  // ============================================
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validar tamaño (10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast.error('El archivo no puede superar 10MB');
       return;
@@ -212,7 +269,6 @@ function MensajesContent() {
 
     setSelectedFile(file);
 
-    // Crear preview para imágenes
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => setFilePreview(e.target?.result as string);
@@ -222,25 +278,30 @@ function MensajesContent() {
     }
   };
 
-  // Cancelar archivo seleccionado
   const handleCancelFile = () => {
     setSelectedFile(null);
     setFilePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Insertar emoji
   const handleEmojiSelect = (emoji: string) => {
     setNewMessage(prev => prev + emoji);
     setShowEmojiPicker(false);
     inputRef.current?.focus();
   };
 
-  // Enviar mensaje
+  const handleTyping = () => {
+    if (!selectedConversation || !userId) return;
+    chatService.startTyping(selectedConversation.id, userId, username);
+  };
+
   const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    
+
     if ((!newMessage.trim() && !selectedFile) || !selectedConversation || !userId || sending) return;
+
+    // Stop typing indicator
+    chatService.stopTyping(selectedConversation.id, userId, username);
 
     setSending(true);
     const messageContent = newMessage;
@@ -249,7 +310,6 @@ function MensajesContent() {
     try {
       let fileData = undefined;
 
-      // Subir archivo si hay uno seleccionado
       if (selectedFile) {
         setUploading(true);
         fileData = await chatService.uploadFile(selectedFile, userId);
@@ -266,7 +326,10 @@ function MensajesContent() {
         selectedConversation.id,
         userId,
         messageContent || (fileData ? `📎 ${fileData.name}` : ''),
-        fileData
+        {
+          file: fileData,
+          replyToId: replyingTo?.id,
+        }
       );
 
       if (sent) {
@@ -276,6 +339,7 @@ function MensajesContent() {
         });
         loadConversations();
         handleCancelFile();
+        setReplyingTo(null);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -286,21 +350,153 @@ function MensajesContent() {
     }
   };
 
-  // Seleccionar conversación
   const handleSelectConversation = (conv: Conversation) => {
     setSelectedConversation(conv);
+    setReplyingTo(null);
+    setTypingUsers([]);
     loadMessages(conv.id);
     router.push(`/mensajes?conv=${conv.id}`, { scroll: false });
   };
 
-  // Volver a lista de conversaciones (móvil)
   const handleBack = () => {
     setSelectedConversation(null);
     setMessages([]);
+    setReplyingTo(null);
+    setTypingUsers([]);
     router.push('/mensajes', { scroll: false });
   };
 
-  // Obtener ícono según tipo de archivo
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!userId) return;
+
+    setDeletingMessageId(messageId);
+    try {
+      const result = await chatService.deleteMessage(messageId, userId);
+
+      if (result.success) {
+        setMessages(prev => prev.map(m =>
+          m.id === messageId
+            ? { ...m, is_deleted: true, content: 'Este mensaje fue eliminado', file_url: undefined }
+            : m
+        ));
+        toast.success('Mensaje eliminado');
+      } else {
+        toast.error(result.error || 'Error al eliminar');
+      }
+    } catch (error) {
+      toast.error('Error al eliminar el mensaje');
+    } finally {
+      setDeletingMessageId(null);
+    }
+  };
+
+  const handleReaction = async (messageId: string, emoji: string) => {
+    if (!userId) return;
+
+    const success = await chatService.addReaction(messageId, userId, emoji);
+    if (success) {
+      // Recargar mensajes para ver reacciones actualizadas
+      if (selectedConversation) {
+        const updatedMessages = await chatService.getMessages(selectedConversation.id);
+        setMessages(updatedMessages);
+      }
+    }
+    setShowReactionsFor(null);
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!selectedConversation || !userId) return;
+
+    const success = await chatService.toggleFavorite(selectedConversation.id, userId);
+    if (success) {
+      setSelectedConversation(prev => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
+      toast.success(selectedConversation.is_favorite ? 'Eliminado de favoritos' : 'Agregado a favoritos');
+      loadConversations();
+    }
+    setShowChatMenu(false);
+  };
+
+  const handleToggleMute = async () => {
+    if (!selectedConversation || !userId) return;
+
+    const success = await chatService.toggleMute(selectedConversation.id, userId);
+    if (success) {
+      setSelectedConversation(prev => prev ? { ...prev, is_muted: !prev.is_muted } : null);
+      toast.success(selectedConversation.is_muted ? 'Notificaciones activadas' : 'Notificaciones silenciadas');
+      loadConversations();
+    }
+    setShowChatMenu(false);
+  };
+
+  const handleToggleArchive = async () => {
+    if (!selectedConversation || !userId) return;
+
+    const success = await chatService.toggleArchive(selectedConversation.id, userId);
+    if (success) {
+      toast.success(selectedConversation.is_archived ? 'Chat desarchivado' : 'Chat archivado');
+      setSelectedConversation(null);
+      loadConversations();
+    }
+    setShowChatMenu(false);
+  };
+
+  const handleCreateGroup = async () => {
+    if (!userId || !groupName.trim()) {
+      toast.error('El nombre del grupo es obligatorio');
+      return;
+    }
+
+    setCreatingGroup(true);
+    try {
+      const group = await chatService.createGroup(
+        userId,
+        groupName.trim(),
+        [], // Por ahora sin miembros adicionales
+        groupDescription.trim() || undefined
+      );
+
+      if (group) {
+        toast.success('Grupo creado');
+        setShowCreateGroup(false);
+        setGroupName('');
+        setGroupDescription('');
+        loadConversations();
+        handleSelectConversation(group);
+      } else {
+        toast.error('Error al crear el grupo');
+      }
+    } catch (error) {
+      toast.error('Error al crear el grupo');
+    } finally {
+      setCreatingGroup(false);
+    }
+  };
+
+  const handleSearchInChat = async () => {
+    if (!selectedConversation || !searchInChatQuery.trim()) return;
+
+    const results = await chatService.searchMessages(selectedConversation.id, searchInChatQuery);
+    setSearchResults(results);
+  };
+
+  const handleLeaveGroup = async () => {
+    if (!selectedConversation || !userId || selectedConversation.type !== 'group') return;
+
+    if (confirm('¿Seguro que quieres salir del grupo?')) {
+      const success = await chatService.leaveGroup(selectedConversation.id, userId);
+      if (success) {
+        toast.success('Has salido del grupo');
+        setSelectedConversation(null);
+        loadConversations();
+      }
+    }
+    setShowChatMenu(false);
+  };
+
+  // ============================================
+  // RENDER HELPERS
+  // ============================================
+
   const getFileIcon = (fileType: string) => {
     switch (fileType) {
       case 'image': return <ImageIcon className="w-5 h-5" />;
@@ -309,49 +505,141 @@ function MensajesContent() {
     }
   };
 
-  // Filtrar conversaciones
   const filteredConversations = conversations.filter(conv => {
     if (!searchQuery) return true;
-    const name = conv.other_user?.display_name || conv.other_user?.username || '';
-    return name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (conv.type === 'direct') {
+      const name = conv.other_user?.display_name || conv.other_user?.username || '';
+      return name.toLowerCase().includes(searchQuery.toLowerCase());
+    } else {
+      return (conv.group_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    }
   });
 
-  // Renderizar contenido del mensaje
+  const getConversationName = (conv: Conversation) => {
+    if (conv.type === 'group') {
+      return conv.group_name || 'Grupo';
+    }
+    return conv.other_user?.display_name || conv.other_user?.username || 'Usuario';
+  };
+
+  const getConversationAvatar = (conv: Conversation) => {
+    if (conv.type === 'group') {
+      return conv.group_avatar;
+    }
+    return conv.other_user?.avatar_url;
+  };
+
+  // Agrupar reacciones por emoji
+  const groupReactions = (reactions?: MessageReaction[]) => {
+    if (!reactions?.length) return [];
+
+    const groups = new Map<string, { emoji: string; count: number; users: string[]; hasCurrentUser: boolean }>();
+
+    reactions.forEach(r => {
+      const existing = groups.get(r.emoji);
+      if (existing) {
+        existing.count++;
+        existing.users.push(r.user?.display_name || 'Usuario');
+        if (r.user_id === userId) existing.hasCurrentUser = true;
+      } else {
+        groups.set(r.emoji, {
+          emoji: r.emoji,
+          count: 1,
+          users: [r.user?.display_name || 'Usuario'],
+          hasCurrentUser: r.user_id === userId,
+        });
+      }
+    });
+
+    return Array.from(groups.values());
+  };
+
   const renderMessageContent = (message: Message, isOwn: boolean) => {
     const deleteCheck = isOwn && !message.is_deleted ? chatService.canDeleteMessage(message, userId || '') : { canDelete: false };
     const canDelete = deleteCheck.canDelete;
     const timeLeft = 'timeLeft' in deleteCheck ? deleteCheck.timeLeft : 0;
-    
+    const reactionGroups = groupReactions(message.reactions);
+
     return (
       <div className="group relative">
-        {/* Botón de eliminar (solo mensajes propios dentro del tiempo límite) */}
-        {canDelete && (
-          <button
-            onClick={() => handleDeleteMessage(message.id)}
-            disabled={deletingMessageId === message.id}
-            className={`
-              absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 rounded-full
-              bg-gray-800 hover:bg-red-600 text-gray-400 hover:text-white
-              opacity-0 group-hover:opacity-100 transition-all
-              ${deletingMessageId === message.id ? 'opacity-100' : ''}
-            `}
-            title={`Eliminar (${Math.floor((timeLeft || 0) / 60)}:${String((timeLeft || 0) % 60).padStart(2, '0')} restantes)`}
-          >
-            {deletingMessageId === message.id ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
+        {/* Acciones del mensaje */}
+        {!message.is_deleted && (
+          <div className={`
+            absolute top-0 ${isOwn ? 'right-full mr-2' : 'left-full ml-2'}
+            flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity
+          `}>
+            {/* Responder */}
+            <button
+              onClick={() => setReplyingTo(message)}
+              className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white"
+              title="Responder"
+            >
+              <Reply className="w-4 h-4" />
+            </button>
+
+            {/* Reaccionar */}
+            <div className="relative">
+              <button
+                onClick={() => setShowReactionsFor(showReactionsFor === message.id ? null : message.id)}
+                className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white"
+                title="Reaccionar"
+              >
+                <Smile className="w-4 h-4" />
+              </button>
+
+              {showReactionsFor === message.id && (
+                <div className="absolute bottom-full mb-2 left-0 bg-gray-800 border border-gray-700 rounded-lg p-1 flex gap-1 z-50">
+                  {QUICK_REACTIONS.map(emoji => (
+                    <button
+                      key={emoji}
+                      onClick={() => handleReaction(message.id, emoji)}
+                      className="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded text-lg"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Eliminar */}
+            {canDelete && (
+              <button
+                onClick={() => handleDeleteMessage(message.id)}
+                disabled={deletingMessageId === message.id}
+                className="p-1.5 rounded-full bg-gray-800 hover:bg-red-600 text-gray-400 hover:text-white"
+                title={`Eliminar (${Math.floor((timeLeft || 0) / 60)}:${String((timeLeft || 0) % 60).padStart(2, '0')} restantes)`}
+              >
+                {deletingMessageId === message.id ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+              </button>
             )}
-          </button>
+          </div>
         )}
-        
+
         <div className={`
           max-w-[75%] rounded-2xl overflow-hidden
-          ${message.is_deleted 
-            ? 'bg-gray-800/50 border border-gray-700' 
+          ${message.is_deleted
+            ? 'bg-gray-800/50 border border-gray-700'
             : isOwn ? 'bg-purple-600 rounded-br-md' : 'bg-gray-800 rounded-bl-md'
           }
         `}>
+          {/* Mensaje de respuesta */}
+          {message.reply_to && !message.is_deleted && (
+            <div className={`px-3 py-2 border-l-2 ${isOwn ? 'border-purple-300 bg-purple-700/50' : 'border-gray-500 bg-gray-700/50'}`}>
+              <p className="text-xs opacity-70">
+                Respondiendo a {message.reply_to.sender?.display_name || 'Usuario'}
+              </p>
+              <p className="text-xs truncate opacity-80">
+                {message.reply_to.content}
+              </p>
+            </div>
+          )}
+
           {/* Mensaje eliminado */}
           {message.is_deleted ? (
             <p className="text-sm text-gray-500 italic px-4 py-2">
@@ -364,22 +652,18 @@ function MensajesContent() {
                 <div className="relative">
                   {message.file_type === 'image' ? (
                     <a href={message.file_url} target="_blank" rel="noopener noreferrer">
-                      <img 
-                        src={message.file_url} 
-                        alt={message.file_name || 'Imagen'} 
+                      <img
+                        src={message.file_url}
+                        alt={message.file_name || 'Imagen'}
                         className="max-w-full max-h-64 object-cover cursor-pointer hover:opacity-90"
                       />
                     </a>
                   ) : message.file_type === 'video' ? (
-                    <video 
-                      src={message.file_url} 
-                      controls 
-                      className="max-w-full max-h-64"
-                    />
+                    <video src={message.file_url} controls className="max-w-full max-h-64" />
                   ) : (
-                    <a 
-                      href={message.file_url} 
-                      target="_blank" 
+                    <a
+                      href={message.file_url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className={`flex items-center gap-3 p-3 ${isOwn ? 'bg-purple-700' : 'bg-gray-700'} hover:opacity-80`}
                     >
@@ -409,15 +693,40 @@ function MensajesContent() {
               {formatDistanceToNow(new Date(message.created_at), { addSuffix: false, locale: es })}
             </span>
             {isOwn && !message.is_deleted && (
-              message.is_read 
+              message.is_read
                 ? <CheckCheck className="w-3 h-3 text-blue-400" />
                 : <Check className="w-3 h-3 text-gray-400" />
             )}
           </div>
         </div>
+
+        {/* Reacciones */}
+        {reactionGroups.length > 0 && (
+          <div className={`flex flex-wrap gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+            {reactionGroups.map(group => (
+              <button
+                key={group.emoji}
+                onClick={() => handleReaction(message.id, group.emoji)}
+                className={`
+                  flex items-center gap-1 px-2 py-0.5 rounded-full text-xs
+                  ${group.hasCurrentUser ? 'bg-purple-500/30 border border-purple-500' : 'bg-gray-800 border border-gray-700'}
+                  hover:bg-gray-700 transition-colors
+                `}
+                title={group.users.join(', ')}
+              >
+                <span>{group.emoji}</span>
+                <span>{group.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   };
+
+  // ============================================
+  // LOADING STATE
+  // ============================================
 
   if (status === 'loading' || loading) {
     return (
@@ -430,29 +739,45 @@ function MensajesContent() {
     );
   }
 
+  // ============================================
+  // MAIN RENDER
+  // ============================================
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
-      
-      {/* Tracker de presencia del usuario actual */}
+
       {userId && <PresenceTracker userId={userId} />}
 
       <div className="container mx-auto px-0 sm:px-4 py-0 sm:py-6">
         <div className="bg-gray-900 border border-gray-800 rounded-none sm:rounded-xl overflow-hidden h-[calc(100vh-4rem)] sm:h-[calc(100vh-8rem)]">
           <div className="flex h-full">
-            {/* Lista de conversaciones */}
+
+            {/* ============================================ */}
+            {/* LISTA DE CONVERSACIONES */}
+            {/* ============================================ */}
             <div className={`
               w-full md:w-80 lg:w-96 border-r border-gray-800 flex flex-col
               ${selectedConversation ? 'hidden md:flex' : 'flex'}
             `}>
-              {/* Header */}
+              {/* Header con filtros */}
               <div className="p-4 border-b border-gray-800">
-                <h1 className="text-xl font-bold flex items-center gap-2 mb-4">
-                  <MessageCircle className="w-6 h-6 text-purple-400" />
-                  Mensajes
-                </h1>
-                
-                <div className="relative">
+                <div className="flex items-center justify-between mb-4">
+                  <h1 className="text-xl font-bold flex items-center gap-2">
+                    <MessageCircle className="w-6 h-6 text-purple-400" />
+                    Mensajes
+                  </h1>
+                  <button
+                    onClick={() => setShowCreateGroup(true)}
+                    className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                    title="Crear grupo"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Barra de búsqueda */}
+                <div className="relative mb-3">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                   <input
                     type="text"
@@ -462,17 +787,45 @@ function MensajesContent() {
                     className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
+
+                {/* Filtros */}
+                <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+                  {FILTERS.map(filter => (
+                    <button
+                      key={filter.key}
+                      onClick={() => setActiveFilter(filter.key)}
+                      className={`
+                        flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors
+                        ${activeFilter === filter.key
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                        }
+                      `}
+                    >
+                      {filter.icon}
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Lista */}
+              {/* Lista de conversaciones */}
               <div className="flex-1 overflow-y-auto">
                 {filteredConversations.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
                     <MessageCircle className="w-12 h-12 text-gray-700 mb-4" />
-                    <p className="text-gray-400">No tienes conversaciones</p>
-                    <p className="text-gray-500 text-sm mt-1">
-                      Ve al perfil de alguien y haz clic en el ícono de mensaje
+                    <p className="text-gray-400">
+                      {activeFilter === 'all' ? 'No tienes conversaciones' :
+                       activeFilter === 'unread' ? 'No hay mensajes sin leer' :
+                       activeFilter === 'favorites' ? 'No tienes favoritos' :
+                       activeFilter === 'groups' ? 'No tienes grupos' :
+                       'No hay chats archivados'}
                     </p>
+                    {activeFilter === 'all' && (
+                      <p className="text-gray-500 text-sm mt-1">
+                        Ve al perfil de alguien para enviar un mensaje
+                      </p>
+                    )}
                   </div>
                 ) : (
                   filteredConversations.map((conv) => (
@@ -486,20 +839,26 @@ function MensajesContent() {
                     >
                       <div className="relative flex-shrink-0">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
-                          {conv.other_user?.avatar_url ? (
-                            <img src={conv.other_user.avatar_url} alt="" className="w-full h-full object-cover" />
+                          {getConversationAvatar(conv) ? (
+                            <img src={getConversationAvatar(conv)} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-lg font-bold">
-                              {(conv.other_user?.display_name || conv.other_user?.username || '?')[0].toUpperCase()}
+                              {conv.type === 'group' ? (
+                                <Users className="w-6 h-6" />
+                              ) : (
+                                getConversationName(conv)[0].toUpperCase()
+                              )}
                             </span>
                           )}
                         </div>
-                        {/* Indicador de estado online */}
-                        {conv.other_user?.id && (
+
+                        {/* Indicadores */}
+                        {conv.type === 'direct' && conv.other_user?.id && (
                           <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
                             <OnlineStatus userId={conv.other_user.id} size="sm" />
                           </div>
                         )}
+
                         {conv.unread_count && conv.unread_count > 0 && (
                           <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full text-xs flex items-center justify-center font-bold">
                             {conv.unread_count > 9 ? '9+' : conv.unread_count}
@@ -508,11 +867,15 @@ function MensajesContent() {
                       </div>
 
                       <div className="flex-1 min-w-0 text-left">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold truncate">
-                            {conv.other_user?.display_name || conv.other_user?.username}
-                          </span>
-                          <span className="text-xs text-gray-500">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="font-semibold truncate">
+                              {getConversationName(conv)}
+                            </span>
+                            {conv.is_favorite && <Star className="w-3 h-3 text-yellow-400 flex-shrink-0" />}
+                            {conv.is_muted && <BellOff className="w-3 h-3 text-gray-500 flex-shrink-0" />}
+                          </div>
+                          <span className="text-xs text-gray-500 flex-shrink-0">
                             {conv.last_message && formatDistanceToNow(new Date(conv.last_message.created_at), { addSuffix: false, locale: es })}
                           </span>
                         </div>
@@ -526,7 +889,9 @@ function MensajesContent() {
               </div>
             </div>
 
-            {/* Área de chat */}
+            {/* ============================================ */}
+            {/* ÁREA DE CHAT */}
+            {/* ============================================ */}
             <div className={`
               flex-1 flex flex-col
               ${selectedConversation ? 'flex' : 'hidden md:flex'}
@@ -534,43 +899,173 @@ function MensajesContent() {
               {selectedConversation ? (
                 <>
                   {/* Header del chat */}
-                  <div className="p-4 border-b border-gray-800 flex items-center gap-3">
-                    <button onClick={handleBack} className="md:hidden p-2 hover:bg-gray-800 rounded-lg">
-                      <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    
-                    <Link 
-                      href={`/perfil/${selectedConversation.other_user?.username}`}
-                      className="flex items-center gap-3 flex-1 hover:opacity-80"
-                    >
-                      <div className="relative">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
-                          {selectedConversation.other_user?.avatar_url ? (
-                            <img src={selectedConversation.other_user.avatar_url} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="font-bold">
-                              {(selectedConversation.other_user?.display_name || '?')[0].toUpperCase()}
-                            </span>
+                  <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <button onClick={handleBack} className="md:hidden p-2 hover:bg-gray-800 rounded-lg">
+                        <ArrowLeft className="w-5 h-5" />
+                      </button>
+
+                      <Link
+                        href={selectedConversation.type === 'direct'
+                          ? `/perfil/${selectedConversation.other_user?.username}`
+                          : '#'
+                        }
+                        className="flex items-center gap-3 hover:opacity-80"
+                      >
+                        <div className="relative">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
+                            {getConversationAvatar(selectedConversation) ? (
+                              <img src={getConversationAvatar(selectedConversation)} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              selectedConversation.type === 'group' ? (
+                                <Users className="w-5 h-5" />
+                              ) : (
+                                <span className="font-bold">
+                                  {getConversationName(selectedConversation)[0].toUpperCase()}
+                                </span>
+                              )
+                            )}
+                          </div>
+                          {selectedConversation.type === 'direct' && selectedConversation.other_user?.id && (
+                            <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
+                              <OnlineStatus userId={selectedConversation.other_user.id} size="sm" />
+                            </div>
                           )}
                         </div>
-                        {/* Indicador de estado online */}
-                        {selectedConversation.other_user?.id && (
-                          <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
-                            <OnlineStatus userId={selectedConversation.other_user.id} size="sm" />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold">{getConversationName(selectedConversation)}</p>
+                            {selectedConversation.type === 'group' && (
+                              <span className="text-xs text-gray-400">
+                                {selectedConversation.members?.length || 0} miembros
+                              </span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-semibold">
-                          {selectedConversation.other_user?.display_name || selectedConversation.other_user?.username}
-                        </p>
-                        {/* Estado online con texto */}
-                        {selectedConversation.other_user?.id && (
-                          <OnlineStatus userId={selectedConversation.other_user.id} showText size="sm" />
-                        )}
-                      </div>
-                    </Link>
+                          {selectedConversation.type === 'direct' && selectedConversation.other_user?.id && (
+                            <OnlineStatus userId={selectedConversation.other_user.id} showText size="sm" />
+                          )}
+                          {selectedConversation.type === 'group' && selectedConversation.group_description && (
+                            <p className="text-xs text-gray-400 truncate max-w-[200px]">
+                              {selectedConversation.group_description}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    </div>
+
+                    {/* Menú de opciones */}
+                    <div className="relative" ref={chatMenuRef}>
+                      <button
+                        onClick={() => setShowChatMenu(!showChatMenu)}
+                        className="p-2 hover:bg-gray-800 rounded-lg"
+                      >
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+
+                      {showChatMenu && (
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
+                          <button
+                            onClick={handleToggleFavorite}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
+                          >
+                            {selectedConversation.is_favorite ? (
+                              <>
+                                <StarOff className="w-4 h-4" />
+                                <span>Quitar de favoritos</span>
+                              </>
+                            ) : (
+                              <>
+                                <Star className="w-4 h-4" />
+                                <span>Agregar a favoritos</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={handleToggleMute}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
+                          >
+                            {selectedConversation.is_muted ? (
+                              <>
+                                <Bell className="w-4 h-4" />
+                                <span>Activar notificaciones</span>
+                              </>
+                            ) : (
+                              <>
+                                <BellOff className="w-4 h-4" />
+                                <span>Silenciar</span>
+                              </>
+                            )}
+                          </button>
+
+                          <button
+                            onClick={handleToggleArchive}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
+                          >
+                            <Archive className="w-4 h-4" />
+                            <span>{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => { setShowSearchInChat(true); setShowChatMenu(false); }}
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors"
+                          >
+                            <Search className="w-4 h-4" />
+                            <span>Buscar en el chat</span>
+                          </button>
+
+                          {selectedConversation.type === 'group' && (
+                            <button
+                              onClick={handleLeaveGroup}
+                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-600/20 text-red-400 transition-colors border-t border-gray-700"
+                            >
+                              <LogOut className="w-4 h-4" />
+                              <span>Salir del grupo</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Búsqueda en chat */}
+                  {showSearchInChat && (
+                    <div className="p-3 border-b border-gray-800 bg-gray-800/50">
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                          <input
+                            type="text"
+                            value={searchInChatQuery}
+                            onChange={(e) => setSearchInChatQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearchInChat()}
+                            placeholder="Buscar mensajes..."
+                            className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            autoFocus
+                          />
+                        </div>
+                        <button
+                          onClick={() => { setShowSearchInChat(false); setSearchInChatQuery(''); setSearchResults([]); }}
+                          className="p-2 hover:bg-gray-700 rounded-lg"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                      {searchResults.length > 0 && (
+                        <div className="mt-2 max-h-48 overflow-y-auto">
+                          {searchResults.map(msg => (
+                            <div
+                              key={msg.id}
+                              className="p-2 hover:bg-gray-700 rounded cursor-pointer text-sm"
+                            >
+                              <p className="text-gray-400 text-xs">{msg.sender?.display_name}</p>
+                              <p className="truncate">{msg.content}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Mensajes */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -587,6 +1082,18 @@ function MensajesContent() {
                     ) : (
                       messages.map((message) => {
                         const isOwn = message.sender_id === userId;
+                        const isSystem = !message.sender_id;
+
+                        if (isSystem) {
+                          return (
+                            <div key={message.id} className="flex justify-center">
+                              <span className="text-xs text-gray-500 bg-gray-800/50 px-3 py-1 rounded-full">
+                                {message.content}
+                              </span>
+                            </div>
+                          );
+                        }
+
                         return (
                           <div key={message.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
                             {renderMessageContent(message, isOwn)}
@@ -594,8 +1101,38 @@ function MensajesContent() {
                         );
                       })
                     )}
+
+                    {/* Typing indicator */}
+                    {typingUsers.length > 0 && (
+                      <div className="flex items-center gap-2 text-gray-400 text-sm">
+                        <div className="flex space-x-1">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span>
+                          {typingUsers.map(u => u.username).join(', ')} está escribiendo...
+                        </span>
+                      </div>
+                    )}
+
                     <div ref={messagesEndRef} />
                   </div>
+
+                  {/* Reply preview */}
+                  {replyingTo && (
+                    <div className="px-4 py-2 border-t border-gray-800 bg-gray-800/50 flex items-center gap-3">
+                      <div className="flex-1 border-l-2 border-purple-500 pl-3">
+                        <p className="text-xs text-gray-400">
+                          Respondiendo a {replyingTo.sender?.display_name || 'Usuario'}
+                        </p>
+                        <p className="text-sm truncate">{replyingTo.content}</p>
+                      </div>
+                      <button onClick={() => setReplyingTo(null)} className="p-1 hover:bg-gray-700 rounded">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
 
                   {/* Preview de archivo seleccionado */}
                   {selectedFile && (
@@ -614,10 +1151,7 @@ function MensajesContent() {
                             {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                           </p>
                         </div>
-                        <button
-                          onClick={handleCancelFile}
-                          className="p-2 hover:bg-gray-700 rounded-full"
-                        >
+                        <button onClick={handleCancelFile} className="p-2 hover:bg-gray-700 rounded-full">
                           <X className="w-5 h-5" />
                         </button>
                       </div>
@@ -636,8 +1170,7 @@ function MensajesContent() {
                         >
                           <Smile className="w-6 h-6" />
                         </button>
-                        
-                        {/* Emoji picker */}
+
                         {showEmojiPicker && (
                           <div className="absolute bottom-12 left-0 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50">
                             <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
@@ -677,7 +1210,10 @@ function MensajesContent() {
                         ref={inputRef}
                         type="text"
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={(e) => {
+                          setNewMessage(e.target.value);
+                          handleTyping();
+                        }}
                         placeholder="Escribe un mensaje..."
                         className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         disabled={sending || uploading}
@@ -713,6 +1249,78 @@ function MensajesContent() {
           </div>
         </div>
       </div>
+
+      {/* ============================================ */}
+      {/* MODAL CREAR GRUPO */}
+      {/* ============================================ */}
+      {showCreateGroup && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md">
+            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-400" />
+                Crear grupo
+              </h2>
+              <button onClick={() => setShowCreateGroup(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Nombre del grupo *</label>
+                <input
+                  type="text"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Ej: Profetas del Apocalipsis"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  maxLength={50}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Descripción (opcional)</label>
+                <textarea
+                  value={groupDescription}
+                  onChange={(e) => setGroupDescription(e.target.value)}
+                  placeholder="¿De qué trata este grupo?"
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  rows={3}
+                  maxLength={200}
+                />
+              </div>
+
+              <p className="text-xs text-gray-500">
+                Después de crear el grupo podrás agregar miembros desde el menú de opciones.
+              </p>
+            </div>
+
+            <div className="p-4 border-t border-gray-800 flex gap-3">
+              <button
+                onClick={() => setShowCreateGroup(false)}
+                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreateGroup}
+                disabled={!groupName.trim() || creatingGroup}
+                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {creatingGroup ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creando...
+                  </>
+                ) : (
+                  'Crear grupo'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
