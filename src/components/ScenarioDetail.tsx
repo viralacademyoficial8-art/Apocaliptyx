@@ -2,10 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { Scenario } from "@/types";
-import { useAuthStore, useScenarioStore } from "@/lib/stores";
+import { useAuthStore } from "@/lib/stores";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Calendar,
   Flame,
@@ -22,6 +29,8 @@ import {
   ThumbsDown,
   Check,
   Loader2,
+  History,
+  Coins,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -29,6 +38,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { getCategoryColor, calculateTimeLeft } from "@/lib/utils";
 import { predictionsService, type PredictionType, type Prediction } from "@/services/predictions.service";
+import { useScenarioStealing } from "@/hooks/useScenarioStealing";
 
 interface ScenarioDetailProps {
   scenario: Scenario;
@@ -46,10 +56,12 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
-  const scenarioStore = useScenarioStore();
+  const { user, updateApCoins } = useAuthStore();
+  const { stealScenario, applyShield, getShieldTypes, isLoading: isStealLoading } = useScenarioStealing();
   const [isStealing, setIsStealing] = useState(false);
-  
+  const [showShieldModal, setShowShieldModal] = useState(false);
+  const [applyingShield, setApplyingShield] = useState<string | null>(null);
+
   // Estados para votación
   const [isVoting, setIsVoting] = useState(false);
   const [userPrediction, setUserPrediction] = useState<Prediction | null>(null);
@@ -207,17 +219,71 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
 
     setIsStealing(true);
     try {
-      const stealScenarioFn = (scenarioStore as any).stealScenario;
-      if (!stealScenarioFn) {
-        toast.error("La función para robar escenario aún no está implementada");
+      const result = await stealScenario(scenario.id);
+
+      if (result.success) {
+        toast.success(
+          <div className="flex flex-col gap-1">
+            <span className="font-bold">¡Escenario robado!</span>
+            <span className="text-sm">
+              Pagaste {result.stealPrice} AP - Pool: {result.poolTotal} AP
+            </span>
+          </div>,
+          { duration: 4000 }
+        );
+
+        // Actualizar balance del usuario
+        if (user && result.stealPrice) {
+          updateApCoins(user.apCoins - result.stealPrice);
+        }
+
+        // Recargar la página para ver los cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       } else {
-        await stealScenarioFn(scenario.id);
-        toast.success("¡Escenario robado exitosamente!");
+        toast.error(result.error || "Error al robar escenario");
       }
     } catch (error: any) {
       toast.error(error?.message || "Error al robar escenario");
     } finally {
       setIsStealing(false);
+    }
+  };
+
+  const handleApplyShield = async (shieldType: string) => {
+    if (!user) {
+      toast.error("Debes iniciar sesión");
+      return;
+    }
+
+    setApplyingShield(shieldType);
+    try {
+      const result = await applyShield(scenario.id, shieldType as any);
+
+      if (result.success) {
+        toast.success(
+          <div className="flex flex-col gap-1">
+            <span className="font-bold">¡Escudo activado!</span>
+            <span className="text-sm">
+              Protegido hasta {result.protectedUntil ? format(new Date(result.protectedUntil), "dd MMM HH:mm", { locale: es }) : 'pronto'}
+            </span>
+          </div>,
+          { duration: 4000 }
+        );
+        setShowShieldModal(false);
+
+        // Recargar para ver cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        toast.error(result.error || "Error al aplicar escudo");
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Error al aplicar escudo");
+    } finally {
+      setApplyingShield(null);
     }
   };
 
@@ -566,15 +632,87 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               </div>
             )}
 
-            <Button
-              variant="outline"
-              onClick={() => router.push("/tienda")}
-              className="border-gray-700 hover:bg-gray-800"
-            >
-              <Lock className="w-4 h-4 mr-2" />
-              Comprar Protección
-            </Button>
+            {isOwner && (
+              <Button
+                variant="outline"
+                onClick={() => setShowShieldModal(true)}
+                className="border-blue-500/50 hover:bg-blue-500/20 text-blue-400"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Proteger Escenario
+              </Button>
+            )}
           </div>
+
+          {/* Shield Modal */}
+          <Dialog open={showShieldModal} onOpenChange={setShowShieldModal}>
+            <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <Shield className="w-6 h-6 text-blue-400" />
+                  Proteger Escenario
+                </DialogTitle>
+                <DialogDescription className="text-gray-400">
+                  Activa un escudo para proteger tu escenario de robos temporalmente
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-3 mt-4">
+                {getShieldTypes().map((shield) => (
+                  <div
+                    key={shield.id}
+                    className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xl">{shield.icon}</span>
+                          <span className="font-bold text-white">{shield.name}</span>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-2">
+                          {shield.description}
+                        </p>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Coins className="w-4 h-4 text-yellow-400" />
+                          <span className="text-yellow-400 font-semibold">
+                            {shield.price} AP
+                          </span>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleApplyShield(shield.id)}
+                        disabled={
+                          applyingShield !== null ||
+                          !user ||
+                          (user.apCoins || 0) < shield.price
+                        }
+                        className="bg-blue-600 hover:bg-blue-700"
+                        size="sm"
+                      >
+                        {applyingShield === shield.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Activar"
+                        )}
+                      </Button>
+                    </div>
+                    {user && (user.apCoins || 0) < shield.price && (
+                      <p className="text-xs text-red-400 mt-2">
+                        No tienes suficientes AP coins
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {user && (
+                <div className="mt-4 pt-4 border-t border-gray-700 text-center">
+                  <span className="text-sm text-gray-400">Tu balance: </span>
+                  <span className="font-bold text-yellow-400">{user.apCoins || 0} AP</span>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
 
           {/* Warnings */}
           {lockUntil && new Date() < lockUntil && (
