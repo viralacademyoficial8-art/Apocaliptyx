@@ -2,12 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current user
-    const { data: currentUser } = await supabase
+    const { data: currentUser } = await getSupabaseAdmin()
       .from('users')
       .select('id')
       .eq('email', session.user.email)
@@ -28,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent transactions as activity
-    const { data: transactions, error } = await supabase
+    const { data: transactions, error } = await getSupabaseAdmin()
       .from('transactions')
       .select(`
         id,

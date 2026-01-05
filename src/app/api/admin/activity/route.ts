@@ -1,13 +1,10 @@
 // src/app/api/admin/activity/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@/lib/auth";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +14,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { data: userData } = await supabase
+    const { data: userData } = await supabase()
       .from("users")
       .select("role")
       .eq("email", session.user.email)
@@ -41,7 +38,7 @@ export async function GET(request: NextRequest) {
     }> = [];
 
     // Obtener usuarios recientes
-    const { data: recentUsers } = await supabase
+    const { data: recentUsers } = await supabase()
       .from("users")
       .select("id, username, created_at")
       .order("created_at", { ascending: false })
@@ -59,7 +56,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Obtener escenarios recientes con creador
-    const { data: recentScenarios } = await supabase
+    const { data: recentScenarios } = await supabase()
       .from("scenarios")
       .select("id, title, created_at, total_p, creator_id")
       .order("created_at", { ascending: false })
@@ -68,7 +65,7 @@ export async function GET(request: NextRequest) {
     if (recentScenarios) {
       // Obtener usernames de los creadores
       const creatorIds = recentScenarios.map(s => s.creator_id).filter(Boolean);
-      const { data: creators } = await supabase
+      const { data: creators } = await supabase()
         .from("users")
         .select("id, username")
         .in("id", creatorIds);
@@ -88,7 +85,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener transacciones recientes
-    const { data: recentTransactions } = await supabase
+    const { data: recentTransactions } = await supabase()
       .from("transactions")
       .select("id, type, amount, created_at, user_id")
       .order("created_at", { ascending: false })
@@ -97,7 +94,7 @@ export async function GET(request: NextRequest) {
     if (recentTransactions) {
       // Obtener usernames de los usuarios
       const userIds = recentTransactions.map(t => t.user_id).filter(Boolean);
-      const { data: txUsers } = await supabase
+      const { data: txUsers } = await supabase()
         .from("users")
         .select("id, username")
         .in("id", userIds);
@@ -139,7 +136,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener posts del foro recientes
-    const { data: recentPosts } = await supabase
+    const { data: recentPosts } = await supabase()
       .from("forum_posts")
       .select("id, title, created_at, author_id")
       .order("created_at", { ascending: false })
@@ -147,7 +144,7 @@ export async function GET(request: NextRequest) {
 
     if (recentPosts) {
       const authorIds = recentPosts.map(p => p.author_id).filter(Boolean);
-      const { data: authors } = await supabase
+      const { data: authors } = await supabase()
         .from("users")
         .select("id, username")
         .in("id", authorIds);
@@ -166,7 +163,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener reportes recientes
-    const { data: recentReports } = await supabase
+    const { data: recentReports } = await supabase()
       .from("scenario_reports")
       .select("id, reason, created_at, reporter_id")
       .order("created_at", { ascending: false })
@@ -174,7 +171,7 @@ export async function GET(request: NextRequest) {
 
     if (recentReports) {
       const reporterIds = recentReports.map(r => r.reporter_id).filter(Boolean);
-      const { data: reporters } = await supabase
+      const { data: reporters } = await supabase()
         .from("users")
         .select("id, username")
         .in("id", reporterIds);

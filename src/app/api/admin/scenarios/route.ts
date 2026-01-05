@@ -1,13 +1,10 @@
 // src/app/api/admin/scenarios/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@/lib/auth";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +14,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { data: userData } = await supabase
+    const { data: userData } = await supabase()
       .from("users")
       .select("role")
       .eq("email", session.user.email)
@@ -37,7 +34,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Construir query
-    let query = supabase
+    let query = supabase()
       .from("scenarios")
       .select(`
         *,
@@ -73,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     // Obtener conteo de reportes por escenario
     const scenarioIds = scenarios?.map(s => s.id) || [];
-    const { data: reportsData } = await supabase
+    const { data: reportsData } = await supabase()
       .from("scenario_reports")
       .select("scenario_id")
       .in("scenario_id", scenarioIds);
@@ -129,7 +126,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { data: adminData } = await supabase
+    const { data: adminData } = await supabase()
       .from("users")
       .select("role")
       .eq("email", session.user.email)
@@ -173,7 +170,7 @@ export async function PATCH(request: NextRequest) {
 
     updateData.updated_at = new Date().toISOString();
 
-    const { error } = await supabase
+    const { error } = await supabase()
       .from("scenarios")
       .update(updateData)
       .eq("id", scenarioId);
@@ -201,7 +198,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { data: adminData } = await supabase
+    const { data: adminData } = await supabase()
       .from("users")
       .select("role")
       .eq("email", session.user.email)
@@ -218,7 +215,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "ID requerido" }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { error } = await supabase()
       .from("scenarios")
       .delete()
       .eq("id", scenarioId);

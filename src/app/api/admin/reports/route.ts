@@ -1,13 +1,10 @@
 // src/app/api/admin/reports/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@/lib/auth";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +14,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { data: userData } = await supabase
+    const { data: userData } = await supabase()
       .from("users")
       .select("role")
       .eq("email", session.user.email)
@@ -36,7 +33,7 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
 
     // Obtener reportes de escenarios
-    let scenarioReportsQuery = supabase
+    let scenarioReportsQuery = supabase()
       .from("scenario_reports")
       .select(`
         *,
@@ -53,7 +50,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     // Obtener reportes de usuarios
-    let userReportsQuery = supabase
+    let userReportsQuery = supabase()
       .from("user_reports")
       .select(`
         *,
@@ -157,7 +154,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
-    const { data: adminData } = await supabase
+    const { data: adminData } = await supabase()
       .from("users")
       .select("id, role")
       .eq("email", session.user.email)
@@ -198,7 +195,7 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { error } = await supabase()
       .from(table)
       .update(updateData)
       .eq("id", reportId);

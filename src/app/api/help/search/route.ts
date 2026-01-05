@@ -1,12 +1,7 @@
 // src/app/api/help/search/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Buscar en título, descripción y keywords
-    const { data: articles, error } = await supabase
+    const { data: articles, error } = await getSupabaseAdmin()
       .from('help_articles')
       .select('slug, title, description, category, views')
       .or(`title.ilike.%${query}%,description.ilike.%${query}%,keywords.cs.{${query}}`)

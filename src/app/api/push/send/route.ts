@@ -2,22 +2,27 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import webpush from 'web-push';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
-// Configurar VAPID
-webpush.setVapidDetails(
-  'mailto:soporte@apocaliptics.com',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+// Lazy initialization para VAPID
+let vapidConfigured = false;
+const configureVapid = () => {
+  if (!vapidConfigured && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+      'mailto:soporte@apocaliptics.com',
+      process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      process.env.VAPID_PRIVATE_KEY
+    );
+    vapidConfigured = true;
+  }
+};
 
 export async function POST(request: NextRequest) {
   try {
+    configureVapid();
+
     const body = await request.json();
     const { userId, title, message, url, icon, image } = body;
 
@@ -29,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtener suscripciones del usuario
-    const { data: subscriptions, error } = await supabase
+    const { data: subscriptions, error } = await supabase()
       .from('push_subscriptions')
       .select('*')
       .eq('user_id', userId);
@@ -71,8 +76,8 @@ export async function POST(request: NextRequest) {
         
         // Si la suscripción ya no es válida, eliminarla
         if (pushError.statusCode === 410 || pushError.statusCode === 404) {
-          await supabase
-            .from('push_subscriptions')
+          await supabase()
+      .from('push_subscriptions')
             .delete()
             .eq('id', sub.id);
         }

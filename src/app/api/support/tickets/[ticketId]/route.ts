@@ -3,12 +3,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 // GET - Obtener un ticket específico
 export async function GET(
@@ -19,7 +16,7 @@ export async function GET(
     const session = await auth();
     const { ticketId } = await params;
 
-    const { data: ticket, error } = await supabase
+    const { data: ticket, error } = await supabase()
       .from("support_tickets")
       .select(`
         *,
@@ -101,7 +98,7 @@ export async function PATCH(
       updateData.assigned_to = assigned_to;
     }
 
-    const { data: ticket, error } = await supabase
+    const { data: ticket, error } = await supabase()
       .from("support_tickets")
       .update(updateData)
       .eq("id", ticketId)
@@ -123,7 +120,7 @@ export async function PATCH(
       };
 
       if (statusMessages[status]) {
-        await supabase.from("support_messages").insert({
+        await supabase().from("support_messages").insert({
           ticket_id: ticketId,
           sender_type: "system",
           content: statusMessages[status],

@@ -1,19 +1,16 @@
 // src/app/api/stats/public/route.ts
 
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 export const revalidate = 60; // Revalidar cada 60 segundos
 
 export async function GET() {
   try {
     // Obtener conteo de usuarios desde la tabla 'users'
-    const { count: usersCount, error: usersError } = await supabase
+    const { count: usersCount, error: usersError } = await supabase()
       .from("users")
       .select("*", { count: "exact", head: true });
 
@@ -22,7 +19,7 @@ export async function GET() {
     }
 
     // Obtener conteo de escenarios desde la tabla 'scenarios'
-    const { count: scenariosCount, error: scenariosError } = await supabase
+    const { count: scenariosCount, error: scenariosError } = await supabase()
       .from("scenarios")
       .select("*", { count: "exact", head: true });
 
@@ -31,7 +28,7 @@ export async function GET() {
     }
 
     // Obtener suma total de AP Coins (total_p de scenarios como proxy)
-    const { data: poolData, error: poolError } = await supabase
+    const { data: poolData, error: poolError } = await supabase()
       .from("scenarios")
       .select("total_p");
 
@@ -42,7 +39,7 @@ export async function GET() {
 
     // Obtener conteo de predicciones (scenario_predictions si existe)
     let predictionsCount = 0;
-    const { count: predCount, error: predError } = await supabase
+    const { count: predCount, error: predError } = await supabase()
       .from("scenario_predictions")
       .select("*", { count: "exact", head: true });
 
@@ -50,8 +47,8 @@ export async function GET() {
       predictionsCount = predCount;
     } else {
       // Fallback: contar posts del foro como actividad
-      const { count: postsCount } = await supabase
-        .from("forum_posts")
+      const { count: postsCount } = await supabase()
+      .from("forum_posts")
         .select("*", { count: "exact", head: true });
       predictionsCount = postsCount || 0;
     }
