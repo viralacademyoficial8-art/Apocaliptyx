@@ -94,6 +94,14 @@ export interface Database {
           resolved_at: string | null;
           created_at: string;
           updated_at: string;
+          // Campos de sistema de robo
+          current_holder_id: string | null;
+          current_price: number;
+          steal_count: number;
+          theft_pool: number;
+          is_protected: boolean;
+          protected_until: string | null;
+          can_be_stolen: boolean;
         };
         Insert: {
           id?: string;
@@ -116,6 +124,14 @@ export interface Database {
           resolved_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          // Campos de sistema de robo
+          current_holder_id?: string | null;
+          current_price?: number;
+          steal_count?: number;
+          theft_pool?: number;
+          is_protected?: boolean;
+          protected_until?: string | null;
+          can_be_stolen?: boolean;
         };
         Update: {
           creator_id?: string;
@@ -136,6 +152,14 @@ export interface Database {
           resolution_date?: string;
           resolved_at?: string | null;
           updated_at?: string;
+          // Campos de sistema de robo
+          current_holder_id?: string | null;
+          current_price?: number;
+          steal_count?: number;
+          theft_pool?: number;
+          is_protected?: boolean;
+          protected_until?: string | null;
+          can_be_stolen?: boolean;
         };
       };
       predictions: {
@@ -372,6 +396,141 @@ export interface Database {
           is_read?: boolean;
         };
       };
+      scenario_holdings: {
+        Row: {
+          id: string;
+          scenario_id: string;
+          holder_id: string;
+          acquired_at: string;
+          acquisition_type: 'creation' | 'steal' | 'recovery';
+          price_paid: number;
+          steal_count: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          scenario_id: string;
+          holder_id: string;
+          acquired_at?: string;
+          acquisition_type?: 'creation' | 'steal' | 'recovery';
+          price_paid?: number;
+          steal_count?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          holder_id?: string;
+          acquired_at?: string;
+          acquisition_type?: 'creation' | 'steal' | 'recovery';
+          price_paid?: number;
+          steal_count?: number;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+      };
+      scenario_steal_history: {
+        Row: {
+          id: string;
+          scenario_id: string;
+          thief_id: string;
+          victim_id: string;
+          price_paid: number;
+          amount_to_victim: number;
+          amount_to_pool: number;
+          apocalyptix_contribution: number;
+          steal_number: number;
+          stolen_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          scenario_id: string;
+          thief_id: string;
+          victim_id: string;
+          price_paid: number;
+          amount_to_victim?: number;
+          amount_to_pool: number;
+          apocalyptix_contribution?: number;
+          steal_number: number;
+          stolen_at?: string;
+          created_at?: string;
+        };
+        Update: never;
+      };
+      scenario_pools: {
+        Row: {
+          id: string;
+          scenario_id: string;
+          total_pool: number;
+          user_contributions: number;
+          platform_contributions: number;
+          creator_reimbursed: boolean;
+          creator_reimbursement_amount: number;
+          winner_id: string | null;
+          won_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          scenario_id: string;
+          total_pool?: number;
+          user_contributions?: number;
+          platform_contributions?: number;
+          creator_reimbursed?: boolean;
+          creator_reimbursement_amount?: number;
+          winner_id?: string | null;
+          won_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          total_pool?: number;
+          user_contributions?: number;
+          platform_contributions?: number;
+          creator_reimbursed?: boolean;
+          creator_reimbursement_amount?: number;
+          winner_id?: string | null;
+          won_at?: string | null;
+          updated_at?: string;
+        };
+      };
+      scenario_shields: {
+        Row: {
+          id: string;
+          scenario_id: string;
+          user_id: string;
+          shield_type: string;
+          protection_until: string;
+          price_paid: number;
+          is_active: boolean;
+          activated_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          scenario_id: string;
+          user_id: string;
+          shield_type?: string;
+          protection_until: string;
+          price_paid?: number;
+          is_active?: boolean;
+          activated_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          shield_type?: string;
+          protection_until?: string;
+          price_paid?: number;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       [_ in never]: never;
@@ -403,3 +562,9 @@ export type Transaction = Tables<'transactions'>;
 export type Achievement = Tables<'achievements'>;
 export type ShopItem = Tables<'shop_items'>;
 export type Notification = Tables<'notifications'>;
+
+// Aliases para sistema de robo
+export type ScenarioHolding = Tables<'scenario_holdings'>;
+export type ScenarioStealHistory = Tables<'scenario_steal_history'>;
+export type ScenarioPool = Tables<'scenario_pools'>;
+export type ScenarioShield = Tables<'scenario_shields'>;
