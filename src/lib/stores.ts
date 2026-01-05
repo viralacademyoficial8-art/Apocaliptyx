@@ -6,19 +6,47 @@ import type {
   Scenario,
   ScenarioCategory,
   User,
-  ForumPost,
-  ForumComment,
-  CreatePostInput,
-  CreateCommentInput,
   Notification,
+  ForumComment,
 } from "@/types";
-import {
-  mockScenarios,
-  mockForumPosts,
-  mockForumComments,
-} from "@/lib/mock-data";
-import { safeGetItem, safeSetItem } from "@/lib/utils";
+import { scenariosService, ScenarioFromDB } from "@/services/scenarios.service";
 import { notificationsService } from "@/services/notifications.service";
+import { forumService } from "@/services/forum.service";
+
+//
+// ----------------------------------------------------
+// HELPER: Convert DB scenario to frontend format
+// ----------------------------------------------------
+//
+
+function mapScenarioFromDB(s: ScenarioFromDB): Scenario {
+  return {
+    id: s.id,
+    creatorId: s.creator_id,
+    creatorUsername: '',
+    creatorAvatar: '',
+    currentHolderId: s.creator_id,
+    currentHolderUsername: '',
+    title: s.title,
+    description: s.description,
+    category: s.category.toLowerCase() as ScenarioCategory,
+    dueDate: s.resolution_date,
+    creationCost: s.min_bet,
+    currentPrice: s.total_pool,
+    totalPot: s.total_pool,
+    status: s.status.toLowerCase() as any,
+    lockUntil: null,
+    isProtected: false,
+    protectionUntil: null,
+    createdAt: s.created_at,
+    updatedAt: new Date(s.updated_at),
+    transferCount: 0,
+    votes: {
+      yes: s.yes_pool,
+      no: s.no_pool,
+    },
+  };
+}
 
 //
 // ----------------------------------------------------
@@ -78,61 +106,61 @@ export const useAuthStore = create<AuthState>()(
 
 //
 // ----------------------------------------------------
-// 2) NOTIFICATION STORE
+// 2) NOTIFICATION STORE - Connected to Supabase
 // ----------------------------------------------------
 //
 
 interface NotificationStoreState {
   notifications: Notification[];
   unreadCount: number;
-  fetchNotifications: () => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
-  clearAll: () => void;
+  isLoading: boolean;
+  fetchNotifications: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
 }
 
-export const useNotificationStore = create<NotificationStoreState>((set) => ({
+export const useNotificationStore = create<NotificationStoreState>((set, get) => ({
   notifications: [],
   unreadCount: 0,
+  isLoading: false,
 
-  fetchNotifications: () => {
-    const now = new Date();
+  fetchNotifications: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user?.id) return;
 
-    const mock: Notification[] = [
-      {
-        id: "1",
-        type: "comment",
-        title: "Nuevo comentario en tu escenario",
-        message: "Un profeta dejó un comentario en tu predicción.",
-        relatedScenarioId: "scenario_1",
-        relatedUserId: "user_2",
-        read: false,
-        createdAt: now,
-      },
-      {
-        id: "2",
-        type: "new_follower",
-        title: "Nuevo seguidor",
-        message: "Un profeta empezó a seguirte.",
-        relatedUserId: "user_3",
-        read: true,
-        createdAt: now,
-      },
-    ];
+    set({ isLoading: true });
+    try {
+      const data = await notificationsService.getByUserId(user.id, 50);
+      const mapped: Notification[] = data.map((n) => ({
+        id: n.id,
+        type: n.type as any,
+        title: n.title,
+        message: n.message,
+        relatedScenarioId: undefined,
+        relatedUserId: undefined,
+        read: n.is_read,
+        createdAt: new Date(n.created_at),
+      }));
 
-    set({
-      notifications: mock,
-      unreadCount: mock.filter((n) => !n.read).length,
-    });
+      set({
+        notifications: mapped,
+        unreadCount: mapped.filter((n) => !n.read).length,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      set({ isLoading: false });
+    }
   },
 
-  markAsRead: (id) => {
+  markAsRead: async (id) => {
+    await notificationsService.markAsRead(id);
     set((state) => {
       const updated = state.notifications.map((n) =>
         n.id === id ? { ...n, read: true } : n
       );
-
       return {
         notifications: updated,
         unreadCount: updated.filter((n) => !n.read).length,
@@ -140,21 +168,19 @@ export const useNotificationStore = create<NotificationStoreState>((set) => ({
     });
   },
 
-  markAllAsRead: () => {
-    set((state) => {
-      const updated = state.notifications.map((n) => ({
-        ...n,
-        read: true,
-      }));
+  markAllAsRead: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user?.id) return;
 
-      return {
-        notifications: updated,
-        unreadCount: 0,
-      };
-    });
+    await notificationsService.markAllAsRead(user.id);
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({ ...n, read: true })),
+      unreadCount: 0,
+    }));
   },
 
-  deleteNotification: (id) => {
+  deleteNotification: async (id) => {
+    await notificationsService.delete(id);
     set((state) => {
       const remaining = state.notifications.filter((n) => n.id !== id);
       return {
@@ -164,7 +190,11 @@ export const useNotificationStore = create<NotificationStoreState>((set) => ({
     });
   },
 
-  clearAll: () => {
+  clearAll: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user?.id) return;
+
+    await notificationsService.deleteAll(user.id);
     set({
       notifications: [],
       unreadCount: 0,
@@ -174,7 +204,7 @@ export const useNotificationStore = create<NotificationStoreState>((set) => ({
 
 //
 // ----------------------------------------------------
-// 3) SCENARIO STORE
+// 3) SCENARIO STORE - Connected to Supabase
 // ----------------------------------------------------
 //
 
@@ -192,7 +222,7 @@ interface ScenarioStoreState {
 }
 
 export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
-  scenarios: mockScenarios,
+  scenarios: [],
   isLoading: false,
   error: null,
 
@@ -200,67 +230,47 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      await new Promise((r) => setTimeout(r, 400));
-
-      set({
-        scenarios: mockScenarios,
-        isLoading: false,
-      });
+      const data = await scenariosService.getActive();
+      const mapped = data.map(mapScenarioFromDB);
+      set({ scenarios: mapped, isLoading: false });
     } catch (e) {
-      set({
-        error: "Error al cargar escenarios",
-        isLoading: false,
-      });
+      console.error('Error fetching scenarios:', e);
+      set({ error: "Error al cargar escenarios", isLoading: false });
     }
   },
 
   async createScenario({ title, description, category, dueDate }) {
     const { user } = useAuthStore.getState();
-
-    const scenarioId = `scenario_${Date.now()}`;
-
-    const newScenario: Scenario = {
-      id: scenarioId,
-      title,
-      description,
-      category,
-      createdBy: user?.username ?? "anónimo",
-      createdAt: new Date().toISOString(),
-      dueDate,
-      status: "active",
-      pot: 20,
-    } as Scenario;
-
-    const current = get().scenarios;
-    const updated = [newScenario, ...current];
-
-    set({ scenarios: updated });
+    if (!user?.id) return;
 
     try {
-      const raw = safeGetItem("scenarios");
-      let stored: Scenario[] = [];
-
-      if (raw) stored = JSON.parse(raw) as Scenario[];
-
-      stored.unshift(newScenario);
-      safeSetItem("scenarios", stored);
-    } catch {
-      console.warn("No se pudo guardar escenarios");
-    }
-
-    if (user?.id) {
-      await notificationsService.notifyScenarioCreated(
-        user.id,
+      const result = await scenariosService.create({
         title,
-        scenarioId
-      );
+        description,
+        category,
+        resolutionDate: dueDate,
+        creatorId: user.id,
+      });
+
+      if (result) {
+        const newScenario = mapScenarioFromDB(result);
+        set((state) => ({ scenarios: [newScenario, ...state.scenarios] }));
+
+        await notificationsService.notifyScenarioCreated(
+          user.id,
+          title,
+          result.id
+        );
+      }
+    } catch (error) {
+      console.error('Error creating scenario:', error);
     }
   },
 }));
 
 //
 // ----------------------------------------------------
-// 4) ITEM STORE (tienda)
+// 4) ITEM STORE (tienda) - Uses shopStore instead
 // ----------------------------------------------------
 //
 
@@ -271,32 +281,31 @@ interface ItemStoreState {
 
 export const useItemStore = create<ItemStoreState>(() => ({
   items: [],
-
   async buyItem(item: any) {
-    console.log("buyItem llamado con:", item);
+    console.log("useItemStore.buyItem is deprecated. Use useShopStore instead.");
   },
 }));
 
 //
 // ----------------------------------------------------
-// 5) FORUM STORE - Foro y Comunidad
+// 5) FORUM STORE - Connected to Supabase via forumService
 // ----------------------------------------------------
 //
 
 interface ForumState {
-  posts: ForumPost[];
+  posts: any[];
   comments: ForumComment[];
   isLoading: boolean;
   filter: "recientes" | "populares" | "siguiendo";
   selectedTag: string | null;
 
-  fetchPosts: () => void;
-  fetchComments: (postId: string) => void;
-  createPost: (data: CreatePostInput) => Promise<void>;
-  createComment: (data: CreateCommentInput) => Promise<void>;
-  toggleLikePost: (postId: string) => void;
+  fetchPosts: () => Promise<void>;
+  fetchComments: (postId: string) => Promise<void>;
+  createPost: (data: { content: string; tags?: string[]; linkedScenarioId?: string }) => Promise<void>;
+  createComment: (data: { postId: string; content: string; parentCommentId?: string }) => Promise<void>;
+  toggleLikePost: (postId: string) => Promise<void>;
   toggleLikeComment: (commentId: string) => void;
-  deletePost: (postId: string) => void;
+  deletePost: (postId: string) => Promise<void>;
   deleteComment: (commentId: string) => void;
   setFilter: (filter: "recientes" | "populares" | "siguiendo") => void;
   setSelectedTag: (tag: string | null) => void;
@@ -309,241 +318,164 @@ export const useForumStore = create<ForumState>((set, get) => ({
   filter: "recientes",
   selectedTag: null,
 
-  fetchPosts: () => {
+  fetchPosts: async () => {
     set({ isLoading: true });
+    try {
+      const { filter, selectedTag } = get();
+      const sortBy = filter === 'populares' ? 'popular' : filter === 'siguiendo' ? 'recent' : 'recent';
+      
+      const data = await forumService.getPosts({
+        sortBy,
+        tag: selectedTag || undefined,
+        limit: 50,
+      });
+      
+      set({ posts: data, isLoading: false });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      set({ isLoading: false });
+    }
+  },
 
-    setTimeout(() => {
-      let posts: ForumPost[];
-
-      if (typeof window !== "undefined") {
-        const saved = localStorage.getItem("forumPosts");
-        posts = saved ? JSON.parse(saved) : mockForumPosts;
-      } else {
-        posts = mockForumPosts;
-      }
-
-      posts = posts.map((p: any) => ({
-        ...p,
-        createdAt: new Date(p.createdAt),
-        updatedAt: new Date(p.updatedAt),
+  fetchComments: async (postId: string) => {
+    try {
+      const data = await forumService.getComments(postId);
+      const mapped: ForumComment[] = data.map((c: any) => ({
+        id: c.id,
+        postId: c.post_id,
+        authorId: c.author_id,
+        authorUsername: c.author?.username || 'unknown',
+        authorDisplayName: c.author?.display_name || c.author?.username || 'Unknown',
+        authorAvatar: c.author?.avatar_url || '',
+        authorLevel: 'monividente' as any,
+        content: c.content,
+        likes: [],
+        createdAt: new Date(c.created_at),
+        parentCommentId: c.parent_id || undefined,
       }));
+      set({ comments: mapped });
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  },
 
-      const { filter } = get();
+  createPost: async (data) => {
+    const { user } = useAuthStore.getState();
+    if (!user?.id) return;
 
-      if (filter === "recientes" || filter === "siguiendo") {
-        posts.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      } else if (filter === "populares") {
-        posts.sort((a, b) => b.likes.length - a.likes.length);
+    try {
+      const post = await forumService.createPost(user.id, {
+        content: data.content,
+        tags: data.tags,
+      });
+
+      if (post) {
+        set((state) => ({ posts: [post, ...state.posts] }));
       }
-
-      set({ posts, isLoading: false });
-    }, 300);
-  },
-
-  fetchComments: (postId: string) => {
-    let comments: ForumComment[];
-
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("forumComments");
-      comments = saved ? JSON.parse(saved) : mockForumComments;
-    } else {
-      comments = mockForumComments;
+    } catch (error) {
+      console.error('Error creating post:', error);
     }
-
-    comments = comments
-      .filter((c) => c.postId === postId)
-      .map((c: any) => ({
-        ...c,
-        createdAt: new Date(c.createdAt),
-      }))
-      .sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-
-    set({ comments });
   },
 
-  createPost: async (data: CreatePostInput) => {
+  createComment: async (data) => {
     const { user } = useAuthStore.getState();
-    if (!user) throw new Error("Debes iniciar sesión");
+    if (!user?.id) return;
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const comment = await forumService.createComment(user.id, {
+        post_id: data.postId,
+        content: data.content,
+        parent_id: data.parentCommentId,
+      });
 
-    const newPost: ForumPost = {
-      id: `post_${Date.now()}`,
-      authorId: user.id,
-      authorUsername: user.username,
-      authorDisplayName: user.displayName,
-      authorAvatar: user.avatarUrl,
-      authorLevel: user.prophetLevel,
-      content: data.content,
-      linkedScenarioId: data.linkedScenarioId,
-      likes: [],
-      commentsCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      tags: data.tags || [],
-    };
-
-    const posts = [newPost, ...get().posts];
-    set({ posts });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
-    }
-  },
-
-  createComment: async (data: CreateCommentInput) => {
-    const { user } = useAuthStore.getState();
-    if (!user) throw new Error("Debes iniciar sesión");
-
-    await new Promise((resolve) => setTimeout(resolve, 300));
-
-    const newComment: ForumComment = {
-      id: `comment_${Date.now()}`,
-      postId: data.postId,
-      authorId: user.id,
-      authorUsername: user.username,
-      authorDisplayName: user.displayName,
-      authorAvatar: user.avatarUrl,
-      authorLevel: user.prophetLevel,
-      content: data.content,
-      likes: [],
-      createdAt: new Date(),
-      parentCommentId: data.parentCommentId,
-    };
-
-    let comments: ForumComment[];
-
-    if (typeof window !== "undefined") {
-      const allComments = localStorage.getItem("forumComments");
-      comments = allComments ? JSON.parse(allComments) : mockForumComments;
-      comments = [...comments, newComment];
-      localStorage.setItem("forumComments", JSON.stringify(comments));
-    } else {
-      comments = [...mockForumComments, newComment];
-    }
-
-    const posts = get().posts.map((p) =>
-      p.id === data.postId
-        ? { ...p, commentsCount: p.commentsCount + 1 }
-        : p
-    );
-
-    set({ posts });
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
-    }
-
-    get().fetchComments(data.postId);
-  },
-
-  toggleLikePost: (postId: string) => {
-    const { user } = useAuthStore.getState();
-    if (!user) return;
-
-    const posts = get().posts.map((post) => {
-      if (post.id === postId) {
-        const hasLiked = post.likes.includes(user.id);
-        return {
-          ...post,
-          likes: hasLiked
-            ? post.likes.filter((id) => id !== user.id)
-            : [...post.likes, user.id],
+      if (comment) {
+        const mapped: ForumComment = {
+          id: comment.id,
+          postId: comment.post_id,
+          authorId: comment.author_id,
+          authorUsername: comment.author?.username || user.username,
+          authorDisplayName: comment.author?.display_name || user.displayName || user.username,
+          authorAvatar: comment.author?.avatar_url || user.avatarUrl || '',
+          authorLevel: user.prophetLevel || 'monividente' as any,
+          content: comment.content,
+          likes: [],
+          createdAt: new Date(comment.created_at),
+          parentCommentId: comment.parent_id || undefined,
         };
+        set((state) => ({ comments: [...state.comments, mapped] }));
       }
-      return post;
-    });
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
+  },
 
-    set({ posts });
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
+  toggleLikePost: async (postId: string) => {
+    const { user } = useAuthStore.getState();
+    if (!user?.id) return;
+
+    try {
+      const result = await forumService.toggleLikePost(postId, user.id);
+      set((state) => ({
+        posts: state.posts.map((p: any) =>
+          p.id === postId ? { ...p, likes_count: result.likesCount } : p
+        ),
+      }));
+    } catch (error) {
+      console.error('Error toggling like:', error);
     }
   },
 
   toggleLikeComment: (commentId: string) => {
     const { user } = useAuthStore.getState();
-    if (!user) return;
+    if (!user?.id) return;
 
-    let comments: ForumComment[];
+    set((state) => ({
+      comments: state.comments.map((c) => {
+        if (c.id === commentId) {
+          const hasLiked = c.likes.includes(user.id);
+          return {
+            ...c,
+            likes: hasLiked
+              ? c.likes.filter((id) => id !== user.id)
+              : [...c.likes, user.id],
+          };
+        }
+        return c;
+      }),
+    }));
 
-    if (typeof window !== "undefined") {
-      const allComments = localStorage.getItem("forumComments");
-      comments = allComments ? JSON.parse(allComments) : mockForumComments;
-    } else {
-      comments = mockForumComments;
-    }
-
-    comments = comments.map((comment) => {
-      if (comment.id === commentId) {
-        const hasLiked = comment.likes.includes(user.id);
-        return {
-          ...comment,
-          likes: hasLiked
-            ? comment.likes.filter((id) => id !== user.id)
-            : [...comment.likes, user.id],
-        };
-      }
-      return comment;
-    });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumComments", JSON.stringify(comments));
-    }
-
-    const currentComments = get().comments;
-    if (currentComments.length > 0) {
-      get().fetchComments(currentComments[0].postId);
-    }
+    forumService.toggleLikeComment(commentId, user.id).catch(console.error);
   },
 
-  deletePost: (postId: string) => {
+  deletePost: async (postId: string) => {
     const { user } = useAuthStore.getState();
-    const post = get().posts.find((p) => p.id === postId);
+    if (!user?.id) return;
 
-    if (!post || post.authorId !== user?.id) return;
-
-    const posts = get().posts.filter((p) => p.id !== postId);
-    set({ posts });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
-
-      const allComments = localStorage.getItem("forumComments");
-      let comments = allComments ? JSON.parse(allComments) : [];
-      comments = comments.filter((c: ForumComment) => c.postId !== postId);
-      localStorage.setItem("forumComments", JSON.stringify(comments));
+    try {
+      const success = await forumService.deletePost(postId, user.id);
+      if (success) {
+        set((state) => ({
+          posts: state.posts.filter((p: any) => p.id !== postId),
+        }));
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
     }
   },
 
   deleteComment: (commentId: string) => {
     const { user } = useAuthStore.getState();
-    if (!user) return;
+    if (!user?.id) return;
 
-    if (typeof window === "undefined") return;
-
-    const allComments = localStorage.getItem("forumComments");
-    let comments: ForumComment[] = allComments ? JSON.parse(allComments) : [];
-
+    const { comments } = get();
     const comment = comments.find((c) => c.id === commentId);
     if (!comment || comment.authorId !== user.id) return;
 
-    comments = comments.filter((c) => c.id !== commentId);
-    localStorage.setItem("forumComments", JSON.stringify(comments));
+    set((state) => ({
+      comments: state.comments.filter((c) => c.id !== commentId),
+    }));
 
-    const posts = get().posts.map((p) =>
-      p.id === comment.postId
-        ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) }
-        : p
-    );
-    set({ posts });
-    localStorage.setItem("forumPosts", JSON.stringify(posts));
-
-    get().fetchComments(comment.postId);
+    forumService.deleteComment(commentId, user.id).catch(console.error);
   },
 
   setFilter: (filter) => {
