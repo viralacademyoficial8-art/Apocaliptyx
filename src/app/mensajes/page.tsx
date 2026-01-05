@@ -1515,7 +1515,7 @@ function MensajesContent() {
             </div>
 
             <div className="p-4 text-sm text-gray-400 border-b border-gray-800">
-              Invita a personas que sigues a unirse a "{selectedConversation.group_name}"
+              Invita a personas que sigues a unirse a &quot;{selectedConversation.group_name}&quot;
             </div>
 
             <div className="flex-1 overflow-y-auto p-2">

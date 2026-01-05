@@ -3,12 +3,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 // GET - Obtener mensajes de un ticket
 export async function GET(
@@ -20,7 +17,7 @@ export async function GET(
     const { ticketId } = await params;
 
     // Verificar acceso al ticket
-    const { data: ticket } = await supabase
+    const { data: ticket } = await supabase()
       .from("support_tickets")
       .select("user_id")
       .eq("id", ticketId)
@@ -45,7 +42,7 @@ export async function GET(
     }
 
     // Obtener mensajes
-    const { data: messages, error } = await supabase
+    const { data: messages, error } = await supabase()
       .from("support_messages")
       .select(`
         *,
@@ -61,7 +58,7 @@ export async function GET(
 
     // Marcar mensajes como leídos
     const senderTypeToMark = isAdmin ? ["user", "guest"] : ["agent", "system"];
-    await supabase
+    await supabase()
       .from("support_messages")
       .update({ is_read: true })
       .eq("ticket_id", ticketId)
@@ -89,7 +86,7 @@ export async function POST(
     }
 
     // Verificar acceso al ticket
-    const { data: ticket } = await supabase
+    const { data: ticket } = await supabase()
       .from("support_tickets")
       .select("user_id, status")
       .eq("id", ticketId)
@@ -118,7 +115,7 @@ export async function POST(
     }
 
     // Crear mensaje
-    const { data: message, error } = await supabase
+    const { data: message, error } = await supabase()
       .from("support_messages")
       .insert({
         ticket_id: ticketId,
@@ -147,7 +144,7 @@ export async function POST(
       updateData.assigned_to = session?.user?.id;
     }
 
-    await supabase
+    await supabase()
       .from("support_tickets")
       .update(updateData)
       .eq("id", ticketId);

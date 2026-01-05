@@ -3,12 +3,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 // GET - Obtener tickets del usuario o todos (admin)
 export async function GET(request: NextRequest) {
@@ -27,7 +24,7 @@ export async function GET(request: NextRequest) {
       isAdmin = ["ADMIN", "SUPER_ADMIN", "STAFF", "MODERATOR"].includes(user?.role || "");
     }
 
-    let query = supabase
+    let query = supabase()
       .from("support_tickets")
       .select(`
         *,
@@ -59,8 +56,8 @@ export async function GET(request: NextRequest) {
     // Obtener conteo de mensajes no leídos por ticket
     const ticketsWithUnread = await Promise.all(
       (tickets || []).map(async (ticket) => {
-        const { count } = await supabase
-          .from("support_messages")
+        const { count } = await supabase()
+      .from("support_messages")
           .select("*", { count: "exact", head: true })
           .eq("ticket_id", ticket.id)
           .eq("is_read", false)
@@ -113,7 +110,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: ticket, error: ticketError } = await supabase
+    const { data: ticket, error: ticketError } = await supabase()
       .from("support_tickets")
       .insert(ticketData)
       .select()
@@ -125,7 +122,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear primer mensaje
-    const { error: messageError } = await supabase
+    const { error: messageError } = await supabase()
       .from("support_messages")
       .insert({
         ticket_id: ticket.id,
@@ -139,7 +136,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Mensaje automático del sistema
-    await supabase.from("support_messages").insert({
+    await supabase().from("support_messages").insert({
       ticket_id: ticket.id,
       sender_type: "system",
       content: "Gracias por contactarnos. Un agente de soporte te responderá pronto.",

@@ -2,12 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current user
-    const { data: currentUser } = await supabase
+    const { data: currentUser } = await getSupabaseAdmin()
       .from('users')
       .select('id, total_predictions, correct_predictions, total_earnings, current_streak, best_streak')
       .eq('email', session.user.email)
@@ -28,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all achievements
-    const { data: allAchievements, error: achievementsError } = await supabase
+    const { data: allAchievements, error: achievementsError } = await getSupabaseAdmin()
       .from('achievements')
       .select('*')
       .order('created_at', { ascending: true });
@@ -36,7 +31,7 @@ export async function GET(request: NextRequest) {
     if (achievementsError) throw achievementsError;
 
     // Get user's unlocked achievements
-    const { data: userAchievements, error: userError } = await supabase
+    const { data: userAchievements, error: userError } = await getSupabaseAdmin()
       .from('user_achievements')
       .select('achievement_id, unlocked_at')
       .eq('user_id', currentUser.id);

@@ -1,13 +1,10 @@
 // src/app/api/admin/stats/route.ts
 
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { auth } from "@/lib/auth";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 export async function GET() {
   try {
@@ -18,7 +15,7 @@ export async function GET() {
     }
 
     // Verificar rol de admin
-    const { data: userData } = await supabase
+    const { data: userData } = await supabase()
       .from("users")
       .select("role")
       .eq("email", session.user.email)
@@ -37,54 +34,54 @@ export async function GET() {
     monthAgo.setDate(monthAgo.getDate() - 30);
 
     // Total de usuarios
-    const { count: totalUsers } = await supabase
+    const { count: totalUsers } = await supabase()
       .from("users")
       .select("*", { count: "exact", head: true });
 
     // Usuarios activos (online o vistos en últimas 24h)
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const { count: activeUsers } = await supabase
+    const { count: activeUsers } = await supabase()
       .from("users")
       .select("*", { count: "exact", head: true })
       .or(`is_online.eq.true,last_seen.gte.${yesterday.toISOString()}`);
 
     // Nuevos usuarios hoy
-    const { count: newUsersToday } = await supabase
+    const { count: newUsersToday } = await supabase()
       .from("users")
       .select("*", { count: "exact", head: true })
       .gte("created_at", today.toISOString());
 
     // Nuevos usuarios esta semana
-    const { count: newUsersThisWeek } = await supabase
+    const { count: newUsersThisWeek } = await supabase()
       .from("users")
       .select("*", { count: "exact", head: true })
       .gte("created_at", weekAgo.toISOString());
 
     // Total de escenarios
-    const { count: totalScenarios } = await supabase
+    const { count: totalScenarios } = await supabase()
       .from("scenarios")
       .select("*", { count: "exact", head: true });
 
     // Escenarios activos
-    const { count: activeScenarios } = await supabase
+    const { count: activeScenarios } = await supabase()
       .from("scenarios")
       .select("*", { count: "exact", head: true })
       .eq("status", "ACTIVE");
 
     // Escenarios completados
-    const { count: completedScenarios } = await supabase
+    const { count: completedScenarios } = await supabase()
       .from("scenarios")
       .select("*", { count: "exact", head: true })
       .eq("status", "RESOLVED");
 
     // Total de transacciones
-    const { count: totalTransactions } = await supabase
+    const { count: totalTransactions } = await supabase()
       .from("transactions")
       .select("*", { count: "exact", head: true });
 
     // Volumen total (suma de transacciones positivas)
-    const { data: volumeData } = await supabase
+    const { data: volumeData } = await supabase()
       .from("transactions")
       .select("amount")
       .gt("amount", 0);
@@ -92,19 +89,19 @@ export async function GET() {
     const totalVolume = volumeData?.reduce((sum, t) => sum + (t.amount || 0), 0) || 0;
 
     // Reportes pendientes
-    const { count: pendingReports } = await supabase
+    const { count: pendingReports } = await supabase()
       .from("reports")
       .select("*", { count: "exact", head: true })
       .eq("status", "pending");
 
     // Usuarios baneados
-    const { count: bannedUsers } = await supabase
+    const { count: bannedUsers } = await supabase()
       .from("users")
       .select("*", { count: "exact", head: true })
       .eq("is_banned", true);
 
     // Posts del foro
-    const { count: totalPosts } = await supabase
+    const { count: totalPosts } = await supabase()
       .from("forum_posts")
       .select("*", { count: "exact", head: true });
 

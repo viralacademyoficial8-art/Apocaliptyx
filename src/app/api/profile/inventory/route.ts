@@ -2,12 +2,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = () => getSupabaseAdmin();
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current user
-    const { data: currentUser } = await supabase
+    const { data: currentUser } = await supabase()
       .from('users')
       .select('id')
       .eq('email', session.user.email)
@@ -27,7 +24,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const { data: items, error } = await supabase
+    const { data: items, error } = await supabase()
       .from('inventory_items')
       .select(`
         id,
@@ -78,7 +75,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Get current user
-    const { data: currentUser } = await supabase
+    const { data: currentUser } = await supabase()
       .from('users')
       .select('id')
       .eq('email', session.user.email)
@@ -95,7 +92,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Verify ownership
-    const { data: item } = await supabase
+    const { data: item } = await supabase()
       .from('inventory_items')
       .select('id, quantity')
       .eq('id', itemId)
@@ -108,15 +105,15 @@ export async function PATCH(request: NextRequest) {
 
     if (action === 'use') {
       if (item.quantity <= 1) {
-        await supabase.from('inventory_items').delete().eq('id', itemId);
+        await supabase().from('inventory_items').delete().eq('id', itemId);
       } else {
-        await supabase
+        await supabase()
           .from('inventory_items')
           .update({ quantity: item.quantity - 1 })
           .eq('id', itemId);
       }
     } else {
-      await supabase
+      await supabase()
         .from('inventory_items')
         .update({ is_active: action === 'equip' })
         .eq('id', itemId);

@@ -2,8 +2,23 @@
 
 import { Resend } from 'resend';
 
-// Inicializar cliente de Resend
-export const resend = new Resend(process.env.RESEND_API_KEY);
+// Inicializar cliente de Resend (lazy initialization para evitar errores en build)
+let _resend: Resend | null = null;
+
+export const getResend = () => {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY || 'dummy_key_for_build');
+  }
+  return _resend;
+};
+
+export const resend = {
+  emails: {
+    send: async (params: Parameters<Resend['emails']['send']>[0]) => {
+      return getResend().emails.send(params);
+    }
+  }
+};
 
 // Email por defecto (cambia cuando tengas dominio verificado)
 export const FROM_EMAIL = 'Apocaliptics <onboarding@resend.dev>';

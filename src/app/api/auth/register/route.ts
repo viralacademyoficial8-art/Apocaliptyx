@@ -1,18 +1,7 @@
 // src/app/api/auth/register/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-// Usar service_role para poder crear usuarios en auth.users
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Necesitas esta variable de entorno
-);
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseAdmin, getSupabaseClient } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,7 +33,7 @@ export async function POST(request: NextRequest) {
     const usernameLower = username.toLowerCase().trim();
 
     // Verificar si el email ya existe en nuestra tabla users
-    const { data: existingEmail } = await supabase
+    const { data: existingEmail } = await getSupabaseClient()
       .from("users")
       .select("id")
       .eq("email", emailLower)
@@ -58,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si el username ya existe
-    const { data: existingUsername } = await supabase
+    const { data: existingUsername } = await getSupabaseClient()
       .from("users")
       .select("id")
       .eq("username", usernameLower)
@@ -72,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Crear usuario en Supabase Auth
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    const { data: authData, error: authError } = await getSupabaseAdmin().auth.admin.createUser({
       email: emailLower,
       password: password,
       email_confirm: true, // Auto-confirmar email
@@ -91,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Crear perfil en nuestra tabla users con el mismo ID
-    const { data: newUser, error: userError } = await supabase
+    const { data: newUser, error: userError } = await getSupabaseClient()
       .from("users")
       .insert({
         id: authData.user.id, // Usar el mismo ID de auth.users
@@ -117,7 +106,7 @@ export async function POST(request: NextRequest) {
     if (userError || !newUser) {
       console.error("Error creating user profile:", userError);
       // Si falla crear el perfil, eliminar el usuario de auth
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      await getSupabaseAdmin().auth.admin.deleteUser(authData.user.id);
       return NextResponse.json(
         { success: false, message: "Error al crear el perfil de usuario" },
         { status: 500 }
@@ -125,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Crear notificación de bienvenida
-    await supabase.from("notifications").insert({
+    await getSupabaseClient().from("notifications").insert({
       user_id: newUser.id,
       type: "welcome",
       title: "¡Bienvenido a Apocaliptics! 🎉",

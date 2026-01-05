@@ -4,10 +4,11 @@ import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './database.types';
 
 export function createClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  // Use fallback empty strings during build time to prevent errors
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  return createBrowserClient<Database>(supabaseUrl, supabaseKey);
 }
 
 // Singleton para uso en componentes

@@ -2,12 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export async function GET(
   request: NextRequest,
@@ -20,7 +15,7 @@ export async function GET(
     // Get current user id if logged in
     let currentUserId: string | null = null;
     if (session?.user?.email) {
-      const { data: currentUser } = await supabase
+      const { data: currentUser } = await getSupabaseAdmin()
         .from('users')
         .select('id')
         .eq('email', session.user.email)
@@ -29,7 +24,7 @@ export async function GET(
     }
 
     // Get user profile
-    const { data: user, error } = await supabase
+    const { data: user, error } = await getSupabaseAdmin()
       .from('users')
       .select(`
         id,
@@ -60,13 +55,13 @@ export async function GET(
     }
 
     // Get followers count
-    const { count: followersCount } = await supabase
+    const { count: followersCount } = await getSupabaseAdmin()
       .from('follows')
       .select('*', { count: 'exact', head: true })
       .eq('following_id', user.id);
 
     // Get following count
-    const { count: followingCount } = await supabase
+    const { count: followingCount } = await getSupabaseAdmin()
       .from('follows')
       .select('*', { count: 'exact', head: true })
       .eq('follower_id', user.id);
@@ -74,7 +69,7 @@ export async function GET(
     // Check if current user is following this profile
     let isFollowing = false;
     if (currentUserId && currentUserId !== user.id) {
-      const { data: followData } = await supabase
+      const { data: followData } = await getSupabaseAdmin()
         .from('follows')
         .select('id')
         .eq('follower_id', currentUserId)
@@ -84,7 +79,7 @@ export async function GET(
     }
 
     // Get user badges
-    const { data: badges } = await supabase
+    const { data: badges } = await getSupabaseAdmin()
       .from('user_achievements')
       .select(`
         id,
@@ -106,7 +101,7 @@ export async function GET(
       : 0;
 
     // Get scenarios created count
-    const { count: scenariosCreated } = await supabase
+    const { count: scenariosCreated } = await getSupabaseAdmin()
       .from('scenarios')
       .select('*', { count: 'exact', head: true })
       .eq('creator_id', user.id);
@@ -188,7 +183,7 @@ export async function PATCH(
     const body = await request.json();
 
     // Get current user
-    const { data: currentUser } = await supabase
+    const { data: currentUser } = await getSupabaseAdmin()
       .from('users')
       .select('id')
       .eq('email', session.user.email)
@@ -199,7 +194,7 @@ export async function PATCH(
     }
 
     // Verify user owns this profile
-    const { data: profileUser } = await supabase
+    const { data: profileUser } = await getSupabaseAdmin()
       .from('users')
       .select('id')
       .eq('username', username)
@@ -219,7 +214,7 @@ export async function PATCH(
       }
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseAdmin()
       .from('users')
       .update(updates)
       .eq('id', currentUser.id);
