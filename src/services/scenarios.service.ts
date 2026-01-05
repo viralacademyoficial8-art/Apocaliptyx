@@ -40,6 +40,17 @@ export interface ScenarioFromDB {
   created_at: string;
   updated_at: string;
   content_hash?: string;
+  // Stealing system fields
+  current_holder_id?: string | null;
+  current_price?: number;
+  steal_count?: number;
+  theft_pool?: number;
+  is_protected?: boolean;
+  protected_until?: string | null;
+  can_be_stolen?: boolean;
+  // Joined fields
+  holder_username?: string;
+  creator_username?: string;
 }
 
 class ScenariosService {
@@ -151,7 +162,33 @@ class ScenariosService {
         return null;
       }
 
-      return data as ScenarioFromDB;
+      // Fetch holder and creator usernames
+      let holderUsername: string | undefined;
+      let creatorUsername: string | undefined;
+
+      if (data.current_holder_id) {
+        const { data: holderData } = await supabase
+          .from("users")
+          .select("username")
+          .eq("id", data.current_holder_id)
+          .single();
+        holderUsername = holderData?.username;
+      }
+
+      if (data.creator_id) {
+        const { data: creatorData } = await supabase
+          .from("users")
+          .select("username")
+          .eq("id", data.creator_id)
+          .single();
+        creatorUsername = creatorData?.username;
+      }
+
+      return {
+        ...data,
+        holder_username: holderUsername || creatorUsername,
+        creator_username: creatorUsername,
+      } as ScenarioFromDB;
     } catch (error) {
       console.error("Error in getById scenario:", error);
       return null;
