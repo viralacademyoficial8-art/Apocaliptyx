@@ -1,21 +1,78 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { User } from '@/types';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScenarioCard } from '@/components/ScenarioCard';
-import { mockScenarios } from '@/lib/mock-data';
+import { scenariosService, ScenarioFromDB } from '@/services/scenarios.service';
+import { Loader2 } from 'lucide-react';
 
 type ProfileTabsProps = {
   user: User;
 };
 
+// Helper para convertir ScenarioFromDB al formato esperado por ScenarioCard
+function mapScenarioFromDB(s: ScenarioFromDB) {
+  return {
+    id: s.id,
+    title: s.title,
+    description: s.description,
+    category: s.category as any,
+    status: s.status.toLowerCase() as any,
+    createdAt: s.created_at,
+    dueDate: s.resolution_date,
+    totalPot: s.total_pool,
+    currentPrice: s.min_bet,
+    votes: {
+      yes: s.yes_pool,
+      no: s.no_pool,
+    },
+    creatorId: s.creator_id,
+    currentHolderId: s.creator_id,
+  };
+}
+
 export function ProfileTabs({ user }: ProfileTabsProps) {
   const [activeTab, setActiveTab] = useState<'activos' | 'historial'>('activos');
+  const [scenarios, setScenarios] = useState<ScenarioFromDB[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 🔹 Por ahora usamos mockScenarios (luego filtramos por user.id / username)
-  const escenariosActivos = mockScenarios.slice(0, 4);
-  const escenariosHistorial = mockScenarios.slice(4);
+  useEffect(() => {
+    async function loadScenarios() {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await scenariosService.getByCreator(user.id);
+        setScenarios(data);
+      } catch (error) {
+        console.error('Error loading scenarios:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadScenarios();
+  }, [user?.id]);
+
+  const escenariosActivos = scenarios
+    .filter(s => s.status === 'ACTIVE')
+    .map(mapScenarioFromDB);
+
+  const escenariosHistorial = scenarios
+    .filter(s => s.status !== 'ACTIVE')
+    .map(mapScenarioFromDB);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -27,25 +84,25 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
         {/* Tabs responsive */}
         <TabsList
           className="
-            w-full 
-            bg-gray-900/70 
-            rounded-xl 
+            w-full
+            bg-gray-900/70
+            rounded-xl
             p-1
-            flex 
-            flex-col 
+            flex
+            flex-col
             gap-2
-            sm:flex-row 
+            sm:flex-row
             sm:gap-0
           "
         >
           <TabsTrigger
             value="activos"
             className="
-              flex-1 
-              text-xs sm:text-sm 
-              px-3 sm:px-4 
+              flex-1
+              text-xs sm:text-sm
+              px-3 sm:px-4
               py-2
-              data-[state=active]:bg-gray-800 
+              data-[state=active]:bg-gray-800
               data-[state=active]:text-white
             "
           >
@@ -54,11 +111,11 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           <TabsTrigger
             value="historial"
             className="
-              flex-1 
-              text-xs sm:text-sm 
-              px-3 sm:px-4 
+              flex-1
+              text-xs sm:text-sm
+              px-3 sm:px-4
               py-2
-              data-[state=active]:bg-gray-800 
+              data-[state=active]:bg-gray-800
               data-[state=active]:text-white
             "
           >
@@ -80,15 +137,15 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           ) : (
             <div
               className="
-                grid 
-                gap-4 
-                grid-cols-1 
+                grid
+                gap-4
+                grid-cols-1
                 sm:grid-cols-2
                 xl:grid-cols-3
               "
             >
               {escenariosActivos.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} />
+                <ScenarioCard key={scenario.id} scenario={scenario as any} />
               ))}
             </div>
           )}
@@ -108,15 +165,15 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           ) : (
             <div
               className="
-                grid 
-                gap-4 
-                grid-cols-1 
+                grid
+                gap-4
+                grid-cols-1
                 sm:grid-cols-2
                 xl:grid-cols-3
               "
             >
               {escenariosHistorial.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} />
+                <ScenarioCard key={scenario.id} scenario={scenario as any} />
               ))}
             </div>
           )}

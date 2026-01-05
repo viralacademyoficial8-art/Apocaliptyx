@@ -12,13 +12,9 @@ import type {
   CreateCommentInput,
   Notification,
 } from "@/types";
-import {
-  mockScenarios,
-  mockForumPosts,
-  mockForumComments,
-} from "@/lib/mock-data";
-import { safeGetItem, safeSetItem } from "@/lib/utils";
 import { notificationsService } from "@/services/notifications.service";
+import { scenariosService, ScenarioFromDB } from "@/services/scenarios.service";
+import { forumService } from "@/services/forum.service";
 
 //
 // ----------------------------------------------------
@@ -85,49 +81,52 @@ export const useAuthStore = create<AuthState>()(
 interface NotificationStoreState {
   notifications: Notification[];
   unreadCount: number;
-  fetchNotifications: () => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
+  isLoading: boolean;
+  fetchNotifications: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
   clearAll: () => void;
 }
 
-export const useNotificationStore = create<NotificationStoreState>((set) => ({
+export const useNotificationStore = create<NotificationStoreState>((set, get) => ({
   notifications: [],
   unreadCount: 0,
+  isLoading: false,
 
-  fetchNotifications: () => {
-    const now = new Date();
+  fetchNotifications: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
 
-    const mock: Notification[] = [
-      {
-        id: "1",
-        type: "comment",
-        title: "Nuevo comentario en tu escenario",
-        message: "Un profeta dejó un comentario en tu predicción.",
-        relatedScenarioId: "scenario_1",
-        relatedUserId: "user_2",
-        read: false,
-        createdAt: now,
-      },
-      {
-        id: "2",
-        type: "new_follower",
-        title: "Nuevo seguidor",
-        message: "Un profeta empezó a seguirte.",
-        relatedUserId: "user_3",
-        read: true,
-        createdAt: now,
-      },
-    ];
+    set({ isLoading: true });
 
-    set({
-      notifications: mock,
-      unreadCount: mock.filter((n) => !n.read).length,
-    });
+    try {
+      const data = await notificationsService.getByUserId(user.id);
+      const notifications: Notification[] = data.map((n: any) => ({
+        id: n.id,
+        type: n.type as any,
+        title: n.title,
+        message: n.message,
+        relatedScenarioId: n.link_url?.includes('escenario') ? n.link_url.split('/').pop() : undefined,
+        relatedUserId: undefined,
+        read: n.is_read,
+        createdAt: new Date(n.created_at),
+      }));
+
+      set({
+        notifications,
+        unreadCount: notifications.filter((n) => !n.read).length,
+        isLoading: false,
+      });
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      set({ isLoading: false });
+    }
   },
 
-  markAsRead: (id) => {
+  markAsRead: async (id) => {
+    await notificationsService.markAsRead(id);
+
     set((state) => {
       const updated = state.notifications.map((n) =>
         n.id === id ? { ...n, read: true } : n
@@ -140,7 +139,12 @@ export const useNotificationStore = create<NotificationStoreState>((set) => ({
     });
   },
 
-  markAllAsRead: () => {
+  markAllAsRead: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+
+    await notificationsService.markAllAsRead(user.id);
+
     set((state) => {
       const updated = state.notifications.map((n) => ({
         ...n,
@@ -154,7 +158,9 @@ export const useNotificationStore = create<NotificationStoreState>((set) => ({
     });
   },
 
-  deleteNotification: (id) => {
+  deleteNotification: async (id) => {
+    await notificationsService.delete(id);
+
     set((state) => {
       const remaining = state.notifications.filter((n) => n.id !== id);
       return {
@@ -178,6 +184,36 @@ export const useNotificationStore = create<NotificationStoreState>((set) => ({
 // ----------------------------------------------------
 //
 
+// Helper para convertir ScenarioFromDB a Scenario
+function mapDBToScenario(s: ScenarioFromDB): Scenario {
+  return {
+    id: s.id,
+    title: s.title,
+    description: s.description,
+    category: s.category as ScenarioCategory,
+    status: s.status.toLowerCase() as any,
+    createdAt: s.created_at,
+    dueDate: s.resolution_date,
+    totalPot: s.total_pool,
+    currentPrice: s.min_bet,
+    creationCost: s.min_bet,
+    votes: {
+      yes: s.yes_pool,
+      no: s.no_pool,
+    },
+    creatorId: s.creator_id,
+    creatorUsername: '',
+    creatorAvatar: '',
+    currentHolderId: s.creator_id,
+    currentHolderUsername: '',
+    lockUntil: null,
+    isProtected: false,
+    protectionUntil: null,
+    updatedAt: new Date(s.updated_at),
+    transferCount: 0,
+  } as Scenario;
+}
+
 interface ScenarioStoreState {
   scenarios: Scenario[];
   isLoading: boolean;
@@ -192,7 +228,7 @@ interface ScenarioStoreState {
 }
 
 export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
-  scenarios: mockScenarios,
+  scenarios: [],
   isLoading: false,
   error: null,
 
@@ -200,13 +236,15 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      await new Promise((r) => setTimeout(r, 400));
+      const data = await scenariosService.getActive();
+      const scenarios = data.map(mapDBToScenario);
 
       set({
-        scenarios: mockScenarios,
+        scenarios,
         isLoading: false,
       });
     } catch (e) {
+      console.error('Error fetching scenarios:', e);
       set({
         error: "Error al cargar escenarios",
         isLoading: false,
@@ -216,44 +254,31 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
 
   async createScenario({ title, description, category, dueDate }) {
     const { user } = useAuthStore.getState();
-
-    const scenarioId = `scenario_${Date.now()}`;
-
-    const newScenario: Scenario = {
-      id: scenarioId,
-      title,
-      description,
-      category,
-      createdBy: user?.username ?? "anónimo",
-      createdAt: new Date().toISOString(),
-      dueDate,
-      status: "active",
-      pot: 20,
-    } as Scenario;
-
-    const current = get().scenarios;
-    const updated = [newScenario, ...current];
-
-    set({ scenarios: updated });
+    if (!user) throw new Error("Debes iniciar sesión");
 
     try {
-      const raw = safeGetItem("scenarios");
-      let stored: Scenario[] = [];
-
-      if (raw) stored = JSON.parse(raw) as Scenario[];
-
-      stored.unshift(newScenario);
-      safeSetItem("scenarios", stored);
-    } catch {
-      console.warn("No se pudo guardar escenarios");
-    }
-
-    if (user?.id) {
-      await notificationsService.notifyScenarioCreated(
-        user.id,
+      const created = await scenariosService.create({
         title,
-        scenarioId
-      );
+        description,
+        category,
+        resolutionDate: dueDate,
+        creatorId: user.id,
+      });
+
+      if (created) {
+        const newScenario = mapDBToScenario(created);
+        const current = get().scenarios;
+        set({ scenarios: [newScenario, ...current] });
+
+        await notificationsService.notifyScenarioCreated(
+          user.id,
+          title,
+          created.id
+        );
+      }
+    } catch (error) {
+      console.error('Error creating scenario:', error);
+      throw error;
     }
   },
 }));
@@ -290,14 +315,14 @@ interface ForumState {
   filter: "recientes" | "populares" | "siguiendo";
   selectedTag: string | null;
 
-  fetchPosts: () => void;
-  fetchComments: (postId: string) => void;
+  fetchPosts: () => Promise<void>;
+  fetchComments: (postId: string) => Promise<void>;
   createPost: (data: CreatePostInput) => Promise<void>;
   createComment: (data: CreateCommentInput) => Promise<void>;
-  toggleLikePost: (postId: string) => void;
-  toggleLikeComment: (commentId: string) => void;
-  deletePost: (postId: string) => void;
-  deleteComment: (commentId: string) => void;
+  toggleLikePost: (postId: string) => Promise<void>;
+  toggleLikeComment: (commentId: string) => Promise<void>;
+  deletePost: (postId: string) => Promise<void>;
+  deleteComment: (commentId: string) => Promise<void>;
   setFilter: (filter: "recientes" | "populares" | "siguiendo") => void;
   setSelectedTag: (tag: string | null) => void;
 }
@@ -309,91 +334,98 @@ export const useForumStore = create<ForumState>((set, get) => ({
   filter: "recientes",
   selectedTag: null,
 
-  fetchPosts: () => {
+  fetchPosts: async () => {
     set({ isLoading: true });
 
-    setTimeout(() => {
-      let posts: ForumPost[];
+    try {
+      const { filter, selectedTag } = get();
 
-      if (typeof window !== "undefined") {
-        const saved = localStorage.getItem("forumPosts");
-        posts = saved ? JSON.parse(saved) : mockForumPosts;
-      } else {
-        posts = mockForumPosts;
-      }
+      const sortBy = filter === 'populares' ? 'popular' : 'recent';
+      const data = await forumService.getPosts({
+        limit: 50,
+        sortBy,
+        tag: selectedTag || undefined,
+      });
 
-      posts = posts.map((p: any) => ({
-        ...p,
-        createdAt: new Date(p.createdAt),
-        updatedAt: new Date(p.updatedAt),
+      const posts: ForumPost[] = data.map((p: any) => ({
+        id: p.id,
+        authorId: p.author_id,
+        authorUsername: p.author?.username || 'unknown',
+        authorDisplayName: p.author?.display_name || 'Unknown',
+        authorAvatar: p.author?.avatar_url || '',
+        authorLevel: (p.author?.level || 'monividente') as any,
+        content: p.content,
+        linkedScenarioId: undefined,
+        likes: [],
+        commentsCount: p.comments_count || 0,
+        createdAt: new Date(p.created_at),
+        updatedAt: new Date(p.updated_at),
+        tags: p.tags || [],
       }));
 
-      const { filter } = get();
-
-      if (filter === "recientes" || filter === "siguiendo") {
-        posts.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      } else if (filter === "populares") {
-        posts.sort((a, b) => b.likes.length - a.likes.length);
-      }
-
       set({ posts, isLoading: false });
-    }, 300);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      set({ isLoading: false });
+    }
   },
 
-  fetchComments: (postId: string) => {
-    let comments: ForumComment[];
+  fetchComments: async (postId: string) => {
+    try {
+      const data = await forumService.getComments(postId);
 
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("forumComments");
-      comments = saved ? JSON.parse(saved) : mockForumComments;
-    } else {
-      comments = mockForumComments;
+      const comments: ForumComment[] = data.map((c: any) => ({
+        id: c.id,
+        postId: c.post_id,
+        authorId: c.author_id,
+        authorUsername: c.author?.username || 'unknown',
+        authorDisplayName: c.author?.display_name || 'Unknown',
+        authorAvatar: c.author?.avatar_url || '',
+        authorLevel: (c.author?.level || 'monividente') as any,
+        content: c.content,
+        likes: [],
+        createdAt: new Date(c.created_at),
+        parentCommentId: c.parent_id || undefined,
+      }));
+
+      set({ comments });
+    } catch (error) {
+      console.error('Error fetching comments:', error);
     }
-
-    comments = comments
-      .filter((c) => c.postId === postId)
-      .map((c: any) => ({
-        ...c,
-        createdAt: new Date(c.createdAt),
-      }))
-      .sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-
-    set({ comments });
   },
 
   createPost: async (data: CreatePostInput) => {
     const { user } = useAuthStore.getState();
     if (!user) throw new Error("Debes iniciar sesión");
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const created = await forumService.createPost(user.id, {
+        content: data.content,
+        tags: data.tags,
+      });
 
-    const newPost: ForumPost = {
-      id: `post_${Date.now()}`,
-      authorId: user.id,
-      authorUsername: user.username,
-      authorDisplayName: user.displayName,
-      authorAvatar: user.avatarUrl,
-      authorLevel: user.prophetLevel,
-      content: data.content,
-      linkedScenarioId: data.linkedScenarioId,
-      likes: [],
-      commentsCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      tags: data.tags || [],
-    };
+      if (created) {
+        const newPost: ForumPost = {
+          id: created.id,
+          authorId: user.id,
+          authorUsername: user.username,
+          authorDisplayName: user.displayName,
+          authorAvatar: user.avatarUrl,
+          authorLevel: user.prophetLevel,
+          content: data.content,
+          linkedScenarioId: data.linkedScenarioId,
+          likes: [],
+          commentsCount: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          tags: data.tags || [],
+        };
 
-    const posts = [newPost, ...get().posts];
-    set({ posts });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
+        set((state) => ({ posts: [newPost, ...state.posts] }));
+      }
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
     }
   },
 
@@ -401,149 +433,121 @@ export const useForumStore = create<ForumState>((set, get) => ({
     const { user } = useAuthStore.getState();
     if (!user) throw new Error("Debes iniciar sesión");
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    try {
+      const created = await forumService.createComment(user.id, {
+        post_id: data.postId,
+        content: data.content,
+        parent_id: data.parentCommentId,
+      });
 
-    const newComment: ForumComment = {
-      id: `comment_${Date.now()}`,
-      postId: data.postId,
-      authorId: user.id,
-      authorUsername: user.username,
-      authorDisplayName: user.displayName,
-      authorAvatar: user.avatarUrl,
-      authorLevel: user.prophetLevel,
-      content: data.content,
-      likes: [],
-      createdAt: new Date(),
-      parentCommentId: data.parentCommentId,
-    };
+      if (created) {
+        // Refresh comments
+        get().fetchComments(data.postId);
 
-    let comments: ForumComment[];
-
-    if (typeof window !== "undefined") {
-      const allComments = localStorage.getItem("forumComments");
-      comments = allComments ? JSON.parse(allComments) : mockForumComments;
-      comments = [...comments, newComment];
-      localStorage.setItem("forumComments", JSON.stringify(comments));
-    } else {
-      comments = [...mockForumComments, newComment];
-    }
-
-    const posts = get().posts.map((p) =>
-      p.id === data.postId
-        ? { ...p, commentsCount: p.commentsCount + 1 }
-        : p
-    );
-
-    set({ posts });
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
-    }
-
-    get().fetchComments(data.postId);
-  },
-
-  toggleLikePost: (postId: string) => {
-    const { user } = useAuthStore.getState();
-    if (!user) return;
-
-    const posts = get().posts.map((post) => {
-      if (post.id === postId) {
-        const hasLiked = post.likes.includes(user.id);
-        return {
-          ...post,
-          likes: hasLiked
-            ? post.likes.filter((id) => id !== user.id)
-            : [...post.likes, user.id],
-        };
+        // Update comments count in posts
+        set((state) => ({
+          posts: state.posts.map((p) =>
+            p.id === data.postId
+              ? { ...p, commentsCount: p.commentsCount + 1 }
+              : p
+          ),
+        }));
       }
-      return post;
-    });
-
-    set({ posts });
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
+    } catch (error) {
+      console.error('Error creating comment:', error);
+      throw error;
     }
   },
 
-  toggleLikeComment: (commentId: string) => {
+  toggleLikePost: async (postId: string) => {
     const { user } = useAuthStore.getState();
     if (!user) return;
 
-    let comments: ForumComment[];
+    try {
+      await forumService.toggleLikePost(postId, user.id);
 
-    if (typeof window !== "undefined") {
-      const allComments = localStorage.getItem("forumComments");
-      comments = allComments ? JSON.parse(allComments) : mockForumComments;
-    } else {
-      comments = mockForumComments;
+      set((state) => ({
+        posts: state.posts.map((post) => {
+          if (post.id === postId) {
+            const hasLiked = post.likes.includes(user.id);
+            return {
+              ...post,
+              likes: hasLiked
+                ? post.likes.filter((id) => id !== user.id)
+                : [...post.likes, user.id],
+            };
+          }
+          return post;
+        }),
+      }));
+    } catch (error) {
+      console.error('Error toggling like:', error);
     }
+  },
 
-    comments = comments.map((comment) => {
-      if (comment.id === commentId) {
-        const hasLiked = comment.likes.includes(user.id);
-        return {
-          ...comment,
-          likes: hasLiked
-            ? comment.likes.filter((id) => id !== user.id)
-            : [...comment.likes, user.id],
-        };
+  toggleLikeComment: async (commentId: string) => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+
+    try {
+      await forumService.toggleLikeComment(commentId, user.id);
+
+      set((state) => ({
+        comments: state.comments.map((comment) => {
+          if (comment.id === commentId) {
+            const hasLiked = comment.likes.includes(user.id);
+            return {
+              ...comment,
+              likes: hasLiked
+                ? comment.likes.filter((id) => id !== user.id)
+                : [...comment.likes, user.id],
+            };
+          }
+          return comment;
+        }),
+      }));
+    } catch (error) {
+      console.error('Error toggling comment like:', error);
+    }
+  },
+
+  deletePost: async (postId: string) => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+
+    try {
+      const success = await forumService.deletePost(postId, user.id);
+      if (success) {
+        set((state) => ({
+          posts: state.posts.filter((p) => p.id !== postId),
+        }));
       }
-      return comment;
-    });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumComments", JSON.stringify(comments));
-    }
-
-    const currentComments = get().comments;
-    if (currentComments.length > 0) {
-      get().fetchComments(currentComments[0].postId);
+    } catch (error) {
+      console.error('Error deleting post:', error);
     }
   },
 
-  deletePost: (postId: string) => {
-    const { user } = useAuthStore.getState();
-    const post = get().posts.find((p) => p.id === postId);
-
-    if (!post || post.authorId !== user?.id) return;
-
-    const posts = get().posts.filter((p) => p.id !== postId);
-    set({ posts });
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("forumPosts", JSON.stringify(posts));
-
-      const allComments = localStorage.getItem("forumComments");
-      let comments = allComments ? JSON.parse(allComments) : [];
-      comments = comments.filter((c: ForumComment) => c.postId !== postId);
-      localStorage.setItem("forumComments", JSON.stringify(comments));
-    }
-  },
-
-  deleteComment: (commentId: string) => {
+  deleteComment: async (commentId: string) => {
     const { user } = useAuthStore.getState();
     if (!user) return;
 
-    if (typeof window === "undefined") return;
+    try {
+      const comment = get().comments.find((c) => c.id === commentId);
+      const success = await forumService.deleteComment(commentId, user.id);
 
-    const allComments = localStorage.getItem("forumComments");
-    let comments: ForumComment[] = allComments ? JSON.parse(allComments) : [];
-
-    const comment = comments.find((c) => c.id === commentId);
-    if (!comment || comment.authorId !== user.id) return;
-
-    comments = comments.filter((c) => c.id !== commentId);
-    localStorage.setItem("forumComments", JSON.stringify(comments));
-
-    const posts = get().posts.map((p) =>
-      p.id === comment.postId
-        ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) }
-        : p
-    );
-    set({ posts });
-    localStorage.setItem("forumPosts", JSON.stringify(posts));
-
-    get().fetchComments(comment.postId);
+      if (success && comment) {
+        set((state) => ({
+          comments: state.comments.filter((c) => c.id !== commentId),
+          posts: state.posts.map((p) =>
+            p.id === comment.postId
+              ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) }
+              : p
+          ),
+        }));
+      }
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
   },
 
   setFilter: (filter) => {
