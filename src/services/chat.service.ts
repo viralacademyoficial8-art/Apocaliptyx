@@ -1,5 +1,5 @@
 // src/services/chat.service.ts
-// Sistema de Chat Completo con Grupos, Favoritos, Reacciones y más
+// Sistema de Chat Completo estilo WhatsApp con Grupos, Invitaciones, Estados y más
 
 import { createClient, RealtimeChannel } from '@supabase/supabase-js';
 
@@ -14,6 +14,7 @@ const supabase = createClient(
 
 export type ConversationType = 'direct' | 'group';
 export type ChatFilter = 'all' | 'unread' | 'favorites' | 'groups' | 'archived';
+export type InvitationStatus = 'pending' | 'accepted' | 'declined' | 'expired';
 
 export interface Conversation {
   id: string;
@@ -27,6 +28,9 @@ export interface Conversation {
   group_avatar?: string;
   group_description?: string;
   created_by?: string;
+  invite_code?: string;
+  invite_enabled?: boolean;
+  max_members?: number | null;
   // Estado del usuario en esta conversación
   is_favorite?: boolean;
   is_archived?: boolean;
@@ -37,6 +41,51 @@ export interface Conversation {
   unread_count?: number;
   members?: GroupMember[];
   typing_users?: string[];
+  pinned_messages?: Message[];
+}
+
+export interface GroupInvitation {
+  id: string;
+  conversation_id: string;
+  invited_by: string;
+  invited_user_id: string;
+  status: InvitationStatus;
+  message?: string;
+  created_at: string;
+  responded_at?: string;
+  expires_at: string;
+  // Datos adicionales
+  inviter?: UserInfo;
+  group?: { id: string; group_name: string; group_avatar?: string; members_count?: number };
+}
+
+export interface UserStatus {
+  id: string;
+  user_id: string;
+  content?: string;
+  media_url?: string;
+  media_type?: 'image' | 'video' | 'text';
+  background_color?: string;
+  views_count: number;
+  created_at: string;
+  expires_at: string;
+  user?: UserInfo;
+  viewed_by_me?: boolean;
+}
+
+export interface ChatPrivacySettings {
+  show_online_status: boolean;
+  show_last_seen: boolean;
+  show_read_receipts: boolean;
+  who_can_message: 'everyone' | 'followers' | 'nobody';
+  who_can_add_to_groups: 'everyone' | 'followers' | 'nobody';
+}
+
+export interface ConversationLabel {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string;
 }
 
 export interface UserInfo {
@@ -1005,6 +1054,756 @@ class ChatService {
       favoriteChats: favorites,
       groupChats: groups,
     };
+  }
+
+  // ============================================
+  // SISTEMA DE INVITACIONES A GRUPOS
+  // ============================================
+
+  async getFollowers(userId: string): Promise<UserInfo[]> {
+    const { data } = await supabase
+      .from('follows')
+      .select(`
+        follower:users!follows_follower_id_fkey(id, username, display_name, avatar_url, is_verified)
+      `)
+      .eq('following_id', userId);
+
+    return data?.map(f => f.follower as unknown as UserInfo) || [];
+  }
+
+  async getFollowing(userId: string): Promise<UserInfo[]> {
+    const { data } = await supabase
+      .from('follows')
+      .select(`
+        following:users!follows_following_id_fkey(id, username, display_name, avatar_url, is_verified)
+      `)
+      .eq('follower_id', userId);
+
+    return data?.map(f => f.following as unknown as UserInfo) || [];
+  }
+
+  async inviteToGroup(
+    conversationId: string,
+    invitedUserId: string,
+    invitedBy: string,
+    message?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    // Verificar que el invitador es miembro del grupo
+    const { data: member } = await supabase
+      .from('group_members')
+      .select('role')
+      .eq('conversation_id', conversationId)
+      .eq('user_id', invitedBy)
+      .single();
+
+    if (!member) {
+      return { success: false, error: 'No eres miembro de este grupo' };
+    }
+
+    // Verificar que el usuario no es ya miembro
+    const { data: existingMember } = await supabase
+      .from('group_members')
+      .select('id')
+      .eq('conversation_id', conversationId)
+      .eq('user_id', invitedUserId)
+      .single();
+
+    if (existingMember) {
+      return { success: false, error: 'Este usuario ya es miembro del grupo' };
+    }
+
+    // Verificar invitación pendiente
+    const { data: existingInvite } = await supabase
+      .from('group_invitations')
+      .select('id')
+      .eq('conversation_id', conversationId)
+      .eq('invited_user_id', invitedUserId)
+      .eq('status', 'pending')
+      .single();
+
+    if (existingInvite) {
+      return { success: false, error: 'Ya existe una invitación pendiente' };
+    }
+
+    // Crear invitación
+    const { error } = await supabase
+      .from('group_invitations')
+      .insert({
+        conversation_id: conversationId,
+        invited_by: invitedBy,
+        invited_user_id: invitedUserId,
+        message: message || null,
+        status: 'pending',
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 días
+      });
+
+    if (error) {
+      console.error('Error creating invitation:', error);
+      return { success: false, error: 'Error al crear invitación' };
+    }
+
+    // Obtener info del grupo y del invitador para la notificación
+    const { data: groupInfo } = await supabase
+      .from('conversations')
+      .select('group_name')
+      .eq('id', conversationId)
+      .single();
+
+    const { data: inviterInfo } = await supabase
+      .from('users')
+      .select('username, display_name')
+      .eq('id', invitedBy)
+      .single();
+
+    // Crear notificación
+    await supabase.from('notifications').insert({
+      user_id: invitedUserId,
+      type: 'group_invitation',
+      title: '👥 Invitación a grupo',
+      message: `@${inviterInfo?.username} te invitó a unirte a "${groupInfo?.group_name}"`,
+      link_url: `/mensajes?invitation=${conversationId}`,
+      is_read: false,
+    });
+
+    return { success: true };
+  }
+
+  async getPendingInvitations(userId: string): Promise<GroupInvitation[]> {
+    const { data } = await supabase
+      .from('group_invitations')
+      .select(`
+        *,
+        inviter:users!group_invitations_invited_by_fkey(id, username, display_name, avatar_url),
+        group:conversations!group_invitations_conversation_id_fkey(id, group_name, group_avatar)
+      `)
+      .eq('invited_user_id', userId)
+      .eq('status', 'pending')
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false });
+
+    // Obtener cantidad de miembros de cada grupo
+    const invitations = await Promise.all((data || []).map(async (inv) => {
+      const { count } = await supabase
+        .from('group_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('conversation_id', inv.conversation_id);
+
+      return {
+        ...inv,
+        inviter: inv.inviter as unknown as UserInfo,
+        group: {
+          ...inv.group,
+          members_count: count || 0
+        }
+      };
+    }));
+
+    return invitations;
+  }
+
+  async respondToInvitation(
+    invitationId: string,
+    userId: string,
+    accept: boolean
+  ): Promise<{ success: boolean; conversationId?: string; error?: string }> {
+    const { data: invitation } = await supabase
+      .from('group_invitations')
+      .select('*')
+      .eq('id', invitationId)
+      .eq('invited_user_id', userId)
+      .eq('status', 'pending')
+      .single();
+
+    if (!invitation) {
+      return { success: false, error: 'Invitación no encontrada o ya respondida' };
+    }
+
+    // Actualizar estado de la invitación
+    await supabase
+      .from('group_invitations')
+      .update({
+        status: accept ? 'accepted' : 'declined',
+        responded_at: new Date().toISOString()
+      })
+      .eq('id', invitationId);
+
+    if (accept) {
+      // Agregar al grupo
+      const { error } = await supabase
+        .from('group_members')
+        .insert({
+          conversation_id: invitation.conversation_id,
+          user_id: userId,
+          role: 'member'
+        });
+
+      if (error) {
+        return { success: false, error: 'Error al unirse al grupo' };
+      }
+
+      // Obtener info del usuario para el mensaje
+      const { data: userInfo } = await supabase
+        .from('users')
+        .select('display_name')
+        .eq('id', userId)
+        .single();
+
+      await this.sendSystemMessage(
+        invitation.conversation_id,
+        `👋 ${userInfo?.display_name || 'Usuario'} se unió al grupo`
+      );
+
+      return { success: true, conversationId: invitation.conversation_id };
+    }
+
+    return { success: true };
+  }
+
+  // ============================================
+  // ENLACES DE INVITACIÓN
+  // ============================================
+
+  async getInviteLink(conversationId: string, userId: string): Promise<string | null> {
+    // Verificar que es admin del grupo
+    const { data: member } = await supabase
+      .from('group_members')
+      .select('role')
+      .eq('conversation_id', conversationId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!member || member.role !== 'admin') return null;
+
+    // Obtener o generar código
+    const { data: conv } = await supabase
+      .from('conversations')
+      .select('invite_code, invite_enabled')
+      .eq('id', conversationId)
+      .single();
+
+    if (!conv) return null;
+    if (!conv.invite_enabled) return null;
+
+    let inviteCode = conv.invite_code;
+
+    if (!inviteCode) {
+      // Generar nuevo código
+      inviteCode = this.generateInviteCode();
+      await supabase
+        .from('conversations')
+        .update({ invite_code: inviteCode })
+        .eq('id', conversationId);
+    }
+
+    // Retornar URL completa
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${baseUrl}/join/${inviteCode}`;
+  }
+
+  async regenerateInviteLink(conversationId: string, userId: string): Promise<string | null> {
+    const { data: member } = await supabase
+      .from('group_members')
+      .select('role')
+      .eq('conversation_id', conversationId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!member || member.role !== 'admin') return null;
+
+    const newCode = this.generateInviteCode();
+    await supabase
+      .from('conversations')
+      .update({ invite_code: newCode })
+      .eq('id', conversationId);
+
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${baseUrl}/join/${newCode}`;
+  }
+
+  async toggleInviteLink(conversationId: string, userId: string, enabled: boolean): Promise<boolean> {
+    const { data: member } = await supabase
+      .from('group_members')
+      .select('role')
+      .eq('conversation_id', conversationId)
+      .eq('user_id', userId)
+      .single();
+
+    if (!member || member.role !== 'admin') return false;
+
+    const { error } = await supabase
+      .from('conversations')
+      .update({ invite_enabled: enabled })
+      .eq('id', conversationId);
+
+    return !error;
+  }
+
+  async joinViaInviteCode(inviteCode: string, userId: string): Promise<{ success: boolean; conversationId?: string; error?: string }> {
+    const { data: conv } = await supabase
+      .from('conversations')
+      .select('id, group_name, invite_enabled, max_members')
+      .eq('invite_code', inviteCode.toUpperCase())
+      .eq('type', 'group')
+      .single();
+
+    if (!conv) {
+      return { success: false, error: 'Enlace de invitación inválido o expirado' };
+    }
+
+    if (!conv.invite_enabled) {
+      return { success: false, error: 'Este enlace de invitación está desactivado' };
+    }
+
+    // Verificar si ya es miembro
+    const { data: existingMember } = await supabase
+      .from('group_members')
+      .select('id')
+      .eq('conversation_id', conv.id)
+      .eq('user_id', userId)
+      .single();
+
+    if (existingMember) {
+      return { success: true, conversationId: conv.id }; // Ya es miembro
+    }
+
+    // Verificar límite de miembros (si existe)
+    if (conv.max_members) {
+      const { count } = await supabase
+        .from('group_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('conversation_id', conv.id);
+
+      if (count && count >= conv.max_members) {
+        return { success: false, error: 'El grupo ha alcanzado el límite de miembros' };
+      }
+    }
+
+    // Unirse al grupo
+    const { error } = await supabase
+      .from('group_members')
+      .insert({
+        conversation_id: conv.id,
+        user_id: userId,
+        role: 'member'
+      });
+
+    if (error) {
+      return { success: false, error: 'Error al unirse al grupo' };
+    }
+
+    const { data: userInfo } = await supabase
+      .from('users')
+      .select('display_name')
+      .eq('id', userId)
+      .single();
+
+    await this.sendSystemMessage(conv.id, `👋 ${userInfo?.display_name || 'Usuario'} se unió vía enlace de invitación`);
+
+    return { success: true, conversationId: conv.id };
+  }
+
+  private generateInviteCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  // ============================================
+  // ESTADO EN LÍNEA Y ÚLTIMA CONEXIÓN
+  // ============================================
+
+  async updateOnlineStatus(userId: string, isOnline: boolean): Promise<void> {
+    await supabase
+      .from('users')
+      .update({
+        is_online: isOnline,
+        last_seen_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+  }
+
+  async getUserOnlineStatus(userId: string): Promise<{ isOnline: boolean; lastSeen: string | null }> {
+    const { data } = await supabase
+      .from('users')
+      .select('is_online, last_seen_at')
+      .eq('id', userId)
+      .single();
+
+    return {
+      isOnline: data?.is_online || false,
+      lastSeen: data?.last_seen_at || null
+    };
+  }
+
+  // ============================================
+  // CONFIRMACIÓN DE LECTURA (DOBLE CHECK)
+  // ============================================
+
+  async markAsDelivered(messageIds: string[]): Promise<void> {
+    await supabase
+      .from('messages')
+      .update({ delivered_at: new Date().toISOString() })
+      .in('id', messageIds)
+      .is('delivered_at', null);
+  }
+
+  async markAsReadWithTimestamp(conversationId: string, userId: string): Promise<void> {
+    await supabase
+      .from('messages')
+      .update({
+        is_read: true,
+        read_at: new Date().toISOString()
+      })
+      .eq('conversation_id', conversationId)
+      .neq('sender_id', userId)
+      .eq('is_read', false);
+  }
+
+  // ============================================
+  // MENSAJES FIJADOS
+  // ============================================
+
+  async pinMessage(conversationId: string, messageId: string, userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('pinned_messages')
+      .insert({
+        conversation_id: conversationId,
+        message_id: messageId,
+        pinned_by: userId
+      });
+
+    return !error;
+  }
+
+  async unpinMessage(conversationId: string, messageId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('pinned_messages')
+      .delete()
+      .eq('conversation_id', conversationId)
+      .eq('message_id', messageId);
+
+    return !error;
+  }
+
+  async getPinnedMessages(conversationId: string): Promise<Message[]> {
+    const { data } = await supabase
+      .from('pinned_messages')
+      .select(`
+        message:messages(
+          *,
+          sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
+        )
+      `)
+      .eq('conversation_id', conversationId)
+      .order('pinned_at', { ascending: false });
+
+    return data?.map(p => p.message as unknown as Message) || [];
+  }
+
+  // ============================================
+  // MENSAJES GUARDADOS
+  // ============================================
+
+  async saveMessage(userId: string, messageId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('saved_messages')
+      .insert({ user_id: userId, message_id: messageId });
+
+    return !error;
+  }
+
+  async unsaveMessage(userId: string, messageId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('saved_messages')
+      .delete()
+      .eq('user_id', userId)
+      .eq('message_id', messageId);
+
+    return !error;
+  }
+
+  async getSavedMessages(userId: string): Promise<Message[]> {
+    const { data } = await supabase
+      .from('saved_messages')
+      .select(`
+        message:messages(
+          *,
+          sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
+        )
+      `)
+      .eq('user_id', userId)
+      .order('saved_at', { ascending: false });
+
+    return data?.map(s => s.message as unknown as Message) || [];
+  }
+
+  // ============================================
+  // BLOQUEO DE USUARIOS
+  // ============================================
+
+  async blockUser(blockerId: string, blockedId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('blocked_users')
+      .insert({ blocker_id: blockerId, blocked_id: blockedId });
+
+    return !error;
+  }
+
+  async unblockUser(blockerId: string, blockedId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('blocked_users')
+      .delete()
+      .eq('blocker_id', blockerId)
+      .eq('blocked_id', blockedId);
+
+    return !error;
+  }
+
+  async getBlockedUsers(userId: string): Promise<UserInfo[]> {
+    const { data } = await supabase
+      .from('blocked_users')
+      .select(`
+        blocked:users!blocked_users_blocked_id_fkey(id, username, display_name, avatar_url)
+      `)
+      .eq('blocker_id', userId);
+
+    return data?.map(b => b.blocked as unknown as UserInfo) || [];
+  }
+
+  async isBlocked(userId: string, otherUserId: string): Promise<boolean> {
+    const { data } = await supabase
+      .from('blocked_users')
+      .select('id')
+      .or(`blocker_id.eq.${userId},blocker_id.eq.${otherUserId}`)
+      .or(`blocked_id.eq.${userId},blocked_id.eq.${otherUserId}`)
+      .single();
+
+    return !!data;
+  }
+
+  // ============================================
+  // CONFIGURACIÓN DE PRIVACIDAD
+  // ============================================
+
+  async getPrivacySettings(userId: string): Promise<ChatPrivacySettings> {
+    const { data } = await supabase
+      .from('chat_privacy_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    return data || {
+      show_online_status: true,
+      show_last_seen: true,
+      show_read_receipts: true,
+      who_can_message: 'everyone',
+      who_can_add_to_groups: 'everyone'
+    };
+  }
+
+  async updatePrivacySettings(userId: string, settings: Partial<ChatPrivacySettings>): Promise<boolean> {
+    const { data: existing } = await supabase
+      .from('chat_privacy_settings')
+      .select('id')
+      .eq('user_id', userId)
+      .single();
+
+    if (existing) {
+      const { error } = await supabase
+        .from('chat_privacy_settings')
+        .update(settings)
+        .eq('user_id', userId);
+      return !error;
+    } else {
+      const { error } = await supabase
+        .from('chat_privacy_settings')
+        .insert({ user_id: userId, ...settings });
+      return !error;
+    }
+  }
+
+  // ============================================
+  // ESTADOS / HISTORIAS (WHATSAPP STATUS)
+  // ============================================
+
+  async createStatus(
+    userId: string,
+    data: { content?: string; mediaUrl?: string; mediaType?: 'image' | 'video' | 'text'; backgroundColor?: string }
+  ): Promise<UserStatus | null> {
+    const { data: status, error } = await supabase
+      .from('user_status')
+      .insert({
+        user_id: userId,
+        content: data.content || null,
+        media_url: data.mediaUrl || null,
+        media_type: data.mediaType || 'text',
+        background_color: data.backgroundColor || '#6366f1',
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 horas
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating status:', error);
+      return null;
+    }
+
+    return status;
+  }
+
+  async getFollowingStatuses(userId: string): Promise<{ userId: string; user: UserInfo; statuses: UserStatus[] }[]> {
+    // Obtener usuarios que sigo
+    const following = await this.getFollowing(userId);
+    const followingIds = following.map(f => f.id);
+
+    // Obtener estados de los usuarios que sigo
+    const { data: statuses } = await supabase
+      .from('user_status')
+      .select(`
+        *,
+        user:users(id, username, display_name, avatar_url)
+      `)
+      .in('user_id', followingIds)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false });
+
+    // Verificar cuáles ya vi
+    const statusIds = statuses?.map(s => s.id) || [];
+    const { data: myViews } = await supabase
+      .from('status_views')
+      .select('status_id')
+      .eq('viewer_id', userId)
+      .in('status_id', statusIds);
+
+    const viewedSet = new Set(myViews?.map(v => v.status_id) || []);
+
+    // Agrupar por usuario
+    const groupedMap = new Map<string, { user: UserInfo; statuses: UserStatus[] }>();
+
+    statuses?.forEach(s => {
+      const entry = groupedMap.get(s.user_id) || { user: s.user as unknown as UserInfo, statuses: [] };
+      entry.statuses.push({
+        ...s,
+        viewed_by_me: viewedSet.has(s.id),
+        user: s.user as unknown as UserInfo
+      });
+      groupedMap.set(s.user_id, entry);
+    });
+
+    return Array.from(groupedMap.entries()).map(([userId, data]) => ({
+      userId,
+      user: data.user,
+      statuses: data.statuses
+    }));
+  }
+
+  async viewStatus(statusId: string, viewerId: string): Promise<void> {
+    await supabase
+      .from('status_views')
+      .insert({ status_id: statusId, viewer_id: viewerId })
+      .single();
+
+    // Incrementar contador
+    await supabase.rpc('increment_status_views', { status_id: statusId });
+  }
+
+  async deleteStatus(statusId: string, userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('user_status')
+      .delete()
+      .eq('id', statusId)
+      .eq('user_id', userId);
+
+    return !error;
+  }
+
+  async getMyStatuses(userId: string): Promise<UserStatus[]> {
+    const { data } = await supabase
+      .from('user_status')
+      .select('*')
+      .eq('user_id', userId)
+      .gt('expires_at', new Date().toISOString())
+      .order('created_at', { ascending: false });
+
+    return data || [];
+  }
+
+  // ============================================
+  // ETIQUETAS DE CONVERSACIONES
+  // ============================================
+
+  async createLabel(userId: string, name: string, color: string): Promise<ConversationLabel | null> {
+    const { data, error } = await supabase
+      .from('conversation_labels')
+      .insert({ user_id: userId, name, color })
+      .select()
+      .single();
+
+    return error ? null : data;
+  }
+
+  async getLabels(userId: string): Promise<ConversationLabel[]> {
+    const { data } = await supabase
+      .from('conversation_labels')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
+
+    return data || [];
+  }
+
+  async assignLabel(conversationId: string, labelId: string, userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('conversation_label_assignments')
+      .insert({ conversation_id: conversationId, label_id: labelId, user_id: userId });
+
+    return !error;
+  }
+
+  async removeLabel(conversationId: string, labelId: string, userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('conversation_label_assignments')
+      .delete()
+      .eq('conversation_id', conversationId)
+      .eq('label_id', labelId)
+      .eq('user_id', userId);
+
+    return !error;
+  }
+
+  // ============================================
+  // FORWARDING (REENVIAR MENSAJES)
+  // ============================================
+
+  async forwardMessage(
+    messageId: string,
+    toConversationIds: string[],
+    senderId: string
+  ): Promise<{ success: boolean; sentCount: number }> {
+    const { data: originalMessage } = await supabase
+      .from('messages')
+      .select('content, file_url, file_type, file_name')
+      .eq('id', messageId)
+      .single();
+
+    if (!originalMessage) return { success: false, sentCount: 0 };
+
+    let sentCount = 0;
+    for (const convId of toConversationIds) {
+      const result = await this.sendMessage(convId, senderId, `↪️ ${originalMessage.content}`, {
+        file: originalMessage.file_url ? {
+          url: originalMessage.file_url,
+          type: originalMessage.file_type || 'document',
+          name: originalMessage.file_name || 'file'
+        } : undefined
+      });
+      if (result) sentCount++;
+    }
+
+    return { success: true, sentCount };
   }
 }
 
