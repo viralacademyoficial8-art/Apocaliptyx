@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { BarChart3, Users, Activity, FileText, Wallet } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
+import { BarChart3, Users, Activity, FileText, Wallet, Loader2 } from 'lucide-react';
 import { useAdminStore } from '@/stores/adminStore';
 import { StatCard, StatsGrid } from './AdminStats';
 
@@ -21,17 +21,39 @@ function BarRow({ label, value, max }: { label: string; value: number; max: numb
 }
 
 export function AnalyticsDashboard() {
-  const { analytics } = useAdminStore();
+  const { analytics, fetchStats, isLoading, error } = useAdminStore();
+
+  // Fetch stats on mount
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   const data = analytics;
   const maxUsers = useMemo(() => Math.max(...(data?.charts.userGrowth.map(x => x.users) || [0])), [data]);
   const maxTx = useMemo(() => Math.max(...(data?.charts.dailyTransactions.map(x => x.count) || [0])), [data]);
   const maxCat = useMemo(() => Math.max(...(data?.charts.categoryDistribution.map(x => x.count) || [0])), [data]);
 
+  if (isLoading) {
+    return (
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-gray-400 flex items-center gap-2">
+        <Loader2 className="w-5 h-5 animate-spin" />
+        Cargando estadísticas...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-900 border border-red-800 rounded-xl p-6 text-red-400">
+        Error: {error}
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-gray-400">
-        No hay analytics (mock) cargados.
+        No hay datos disponibles.
       </div>
     );
   }
