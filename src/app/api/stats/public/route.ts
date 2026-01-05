@@ -1,31 +1,59 @@
 // src/app/api/stats/public/route.ts
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export const revalidate = 60; // Revalidar cada 60 segundos
 
 export async function GET() {
   try {
-    // Obtener conteo de usuarios
-    const usersCount = await prisma.user.count();
+    // Obtener conteo de usuarios desde la tabla 'users'
+    const { count: usersCount, error: usersError } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true });
 
-    // Obtener total de AP Coins en circulación (suma de todos los usuarios)
-    const totalCoins = await prisma.user.aggregate({
-      _sum: {
-        apCoins: true,
-      },
-    });
+    if (usersError) {
+      console.error("Error fetching users:", usersError);
+    }
 
-    // Obtener conteo de escenarios
-    const scenariosCount = await prisma.scenario.count();
+    // Obtener conteo de escenarios desde la tabla 'scenarios'
+    const { count: scenariosCount, error: scenariosError } = await supabase
+      .from("scenarios")
+      .select("*", { count: "exact", head: true });
 
-    // Obtener conteo de posts del foro como "actividad"
-    let activityCount = 0;
-    try {
-      activityCount = await prisma.forumPost.count();
-    } catch {
-      activityCount = 0;
+    if (scenariosError) {
+      console.error("Error fetching scenarios:", scenariosError);
+    }
+
+    // Obtener suma total de AP Coins (total_p de scenarios como proxy)
+    const { data: poolData, error: poolError } = await supabase
+      .from("scenarios")
+      .select("total_p");
+
+    let totalPool = 0;
+    if (!poolError && poolData) {
+      totalPool = poolData.reduce((sum, s) => sum + (s.total_p || 0), 0);
+    }
+
+    // Obtener conteo de predicciones (scenario_predictions si existe)
+    let predictionsCount = 0;
+    const { count: predCount, error: predError } = await supabase
+      .from("scenario_predictions")
+      .select("*", { count: "exact", head: true });
+
+    if (!predError && predCount) {
+      predictionsCount = predCount;
+    } else {
+      // Fallback: contar posts del foro como actividad
+      const { count: postsCount } = await supabase
+        .from("forum_posts")
+        .select("*", { count: "exact", head: true });
+      predictionsCount = postsCount || 0;
     }
 
     // Formatear números
@@ -41,20 +69,20 @@ export async function GET() {
 
     const stats = {
       users: {
-        value: formatNumber(usersCount),
-        raw: usersCount,
+        value: formatNumber(usersCount || 0),
+        raw: usersCount || 0,
       },
       totalPool: {
-        value: formatNumber(totalCoins._sum.apCoins || 0),
-        raw: totalCoins._sum.apCoins || 0,
+        value: formatNumber(totalPool),
+        raw: totalPool,
       },
       scenarios: {
-        value: formatNumber(scenariosCount),
-        raw: scenariosCount,
+        value: formatNumber(scenariosCount || 0),
+        raw: scenariosCount || 0,
       },
       predictions: {
-        value: formatNumber(activityCount),
-        raw: activityCount,
+        value: formatNumber(predictionsCount),
+        raw: predictionsCount,
       },
     };
 
