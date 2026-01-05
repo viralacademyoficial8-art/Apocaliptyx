@@ -154,7 +154,7 @@ interface AdminStore {
   isLoading: boolean;
   error: string | null;
 
-  // Pagination state
+  // Pagination
   usersPagination: { total: number; page: number; totalPages: number };
   scenariosPagination: { total: number; page: number; totalPages: number };
 
@@ -168,7 +168,7 @@ interface AdminStore {
   selectedScenarios: string[];
   selectedReports: string[];
 
-  // Fetch Actions - Load data from APIs
+  // Fetch Actions
   fetchUsers: (page?: number) => Promise<void>;
   fetchScenarios: (page?: number) => Promise<void>;
   fetchReports: () => Promise<void>;
@@ -293,24 +293,23 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       const data = await res.json();
 
-      // Map API response to AdminUser format
       const users: AdminUser[] = data.users.map((u: Record<string, unknown>) => ({
         id: u.id,
         username: u.username,
         email: u.email,
-        displayName: u.displayName,
-        avatarUrl: u.avatarUrl,
+        displayName: u.displayName || u.display_name,
+        avatarUrl: u.avatarUrl || u.avatar_url,
         role: (u.role as string)?.toUpperCase() || 'USER',
-        apCoins: u.apCoins || 0,
+        apCoins: u.apCoins || u.ap_coins || 0,
         level: u.level || 1,
-        isVerified: u.isVerified || false,
-        isBanned: u.status === 'banned',
-        bannedReason: null,
-        createdAt: u.createdAt,
-        lastLoginAt: u.lastSeen,
-        totalPredictions: u.totalPredictions || 0,
-        correctPredictions: u.correctPredictions || 0,
-        totalEarnings: u.totalEarnings || 0,
+        isVerified: u.isVerified || u.is_verified || false,
+        isBanned: u.status === 'banned' || u.is_banned || false,
+        bannedReason: u.bannedReason || u.banned_reason || null,
+        createdAt: u.createdAt || u.created_at,
+        lastLoginAt: u.lastLoginAt || u.last_login_at || u.lastSeen || u.last_seen,
+        totalPredictions: u.totalPredictions || u.total_predictions || 0,
+        correctPredictions: u.correctPredictions || u.correct_predictions || 0,
+        totalEarnings: u.totalEarnings || u.total_earnings || 0,
       }));
 
       set({
@@ -348,28 +347,27 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       const data = await res.json();
 
-      // Map API response to AdminScenario format
       const scenarios: AdminScenario[] = data.scenarios.map((s: Record<string, unknown>) => ({
         id: s.id,
         title: s.title,
         description: s.description,
         category: s.category,
         status: (s.status as string)?.toUpperCase() || 'ACTIVE',
-        currentPrice: 0,
-        totalPool: s.totalPool || 0,
-        votesUp: s.yesVotes || 0,
-        votesDown: s.noVotes || 0,
+        currentPrice: s.currentPrice || s.current_price || 0,
+        totalPool: s.totalPool || s.total_pool || s.total_p || 0,
+        votesUp: s.votesUp || s.votes_up || s.yesVotes || s.yes_votes || 0,
+        votesDown: s.votesDown || s.votes_down || s.noVotes || s.no_votes || 0,
         deadline: s.deadline,
-        createdAt: s.createdAt,
+        createdAt: s.createdAt || s.created_at,
         creator: {
-          id: s.creatorId as string,
-          username: s.creatorUsername as string,
-          avatarUrl: s.creatorAvatar as string | null
+          id: s.creatorId || s.creator_id || '',
+          username: s.creatorUsername || s.creator_username || 'Unknown',
+          avatarUrl: s.creatorAvatar || s.creator_avatar || null
         },
         currentHolder: null,
-        imageUrl: s.imageUrl as string | null,
-        isFeatured: false,
-        reportCount: (s.reports as number) || 0,
+        imageUrl: s.imageUrl || s.image_url || null,
+        isFeatured: s.isFeatured || s.is_featured || false,
+        reportCount: s.reportCount || s.report_count || s.reports || 0,
       }));
 
       set({
@@ -397,7 +395,31 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
       }
 
       const data = await res.json();
-      set({ reports: data.reports || [], isLoading: false });
+
+      const reports: AdminReport[] = (data.reports || []).map((r: Record<string, unknown>) => ({
+        id: r.id,
+        type: (r.type as string)?.toUpperCase() || 'SCENARIO',
+        reason: r.reason || '',
+        description: r.description || '',
+        status: (r.status as string)?.toUpperCase() || 'PENDING',
+        priority: (r.priority as string)?.toUpperCase() || 'LOW',
+        createdAt: r.createdAt || r.created_at,
+        reporter: {
+          id: r.reporterId || r.reporter_id || '',
+          username: r.reporterUsername || r.reporter_username || 'Unknown'
+        },
+        reported: {
+          id: r.targetId || r.target_id || '',
+          type: r.type || 'SCENARIO',
+          title: r.targetTitle || r.target_title,
+          username: r.targetUsername || r.target_username
+        },
+        assignedTo: null,
+        resolution: r.resolution || null,
+        resolvedAt: r.resolvedAt || r.resolved_at || null,
+      }));
+
+      set({ reports, isLoading: false });
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
@@ -415,13 +437,12 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
       const stats = await res.json();
 
-      // Convert stats API response to AnalyticsData format
       const analytics: AnalyticsData = {
         overview: {
           totalUsers: stats.totalUsers || 0,
           activeUsers: stats.activeUsers || 0,
           newUsersToday: stats.newUsersToday || 0,
-          newUsersWeek: stats.newUsersThisWeek || 0,
+          newUsersWeek: stats.newUsersThisWeek || stats.newUsersWeek || 0,
           totalScenarios: stats.totalScenarios || 0,
           activeScenarios: stats.activeScenarios || 0,
           totalTransactions: stats.totalTransactions || 0,
@@ -551,7 +572,6 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
 
   adjustUserCoins: async (id, amount) => {
     try {
-      // First get current coins
       const user = get().users.find(u => u.id === id);
       if (!user) return false;
 
