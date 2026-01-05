@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Eye, ArrowUpCircle, CheckCircle, XCircle } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Eye, ArrowUpCircle, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { useAdminStore, AdminReport } from '@/stores/adminStore';
 import { AdminDataTable } from './AdminDataTable';
 import { AdminModal } from './AdminModal';
@@ -15,7 +15,15 @@ export function ReportsPanel() {
     resolveReport,
     dismissReport,
     escalateReport,
+    fetchReports,
+    isLoading,
+    error,
   } = useAdminStore();
+
+  // Fetch reports on mount
+  useEffect(() => {
+    fetchReports();
+  }, [fetchReports]);
 
   const [selected, setSelected] = useState<AdminReport | null>(null);
   const [openDetails, setOpenDetails] = useState(false);
@@ -131,6 +139,25 @@ export function ReportsPanel() {
     </div>
   );
 
+  // Loading state
+  if (isLoading && reports.length === 0) {
+    return (
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-gray-400 flex items-center gap-2">
+        <Loader2 className="w-5 h-5 animate-spin" />
+        Cargando reportes...
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-gray-900 border border-red-800 rounded-xl p-6 text-red-400">
+        Error: {error}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <StatsGrid>
@@ -169,7 +196,7 @@ export function ReportsPanel() {
             </button>
 
             <button
-              onClick={() => resolveReport(r.id, 'Resuelto (mock)')}
+              onClick={() => resolveReport(r.id, 'Resuelto')}
               className="p-2 rounded-lg bg-green-600/20 text-green-300 hover:bg-green-600/30"
               title="Resolver rápido"
             >
@@ -177,7 +204,7 @@ export function ReportsPanel() {
             </button>
 
             <button
-              onClick={() => dismissReport(r.id, 'Descartado (mock)')}
+              onClick={() => dismissReport(r.id, 'Descartado')}
               className="p-2 rounded-lg bg-red-600/20 text-red-300 hover:bg-red-600/30"
               title="Descartar"
             >
@@ -205,7 +232,7 @@ export function ReportsPanel() {
               <button
                 onClick={() => {
                   if (!selected) return;
-                  resolveReport(selected.id, resolution || 'Resuelto (mock)');
+                  resolveReport(selected.id, resolution || 'Resuelto');
                   setOpenDetails(false);
                 }}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
@@ -216,7 +243,7 @@ export function ReportsPanel() {
               <button
                 onClick={() => {
                   if (!selected) return;
-                  dismissReport(selected.id, resolution || 'Descartado (mock)');
+                  dismissReport(selected.id, resolution || 'Descartado');
                   setOpenDetails(false);
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500"
@@ -263,7 +290,7 @@ export function ReportsPanel() {
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">Resolución (mock)</div>
+              <div className="text-xs text-gray-500 mb-2">Resolución</div>
               <textarea
                 value={resolution}
                 onChange={(e) => setResolution(e.target.value)}

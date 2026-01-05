@@ -11,24 +11,26 @@ type ProfileTabsProps = {
   user: User;
 };
 
-// Helper para convertir ScenarioFromDB al formato esperado por ScenarioCard
-function mapScenarioFromDB(s: ScenarioFromDB) {
+// Helper para convertir ScenarioFromDB al formato que espera ScenarioCard
+function mapScenarioFromDB(s: ScenarioFromDB): any {
   return {
     id: s.id,
+    creatorId: s.creator_id,
+    currentHolderId: s.creator_id,
     title: s.title,
     description: s.description,
-    category: s.category as any,
-    status: s.status.toLowerCase() as any,
-    createdAt: s.created_at,
+    category: s.category.toLowerCase(),
     dueDate: s.resolution_date,
+    creationCost: s.min_bet,
+    currentPrice: s.total_pool,
     totalPot: s.total_pool,
-    currentPrice: s.min_bet,
+    status: s.status.toLowerCase(),
+    createdAt: s.created_at,
+    updatedAt: new Date(s.updated_at),
     votes: {
       yes: s.yes_pool,
       no: s.no_pool,
     },
-    creatorId: s.creator_id,
-    currentHolderId: s.creator_id,
   };
 }
 
@@ -81,7 +83,6 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
         onValueChange={(val) => setActiveTab(val as 'activos' | 'historial')}
         className="w-full"
       >
-        {/* Tabs responsive */}
         <TabsList
           className="
             w-full
@@ -106,7 +107,7 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
               data-[state=active]:text-white
             "
           >
-            Escenarios activos
+            Escenarios activos ({escenariosActivos.length})
           </TabsTrigger>
           <TabsTrigger
             value="historial"
@@ -119,11 +120,10 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
               data-[state=active]:text-white
             "
           >
-            Historial
+            Historial ({escenariosHistorial.length})
           </TabsTrigger>
         </TabsList>
 
-        {/* TAB: ACTIVOS */}
         <TabsContent value="activos" className="mt-6">
           {escenariosActivos.length === 0 ? (
             <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 text-center">
@@ -151,7 +151,6 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           )}
         </TabsContent>
 
-        {/* TAB: HISTORIAL */}
         <TabsContent value="historial" className="mt-6">
           {escenariosHistorial.length === 0 ? (
             <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 text-center">

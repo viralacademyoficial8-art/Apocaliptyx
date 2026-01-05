@@ -172,7 +172,7 @@ export function ProfileHeader({
               <span className="text-white font-bold">{profile.followingCount.toLocaleString()}</span>
               <span className="text-gray-400">siguiendo</span>
             </div>
-            {isOwnProfile && (
+            {isOwnProfile && profile.apCoins !== undefined && (
               <div className="flex items-center gap-1">
                 <span className="text-yellow-400 font-bold">{profile.apCoins.toLocaleString()}</span>
                 <span className="text-gray-400">AP Coins</span>

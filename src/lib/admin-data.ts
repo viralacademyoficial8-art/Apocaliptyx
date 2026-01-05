@@ -93,8 +93,49 @@ export interface PlatformStats {
 }
 
 // ===============================
-// Anuncios
+// Helpers de colores y estados
 // ===============================
+
+export const getStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    active: 'bg-green-500/20 text-green-400',
+    suspended: 'bg-yellow-500/20 text-yellow-400',
+    banned: 'bg-red-500/20 text-red-400',
+    pending: 'bg-blue-500/20 text-blue-400',
+    reviewing: 'bg-purple-500/20 text-purple-400',
+    resolved: 'bg-green-500/20 text-green-400',
+    dismissed: 'bg-gray-500/20 text-gray-400',
+  };
+  return colors[status] || 'bg-gray-500/20 text-gray-400';
+};
+
+export const getReportPriorityColor = (priority: string) => {
+  const colors: Record<string, string> = {
+    critical: 'bg-red-500/20 text-red-400 border-red-500/50',
+    high: 'bg-orange-500/20 text-orange-400 border-orange-500/50',
+    medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
+    low: 'bg-green-500/20 text-green-400 border-green-500/50',
+  };
+  return colors[priority] || 'bg-gray-500/20 text-gray-400';
+};
+
+export const getActivityIcon = (type: string) => {
+  const icons: Record<string, string> = {
+    user_registered: '👤',
+    scenario_created: '📝',
+    scenario_stolen: '🔥',
+    scenario_resolved: '✅',
+    report_submitted: '🚨',
+    user_banned: '🚫',
+    purchase: '💰',
+    withdrawal: '💸',
+  };
+  return icons[type] || '📌';
+};
+
+// ============================================
+// ANUNCIOS
+// ============================================
 
 export interface Announcement {
   id: string;
@@ -116,9 +157,41 @@ export interface Announcement {
   };
 }
 
-// ===============================
-// Promo Codes
-// ===============================
+export const getAnnouncementTypeColor = (type: string) => {
+  const colors: Record<string, string> = {
+    info: 'bg-blue-500/20 text-blue-400 border-blue-500/50',
+    warning: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
+    success: 'bg-green-500/20 text-green-400 border-green-500/50',
+    promo: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
+    maintenance: 'bg-orange-500/20 text-orange-400 border-orange-500/50',
+  };
+  return colors[type] || 'bg-gray-500/20 text-gray-400';
+};
+
+export const getAnnouncementTypeIcon = (type: string) => {
+  const icons: Record<string, string> = {
+    info: 'ℹ️',
+    warning: '⚠️',
+    success: '✅',
+    promo: '🎉',
+    maintenance: '🔧',
+  };
+  return icons[type] || '📢';
+};
+
+export const getAnnouncementStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    draft: 'bg-gray-500/20 text-gray-400',
+    scheduled: 'bg-blue-500/20 text-blue-400',
+    active: 'bg-green-500/20 text-green-400',
+    expired: 'bg-red-500/20 text-red-400',
+  };
+  return colors[status] || 'bg-gray-500/20 text-gray-400';
+};
+
+// ============================================
+// PROMO CODES
+// ============================================
 
 export interface PromoCode {
   id: string;
@@ -140,9 +213,54 @@ export interface PromoCode {
   usedBy: { userId: string; username: string; usedAt: string; amount: number }[];
 }
 
-// ===============================
-// Foro
-// ===============================
+export const getPromoTypeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    percentage: 'Porcentaje',
+    fixed_discount: 'Descuento fijo',
+    free_coins: 'Coins gratis',
+    bonus_multiplier: 'Multiplicador',
+  };
+  return labels[type] || type;
+};
+
+export const getPromoTypeColor = (type: string) => {
+  const colors: Record<string, string> = {
+    percentage: 'bg-blue-500/20 text-blue-400',
+    fixed_discount: 'bg-green-500/20 text-green-400',
+    free_coins: 'bg-yellow-500/20 text-yellow-400',
+    bonus_multiplier: 'bg-purple-500/20 text-purple-400',
+  };
+  return colors[type] || 'bg-gray-500/20 text-gray-400';
+};
+
+export const getPromoStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    active: 'bg-green-500/20 text-green-400',
+    inactive: 'bg-gray-500/20 text-gray-400',
+    expired: 'bg-red-500/20 text-red-400',
+    depleted: 'bg-orange-500/20 text-orange-400',
+  };
+  return colors[status] || 'bg-gray-500/20 text-gray-400';
+};
+
+export const formatPromoValue = (promo: PromoCode) => {
+  switch (promo.type) {
+    case 'percentage':
+      return `${promo.value}% OFF`;
+    case 'fixed_discount':
+      return `$${promo.value} OFF`;
+    case 'free_coins':
+      return `${promo.value} AP Gratis`;
+    case 'bonus_multiplier':
+      return `${promo.value}x Bonus`;
+    default:
+      return promo.value.toString();
+  }
+};
+
+// ============================================
+// FORO
+// ============================================
 
 export interface ForumPost {
   id: string;
@@ -190,165 +308,6 @@ export interface ForumCategory {
   createdAt: string;
 }
 
-// ===============================
-// Items de Tienda
-// ===============================
-
-export interface ShopItem {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  shortDescription: string;
-  icon: string;
-  price: number;
-  originalPrice?: number;
-  currency: 'AP' | 'USD';
-  category: 'protection' | 'power' | 'cosmetic' | 'boost' | 'special';
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  effect: string;
-  duration?: number;
-  usageLimit?: number;
-  cooldown?: number;
-  isActive: boolean;
-  isNew: boolean;
-  isFeatured: boolean;
-  stock?: number;
-  soldCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// ===============================
-// Helpers - Colores de Estado
-// ===============================
-
-export const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    active: 'bg-green-500/20 text-green-400',
-    suspended: 'bg-yellow-500/20 text-yellow-400',
-    banned: 'bg-red-500/20 text-red-400',
-    pending: 'bg-blue-500/20 text-blue-400',
-    reviewing: 'bg-purple-500/20 text-purple-400',
-    resolved: 'bg-green-500/20 text-green-400',
-    dismissed: 'bg-gray-500/20 text-gray-400',
-  };
-  return colors[status] || 'bg-gray-500/20 text-gray-400';
-};
-
-export const getReportPriorityColor = (priority: string) => {
-  const colors: Record<string, string> = {
-    critical: 'bg-red-500/20 text-red-400 border-red-500/50',
-    high: 'bg-orange-500/20 text-orange-400 border-orange-500/50',
-    medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
-    low: 'bg-green-500/20 text-green-400 border-green-500/50',
-  };
-  return colors[priority] || 'bg-gray-500/20 text-gray-400';
-};
-
-export const getActivityIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    user_registered: '👤',
-    scenario_created: '📝',
-    scenario_stolen: '🔥',
-    scenario_resolved: '✅',
-    report_submitted: '🚨',
-    user_banned: '🚫',
-    purchase: '💰',
-    withdrawal: '💸',
-  };
-  return icons[type] || '📌';
-};
-
-// ===============================
-// Helpers - Anuncios
-// ===============================
-
-export const getAnnouncementTypeColor = (type: string) => {
-  const colors: Record<string, string> = {
-    info: 'bg-blue-500/20 text-blue-400 border-blue-500/50',
-    warning: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50',
-    success: 'bg-green-500/20 text-green-400 border-green-500/50',
-    promo: 'bg-purple-500/20 text-purple-400 border-purple-500/50',
-    maintenance: 'bg-orange-500/20 text-orange-400 border-orange-500/50',
-  };
-  return colors[type] || 'bg-gray-500/20 text-gray-400';
-};
-
-export const getAnnouncementTypeIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    info: 'ℹ️',
-    warning: '⚠️',
-    success: '✅',
-    promo: '🎉',
-    maintenance: '🔧',
-  };
-  return icons[type] || '📢';
-};
-
-export const getAnnouncementStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    draft: 'bg-gray-500/20 text-gray-400',
-    scheduled: 'bg-blue-500/20 text-blue-400',
-    active: 'bg-green-500/20 text-green-400',
-    expired: 'bg-red-500/20 text-red-400',
-  };
-  return colors[status] || 'bg-gray-500/20 text-gray-400';
-};
-
-// ===============================
-// Helpers - Promo Codes
-// ===============================
-
-export const getPromoTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    percentage: 'Porcentaje',
-    fixed_discount: 'Descuento fijo',
-    free_coins: 'Coins gratis',
-    bonus_multiplier: 'Multiplicador',
-  };
-  return labels[type] || type;
-};
-
-export const getPromoTypeColor = (type: string) => {
-  const colors: Record<string, string> = {
-    percentage: 'bg-blue-500/20 text-blue-400',
-    fixed_discount: 'bg-green-500/20 text-green-400',
-    free_coins: 'bg-yellow-500/20 text-yellow-400',
-    bonus_multiplier: 'bg-purple-500/20 text-purple-400',
-  };
-  return colors[type] || 'bg-gray-500/20 text-gray-400';
-};
-
-export const getPromoStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    active: 'bg-green-500/20 text-green-400',
-    inactive: 'bg-gray-500/20 text-gray-400',
-    expired: 'bg-red-500/20 text-red-400',
-    depleted: 'bg-orange-500/20 text-orange-400',
-  };
-  return colors[status] || 'bg-gray-500/20 text-gray-400';
-};
-
-export const formatPromoValue = (promo: PromoCode) => {
-  switch (promo.type) {
-    case 'percentage':
-      return `${promo.value}% OFF`;
-    case 'fixed_discount':
-      return `$${promo.value} OFF`;
-    case 'free_coins':
-      return `${promo.value} AP Gratis`;
-    case 'bonus_multiplier':
-      return `${promo.value}x Bonus`;
-    default:
-      return promo.value.toString();
-  }
-};
-
-// ===============================
-// Helpers - Foro
-// ===============================
-
 export const getForumPostStatusColor = (status: string) => {
   const colors: Record<string, string> = {
     published: 'bg-green-500/20 text-green-400',
@@ -374,9 +333,34 @@ export const getCategoryColor = (color: string) => {
   return colors[color] || 'bg-gray-500/20 text-gray-400 border-gray-500/50';
 };
 
-// ===============================
-// Helpers - Items de Tienda
-// ===============================
+// ============================================
+// SHOP ITEMS
+// ============================================
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  shortDescription: string;
+  icon: string;
+  price: number;
+  originalPrice?: number;
+  currency: 'AP' | 'USD';
+  category: 'protection' | 'power' | 'cosmetic' | 'boost' | 'special';
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  effect: string;
+  duration?: number;
+  usageLimit?: number;
+  cooldown?: number;
+  isActive: boolean;
+  isNew: boolean;
+  isFeatured: boolean;
+  stock?: number;
+  soldCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export const getItemCategoryLabel = (category: string) => {
   const labels: Record<string, string> = {
