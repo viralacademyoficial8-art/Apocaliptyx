@@ -16,6 +16,7 @@ function mapScenarioFromDB(s: ScenarioFromDB): any {
   return {
     id: s.id,
     creatorId: s.creator_id,
+    currentHolderId: s.creator_id,
     title: s.title,
     description: s.description,
     category: s.category.toLowerCase(),
@@ -40,8 +41,11 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
 
   useEffect(() => {
     async function loadScenarios() {
-      if (!user?.id) return;
-      
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         const data = await scenariosService.getByCreator(user.id);
@@ -59,14 +63,14 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
   const escenariosActivos = scenarios
     .filter(s => s.status === 'ACTIVE')
     .map(mapScenarioFromDB);
-  
+
   const escenariosHistorial = scenarios
     .filter(s => s.status !== 'ACTIVE')
     .map(mapScenarioFromDB);
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
       </div>
     );
@@ -81,25 +85,25 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
       >
         <TabsList
           className="
-            w-full 
-            bg-gray-900/70 
-            rounded-xl 
+            w-full
+            bg-gray-900/70
+            rounded-xl
             p-1
-            flex 
-            flex-col 
+            flex
+            flex-col
             gap-2
-            sm:flex-row 
+            sm:flex-row
             sm:gap-0
           "
         >
           <TabsTrigger
             value="activos"
             className="
-              flex-1 
-              text-xs sm:text-sm 
-              px-3 sm:px-4 
+              flex-1
+              text-xs sm:text-sm
+              px-3 sm:px-4
               py-2
-              data-[state=active]:bg-gray-800 
+              data-[state=active]:bg-gray-800
               data-[state=active]:text-white
             "
           >
@@ -108,11 +112,11 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           <TabsTrigger
             value="historial"
             className="
-              flex-1 
-              text-xs sm:text-sm 
-              px-3 sm:px-4 
+              flex-1
+              text-xs sm:text-sm
+              px-3 sm:px-4
               py-2
-              data-[state=active]:bg-gray-800 
+              data-[state=active]:bg-gray-800
               data-[state=active]:text-white
             "
           >
@@ -133,15 +137,15 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           ) : (
             <div
               className="
-                grid 
-                gap-4 
-                grid-cols-1 
+                grid
+                gap-4
+                grid-cols-1
                 sm:grid-cols-2
                 xl:grid-cols-3
               "
             >
               {escenariosActivos.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} />
+                <ScenarioCard key={scenario.id} scenario={scenario as any} />
               ))}
             </div>
           )}
@@ -160,15 +164,15 @@ export function ProfileTabs({ user }: ProfileTabsProps) {
           ) : (
             <div
               className="
-                grid 
-                gap-4 
-                grid-cols-1 
+                grid
+                gap-4
+                grid-cols-1
                 sm:grid-cols-2
                 xl:grid-cols-3
               "
             >
               {escenariosHistorial.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} />
+                <ScenarioCard key={scenario.id} scenario={scenario as any} />
               ))}
             </div>
           )}

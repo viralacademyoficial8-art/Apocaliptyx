@@ -404,13 +404,13 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
         status: (r.status as string)?.toUpperCase() || 'PENDING',
         priority: (r.priority as string)?.toUpperCase() || 'LOW',
         createdAt: r.createdAt || r.created_at,
-        reporter: { 
-          id: r.reporterId || r.reporter_id || '', 
-          username: r.reporterUsername || r.reporter_username || 'Unknown' 
+        reporter: {
+          id: r.reporterId || r.reporter_id || '',
+          username: r.reporterUsername || r.reporter_username || 'Unknown'
         },
-        reported: { 
-          id: r.targetId || r.target_id || '', 
-          type: r.type || 'SCENARIO', 
+        reported: {
+          id: r.targetId || r.target_id || '',
+          type: r.type || 'SCENARIO',
           title: r.targetTitle || r.target_title,
           username: r.targetUsername || r.target_username
         },

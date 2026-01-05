@@ -1,4 +1,6 @@
 // src/lib/admin-data.ts
+// Solo tipos e interfaces + funciones helper para el Admin Panel
+// Los datos reales se obtienen de adminStore y las APIs
 
 // ===============================
 // Tipos base para Admin Panel

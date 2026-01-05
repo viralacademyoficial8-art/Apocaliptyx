@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Users, Shield, BadgeCheck, Coins, UserCog, Eye } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Users, Shield, BadgeCheck, Coins, UserCog, Eye, Loader2 } from 'lucide-react';
 import { useAdminStore, type AdminUser } from '@/stores/adminStore';
 import { AdminDataTable } from './AdminDataTable';
 import { AdminModal } from './AdminModal';
@@ -20,7 +20,16 @@ export function UserManagement() {
     unbanUser,
     changeUserRole,
     adjustUserCoins,
+    fetchUsers,
+    isLoading,
+    error,
+    usersPagination,
   } = useAdminStore();
+
+  // Fetch users on mount and when filters change
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers, userFilters.role, userFilters.status]);
 
   const [detailsUser, setDetailsUser] = useState<AdminUser | null>(null);
   const [banTarget, setBanTarget] = useState<AdminUser | null>(null);

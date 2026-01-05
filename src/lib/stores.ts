@@ -138,7 +138,7 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
         type: n.type as any,
         title: n.title,
         message: n.message,
-        relatedScenarioId: undefined,
+        relatedScenarioId: n.link_url?.includes('escenario') ? n.link_url.split('/').pop() : undefined,
         relatedUserId: undefined,
         read: n.is_read,
         createdAt: new Date(n.created_at),
@@ -241,7 +241,7 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
 
   async createScenario({ title, description, category, dueDate }) {
     const { user } = useAuthStore.getState();
-    if (!user?.id) return;
+    if (!user?.id) throw new Error("Debes iniciar sesión");
 
     try {
       const result = await scenariosService.create({
@@ -264,6 +264,7 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
       }
     } catch (error) {
       console.error('Error creating scenario:', error);
+      throw error;
     }
   },
 }));
@@ -322,14 +323,14 @@ export const useForumStore = create<ForumState>((set, get) => ({
     set({ isLoading: true });
     try {
       const { filter, selectedTag } = get();
-      const sortBy = filter === 'populares' ? 'popular' : filter === 'siguiendo' ? 'recent' : 'recent';
-      
+      const sortBy = filter === 'populares' ? 'popular' : 'recent';
+
       const data = await forumService.getPosts({
         sortBy,
         tag: selectedTag || undefined,
         limit: 50,
       });
-      
+
       set({ posts: data, isLoading: false });
     } catch (error) {
       console.error('Error fetching posts:', error);
