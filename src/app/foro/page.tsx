@@ -4,7 +4,19 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
-import { forumService, ForumPost, ForumComment, ForumCategory, ReactionType, ReactionCounts, TrendingTag } from '@/services/forum.service';
+import {
+  forumService,
+  ForumPost,
+  ForumComment,
+  ForumCategory,
+  ReactionType,
+  TrendingTag,
+  ForumStory,
+  ForumPoll,
+  AwardType,
+  BadgeType,
+  MentionSuggestion,
+} from '@/services/forum.service';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -19,7 +31,6 @@ import {
   Loader2,
   Heart,
   Send,
-  MoreVertical,
   Trash2,
   Pin,
   Lock,
@@ -29,6 +40,18 @@ import {
   Repeat2,
   Image as ImageIcon,
   Sparkles,
+  BarChart3,
+  Plus,
+  Gift,
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Check,
+  AlertCircle,
+  Award,
+  ListPlus,
+  AtSign,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
@@ -55,6 +78,16 @@ const FORUM_TAGS = [
   { id: 'humor', label: '😂 Humor', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
 ];
 
+// Badge colors
+const BADGE_STYLES: Record<BadgeType, { icon: string; color: string; bg: string }> = {
+  verified: { icon: '✓', color: 'text-blue-400', bg: 'bg-blue-500/20' },
+  creator: { icon: '★', color: 'text-yellow-400', bg: 'bg-yellow-500/20' },
+  prophet: { icon: '🔮', color: 'text-purple-400', bg: 'bg-purple-500/20' },
+  og: { icon: '👑', color: 'text-green-400', bg: 'bg-green-500/20' },
+  moderator: { icon: '🛡️', color: 'text-red-400', bg: 'bg-red-500/20' },
+  apocaliptyx: { icon: '⚡', color: 'text-pink-400', bg: 'bg-pink-500/20' },
+};
+
 export default function ForoPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
@@ -62,18 +95,35 @@ export default function ForoPage() {
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
   const [trendingTags, setTrendingTags] = useState<TrendingTag[]>([]);
+  const [stories, setStories] = useState<ForumStory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'recent' | 'popular' | 'comments' | 'following'>('recent');
+  const [filter, setFilter] = useState<'recent' | 'popular' | 'comments' | 'following' | 'hot' | 'rising'>('recent');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Modal de crear post
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createMode, setCreateMode] = useState<'post' | 'poll' | 'thread'>('post');
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostTags, setNewPostTags] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedGif, setSelectedGif] = useState<{ url: string; width: number; height: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Poll creation
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState(['', '']);
+  const [pollDuration, setPollDuration] = useState(24);
+
+  // Thread creation
+  const [threadPosts, setThreadPosts] = useState(['']);
+
+  // Mentions
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionSuggestions, setMentionSuggestions] = useState<MentionSuggestion[]>([]);
+  const [showMentions, setShowMentions] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   // Modal de comentarios
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -88,16 +138,44 @@ export default function ForoPage() {
   const [quoteContent, setQuoteContent] = useState('');
   const [isReposting, setIsReposting] = useState(false);
 
+  // Modal de awards
+  const [awardModalOpen, setAwardModalOpen] = useState(false);
+  const [awardingPost, setAwardingPost] = useState<ForumPost | null>(null);
+  const [awardTypes, setAwardTypes] = useState<AwardType[]>([]);
+  const [selectedAward, setSelectedAward] = useState<AwardType | null>(null);
+  const [awardMessage, setAwardMessage] = useState('');
+  const [givingAward, setGivingAward] = useState(false);
+
+  // Stories Modal
+  const [storyModalOpen, setStoryModalOpen] = useState(false);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [viewingStories, setViewingStories] = useState<ForumStory[]>([]);
+
+  // Create Story Modal
+  const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false);
+  const [storyContent, setStoryContent] = useState('');
+  const [storyBgColor, setStoryBgColor] = useState('#1a1a2e');
+  const [creatingStory, setCreatingStory] = useState(false);
+
   // Cargar posts
   const loadPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await forumService.getPostsWithUserState(user?.id || null, {
-        sortBy: filter,
-        category: selectedCategory !== 'all' ? selectedCategory : undefined,
-        tag: selectedTag || undefined,
-        limit: 50,
-      });
+      let data: ForumPost[];
+
+      if (filter === 'hot' || filter === 'rising') {
+        data = await forumService.getPostsBySorting(filter, {
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          limit: 50,
+        });
+      } else {
+        data = await forumService.getPostsWithUserState(user?.id || null, {
+          sortBy: filter as 'recent' | 'popular' | 'comments' | 'following',
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          tag: selectedTag || undefined,
+          limit: 50,
+        });
+      }
       setPosts(data);
     } catch (error) {
       console.error('Error loading posts:', error);
@@ -118,11 +196,64 @@ export default function ForoPage() {
     setTrendingTags(data);
   }, []);
 
+  // Cargar stories
+  const loadStories = useCallback(async () => {
+    if (!user?.id) return;
+    const data = await forumService.getFollowingStories(user.id);
+    setStories(data);
+  }, [user?.id]);
+
+  // Cargar award types
+  const loadAwardTypes = useCallback(async () => {
+    const data = await forumService.getAwardTypes();
+    setAwardTypes(data);
+  }, []);
+
   useEffect(() => {
     loadPosts();
     loadCategories();
     loadTrendingTags();
-  }, [loadPosts, loadCategories, loadTrendingTags]);
+    loadStories();
+    loadAwardTypes();
+  }, [loadPosts, loadCategories, loadTrendingTags, loadStories, loadAwardTypes]);
+
+  // Search mentions
+  const searchMentions = useCallback(async (query: string) => {
+    if (query.length < 1) {
+      setMentionSuggestions([]);
+      return;
+    }
+    const suggestions = await forumService.searchUsersForMention(query);
+    setMentionSuggestions(suggestions);
+  }, []);
+
+  // Handle content change with mention detection
+  const handleContentChange = (value: string, cursorPos: number) => {
+    setNewPostContent(value);
+    setCursorPosition(cursorPos);
+
+    // Detect @ mentions
+    const beforeCursor = value.substring(0, cursorPos);
+    const mentionMatch = beforeCursor.match(/@(\w*)$/);
+
+    if (mentionMatch) {
+      setMentionQuery(mentionMatch[1]);
+      setShowMentions(true);
+      searchMentions(mentionMatch[1]);
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
+  };
+
+  // Insert mention
+  const insertMention = (username: string) => {
+    const beforeMention = newPostContent.substring(0, cursorPosition - mentionQuery.length - 1);
+    const afterMention = newPostContent.substring(cursorPosition);
+    setNewPostContent(`${beforeMention}@${username} ${afterMention}`);
+    setShowMentions(false);
+    setMentionQuery('');
+  };
 
   // Crear post
   const handleCreatePost = async () => {
@@ -131,7 +262,68 @@ export default function ForoPage() {
       return;
     }
 
-    if (!newPostContent.trim()) {
+    if (createMode === 'poll') {
+      if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) {
+        toast.error('La encuesta necesita pregunta y al menos 2 opciones');
+        return;
+      }
+
+      setCreating(true);
+      try {
+        const post = await forumService.createPostWithPoll(user.id, {
+          content: newPostContent || pollQuestion,
+          tags: newPostTags,
+          category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
+          poll: {
+            question: pollQuestion,
+            options: pollOptions.filter(o => o.trim()),
+            ends_in_hours: pollDuration,
+          },
+        });
+
+        if (post) {
+          toast.success('¡Encuesta creada!');
+          resetCreateModal();
+          loadPosts();
+        }
+      } catch (error) {
+        toast.error('Error al crear la encuesta');
+      } finally {
+        setCreating(false);
+      }
+      return;
+    }
+
+    if (createMode === 'thread') {
+      const validPosts = threadPosts.filter(p => p.trim());
+      if (validPosts.length < 2) {
+        toast.error('Un hilo necesita al menos 2 publicaciones');
+        return;
+      }
+
+      setCreating(true);
+      try {
+        const result = await forumService.createThread(
+          user.id,
+          newPostContent || 'Hilo',
+          validPosts.map(content => ({ content, tags: newPostTags }))
+        );
+
+        if (result.success) {
+          toast.success('¡Hilo creado!');
+          resetCreateModal();
+          loadPosts();
+        }
+      } catch (error) {
+        toast.error('Error al crear el hilo');
+      } finally {
+        setCreating(false);
+      }
+      return;
+    }
+
+    // Regular post
+    if (!newPostContent.trim() && !selectedGif) {
       toast.error('Escribe algo para publicar');
       return;
     }
@@ -142,13 +334,14 @@ export default function ForoPage() {
         content: newPostContent,
         tags: newPostTags,
         category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
+        gif_url: selectedGif?.url,
+        gif_width: selectedGif?.width,
+        gif_height: selectedGif?.height,
       });
 
       if (post) {
         toast.success('¡Publicación creada!');
-        setNewPostContent('');
-        setNewPostTags([]);
-        setIsCreateModalOpen(false);
+        resetCreateModal();
         loadPosts();
       } else {
         toast.error('Error al crear la publicación');
@@ -158,6 +351,18 @@ export default function ForoPage() {
     } finally {
       setCreating(false);
     }
+  };
+
+  const resetCreateModal = () => {
+    setNewPostContent('');
+    setNewPostTags([]);
+    setIsCreateModalOpen(false);
+    setSelectedImages([]);
+    setSelectedGif(null);
+    setCreateMode('post');
+    setPollQuestion('');
+    setPollOptions(['', '']);
+    setThreadPosts(['']);
   };
 
   // Cargar comentarios
@@ -198,9 +403,8 @@ export default function ForoPage() {
       if (comment) {
         setComments(prev => [...prev, comment]);
         setNewComment('');
-        // Actualizar contador en el post
-        setPosts(prev => prev.map(p => 
-          p.id === selectedPostId 
+        setPosts(prev => prev.map(p =>
+          p.id === selectedPostId
             ? { ...p, comments_count: (p.comments_count || 0) + 1 }
             : p
         ));
@@ -210,23 +414,6 @@ export default function ForoPage() {
       toast.error('Error al comentar');
     } finally {
       setSubmittingComment(false);
-    }
-  };
-
-  // Like post
-  const handleLikePost = async (postId: string) => {
-    if (!user?.id) {
-      router.push('/login');
-      return;
-    }
-
-    try {
-      const result = await forumService.toggleLikePost(postId, user.id);
-      setPosts(prev => prev.map(p => 
-        p.id === postId ? { ...p, likes_count: result.likesCount } : p
-      ));
-    } catch (error) {
-      console.error('Error liking post:', error);
     }
   };
 
@@ -351,8 +538,107 @@ export default function ForoPage() {
       window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
     }
 
-    // Track share
     forumService.trackShare(post.id, user?.id || null, type);
+  };
+
+  // Open award modal
+  const openAwardModal = (post: ForumPost) => {
+    if (!user?.id) {
+      router.push('/login');
+      return;
+    }
+    setAwardingPost(post);
+    setSelectedAward(null);
+    setAwardMessage('');
+    setAwardModalOpen(true);
+  };
+
+  // Give award
+  const handleGiveAward = async () => {
+    if (!user?.id || !awardingPost || !selectedAward) return;
+
+    setGivingAward(true);
+    try {
+      const result = await forumService.giveAward(
+        awardingPost.id,
+        selectedAward.id,
+        user.id,
+        awardMessage || undefined
+      );
+
+      if (result.success) {
+        toast.success(`¡Premio ${result.award_name} otorgado!`);
+        setAwardModalOpen(false);
+        setAwardingPost(null);
+        setSelectedAward(null);
+        setAwardMessage('');
+      } else {
+        toast.error(result.error || 'Error al dar premio');
+      }
+    } catch (error) {
+      toast.error('Error al dar premio');
+    } finally {
+      setGivingAward(false);
+    }
+  };
+
+  // Open stories
+  const openStories = (userStories: ForumStory[], startIndex: number = 0) => {
+    setViewingStories(userStories);
+    setCurrentStoryIndex(startIndex);
+    setStoryModalOpen(true);
+
+    // Mark as viewed
+    if (user?.id && userStories[startIndex]) {
+      forumService.viewStory(userStories[startIndex].id, user.id);
+    }
+  };
+
+  // Next/Prev story
+  const nextStory = () => {
+    if (currentStoryIndex < viewingStories.length - 1) {
+      const newIndex = currentStoryIndex + 1;
+      setCurrentStoryIndex(newIndex);
+      if (user?.id) {
+        forumService.viewStory(viewingStories[newIndex].id, user.id);
+      }
+    } else {
+      setStoryModalOpen(false);
+    }
+  };
+
+  const prevStory = () => {
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex(currentStoryIndex - 1);
+    }
+  };
+
+  // Create story
+  const handleCreateStory = async () => {
+    if (!user?.id) return;
+    if (!storyContent.trim()) {
+      toast.error('Escribe algo para tu historia');
+      return;
+    }
+
+    setCreatingStory(true);
+    try {
+      const result = await forumService.createStory(user.id, {
+        content: storyContent,
+        background_color: storyBgColor,
+      });
+
+      if (result.success) {
+        toast.success('¡Historia creada!');
+        setCreateStoryModalOpen(false);
+        setStoryContent('');
+        loadStories();
+      }
+    } catch (error) {
+      toast.error('Error al crear historia');
+    } finally {
+      setCreatingStory(false);
+    }
   };
 
   // Handle image selection
@@ -371,20 +657,107 @@ export default function ForoPage() {
 
   // Toggle tag en nuevo post
   const toggleTag = (tagId: string) => {
-    setNewPostTags(prev => 
-      prev.includes(tagId) 
+    setNewPostTags(prev =>
+      prev.includes(tagId)
         ? prev.filter(t => t !== tagId)
         : [...prev, tagId]
     );
   };
 
+  // Add poll option
+  const addPollOption = () => {
+    if (pollOptions.length < 6) {
+      setPollOptions([...pollOptions, '']);
+    }
+  };
+
+  // Remove poll option
+  const removePollOption = (index: number) => {
+    if (pollOptions.length > 2) {
+      setPollOptions(pollOptions.filter((_, i) => i !== index));
+    }
+  };
+
+  // Add thread post
+  const addThreadPost = () => {
+    if (threadPosts.length < 10) {
+      setThreadPosts([...threadPosts, '']);
+    }
+  };
+
   const selectedPost = posts.find(p => p.id === selectedPostId);
+
+  // Group stories by user
+  const groupedStories = stories.reduce((acc, story) => {
+    const key = story.user_id;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(story);
+    return acc;
+  }, {} as Record<string, ForumStory[]>);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
+        {/* Stories Section */}
+        {isAuthenticated && (Object.keys(groupedStories).length > 0 || true) && (
+          <div className="mb-8">
+            <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {/* Create Story Button */}
+              <button
+                onClick={() => setCreateStoryModalOpen(true)}
+                className="flex-shrink-0 flex flex-col items-center gap-2"
+              >
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 p-[2px]">
+                  <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                    <Plus className="w-6 h-6 text-purple-400" />
+                  </div>
+                </div>
+                <span className="text-xs text-gray-400">Tu historia</span>
+              </button>
+
+              {/* User Stories */}
+              {Object.entries(groupedStories).map(([userId, userStories]) => {
+                const hasUnviewed = userStories.some(s => !s.has_viewed);
+                const firstStory = userStories[0];
+                return (
+                  <button
+                    key={userId}
+                    onClick={() => openStories(userStories)}
+                    className="flex-shrink-0 flex flex-col items-center gap-2"
+                  >
+                    <div className={`w-16 h-16 rounded-full p-[2px] ${
+                      hasUnviewed
+                        ? 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500'
+                        : 'bg-gray-700'
+                    }`}>
+                      <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
+                        {firstStory?.user?.avatar_url ? (
+                          <img
+                            src={firstStory.user.avatar_url}
+                            alt=""
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold">
+                            {(firstStory?.user?.username || 'U')[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-400 truncate max-w-[64px]">
+                      {firstStory?.user?.username || 'Usuario'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
           <div className="flex-1">
@@ -420,7 +793,7 @@ export default function ForoPage() {
               <div className="flex bg-gray-900 border border-gray-800 rounded-lg p-1">
                 <button
                   onClick={() => setFilter('recent')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     filter === 'recent'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-400 hover:text-white'
@@ -430,31 +803,42 @@ export default function ForoPage() {
                   Recientes
                 </button>
                 <button
+                  onClick={() => setFilter('hot')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                    filter === 'hot'
+                      ? 'bg-orange-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <Flame className="w-4 h-4" />
+                  Hot
+                </button>
+                <button
+                  onClick={() => setFilter('rising')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                    filter === 'rising'
+                      ? 'bg-green-600 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Rising
+                </button>
+                <button
                   onClick={() => setFilter('popular')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     filter === 'popular'
                       ? 'bg-purple-600 text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
-                  <TrendingUp className="w-4 h-4" />
-                  Populares
-                </button>
-                <button
-                  onClick={() => setFilter('comments')}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                    filter === 'comments'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Más comentados
+                  <Sparkles className="w-4 h-4" />
+                  Top
                 </button>
                 {isAuthenticated && (
                   <button
                     onClick={() => setFilter('following')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                       filter === 'following'
                         ? 'bg-purple-600 text-white'
                         : 'text-gray-400 hover:text-white'
@@ -507,12 +891,12 @@ export default function ForoPage() {
                     post={post}
                     currentUserId={user?.id}
                     onOpenComments={openComments}
-                    onLike={handleLikePost}
                     onDelete={handleDeletePost}
                     onReaction={handleReaction}
                     onBookmark={handleBookmark}
                     onRepost={openRepostModal}
                     onShare={handleShare}
+                    onAward={openAwardModal}
                   />
                 ))}
               </div>
@@ -630,61 +1014,280 @@ export default function ForoPage() {
 
       {/* Create Post Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">Nueva Publicación</h2>
 
-          <textarea
-            value={newPostContent}
-            onChange={(e) => setNewPostContent(e.target.value)}
-            placeholder="¿Qué quieres compartir con la comunidad?"
-            rows={4}
-            className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-          />
+          {/* Post Type Selector */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setCreateMode('post')}
+              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                createMode === 'post'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Post
+            </button>
+            <button
+              onClick={() => setCreateMode('poll')}
+              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                createMode === 'poll'
+                  ? 'bg-orange-600 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Encuesta
+            </button>
+            <button
+              onClick={() => setCreateMode('thread')}
+              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+                createMode === 'thread'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              <ListPlus className="w-4 h-4" />
+              Hilo
+            </button>
+          </div>
 
-          {/* Image Preview */}
-          {selectedImages.length > 0 && (
-            <div className="flex gap-2 mt-3 flex-wrap">
-              {selectedImages.map((file, index) => (
-                <div key={index} className="relative group">
+          {/* Regular Post Content */}
+          {createMode === 'post' && (
+            <>
+              <div className="relative">
+                <textarea
+                  value={newPostContent}
+                  onChange={(e) => handleContentChange(e.target.value, e.target.selectionStart)}
+                  placeholder="¿Qué quieres compartir con la comunidad? Usa @ para mencionar usuarios"
+                  rows={4}
+                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                />
+
+                {/* Mention Suggestions */}
+                {showMentions && mentionSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
+                    {mentionSuggestions.map((user) => (
+                      <button
+                        key={user.id}
+                        onClick={() => insertMention(user.username)}
+                        className="w-full px-4 py-2 flex items-center gap-3 hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold">
+                          {user.username[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">@{user.username}</span>
+                            {user.badges?.map((badge, i) => (
+                              <span key={i} className={`text-xs ${BADGE_STYLES[badge]?.color}`}>
+                                {BADGE_STYLES[badge]?.icon}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* GIF Preview */}
+              {selectedGif && (
+                <div className="relative mt-3">
                   <img
-                    src={URL.createObjectURL(file)}
-                    alt={`Preview ${index + 1}`}
-                    className="w-20 h-20 object-cover rounded-lg border border-gray-700"
+                    src={selectedGif.url}
+                    alt="GIF"
+                    className="max-h-48 rounded-lg"
                   />
                   <button
-                    onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => setSelectedGif(null)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-gray-900/80 rounded-full flex items-center justify-center text-white hover:bg-gray-900"
                   >
-                    ×
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
-              ))}
+              )}
+
+              {/* Image Preview */}
+              {selectedImages.length > 0 && (
+                <div className="flex gap-2 mt-3 flex-wrap">
+                  {selectedImages.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Preview ${index + 1}`}
+                        className="w-20 h-20 object-cover rounded-lg border border-gray-700"
+                      />
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Media buttons */}
+              <div className="flex items-center gap-2 mt-3 pb-3 border-b border-gray-800">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageSelect}
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={selectedImages.length >= 4}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
+                >
+                  <ImageIcon className="w-5 h-5" />
+                  Imagen
+                </button>
+                <button
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                >
+                  GIF
+                </button>
+                <button
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                >
+                  <AtSign className="w-5 h-5" />
+                  Mención
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Poll Creation */}
+          {createMode === 'poll' && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Pregunta de la encuesta</label>
+                <input
+                  type="text"
+                  value={pollQuestion}
+                  onChange={(e) => setPollQuestion(e.target.value)}
+                  placeholder="¿Qué quieres preguntar?"
+                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Opciones</label>
+                <div className="space-y-2">
+                  {pollOptions.map((option, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={option}
+                        onChange={(e) => {
+                          const newOptions = [...pollOptions];
+                          newOptions[index] = e.target.value;
+                          setPollOptions(newOptions);
+                        }}
+                        placeholder={`Opción ${index + 1}`}
+                        className="flex-1 p-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                      {pollOptions.length > 2 && (
+                        <button
+                          onClick={() => removePollOption(index)}
+                          className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {pollOptions.length < 6 && (
+                  <button
+                    onClick={addPollOption}
+                    className="mt-2 text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Añadir opción
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Duración</label>
+                <select
+                  value={pollDuration}
+                  onChange={(e) => setPollDuration(Number(e.target.value))}
+                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  <option value={1}>1 hora</option>
+                  <option value={6}>6 horas</option>
+                  <option value={12}>12 horas</option>
+                  <option value={24}>24 horas</option>
+                  <option value={48}>2 días</option>
+                  <option value={168}>1 semana</option>
+                </select>
+              </div>
             </div>
           )}
 
-          {/* Media buttons */}
-          <div className="flex items-center gap-2 mt-3 pb-3 border-b border-gray-800">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageSelect}
-              accept="image/*"
-              multiple
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={selectedImages.length >= 4}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
-            >
-              <ImageIcon className="w-5 h-5" />
-              Imagen
-            </button>
-            <span className="text-xs text-gray-500">
-              {selectedImages.length}/4 imágenes
-            </span>
-          </div>
+          {/* Thread Creation */}
+          {createMode === 'thread' && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Título del hilo (opcional)</label>
+                <input
+                  type="text"
+                  value={newPostContent}
+                  onChange={(e) => setNewPostContent(e.target.value)}
+                  placeholder="Título de tu hilo..."
+                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
+              <div>
+                <label className="text-sm text-gray-400 mb-2 block">Publicaciones del hilo</label>
+                <div className="space-y-3">
+                  {threadPosts.map((post, index) => (
+                    <div key={index} className="relative">
+                      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-blue-500/30" />
+                      <div className="flex gap-3 items-start">
+                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold z-10">
+                          {index + 1}
+                        </div>
+                        <textarea
+                          value={post}
+                          onChange={(e) => {
+                            const newPosts = [...threadPosts];
+                            newPosts[index] = e.target.value;
+                            setThreadPosts(newPosts);
+                          }}
+                          placeholder={`Publicación ${index + 1}...`}
+                          rows={3}
+                          className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {threadPosts.length < 10 && (
+                  <button
+                    onClick={addThreadPost}
+                    className="mt-3 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Añadir al hilo
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
           <div className="mt-4">
             <p className="text-sm text-gray-400 mb-2">Etiquetas (opcional)</p>
             <div className="flex flex-wrap gap-2">
@@ -707,18 +1310,21 @@ export default function ForoPage() {
           <div className="flex justify-end gap-3 mt-6">
             <Button
               variant="outline"
-              onClick={() => {
-                setIsCreateModalOpen(false);
-                setSelectedImages([]);
-              }}
+              onClick={resetCreateModal}
               className="border-gray-700"
             >
               Cancelar
             </Button>
             <Button
               onClick={handleCreatePost}
-              disabled={creating || !newPostContent.trim()}
-              className="bg-purple-600 hover:bg-purple-700"
+              disabled={creating}
+              className={
+                createMode === 'poll'
+                  ? 'bg-orange-600 hover:bg-orange-700'
+                  : createMode === 'thread'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-purple-600 hover:bg-purple-700'
+              }
             >
               {creating ? (
                 <>
@@ -726,6 +1332,8 @@ export default function ForoPage() {
                   Publicando...
                 </>
               ) : (
+                createMode === 'poll' ? 'Crear Encuesta' :
+                createMode === 'thread' ? 'Publicar Hilo' :
                 'Publicar'
               )}
             </Button>
@@ -829,7 +1437,6 @@ export default function ForoPage() {
 
           {repostingPost && (
             <>
-              {/* Original post preview */}
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 mb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold">
@@ -842,7 +1449,6 @@ export default function ForoPage() {
                 <p className="text-gray-300 text-sm line-clamp-3">{repostingPost.content}</p>
               </div>
 
-              {/* Quote option */}
               <div className="mb-4">
                 <label className="text-sm text-gray-400 mb-2 block">
                   Añadir comentario (opcional)
@@ -879,6 +1485,229 @@ export default function ForoPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Award Modal */}
+      <Dialog open={awardModalOpen} onOpenChange={setAwardModalOpen}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <Gift className="w-5 h-5 text-yellow-400" />
+            Dar Premio
+          </h2>
+
+          {awardingPost && (
+            <>
+              <div className="bg-gray-800/50 rounded-lg p-3 mb-4 border border-gray-700">
+                <p className="text-gray-300 text-sm line-clamp-2">{awardingPost.content}</p>
+                <span className="text-xs text-gray-500 mt-1 block">
+                  Por @{awardingPost.author?.username}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {awardTypes.map((award) => (
+                  <button
+                    key={award.id}
+                    onClick={() => setSelectedAward(award)}
+                    className={`p-3 rounded-lg border transition-all text-left ${
+                      selectedAward?.id === award.id
+                        ? 'border-yellow-500 bg-yellow-500/10'
+                        : 'border-gray-700 hover:border-gray-600'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xl">{award.icon}</span>
+                      <span className="font-medium" style={{ color: award.color }}>
+                        {award.name}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">{award.description}</p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-yellow-400">{award.ap_cost} AP</span>
+                      <span className="text-gray-600">→</span>
+                      <span className="text-green-400">+{award.ap_reward} para autor</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {selectedAward && (
+                <div className="mb-4">
+                  <label className="text-sm text-gray-400 mb-2 block">
+                    Mensaje (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={awardMessage}
+                    onChange={(e) => setAwardMessage(e.target.value)}
+                    placeholder="Añadir un mensaje..."
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                  />
+                </div>
+              )}
+
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setAwardModalOpen(false)}
+                  className="border-gray-700"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handleGiveAward}
+                  disabled={givingAward || !selectedAward}
+                  className="bg-yellow-600 hover:bg-yellow-700"
+                >
+                  {givingAward ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <Gift className="w-4 h-4 mr-2" />
+                  )}
+                  Dar {selectedAward?.name || 'Premio'}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Stories Viewer Modal */}
+      <Dialog open={storyModalOpen} onOpenChange={setStoryModalOpen}>
+        <DialogContent className="bg-transparent border-none max-w-md p-0 shadow-none">
+          {viewingStories.length > 0 && viewingStories[currentStoryIndex] && (
+            <div
+              className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden"
+              style={{ backgroundColor: viewingStories[currentStoryIndex].background_color }}
+            >
+              {/* Progress bars */}
+              <div className="absolute top-4 left-4 right-4 flex gap-1 z-10">
+                {viewingStories.map((_, index) => (
+                  <div key={index} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full bg-white transition-all duration-300 ${
+                        index < currentStoryIndex ? 'w-full' :
+                        index === currentStoryIndex ? 'w-full' : 'w-0'
+                      }`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* User info */}
+              <div className="absolute top-10 left-4 right-4 flex items-center gap-3 z-10">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
+                  {viewingStories[currentStoryIndex].user?.username?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <p className="text-white font-medium">
+                    {viewingStories[currentStoryIndex].user?.username || 'Usuario'}
+                  </p>
+                  <p className="text-white/60 text-xs">
+                    {formatDistanceToNow(new Date(viewingStories[currentStoryIndex].created_at), { addSuffix: true, locale: es })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setStoryModalOpen(false)}
+                  className="ml-auto text-white/80 hover:text-white"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Story content */}
+              <div className="absolute inset-0 flex items-center justify-center p-8">
+                {viewingStories[currentStoryIndex].media_url ? (
+                  <img
+                    src={viewingStories[currentStoryIndex].media_url}
+                    alt=""
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <p
+                    className="text-2xl font-bold text-center"
+                    style={{ color: viewingStories[currentStoryIndex].text_color }}
+                  >
+                    {viewingStories[currentStoryIndex].content}
+                  </p>
+                )}
+              </div>
+
+              {/* Navigation */}
+              <button
+                onClick={prevStory}
+                className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
+              />
+              <button
+                onClick={nextStory}
+                className="absolute right-0 top-0 bottom-0 w-2/3 z-10"
+              />
+
+              {/* Views count */}
+              <div className="absolute bottom-4 left-4 flex items-center gap-2 text-white/60 text-sm">
+                <Eye className="w-4 h-4" />
+                {viewingStories[currentStoryIndex].views_count} vistas
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Story Modal */}
+      <Dialog open={createStoryModalOpen} onOpenChange={setCreateStoryModalOpen}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+          <h2 className="text-xl font-bold mb-4">Crear Historia</h2>
+
+          <div
+            className="aspect-[9/16] rounded-xl mb-4 flex items-center justify-center p-8"
+            style={{ backgroundColor: storyBgColor }}
+          >
+            <textarea
+              value={storyContent}
+              onChange={(e) => setStoryContent(e.target.value)}
+              placeholder="Escribe tu historia..."
+              className="w-full text-center text-xl font-bold bg-transparent border-none text-white placeholder-white/50 focus:outline-none resize-none"
+              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+              rows={4}
+            />
+          </div>
+
+          {/* Color picker */}
+          <div className="flex gap-2 mb-4">
+            {['#1a1a2e', '#9B59B6', '#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#1ABC9C', '#E91E63'].map((color) => (
+              <button
+                key={color}
+                onClick={() => setStoryBgColor(color)}
+                className={`w-8 h-8 rounded-full border-2 ${
+                  storyBgColor === color ? 'border-white' : 'border-transparent'
+                }`}
+                style={{ backgroundColor: color }}
+              />
+            ))}
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setCreateStoryModalOpen(false)}
+              className="flex-1 border-gray-700"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleCreateStory}
+              disabled={creatingStory || !storyContent.trim()}
+              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              {creatingStory ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Zap className="w-4 h-4 mr-2" />
+              )}
+              Publicar Historia
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -888,22 +1717,22 @@ function PostCard({
   post,
   currentUserId,
   onOpenComments,
-  onLike,
   onDelete,
   onReaction,
   onBookmark,
   onRepost,
   onShare,
+  onAward,
 }: {
   post: ForumPost;
   currentUserId?: string;
   onOpenComments: (postId: string) => void;
-  onLike: (postId: string) => void;
   onDelete: (postId: string) => void;
   onReaction: (postId: string, reactionType: ReactionType) => void;
   onBookmark: (postId: string) => void;
   onRepost: (post: ForumPost) => void;
   onShare: (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp') => void;
+  onAward: (post: ForumPost) => void;
 }) {
   const [showReactions, setShowReactions] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -926,6 +1755,14 @@ function PostCard({
 
   return (
     <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
+      {/* Thread indicator */}
+      {post.thread_id && (
+        <div className="flex items-center gap-2 text-blue-400 text-sm mb-3">
+          <ListPlus className="w-4 h-4" />
+          <span>Hilo {post.thread_position}/{post.thread?.total_posts || '?'}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -937,6 +1774,16 @@ function PostCard({
               <span className="font-semibold">
                 {post.author?.display_name || post.author?.username}
               </span>
+              {/* Badges */}
+              {post.author?.badges?.map((badge, i) => (
+                <span
+                  key={i}
+                  className={`text-xs px-1.5 py-0.5 rounded ${BADGE_STYLES[badge]?.bg} ${BADGE_STYLES[badge]?.color}`}
+                  title={badge}
+                >
+                  {BADGE_STYLES[badge]?.icon}
+                </span>
+              ))}
               {post.author?.level && (
                 <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded">
                   Lvl {post.author.level}
@@ -953,18 +1800,64 @@ function PostCard({
           </div>
         </div>
 
-        {isAuthor && (
-          <button
-            onClick={() => onDelete(post.id)}
-            className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Award button */}
+          {!isAuthor && currentUserId && (
+            <button
+              onClick={() => onAward(post)}
+              className="p-2 text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-colors"
+              title="Dar premio"
+            >
+              <Gift className="w-4 h-4" />
+            </button>
+          )}
+          {isAuthor && (
+            <button
+              onClick={() => onDelete(post.id)}
+              className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Awards display */}
+      {post.awards && post.awards.length > 0 && (
+        <div className="flex items-center gap-1 mb-3">
+          {post.awards.slice(0, 5).map((award) => (
+            <span
+              key={award.id}
+              className="text-lg"
+              title={`${award.award_type.name} de @${award.giver.username}`}
+            >
+              {award.award_type.icon}
+            </span>
+          ))}
+          {post.awards.length > 5 && (
+            <span className="text-xs text-gray-500">+{post.awards.length - 5}</span>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <p className="text-gray-200 mb-4 whitespace-pre-wrap">{post.content}</p>
+
+      {/* GIF */}
+      {post.gif_url && (
+        <div className="mb-4 rounded-xl overflow-hidden">
+          <img
+            src={post.gif_url}
+            alt="GIF"
+            className="max-h-80 w-auto"
+          />
+        </div>
+      )}
+
+      {/* Poll */}
+      {post.poll && (
+        <PollDisplay poll={post.poll} postId={post.id} currentUserId={currentUserId} />
+      )}
 
       {/* Tags */}
       {post.tags && post.tags.length > 0 && (
@@ -1112,6 +2005,112 @@ function PostCard({
         {/* Views */}
         <span className="text-gray-500 text-sm">
           {post.views_count || 0} vistas
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// Poll Display Component
+function PollDisplay({
+  poll,
+  postId,
+  currentUserId
+}: {
+  poll: ForumPoll;
+  postId: string;
+  currentUserId?: string;
+}) {
+  const [localPoll, setLocalPoll] = useState(poll);
+  const [voting, setVoting] = useState(false);
+
+  const handleVote = async (optionId: string) => {
+    if (!currentUserId || localPoll.has_voted || voting) return;
+
+    setVoting(true);
+    try {
+      const result = await forumService.voteOnPoll(localPoll.id, optionId, currentUserId);
+      if (result.success && result.options) {
+        setLocalPoll(prev => ({
+          ...prev,
+          has_voted: true,
+          user_votes: [optionId],
+          options: result.options!,
+          total_votes: result.options!.reduce((sum, opt) => sum + opt.votes_count, 0),
+        }));
+        toast.success('¡Voto registrado!');
+      }
+    } catch (error) {
+      toast.error('Error al votar');
+    } finally {
+      setVoting(false);
+    }
+  };
+
+  const isExpired = new Date(localPoll.ends_at) < new Date();
+  const showResults = localPoll.has_voted || isExpired;
+
+  return (
+    <div className="bg-gray-800/50 rounded-xl p-4 mb-4 border border-gray-700">
+      <div className="flex items-center gap-2 mb-3">
+        <BarChart3 className="w-5 h-5 text-orange-400" />
+        <span className="font-medium">{localPoll.question}</span>
+      </div>
+
+      <div className="space-y-2">
+        {localPoll.options.map((option) => {
+          const percentage = localPoll.total_votes > 0
+            ? Math.round((option.votes_count / localPoll.total_votes) * 100)
+            : 0;
+          const isSelected = localPoll.user_votes?.includes(option.id);
+
+          return (
+            <button
+              key={option.id}
+              onClick={() => handleVote(option.id)}
+              disabled={showResults || voting || !currentUserId}
+              className={`w-full text-left rounded-lg overflow-hidden transition-all ${
+                showResults
+                  ? 'cursor-default'
+                  : 'hover:bg-gray-700/50 cursor-pointer'
+              }`}
+            >
+              <div className="relative p-3 border border-gray-700 rounded-lg">
+                {showResults && (
+                  <div
+                    className="absolute inset-0 bg-orange-500/20 rounded-lg transition-all"
+                    style={{ width: `${percentage}%` }}
+                  />
+                )}
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {isSelected && (
+                      <Check className="w-4 h-4 text-orange-400" />
+                    )}
+                    <span className={isSelected ? 'text-orange-400 font-medium' : ''}>
+                      {option.option_text}
+                    </span>
+                  </div>
+                  {showResults && (
+                    <span className="text-sm text-gray-400">
+                      {percentage}%
+                    </span>
+                  )}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+        <span>{localPoll.total_votes} {localPoll.total_votes === 1 ? 'voto' : 'votos'}</span>
+        <span>
+          {isExpired ? (
+            'Encuesta finalizada'
+          ) : (
+            `Termina ${formatDistanceToNow(new Date(localPoll.ends_at), { addSuffix: true, locale: es })}`
+          )}
         </span>
       </div>
     </div>
