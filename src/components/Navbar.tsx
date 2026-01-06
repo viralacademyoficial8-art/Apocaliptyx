@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, BarChart3 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function Navbar() {
@@ -72,10 +72,12 @@ export function Navbar() {
   const navItems = [
   { href: "/dashboard", label: t("nav.home") },
   { href: "/explorar", label: "Escenarios" },
-  { href: "/tienda", label: t("nav.shop") },
-  { href: "/leaderboard", label: t("nav.rankings") },
   { href: "/foro", label: t("nav.forum") },
-  { href: "/crear", label: "Crear Escenario" },
+  { href: "/comunidades", label: "Comunidades", icon: <Users className="w-4 h-4" /> },
+  { href: "/reels", label: "Reels", icon: <Film className="w-4 h-4" />, highlight: true },
+  { href: "/streaming", label: "En Vivo", icon: <Radio className="w-4 h-4" /> },
+  { href: "/torneos", label: "Torneos", icon: <Trophy className="w-4 h-4" /> },
+  { href: "/tienda", label: t("nav.shop") },
 ];
 
   const handleLogout = async () => {
@@ -105,22 +107,25 @@ export function Navbar() {
             </div>
 
             {/* Navegación desktop */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={`
-                      px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                      px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
                       ${
                         isActive
                           ? "bg-muted text-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                          : item.highlight
+                            ? "text-pink-400 hover:text-pink-300 hover:bg-pink-500/10"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                       }
                     `}
                   >
+                    {item.icon}
                     {item.label}
                   </Link>
                 );
@@ -255,6 +260,52 @@ export function Navbar() {
                         >
                           <Settings className="mr-2 h-4 w-4" />
                           {t("nav.settings")}
+                        </DropdownMenuItem>
+
+                        {/* Separador - Social */}
+                        <div className="my-1 h-px bg-border" />
+                        <div className="px-2 py-1">
+                          <span className="text-xs text-muted-foreground font-medium">Social</span>
+                        </div>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/comunidades")}
+                          className="cursor-pointer hover:bg-muted"
+                        >
+                          <Users className="mr-2 h-4 w-4 text-blue-400" />
+                          Comunidades
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/reels")}
+                          className="cursor-pointer hover:bg-pink-500/10"
+                        >
+                          <Film className="mr-2 h-4 w-4 text-pink-400" />
+                          Reels
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/streaming")}
+                          className="cursor-pointer hover:bg-red-500/10"
+                        >
+                          <Radio className="mr-2 h-4 w-4 text-red-400" />
+                          En Vivo
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/coleccionables")}
+                          className="cursor-pointer hover:bg-yellow-500/10"
+                        >
+                          <Sparkles className="mr-2 h-4 w-4 text-yellow-400" />
+                          Coleccionables
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/torneos")}
+                          className="cursor-pointer hover:bg-orange-500/10"
+                        >
+                          <Trophy className="mr-2 h-4 w-4 text-orange-400" />
+                          Torneos
                         </DropdownMenuItem>
 
                         {/* Separador */}
