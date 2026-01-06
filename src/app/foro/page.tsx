@@ -52,6 +52,9 @@ import {
   Award,
   ListPlus,
   AtSign,
+  Video,
+  Radio,
+  Globe,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
@@ -171,6 +174,9 @@ export default function ForoPage() {
   // Create Story Modal
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false);
   const [storiesKey, setStoriesKey] = useState(0); // For refreshing StoriesBar
+
+  // Tab navigation for social hub
+  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>('feed');
 
   // Cargar posts
   const loadPosts = useCallback(async () => {
@@ -661,6 +667,58 @@ export default function ForoPage() {
           />
         )}
 
+        {/* Social Hub Tabs */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
+          <button
+            onClick={() => setActiveTab('feed')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'feed'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+            }`}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Feed
+          </button>
+          <button
+            onClick={() => setActiveTab('reels')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'reels'
+                ? 'bg-pink-600 text-white shadow-lg shadow-pink-500/25'
+                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+            }`}
+          >
+            <Video className="w-4 h-4" />
+            Reels
+          </button>
+          <button
+            onClick={() => setActiveTab('lives')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all relative ${
+              activeTab === 'lives'
+                ? 'bg-red-600 text-white shadow-lg shadow-red-500/25'
+                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+            }`}
+          >
+            <Radio className="w-4 h-4" />
+            Lives
+            {/* Live indicator dot */}
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+          </button>
+          <button
+            onClick={() => setActiveTab('comunidades')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'comunidades'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            Comunidades
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'feed' && (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
           <div className="flex-1">
@@ -913,6 +971,186 @@ export default function ForoPage() {
             </div>
           </div>
         </div>
+        )}
+
+        {/* Reels Tab */}
+        {activeTab === 'reels' && (
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold flex items-center gap-3">
+                  <Video className="w-7 h-7 text-pink-400" />
+                  Reels
+                </h2>
+                <p className="text-gray-400 mt-1">Videos cortos de predicciones y análisis</p>
+              </div>
+              {isAuthenticated && (
+                <Button className="bg-pink-600 hover:bg-pink-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Crear Reel
+                </Button>
+              )}
+            </div>
+
+            {/* Reels Feed Placeholder - Will be integrated */}
+            <div className="space-y-4">
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8 text-center">
+                <Video className="w-16 h-16 text-pink-400/50 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Reels próximamente</h3>
+                <p className="text-gray-400 mb-4">
+                  Comparte videos cortos de tus predicciones y análisis con la comunidad
+                </p>
+                <Button variant="outline" className="border-pink-500/50 text-pink-400 hover:bg-pink-500/10">
+                  Explorar Reels
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Lives Tab */}
+        {activeTab === 'lives' && (
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold flex items-center gap-3">
+                  <Radio className="w-7 h-7 text-red-400" />
+                  Transmisiones en Vivo
+                </h2>
+                <p className="text-gray-400 mt-1">Mira y crea streams de predicciones en tiempo real</p>
+              </div>
+              {isAuthenticated && (
+                <Button className="bg-red-600 hover:bg-red-700">
+                  <Radio className="w-4 h-4 mr-2" />
+                  Iniciar Stream
+                </Button>
+              )}
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                <div className="flex items-center gap-2 text-red-400 mb-1">
+                  <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  <span className="text-sm">En vivo ahora</span>
+                </div>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                <div className="flex items-center gap-2 text-gray-400 mb-1">
+                  <Users className="w-4 h-4" />
+                  <span className="text-sm">Espectadores</span>
+                </div>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                <div className="flex items-center gap-2 text-gray-400 mb-1">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-sm">Más visto hoy</span>
+                </div>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                <div className="flex items-center gap-2 text-gray-400 mb-1">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-sm">Streams hoy</span>
+                </div>
+                <p className="text-2xl font-bold">0</p>
+              </div>
+            </div>
+
+            {/* Lives Grid Placeholder */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+              <Radio className="w-16 h-16 text-red-400/50 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No hay streams en vivo</h3>
+              <p className="text-gray-400 mb-4">
+                Sé el primero en iniciar una transmisión y compartir tus predicciones
+              </p>
+              {isAuthenticated && (
+                <Button className="bg-red-600 hover:bg-red-700">
+                  <Radio className="w-4 h-4 mr-2" />
+                  Iniciar mi primer stream
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Comunidades Tab */}
+        {activeTab === 'comunidades' && (
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold flex items-center gap-3">
+                  <Users className="w-7 h-7 text-blue-400" />
+                  Comunidades
+                </h2>
+                <p className="text-gray-400 mt-1">Únete a grupos de predicciones y comparte con otros profetas</p>
+              </div>
+              {isAuthenticated && (
+                <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Crear Comunidad
+                </Button>
+              )}
+            </div>
+
+            {/* Filter buttons */}
+            <div className="flex gap-2 mb-6">
+              <Button variant="outline" className="border-blue-500/50 bg-blue-500/10 text-blue-400">
+                Todas
+              </Button>
+              <Button variant="outline" className="border-gray-700 text-gray-400 hover:text-white">
+                Mis Comunidades
+              </Button>
+              <Button variant="outline" className="border-gray-700 text-gray-400 hover:text-white">
+                <TrendingUp className="w-4 h-4 mr-1" />
+                Populares
+              </Button>
+            </div>
+
+            {/* Communities Grid Placeholder */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Placeholder communities */}
+              {['Deportes MX', 'Política 2026', 'Tech & Crypto', 'Entretenimiento', 'eSports', 'Economía Global'].map((name, i) => (
+                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors cursor-pointer">
+                  <div className={`h-20 bg-gradient-to-r ${
+                    i % 6 === 0 ? 'from-green-600 to-emerald-600' :
+                    i % 6 === 1 ? 'from-red-600 to-orange-600' :
+                    i % 6 === 2 ? 'from-purple-600 to-pink-600' :
+                    i % 6 === 3 ? 'from-yellow-600 to-amber-600' :
+                    i % 6 === 4 ? 'from-blue-600 to-cyan-600' :
+                    'from-indigo-600 to-violet-600'
+                  }`} />
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg bg-gradient-to-br ${
+                        i % 6 === 0 ? 'from-green-500 to-emerald-600' :
+                        i % 6 === 1 ? 'from-red-500 to-orange-600' :
+                        i % 6 === 2 ? 'from-purple-500 to-pink-600' :
+                        i % 6 === 3 ? 'from-yellow-500 to-amber-600' :
+                        i % 6 === 4 ? 'from-blue-500 to-cyan-600' :
+                        'from-indigo-500 to-violet-600'
+                      }`}>
+                        {name[0]}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{name}</h3>
+                        <p className="text-xs text-gray-500">{Math.floor(Math.random() * 5000 + 500)} miembros</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+                      Comunidad de predicciones sobre {name.toLowerCase()}. Únete y comparte tus análisis.
+                    </p>
+                    <Button size="sm" variant="outline" className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
+                      Unirse
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Create Post Modal */}
