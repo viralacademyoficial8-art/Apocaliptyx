@@ -243,6 +243,29 @@ class ScenariosService {
   }
 
   /**
+   * Obtener escenarios que posee un usuario (current_holder_id)
+   */
+  async getByHolder(holderId: string): Promise<ScenarioFromDB[]> {
+    try {
+      const { data, error } = await supabase
+        .from("scenarios")
+        .select("*")
+        .eq("current_holder_id", holderId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching held scenarios:", error);
+        return [];
+      }
+
+      return data as ScenarioFromDB[];
+    } catch (error) {
+      console.error("Error in getByHolder:", error);
+      return [];
+    }
+  }
+
+  /**
    * Obtener escenarios destacados
    */
   async getFeatured(): Promise<ScenarioFromDB[]> {
