@@ -57,6 +57,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
+import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories';
 
 // Reaction definitions
 const REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[] = [
@@ -146,16 +147,30 @@ export default function ForoPage() {
   const [awardMessage, setAwardMessage] = useState('');
   const [givingAward, setGivingAward] = useState(false);
 
-  // Stories Modal
-  const [storyModalOpen, setStoryModalOpen] = useState(false);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  const [viewingStories, setViewingStories] = useState<ForumStory[]>([]);
+  // Stories Modal - New Instagram-style components
+  const [storyViewerOpen, setStoryViewerOpen] = useState(false);
+  const [viewingUserStories, setViewingUserStories] = useState<{
+    userId: string;
+    username?: string;
+    displayName?: string;
+    avatarUrl?: string;
+    hasUnviewed: boolean;
+    storiesCount: number;
+    stories: {
+      id: string;
+      content?: string;
+      mediaUrl?: string;
+      mediaType?: string;
+      backgroundColor?: string;
+      textColor?: string;
+      createdAt: string;
+      isViewed: boolean;
+    }[];
+  } | null>(null);
 
   // Create Story Modal
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false);
-  const [storyContent, setStoryContent] = useState('');
-  const [storyBgColor, setStoryBgColor] = useState('#1a1a2e');
-  const [creatingStory, setCreatingStory] = useState(false);
+  const [storiesKey, setStoriesKey] = useState(0); // For refreshing StoriesBar
 
   // Cargar posts
   const loadPosts = useCallback(async () => {
@@ -582,65 +597,6 @@ export default function ForoPage() {
     }
   };
 
-  // Open stories
-  const openStories = (userStories: ForumStory[], startIndex: number = 0) => {
-    setViewingStories(userStories);
-    setCurrentStoryIndex(startIndex);
-    setStoryModalOpen(true);
-
-    // Mark as viewed
-    if (user?.id && userStories[startIndex]) {
-      forumService.viewStory(userStories[startIndex].id, user.id);
-    }
-  };
-
-  // Next/Prev story
-  const nextStory = () => {
-    if (currentStoryIndex < viewingStories.length - 1) {
-      const newIndex = currentStoryIndex + 1;
-      setCurrentStoryIndex(newIndex);
-      if (user?.id) {
-        forumService.viewStory(viewingStories[newIndex].id, user.id);
-      }
-    } else {
-      setStoryModalOpen(false);
-    }
-  };
-
-  const prevStory = () => {
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex(currentStoryIndex - 1);
-    }
-  };
-
-  // Create story
-  const handleCreateStory = async () => {
-    if (!user?.id) return;
-    if (!storyContent.trim()) {
-      toast.error('Escribe algo para tu historia');
-      return;
-    }
-
-    setCreatingStory(true);
-    try {
-      const result = await forumService.createStory(user.id, {
-        content: storyContent,
-        background_color: storyBgColor,
-      });
-
-      if (result.success) {
-        toast.success('¡Historia creada!');
-        setCreateStoryModalOpen(false);
-        setStoryContent('');
-        loadStories();
-      }
-    } catch (error) {
-      toast.error('Error al crear historia');
-    } finally {
-      setCreatingStory(false);
-    }
-  };
-
   // Handle image selection
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -687,75 +643,22 @@ export default function ForoPage() {
 
   const selectedPost = posts.find(p => p.id === selectedPostId);
 
-  // Group stories by user
-  const groupedStories = stories.reduce((acc, story) => {
-    const key = story.user_id;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(story);
-    return acc;
-  }, {} as Record<string, ForumStory[]>);
-
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stories Section */}
-        {isAuthenticated && (Object.keys(groupedStories).length > 0 || true) && (
-          <div className="mb-8">
-            <div className="flex items-center gap-4 overflow-x-auto pb-4 scrollbar-hide">
-              {/* Create Story Button */}
-              <button
-                onClick={() => setCreateStoryModalOpen(true)}
-                className="flex-shrink-0 flex flex-col items-center gap-2"
-              >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 p-[2px]">
-                  <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                    <Plus className="w-6 h-6 text-purple-400" />
-                  </div>
-                </div>
-                <span className="text-xs text-gray-400">Tu historia</span>
-              </button>
-
-              {/* User Stories */}
-              {Object.entries(groupedStories).map(([userId, userStories]) => {
-                const hasUnviewed = userStories.some(s => !s.has_viewed);
-                const firstStory = userStories[0];
-                return (
-                  <button
-                    key={userId}
-                    onClick={() => openStories(userStories)}
-                    className="flex-shrink-0 flex flex-col items-center gap-2"
-                  >
-                    <div className={`w-16 h-16 rounded-full p-[2px] ${
-                      hasUnviewed
-                        ? 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500'
-                        : 'bg-gray-700'
-                    }`}>
-                      <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
-                        {firstStory?.user?.avatar_url ? (
-                          <img
-                            src={firstStory.user.avatar_url}
-                            alt=""
-                            className="w-full h-full rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold">
-                            {(firstStory?.user?.username || 'U')[0].toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-xs text-gray-400 truncate max-w-[64px]">
-                      {firstStory?.user?.username || 'Usuario'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        {/* Stories Section - Instagram Style */}
+        {isAuthenticated && (
+          <StoriesBar
+            key={storiesKey}
+            currentUserId={user?.id}
+            onCreateStory={() => setCreateStoryModalOpen(true)}
+            onViewStories={(userStories) => {
+              setViewingUserStories(userStories);
+              setStoryViewerOpen(true);
+            }}
+          />
         )}
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -1571,143 +1474,31 @@ export default function ForoPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Stories Viewer Modal */}
-      <Dialog open={storyModalOpen} onOpenChange={setStoryModalOpen}>
-        <DialogContent className="bg-transparent border-none max-w-md p-0 shadow-none">
-          {viewingStories.length > 0 && viewingStories[currentStoryIndex] && (
-            <div
-              className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden"
-              style={{ backgroundColor: viewingStories[currentStoryIndex].background_color }}
-            >
-              {/* Progress bars */}
-              <div className="absolute top-4 left-4 right-4 flex gap-1 z-10">
-                {viewingStories.map((_, index) => (
-                  <div key={index} className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full bg-white transition-all duration-300 ${
-                        index < currentStoryIndex ? 'w-full' :
-                        index === currentStoryIndex ? 'w-full' : 'w-0'
-                      }`}
-                    />
-                  </div>
-                ))}
-              </div>
+      {/* Stories Viewer Modal - Instagram Style */}
+      {storyViewerOpen && viewingUserStories && (
+        <StoryViewer
+          userStories={viewingUserStories}
+          currentUserId={user?.id}
+          onClose={() => {
+            setStoryViewerOpen(false);
+            setViewingUserStories(null);
+            // Refresh stories bar after viewing
+            setStoriesKey(prev => prev + 1);
+          }}
+        />
+      )}
 
-              {/* User info */}
-              <div className="absolute top-10 left-4 right-4 flex items-center gap-3 z-10">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
-                  {viewingStories[currentStoryIndex].user?.username?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <div>
-                  <p className="text-white font-medium">
-                    {viewingStories[currentStoryIndex].user?.username || 'Usuario'}
-                  </p>
-                  <p className="text-white/60 text-xs">
-                    {formatDistanceToNow(new Date(viewingStories[currentStoryIndex].created_at), { addSuffix: true, locale: es })}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setStoryModalOpen(false)}
-                  className="ml-auto text-white/80 hover:text-white"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Story content */}
-              <div className="absolute inset-0 flex items-center justify-center p-8">
-                {viewingStories[currentStoryIndex].media_url ? (
-                  <img
-                    src={viewingStories[currentStoryIndex].media_url}
-                    alt=""
-                    className="max-w-full max-h-full object-contain"
-                  />
-                ) : (
-                  <p
-                    className="text-2xl font-bold text-center"
-                    style={{ color: viewingStories[currentStoryIndex].text_color }}
-                  >
-                    {viewingStories[currentStoryIndex].content}
-                  </p>
-                )}
-              </div>
-
-              {/* Navigation */}
-              <button
-                onClick={prevStory}
-                className="absolute left-0 top-0 bottom-0 w-1/3 z-10"
-              />
-              <button
-                onClick={nextStory}
-                className="absolute right-0 top-0 bottom-0 w-2/3 z-10"
-              />
-
-              {/* Views count */}
-              <div className="absolute bottom-4 left-4 flex items-center gap-2 text-white/60 text-sm">
-                <Eye className="w-4 h-4" />
-                {viewingStories[currentStoryIndex].views_count} vistas
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Create Story Modal */}
-      <Dialog open={createStoryModalOpen} onOpenChange={setCreateStoryModalOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
-          <h2 className="text-xl font-bold mb-4">Crear Historia</h2>
-
-          <div
-            className="aspect-[9/16] rounded-xl mb-4 flex items-center justify-center p-8"
-            style={{ backgroundColor: storyBgColor }}
-          >
-            <textarea
-              value={storyContent}
-              onChange={(e) => setStoryContent(e.target.value)}
-              placeholder="Escribe tu historia..."
-              className="w-full text-center text-xl font-bold bg-transparent border-none text-white placeholder-white/50 focus:outline-none resize-none"
-              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
-              rows={4}
-            />
-          </div>
-
-          {/* Color picker */}
-          <div className="flex gap-2 mb-4">
-            {['#1a1a2e', '#9B59B6', '#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#1ABC9C', '#E91E63'].map((color) => (
-              <button
-                key={color}
-                onClick={() => setStoryBgColor(color)}
-                className={`w-8 h-8 rounded-full border-2 ${
-                  storyBgColor === color ? 'border-white' : 'border-transparent'
-                }`}
-                style={{ backgroundColor: color }}
-              />
-            ))}
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setCreateStoryModalOpen(false)}
-              className="flex-1 border-gray-700"
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleCreateStory}
-              disabled={creatingStory || !storyContent.trim()}
-              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-            >
-              {creatingStory ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <Zap className="w-4 h-4 mr-2" />
-              )}
-              Publicar Historia
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Create Story Modal - Instagram Style */}
+      {createStoryModalOpen && (
+        <CreateStoryModal
+          onClose={() => setCreateStoryModalOpen(false)}
+          onSuccess={() => {
+            toast.success('¡Historia publicada!');
+            // Refresh stories bar
+            setStoriesKey(prev => prev + 1);
+          }}
+        />
+      )}
     </div>
   );
 }
