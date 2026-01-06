@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
-import { forumService, ForumPost, ForumComment, ForumCategory } from '@/services/forum.service';
+import { forumService, ForumPost, ForumComment, ForumCategory, ReactionType, ReactionCounts, TrendingTag } from '@/services/forum.service';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -23,11 +23,27 @@ import {
   Trash2,
   Pin,
   Lock,
+  Bookmark,
+  BookMarked,
+  Share2,
+  Repeat2,
+  Image as ImageIcon,
+  Sparkles,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
+
+// Reaction definitions
+const REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[] = [
+  { type: 'fire', emoji: '🔥', label: 'Fuego', color: 'text-orange-400' },
+  { type: 'love', emoji: '❤️', label: 'Me encanta', color: 'text-red-400' },
+  { type: 'clap', emoji: '👏', label: 'Aplausos', color: 'text-yellow-400' },
+  { type: 'mindblown', emoji: '🤯', label: 'Increíble', color: 'text-purple-400' },
+  { type: 'laugh', emoji: '😂', label: 'Jaja', color: 'text-green-400' },
+  { type: 'sad', emoji: '😢', label: 'Triste', color: 'text-blue-400' },
+];
 
 // Tags disponibles
 const FORUM_TAGS = [
@@ -42,20 +58,23 @@ const FORUM_TAGS = [
 export default function ForoPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  
+
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
+  const [trendingTags, setTrendingTags] = useState<TrendingTag[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'recent' | 'popular' | 'comments'>('recent');
+  const [filter, setFilter] = useState<'recent' | 'popular' | 'comments' | 'following'>('recent');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
+
   // Modal de crear post
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostTags, setNewPostTags] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
-  
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Modal de comentarios
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [comments, setComments] = useState<ForumComment[]>([]);
@@ -63,11 +82,17 @@ export default function ForoPage() {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
 
+  // Modal de repost
+  const [repostModalOpen, setRepostModalOpen] = useState(false);
+  const [repostingPost, setRepostingPost] = useState<ForumPost | null>(null);
+  const [quoteContent, setQuoteContent] = useState('');
+  const [isReposting, setIsReposting] = useState(false);
+
   // Cargar posts
   const loadPosts = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await forumService.getPosts({
+      const data = await forumService.getPostsWithUserState(user?.id || null, {
         sortBy: filter,
         category: selectedCategory !== 'all' ? selectedCategory : undefined,
         tag: selectedTag || undefined,
@@ -79,7 +104,7 @@ export default function ForoPage() {
     } finally {
       setLoading(false);
     }
-  }, [filter, selectedCategory, selectedTag]);
+  }, [filter, selectedCategory, selectedTag, user?.id]);
 
   // Cargar categorías
   const loadCategories = useCallback(async () => {
@@ -87,10 +112,17 @@ export default function ForoPage() {
     setCategories(data);
   }, []);
 
+  // Cargar trending tags
+  const loadTrendingTags = useCallback(async () => {
+    const data = await forumService.getTrendingTags(6);
+    setTrendingTags(data);
+  }, []);
+
   useEffect(() => {
     loadPosts();
     loadCategories();
-  }, [loadPosts, loadCategories]);
+    loadTrendingTags();
+  }, [loadPosts, loadCategories, loadTrendingTags]);
 
   // Crear post
   const handleCreatePost = async () => {
@@ -210,6 +242,133 @@ export default function ForoPage() {
     }
   };
 
+  // Toggle reaction
+  const handleReaction = async (postId: string, reactionType: ReactionType) => {
+    if (!user?.id) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const result = await forumService.toggleReaction(postId, user.id, reactionType);
+      setPosts(prev =>
+        prev.map(p => {
+          if (p.id !== postId) return p;
+          const currentReactions = p.user_reactions || [];
+          const newReactions = result.added
+            ? [...currentReactions, reactionType]
+            : currentReactions.filter(r => r !== reactionType);
+          return {
+            ...p,
+            reactions_count: result.counts,
+            user_reactions: newReactions,
+          };
+        })
+      );
+    } catch (error) {
+      console.error('Error toggling reaction:', error);
+    }
+  };
+
+  // Toggle bookmark
+  const handleBookmark = async (postId: string) => {
+    if (!user?.id) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const result = await forumService.toggleBookmark(postId, user.id);
+      setPosts(prev =>
+        prev.map(p =>
+          p.id === postId
+            ? { ...p, user_bookmarked: result.bookmarked, bookmarks_count: result.count }
+            : p
+        )
+      );
+      toast.success(result.bookmarked ? 'Guardado en marcadores' : 'Eliminado de marcadores');
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+    }
+  };
+
+  // Open repost modal
+  const openRepostModal = (post: ForumPost) => {
+    if (!user?.id) {
+      router.push('/login');
+      return;
+    }
+    setRepostingPost(post);
+    setQuoteContent('');
+    setRepostModalOpen(true);
+  };
+
+  // Handle repost
+  const handleRepost = async (withQuote: boolean = false) => {
+    if (!user?.id || !repostingPost) return;
+
+    setIsReposting(true);
+    try {
+      const result = await forumService.createRepost(
+        repostingPost.id,
+        user.id,
+        withQuote ? quoteContent : undefined
+      );
+
+      if (result.success) {
+        toast.success('¡Publicación compartida!');
+        setPosts(prev =>
+          prev.map(p =>
+            p.id === repostingPost.id
+              ? { ...p, user_reposted: true, reposts_count: (p.reposts_count || 0) + 1 }
+              : p
+          )
+        );
+        setRepostModalOpen(false);
+        setRepostingPost(null);
+        setQuoteContent('');
+      } else {
+        toast.error(result.error || 'Error al compartir');
+      }
+    } catch (error) {
+      toast.error('Error al compartir');
+    } finally {
+      setIsReposting(false);
+    }
+  };
+
+  // Handle share
+  const handleShare = async (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp') => {
+    const url = `${window.location.origin}/foro?post=${post.id}`;
+    const text = post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '');
+
+    if (type === 'clipboard') {
+      await navigator.clipboard.writeText(url);
+      toast.success('Enlace copiado');
+    } else if (type === 'twitter') {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    } else if (type === 'whatsapp') {
+      window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+    }
+
+    // Track share
+    forumService.trackShare(post.id, user?.id || null, type);
+  };
+
+  // Handle image selection
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length + selectedImages.length > 4) {
+      toast.error('Máximo 4 imágenes por publicación');
+      return;
+    }
+    setSelectedImages(prev => [...prev, ...files].slice(0, 4));
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   // Toggle tag en nuevo post
   const toggleTag = (tagId: string) => {
     setNewPostTags(prev => 
@@ -292,6 +451,19 @@ export default function ForoPage() {
                   <MessageCircle className="w-4 h-4" />
                   Más comentados
                 </button>
+                {isAuthenticated && (
+                  <button
+                    onClick={() => setFilter('following')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                      filter === 'following'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                    Siguiendo
+                  </button>
+                )}
               </div>
 
               {selectedTag && (
@@ -337,6 +509,10 @@ export default function ForoPage() {
                     onOpenComments={openComments}
                     onLike={handleLikePost}
                     onDelete={handleDeletePost}
+                    onReaction={handleReaction}
+                    onBookmark={handleBookmark}
+                    onRepost={openRepostModal}
+                    onShare={handleShare}
                   />
                 ))}
               </div>
@@ -374,6 +550,40 @@ export default function ForoPage() {
                       {cat.name}
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Trending Tags */}
+            {trendingTags.length > 0 && (
+              <div className="bg-gradient-to-br from-orange-500/10 to-pink-500/10 border border-orange-500/20 rounded-xl p-6">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-orange-400" />
+                  Trending
+                </h3>
+                <div className="space-y-3">
+                  {trendingTags.map((trend, index) => {
+                    const tagInfo = FORUM_TAGS.find(t => t.id === trend.tag);
+                    return (
+                      <button
+                        key={trend.tag}
+                        onClick={() => setSelectedTag(trend.tag)}
+                        className="w-full text-left hover:bg-white/5 rounded-lg p-2 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-gray-500 text-sm w-4">{index + 1}</span>
+                          <div className="flex-1">
+                            <span className="font-medium text-white group-hover:text-orange-400 transition-colors">
+                              {tagInfo?.label || `#${trend.tag}`}
+                            </span>
+                            <p className="text-xs text-gray-500">
+                              {trend.post_count} {trend.post_count === 1 ? 'post' : 'posts'} esta semana
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -422,7 +632,7 @@ export default function ForoPage() {
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
           <h2 className="text-xl font-bold mb-4">Nueva Publicación</h2>
-          
+
           <textarea
             value={newPostContent}
             onChange={(e) => setNewPostContent(e.target.value)}
@@ -430,6 +640,50 @@ export default function ForoPage() {
             rows={4}
             className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
           />
+
+          {/* Image Preview */}
+          {selectedImages.length > 0 && (
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {selectedImages.map((file, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Preview ${index + 1}`}
+                    className="w-20 h-20 object-cover rounded-lg border border-gray-700"
+                  />
+                  <button
+                    onClick={() => removeImage(index)}
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Media buttons */}
+          <div className="flex items-center gap-2 mt-3 pb-3 border-b border-gray-800">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/*"
+              multiple
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={selectedImages.length >= 4}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
+            >
+              <ImageIcon className="w-5 h-5" />
+              Imagen
+            </button>
+            <span className="text-xs text-gray-500">
+              {selectedImages.length}/4 imágenes
+            </span>
+          </div>
 
           <div className="mt-4">
             <p className="text-sm text-gray-400 mb-2">Etiquetas (opcional)</p>
@@ -453,7 +707,10 @@ export default function ForoPage() {
           <div className="flex justify-end gap-3 mt-6">
             <Button
               variant="outline"
-              onClick={() => setIsCreateModalOpen(false)}
+              onClick={() => {
+                setIsCreateModalOpen(false);
+                setSelectedImages([]);
+              }}
               className="border-gray-700"
             >
               Cancelar
@@ -561,6 +818,67 @@ export default function ForoPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Repost Modal */}
+      <Dialog open={repostModalOpen} onOpenChange={setRepostModalOpen}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+            <Repeat2 className="w-5 h-5 text-green-400" />
+            Compartir Publicación
+          </h2>
+
+          {repostingPost && (
+            <>
+              {/* Original post preview */}
+              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold">
+                    {(repostingPost.author?.display_name || repostingPost.author?.username || 'U')[0].toUpperCase()}
+                  </div>
+                  <span className="font-medium text-sm">
+                    {repostingPost.author?.display_name || repostingPost.author?.username}
+                  </span>
+                </div>
+                <p className="text-gray-300 text-sm line-clamp-3">{repostingPost.content}</p>
+              </div>
+
+              {/* Quote option */}
+              <div className="mb-4">
+                <label className="text-sm text-gray-400 mb-2 block">
+                  Añadir comentario (opcional)
+                </label>
+                <textarea
+                  value={quoteContent}
+                  onChange={(e) => setQuoteContent(e.target.value)}
+                  placeholder="¿Qué piensas sobre esto?"
+                  rows={3}
+                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => handleRepost(false)}
+                  disabled={isReposting}
+                  variant="outline"
+                  className="flex-1 border-gray-700 hover:border-green-500 hover:text-green-400"
+                >
+                  {isReposting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Repeat2 className="w-4 h-4 mr-2" />}
+                  Compartir
+                </Button>
+                <Button
+                  onClick={() => handleRepost(true)}
+                  disabled={isReposting || !quoteContent.trim()}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  {isReposting ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4 mr-2" />}
+                  Citar
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -572,14 +890,39 @@ function PostCard({
   onOpenComments,
   onLike,
   onDelete,
+  onReaction,
+  onBookmark,
+  onRepost,
+  onShare,
 }: {
   post: ForumPost;
   currentUserId?: string;
   onOpenComments: (postId: string) => void;
   onLike: (postId: string) => void;
   onDelete: (postId: string) => void;
+  onReaction: (postId: string, reactionType: ReactionType) => void;
+  onBookmark: (postId: string) => void;
+  onRepost: (post: ForumPost) => void;
+  onShare: (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp') => void;
 }) {
+  const [showReactions, setShowReactions] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
   const isAuthor = currentUserId === post.author_id;
+
+  // Calculate total reactions
+  const totalReactions = post.reactions_count
+    ? Object.values(post.reactions_count).reduce((a, b) => a + b, 0)
+    : post.likes_count || 0;
+
+  // Get top reactions (non-zero)
+  const topReactions = post.reactions_count
+    ? Object.entries(post.reactions_count)
+        .filter(([_, count]) => count > 0)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 3)
+        .map(([type]) => REACTIONS.find(r => r.type === type)?.emoji)
+        .filter(Boolean)
+    : [];
 
   return (
     <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
@@ -639,15 +982,51 @@ function PostCard({
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-4 pt-3 border-t border-gray-800">
-        <button
-          onClick={() => onLike(post.id)}
-          className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors"
-        >
-          <Heart className="w-5 h-5" />
-          <span>{post.likes_count || 0}</span>
-        </button>
+      <div className="flex items-center justify-between pt-3 border-t border-gray-800">
+        {/* Reactions Button with Popup */}
+        <div className="relative">
+          <button
+            onClick={() => setShowReactions(!showReactions)}
+            onMouseEnter={() => setShowReactions(true)}
+            className="flex items-center gap-2 text-gray-400 hover:text-orange-400 transition-colors group"
+          >
+            {topReactions.length > 0 ? (
+              <span className="text-base">{topReactions.join('')}</span>
+            ) : (
+              <Heart className="w-5 h-5" />
+            )}
+            <span>{totalReactions}</span>
+          </button>
 
+          {/* Reactions Popup */}
+          {showReactions && (
+            <div
+              className="absolute bottom-full left-0 mb-2 flex gap-1 bg-gray-800 border border-gray-700 rounded-full px-2 py-1 shadow-xl z-50"
+              onMouseLeave={() => setShowReactions(false)}
+            >
+              {REACTIONS.map((reaction) => {
+                const isActive = post.user_reactions?.includes(reaction.type);
+                return (
+                  <button
+                    key={reaction.type}
+                    onClick={() => {
+                      onReaction(post.id, reaction.type);
+                      setShowReactions(false);
+                    }}
+                    title={reaction.label}
+                    className={`text-xl hover:scale-125 transition-transform p-1 rounded ${
+                      isActive ? 'bg-gray-700' : ''
+                    }`}
+                  >
+                    {reaction.emoji}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Comments */}
         <button
           onClick={() => onOpenComments(post.id)}
           className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors"
@@ -656,7 +1035,82 @@ function PostCard({
           <span>{post.comments_count || 0}</span>
         </button>
 
-        <span className="text-gray-500 text-sm ml-auto">
+        {/* Repost */}
+        <button
+          onClick={() => onRepost(post)}
+          className={`flex items-center gap-2 transition-colors ${
+            post.user_reposted
+              ? 'text-green-400'
+              : 'text-gray-400 hover:text-green-400'
+          }`}
+        >
+          <Repeat2 className="w-5 h-5" />
+          <span>{post.reposts_count || 0}</span>
+        </button>
+
+        {/* Share Menu */}
+        <div className="relative">
+          <button
+            onClick={() => setShowShareMenu(!showShareMenu)}
+            className="flex items-center gap-2 text-gray-400 hover:text-purple-400 transition-colors"
+          >
+            <Share2 className="w-5 h-5" />
+          </button>
+
+          {showShareMenu && (
+            <div
+              className="absolute bottom-full right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[140px] py-1"
+              onMouseLeave={() => setShowShareMenu(false)}
+            >
+              <button
+                onClick={() => {
+                  onShare(post, 'clipboard');
+                  setShowShareMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+              >
+                📋 Copiar enlace
+              </button>
+              <button
+                onClick={() => {
+                  onShare(post, 'twitter');
+                  setShowShareMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+              >
+                𝕏 Twitter/X
+              </button>
+              <button
+                onClick={() => {
+                  onShare(post, 'whatsapp');
+                  setShowShareMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+              >
+                💬 WhatsApp
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Bookmark */}
+        <button
+          onClick={() => onBookmark(post.id)}
+          className={`transition-colors ${
+            post.user_bookmarked
+              ? 'text-yellow-400'
+              : 'text-gray-400 hover:text-yellow-400'
+          }`}
+        >
+          {post.user_bookmarked ? (
+            <BookMarked className="w-5 h-5" />
+          ) : (
+            <Bookmark className="w-5 h-5" />
+          )}
+        </button>
+
+        {/* Views */}
+        <span className="text-gray-500 text-sm">
           {post.views_count || 0} vistas
         </span>
       </div>
