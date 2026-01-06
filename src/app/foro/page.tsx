@@ -19,6 +19,7 @@ import {
 } from '@/services/forum.service';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   MessageSquarePlus,
   TrendingUp,
@@ -55,12 +56,15 @@ import {
   Video,
   Radio,
   Globe,
+  Search,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories';
+import { ReelsFeed } from '@/components/reels/ReelsFeed';
+import { CreateReelModal } from '@/components/reels/CreateReelModal';
 
 // Reaction definitions
 const REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[] = [
@@ -178,6 +182,51 @@ export default function ForoPage() {
   // Tab navigation for social hub
   const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>('feed');
 
+  // Reels state
+  interface Reel {
+    id: string;
+    userId: string;
+    username: string;
+    displayName: string;
+    avatarUrl?: string;
+    videoUrl: string;
+    thumbnailUrl?: string;
+    caption?: string;
+    duration: number;
+    viewsCount: number;
+    likesCount: number;
+    commentsCount: number;
+    sharesCount: number;
+    isLiked?: boolean;
+    isBookmarked?: boolean;
+    tags: string[];
+    createdAt: string;
+  }
+  const [reels, setReels] = useState<Reel[]>([]);
+  const [reelsFilter, setReelsFilter] = useState<'foryou' | 'following' | 'trending'>('foryou');
+  const [reelsLoading, setReelsLoading] = useState(false);
+
+  // Communities state
+  interface Community {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    iconUrl?: string;
+    bannerUrl?: string;
+    themeColor: string;
+    isPublic: boolean;
+    isVerified: boolean;
+    membersCount: number;
+    postsCount: number;
+    categories: string[];
+    isMember?: boolean;
+  }
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [communitiesFilter, setCommunitiesFilter] = useState<'all' | 'joined' | 'popular'>('all');
+  const [communitiesLoading, setCommunitiesLoading] = useState(false);
+  const [communitySearch, setCommunitySearch] = useState('');
+
   // Cargar posts
   const loadPosts = useCallback(async () => {
     setLoading(true);
@@ -204,6 +253,194 @@ export default function ForoPage() {
       setLoading(false);
     }
   }, [filter, selectedCategory, selectedTag, user?.id]);
+
+  // Cargar reels
+  const loadReels = useCallback(async () => {
+    setReelsLoading(true);
+    try {
+      const response = await fetch(`/api/reels?filter=${reelsFilter}`);
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setReels(data.reels || []);
+    } catch (error) {
+      console.error('Error loading reels:', error);
+      toast.error('Error al cargar reels');
+    } finally {
+      setReelsLoading(false);
+    }
+  }, [reelsFilter]);
+
+  // Reels handlers
+  const handleReelLike = async (reelId: string) => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+    const reel = reels.find(r => r.id === reelId);
+    if (!reel) return;
+
+    try {
+      const method = reel.isLiked ? 'DELETE' : 'POST';
+      const response = await fetch(`/api/reels/${reelId}/like`, { method });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      setReels(reels.map((r) =>
+        r.id === reelId
+          ? { ...r, isLiked: !r.isLiked, likesCount: r.isLiked ? r.likesCount - 1 : r.likesCount + 1 }
+          : r
+      ));
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast.error('Error al dar like');
+    }
+  };
+
+  const handleReelBookmark = (reelId: string) => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+    setReels(reels.map((reel) =>
+      reel.id === reelId ? { ...reel, isBookmarked: !reel.isBookmarked } : reel
+    ));
+    const reel = reels.find((r) => r.id === reelId);
+    toast.success(reel?.isBookmarked ? 'Eliminado de guardados' : 'Guardado');
+  };
+
+  const handleReelShare = async (reelId: string) => {
+    const url = `${window.location.origin}/reels/${reelId}`;
+    if (navigator.share) {
+      await navigator.share({ url });
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copiado');
+    }
+  };
+
+  const handleReelComment = (reelId: string) => {
+    toast('Comentarios próximamente', { icon: '💬' });
+  };
+
+  const handleCreateReel = async (data: { videoFile: File; caption: string; tags: string[] }) => {
+    try {
+      const formData = new FormData();
+      formData.append('video', data.videoFile);
+      formData.append('caption', data.caption);
+      formData.append('tags', JSON.stringify(data.tags));
+
+      const response = await fetch('/api/reels', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
+      toast.success('Reel publicado exitosamente');
+      loadReels();
+    } catch (error) {
+      console.error('Error creating reel:', error);
+      toast.error('Error al publicar reel');
+    }
+  };
+
+  // Cargar comunidades
+  const loadCommunities = useCallback(async () => {
+    setCommunitiesLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (communitiesFilter === 'popular') params.set('sort', 'popular');
+      if (communitiesFilter === 'joined') params.set('filter', 'joined');
+
+      const response = await fetch(`/api/communities?${params.toString()}`);
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      setCommunities(data.communities || []);
+    } catch (error) {
+      console.error('Error loading communities:', error);
+      toast.error('Error al cargar comunidades');
+    } finally {
+      setCommunitiesLoading(false);
+    }
+  }, [communitiesFilter]);
+
+  // Communities handlers
+  const handleJoinCommunity = async (communityId: string) => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/communities/${communityId}/join`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      setCommunities(communities.map(c =>
+        c.id === communityId
+          ? { ...c, isMember: true, membersCount: c.membersCount + 1 }
+          : c
+      ));
+      toast.success('Te has unido a la comunidad');
+    } catch (error) {
+      console.error('Error joining community:', error);
+      toast.error('Error al unirse a la comunidad');
+    }
+  };
+
+  const handleLeaveCommunity = async (communityId: string) => {
+    try {
+      const response = await fetch(`/api/communities/${communityId}/join`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      setCommunities(communities.map(c =>
+        c.id === communityId
+          ? { ...c, isMember: false, membersCount: Math.max(0, c.membersCount - 1) }
+          : c
+      ));
+      toast.success('Has salido de la comunidad');
+    } catch (error) {
+      console.error('Error leaving community:', error);
+      toast.error('Error al salir de la comunidad');
+    }
+  };
+
+  const handleCreateCommunity = async (data: {
+    name: string;
+    description: string;
+    isPublic: boolean;
+    categories: string[];
+    themeColor: string;
+  }) => {
+    try {
+      const response = await fetch('/api/communities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
+      toast.success(`Comunidad "${data.name}" creada exitosamente`);
+      loadCommunities();
+    } catch (error) {
+      console.error('Error creating community:', error);
+      toast.error('Error al crear la comunidad');
+    }
+  };
+
+  const filteredCommunities = communities.filter((community) => {
+    if (communitySearch && !community.name.toLowerCase().includes(communitySearch.toLowerCase())) {
+      return false;
+    }
+    return true;
+  });
 
   // Cargar categorías
   const loadCategories = useCallback(async () => {
@@ -237,6 +474,20 @@ export default function ForoPage() {
     loadStories();
     loadAwardTypes();
   }, [loadPosts, loadCategories, loadTrendingTags, loadStories, loadAwardTypes]);
+
+  // Load reels when tab changes to reels or filter changes
+  useEffect(() => {
+    if (activeTab === 'reels') {
+      loadReels();
+    }
+  }, [activeTab, loadReels]);
+
+  // Load communities when tab changes to comunidades or filter changes
+  useEffect(() => {
+    if (activeTab === 'comunidades') {
+      loadCommunities();
+    }
+  }, [activeTab, loadCommunities]);
 
   // Search mentions
   const searchMentions = useCallback(async (query: string) => {
@@ -985,26 +1236,68 @@ export default function ForoPage() {
                 <p className="text-gray-400 mt-1">Videos cortos de predicciones y análisis</p>
               </div>
               {isAuthenticated && (
-                <Button className="bg-pink-600 hover:bg-pink-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Crear Reel
-                </Button>
+                <CreateReelModal onCreateReel={handleCreateReel} />
               )}
             </div>
 
-            {/* Reels Feed Placeholder - Will be integrated */}
-            <div className="space-y-4">
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-8 text-center">
-                <Video className="w-16 h-16 text-pink-400/50 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Reels próximamente</h3>
-                <p className="text-gray-400 mb-4">
-                  Comparte videos cortos de tus predicciones y análisis con la comunidad
-                </p>
-                <Button variant="outline" className="border-pink-500/50 text-pink-400 hover:bg-pink-500/10">
-                  Explorar Reels
-                </Button>
-              </div>
+            {/* Reels Filters */}
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+              <Button
+                variant={reelsFilter === 'foryou' ? 'default' : 'outline'}
+                onClick={() => setReelsFilter('foryou')}
+                className={reelsFilter === 'foryou' ? 'bg-pink-600' : 'border-gray-700'}
+                size="sm"
+              >
+                Para ti
+              </Button>
+              <Button
+                variant={reelsFilter === 'following' ? 'default' : 'outline'}
+                onClick={() => setReelsFilter('following')}
+                className={reelsFilter === 'following' ? 'bg-pink-600' : 'border-gray-700'}
+                size="sm"
+              >
+                <Users className="w-4 h-4 mr-1" />
+                Siguiendo
+              </Button>
+              <Button
+                variant={reelsFilter === 'trending' ? 'default' : 'outline'}
+                onClick={() => setReelsFilter('trending')}
+                className={reelsFilter === 'trending' ? 'bg-pink-600' : 'border-gray-700'}
+                size="sm"
+              >
+                <TrendingUp className="w-4 h-4 mr-1" />
+                Tendencias
+              </Button>
             </div>
+
+            {/* Reels Content */}
+            {reelsLoading ? (
+              <div className="max-w-[400px] mx-auto">
+                <div className="bg-gray-800/50 rounded-xl aspect-[9/16] max-h-[600px] animate-pulse flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
+                </div>
+              </div>
+            ) : reels.length > 0 ? (
+              <ReelsFeed
+                reels={reels}
+                onLike={handleReelLike}
+                onBookmark={handleReelBookmark}
+                onShare={handleReelShare}
+                onComment={handleReelComment}
+                onLoadMore={() => {}}
+              />
+            ) : (
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+                <Video className="w-16 h-16 text-pink-400/50 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No hay reels disponibles</h3>
+                <p className="text-gray-400 mb-4">
+                  Sé el primero en compartir un reel de predicciones
+                </p>
+                {isAuthenticated && (
+                  <CreateReelModal onCreateReel={handleCreateReel} />
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1088,67 +1381,160 @@ export default function ForoPage() {
                 <p className="text-gray-400 mt-1">Únete a grupos de predicciones y comparte con otros profetas</p>
               </div>
               {isAuthenticated && (
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() => {
+                    const name = prompt('Nombre de la comunidad:');
+                    if (name) {
+                      const description = prompt('Descripción:') || '';
+                      handleCreateCommunity({
+                        name,
+                        description,
+                        isPublic: true,
+                        categories: [],
+                        themeColor: '#6366f1'
+                      });
+                    }
+                  }}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Crear Comunidad
                 </Button>
               )}
             </div>
 
-            {/* Filter buttons */}
-            <div className="flex gap-2 mb-6">
-              <Button variant="outline" className="border-blue-500/50 bg-blue-500/10 text-blue-400">
-                Todas
-              </Button>
-              <Button variant="outline" className="border-gray-700 text-gray-400 hover:text-white">
-                Mis Comunidades
-              </Button>
-              <Button variant="outline" className="border-gray-700 text-gray-400 hover:text-white">
-                <TrendingUp className="w-4 h-4 mr-1" />
-                Populares
-              </Button>
+            {/* Search and Filter */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Input
+                  value={communitySearch}
+                  onChange={(e) => setCommunitySearch(e.target.value)}
+                  placeholder="Buscar comunidades..."
+                  className="pl-10 bg-gray-800 border-gray-700"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant={communitiesFilter === 'all' ? 'default' : 'outline'}
+                  onClick={() => setCommunitiesFilter('all')}
+                  className={communitiesFilter === 'all' ? 'bg-blue-600' : 'border-gray-700'}
+                  size="sm"
+                >
+                  Todas
+                </Button>
+                <Button
+                  variant={communitiesFilter === 'joined' ? 'default' : 'outline'}
+                  onClick={() => setCommunitiesFilter('joined')}
+                  className={communitiesFilter === 'joined' ? 'bg-blue-600' : 'border-gray-700'}
+                  size="sm"
+                >
+                  Mis Comunidades
+                </Button>
+                <Button
+                  variant={communitiesFilter === 'popular' ? 'default' : 'outline'}
+                  onClick={() => setCommunitiesFilter('popular')}
+                  className={communitiesFilter === 'popular' ? 'bg-blue-600' : 'border-gray-700'}
+                  size="sm"
+                >
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  Populares
+                </Button>
+              </div>
             </div>
 
-            {/* Communities Grid Placeholder */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Placeholder communities */}
-              {['Deportes MX', 'Política 2026', 'Tech & Crypto', 'Entretenimiento', 'eSports', 'Economía Global'].map((name, i) => (
-                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors cursor-pointer">
-                  <div className={`h-20 bg-gradient-to-r ${
-                    i % 6 === 0 ? 'from-green-600 to-emerald-600' :
-                    i % 6 === 1 ? 'from-red-600 to-orange-600' :
-                    i % 6 === 2 ? 'from-purple-600 to-pink-600' :
-                    i % 6 === 3 ? 'from-yellow-600 to-amber-600' :
-                    i % 6 === 4 ? 'from-blue-600 to-cyan-600' :
-                    'from-indigo-600 to-violet-600'
-                  }`} />
-                  <div className="p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg bg-gradient-to-br ${
-                        i % 6 === 0 ? 'from-green-500 to-emerald-600' :
-                        i % 6 === 1 ? 'from-red-500 to-orange-600' :
-                        i % 6 === 2 ? 'from-purple-500 to-pink-600' :
-                        i % 6 === 3 ? 'from-yellow-500 to-amber-600' :
-                        i % 6 === 4 ? 'from-blue-500 to-cyan-600' :
-                        'from-indigo-500 to-violet-600'
-                      }`}>
-                        {name[0]}
+            {/* Communities Grid */}
+            {communitiesLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-gray-800/50 rounded-xl h-72 animate-pulse" />
+                ))}
+              </div>
+            ) : filteredCommunities.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredCommunities.map((community, i) => (
+                  <div
+                    key={community.id}
+                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors cursor-pointer"
+                  >
+                    <div
+                      className="h-20"
+                      style={{
+                        background: community.bannerUrl
+                          ? `url(${community.bannerUrl}) center/cover`
+                          : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}88)`
+                      }}
+                    />
+                    <div className="p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+                          style={{
+                            background: community.iconUrl
+                              ? `url(${community.iconUrl}) center/cover`
+                              : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}cc)`
+                          }}
+                        >
+                          {!community.iconUrl && community.name[0].toUpperCase()}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold flex items-center gap-1">
+                            {community.name}
+                            {community.isVerified && (
+                              <Check className="w-4 h-4 text-blue-400" />
+                            )}
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            {community.membersCount.toLocaleString()} miembros
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold">{name}</h3>
-                        <p className="text-xs text-gray-500">{Math.floor(Math.random() * 5000 + 500)} miembros</p>
-                      </div>
+                      <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+                        {community.description || `Comunidad de predicciones. Únete y comparte tus análisis.`}
+                      </p>
+                      {community.isMember ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full border-gray-600 text-gray-400 hover:text-red-400 hover:border-red-500/50"
+                          onClick={() => handleLeaveCommunity(community.id)}
+                        >
+                          Salir
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                          onClick={() => handleJoinCommunity(community.id)}
+                        >
+                          Unirse
+                        </Button>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">
-                      Comunidad de predicciones sobre {name.toLowerCase()}. Únete y comparte tus análisis.
-                    </p>
-                    <Button size="sm" variant="outline" className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10">
-                      Unirse
-                    </Button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+                <Users className="w-16 h-16 text-blue-400/50 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No se encontraron comunidades</h3>
+                <p className="text-gray-400 mb-4">
+                  {communitySearch
+                    ? 'Prueba con otros términos de búsqueda'
+                    : 'Sé el primero en crear una comunidad'}
+                </p>
+                {communitySearch && (
+                  <Button
+                    variant="link"
+                    onClick={() => setCommunitySearch('')}
+                    className="text-blue-400"
+                  >
+                    Limpiar búsqueda
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
