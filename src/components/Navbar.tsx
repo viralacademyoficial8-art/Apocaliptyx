@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, BarChart3, Plus, TrendingUp } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function Navbar() {
@@ -70,12 +70,12 @@ export function Navbar() {
   }, [status, session, user, login]);
 
   const navItems = [
-  { href: "/dashboard", label: t("nav.home") },
-  { href: "/explorar", label: "Escenarios" },
-  { href: "/tienda", label: t("nav.shop") },
-  { href: "/rankings", label: "Rankings", icon: <TrendingUp className="w-4 h-4" /> },
-  { href: "/foro", label: t("nav.forum") },
-];
+    { href: "/dashboard", label: t("nav.home") },
+    { href: "/explorar", label: "Escenarios" },
+    { href: "/tienda", label: t("nav.shop") },
+    { href: "/leaderboard", label: "Rankings" },
+    { href: "/foro", label: t("nav.forum") },
+  ];
 
   const handleLogout = async () => {
     logout();
@@ -112,7 +112,7 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     className={`
-                      px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
+                      px-3 py-2 rounded-lg text-sm font-medium transition-colors
                       ${
                         isActive
                           ? "bg-muted text-foreground"
@@ -120,7 +120,6 @@ export function Navbar() {
                       }
                     `}
                   >
-                    {item.icon}
                     {item.label}
                   </Link>
                 );
@@ -129,18 +128,17 @@ export function Navbar() {
               {/* Botón Crear Escenario */}
               {isLoggedIn && (
                 <Link
-                  href="/crear-escenario"
+                  href="/crear"
                   className={`
                     px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
                     ${
-                      pathname === "/crear-escenario"
-                        ? "bg-green-500/20 text-green-400"
-                        : "text-muted-foreground hover:text-green-400 hover:bg-green-500/10"
+                      pathname === "/crear"
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                     }
                   `}
                 >
-                  <Plus className="w-4 h-4" />
-                  <span className="hidden xl:inline">Crear Escenario</span>
+                  Crear Escenario
                 </Link>
               )}
 
