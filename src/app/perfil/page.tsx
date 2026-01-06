@@ -65,6 +65,7 @@ export default function PerfilPage() {
   const [stats, setStats] = useState<UserStatsFromDB | null>(null);
   const [predictions, setPredictions] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
+  const [scenariosHeld, setScenariosHeld] = useState<any[]>([]);
   const [inventory, setInventory] = useState<UserInventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [hydrated, setHydrated] = useState(false);
@@ -99,6 +100,10 @@ export default function PerfilPage() {
       // Cargar escenarios creados
       const scenariosData = await scenariosService.getByCreator(user.id);
       setScenarios(scenariosData.slice(0, 10));
+
+      // Cargar escenarios que posee (robados)
+      const heldData = await scenariosService.getByHolder(user.id);
+      setScenariosHeld(heldData.slice(0, 10));
 
       // Cargar inventario
       const inventoryData = await shopService.getUserInventory(user.id);
@@ -431,6 +436,40 @@ export default function PerfilPage() {
                       <p className="text-xs text-gray-400">
                         {scenario.total_pool} AP en juego
                       </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Escenarios que posees (robados) */}
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-yellow-400" />
+                Escenarios que posees
+              </h3>
+              {scenariosHeld.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-2">No posees ningún escenario robado</p>
+                  <p className="text-gray-500 text-sm">
+                    Roba escenarios de otros usuarios para ganar el pool cuando se resuelvan
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {scenariosHeld.slice(0, 5).map((scenario) => (
+                    <Link
+                      key={scenario.id}
+                      href={`/escenario/${scenario.id}`}
+                      className="block p-3 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg hover:from-yellow-500/20 hover:to-orange-500/20 transition-colors"
+                    >
+                      <p className="font-medium text-sm line-clamp-1 text-yellow-400">
+                        {scenario.title}
+                      </p>
+                      <div className="flex gap-4 text-xs text-gray-400 mt-1">
+                        <span>Pool: {scenario.theft_pool || 0} AP</span>
+                        <span>Robos: {scenario.steal_count || 0}</span>
+                      </div>
                     </Link>
                   ))}
                 </div>
