@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Trophy, Search, Filter, Calendar, TrendingUp, Clock } from 'lucide-react';
+import { Trophy, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { TournamentCard } from '@/components/tournaments/TournamentCard';
@@ -30,113 +30,38 @@ interface Tournament {
     amount: number;
     percentage?: number;
   }[];
+  isJoined?: boolean;
 }
 
 export default function TorneosPage() {
   const { user } = useAuthStore();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
-  const [joinedTournaments, setJoinedTournaments] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'active' | 'ended'>('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadTournaments();
-  }, []);
+  }, [statusFilter]);
 
   const loadTournaments = async () => {
     setIsLoading(true);
-    // Mock data - replace with actual API call
-    const now = new Date();
-    const mockTournaments: Tournament[] = [
-      {
-        id: '1',
-        name: 'Copa Crypto Enero 2026',
-        description: 'El torneo más grande de predicciones crypto del mes. Demuestra tus habilidades prediciendo Bitcoin, Ethereum y más.',
-        tournamentType: 'open',
-        categoryName: 'Crypto',
-        categoryIcon: '₿',
-        entryFee: 100,
-        prizePool: 50000,
-        maxParticipants: 500,
-        participantsCount: 342,
-        minPredictions: 10,
-        startDate: new Date(now.getTime() + 86400000 * 2).toISOString(),
-        endDate: new Date(now.getTime() + 86400000 * 9).toISOString(),
-        status: 'upcoming',
-        prizes: [
-          { position: 1, amount: 25000 },
-          { position: 2, amount: 15000 },
-          { position: 3, amount: 10000 },
-        ],
-      },
-      {
-        id: '2',
-        name: 'Liga de Fútbol - Jornada 20',
-        description: 'Predice los resultados de la jornada 20 de La Liga Española.',
-        tournamentType: 'open',
-        categoryName: 'Deportes',
-        categoryIcon: '⚽',
-        entryFee: 0,
-        prizePool: 10000,
-        maxParticipants: 1000,
-        participantsCount: 756,
-        minPredictions: 5,
-        startDate: new Date(now.getTime() - 86400000).toISOString(),
-        endDate: new Date(now.getTime() + 86400000 * 2).toISOString(),
-        status: 'active',
-        prizes: [
-          { position: 1, amount: 5000 },
-          { position: 2, amount: 3000 },
-          { position: 3, amount: 2000 },
-        ],
-      },
-      {
-        id: '3',
-        name: 'Tech Predictions Challenge',
-        description: 'Predice los próximos movimientos de las empresas tech.',
-        tournamentType: 'open',
-        categoryName: 'Tecnología',
-        categoryIcon: '💻',
-        entryFee: 50,
-        prizePool: 15000,
-        participantsCount: 189,
-        minPredictions: 8,
-        startDate: new Date(now.getTime() + 86400000 * 5).toISOString(),
-        endDate: new Date(now.getTime() + 86400000 * 12).toISOString(),
-        status: 'upcoming',
-        prizes: [
-          { position: 1, amount: 7500 },
-          { position: 2, amount: 4500 },
-          { position: 3, amount: 3000 },
-        ],
-      },
-      {
-        id: '4',
-        name: 'Esports Masters',
-        description: 'Torneo de predicciones de esports: LoL, CS2, Valorant.',
-        tournamentType: 'open',
-        categoryName: 'Gaming',
-        categoryIcon: '🎮',
-        entryFee: 25,
-        prizePool: 8000,
-        maxParticipants: 200,
-        participantsCount: 200,
-        minPredictions: 5,
-        startDate: new Date(now.getTime() - 86400000 * 7).toISOString(),
-        endDate: new Date(now.getTime() - 86400000).toISOString(),
-        status: 'ended',
-        prizes: [
-          { position: 1, amount: 4000 },
-          { position: 2, amount: 2400 },
-          { position: 3, amount: 1600 },
-        ],
-      },
-    ];
+    try {
+      const params = new URLSearchParams();
+      if (statusFilter !== 'all') params.set('status', statusFilter);
 
-    setTournaments(mockTournaments);
-    setJoinedTournaments(['2']);
-    setIsLoading(false);
+      const response = await fetch(`/api/tournaments?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setTournaments(data.tournaments || []);
+    } catch (error) {
+      console.error('Error loading tournaments:', error);
+      toast.error('Error al cargar torneos');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleJoinTournament = async (tournamentId: string) => {
@@ -145,25 +70,51 @@ export default function TorneosPage() {
       return;
     }
 
-    const tournament = tournaments.find((t) => t.id === tournamentId);
-    if (tournament?.entryFee && tournament.entryFee > 0) {
-      toast.success(`Te has inscrito por ${tournament.entryFee} AP`);
-    } else {
-      toast.success('Te has inscrito al torneo');
+    try {
+      const response = await fetch(`/api/tournaments/${tournamentId}/join`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      const tournament = tournaments.find((t) => t.id === tournamentId);
+      setTournaments(tournaments.map(t =>
+        t.id === tournamentId
+          ? { ...t, isJoined: true, participantsCount: t.participantsCount + 1 }
+          : t
+      ));
+
+      toast.success(data.message || 'Te has inscrito al torneo');
+    } catch (error: unknown) {
+      console.error('Error joining tournament:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al inscribirse');
     }
-    setJoinedTournaments([...joinedTournaments, tournamentId]);
   };
 
   const handleLeaveTournament = async (tournamentId: string) => {
-    setJoinedTournaments(joinedTournaments.filter((id) => id !== tournamentId));
-    toast.success('Has abandonado el torneo');
+    try {
+      const response = await fetch(`/api/tournaments/${tournamentId}/join`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setTournaments(tournaments.map(t =>
+        t.id === tournamentId
+          ? { ...t, isJoined: false, participantsCount: Math.max(0, t.participantsCount - 1) }
+          : t
+      ));
+      toast.success('Has abandonado el torneo');
+    } catch (error) {
+      console.error('Error leaving tournament:', error);
+      toast.error('Error al abandonar el torneo');
+    }
   };
 
   const filteredTournaments = tournaments.filter((tournament) => {
     if (searchQuery && !tournament.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (statusFilter !== 'all' && tournament.status !== statusFilter) {
       return false;
     }
     return true;
@@ -173,6 +124,8 @@ export default function TorneosPage() {
     const statusOrder = { active: 0, upcoming: 1, ended: 2, cancelled: 3 };
     return statusOrder[a.status] - statusOrder[b.status];
   });
+
+  const joinedCount = tournaments.filter(t => t.isJoined).length;
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-20">
@@ -214,7 +167,7 @@ export default function TorneosPage() {
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <p className="text-sm text-gray-400">Mis torneos</p>
-            <p className="text-2xl font-bold text-purple-400">{joinedTournaments.length}</p>
+            <p className="text-2xl font-bold text-purple-400">{joinedCount}</p>
           </div>
         </div>
 
@@ -263,7 +216,7 @@ export default function TorneosPage() {
               <TournamentCard
                 key={tournament.id}
                 tournament={tournament}
-                isJoined={joinedTournaments.includes(tournament.id)}
+                isJoined={tournament.isJoined || false}
                 onJoin={handleJoinTournament}
                 onLeave={handleLeaveTournament}
               />

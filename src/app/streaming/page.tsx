@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { LiveStreamCard } from '@/components/streaming/LiveStreamCard';
 import { useAuthStore } from '@/lib/stores';
+import toast from 'react-hot-toast';
 
 interface LiveStream {
   id: string;
@@ -39,101 +40,50 @@ export default function StreamingPage() {
 
   const loadStreams = async () => {
     setIsLoading(true);
-    // Mock data - replace with actual API call
-    const mockStreams: LiveStream[] = [
-      {
-        id: '1',
-        userId: 'user1',
-        username: 'cryptomaster',
-        displayName: 'Crypto Master',
-        avatarUrl: '/avatars/user1.jpg',
-        title: '🔴 Análisis en VIVO: Bitcoin rumbo a 100K',
-        description: 'Analizando el mercado crypto en tiempo real',
-        thumbnailUrl: '/thumbnails/stream1.jpg',
-        status: 'live',
-        viewersCount: 1250,
-        peakViewers: 1800,
-        totalViews: 15420,
-        likesCount: 890,
-        category: 'Crypto',
-        tags: ['bitcoin', 'trading', 'análisis'],
-        startedAt: new Date(Date.now() - 3600000).toISOString(),
-      },
-      {
-        id: '2',
-        userId: 'user2',
-        username: 'sportsguru',
-        displayName: 'Sports Guru',
-        avatarUrl: '/avatars/user2.jpg',
-        title: '⚽ Predicciones La Liga - Jornada 20',
-        thumbnailUrl: '/thumbnails/stream2.jpg',
-        status: 'live',
-        viewersCount: 856,
-        peakViewers: 1200,
-        totalViews: 8930,
-        likesCount: 456,
-        category: 'Deportes',
-        tags: ['futbol', 'laliga', 'predicciones'],
-        startedAt: new Date(Date.now() - 1800000).toISOString(),
-      },
-      {
-        id: '3',
-        userId: 'user3',
-        username: 'techprophet',
-        displayName: 'Tech Prophet',
-        avatarUrl: '/avatars/user3.jpg',
-        title: '💻 Review: Lo que Apple anunciará en 2026',
-        thumbnailUrl: '/thumbnails/stream3.jpg',
-        status: 'live',
-        viewersCount: 423,
-        peakViewers: 600,
-        totalViews: 3200,
-        likesCount: 234,
-        category: 'Tecnología',
-        tags: ['apple', 'tech', 'predicciones'],
-        startedAt: new Date(Date.now() - 900000).toISOString(),
-      },
-      {
-        id: '4',
-        userId: 'user4',
-        username: 'gamingpro',
-        displayName: 'Gaming Pro',
-        avatarUrl: '/avatars/user4.jpg',
-        title: '🎮 Predicciones Esports - League of Legends',
-        thumbnailUrl: '/thumbnails/stream4.jpg',
-        status: 'ended',
-        viewersCount: 0,
-        peakViewers: 2300,
-        totalViews: 12500,
-        likesCount: 1200,
-        category: 'Gaming',
-        tags: ['lol', 'esports', 'predicciones'],
-      },
-      {
-        id: '5',
-        userId: 'user5',
-        username: 'economista',
-        displayName: 'El Economista',
-        avatarUrl: '/avatars/user5.jpg',
-        title: '📈 Mercados financieros - Semana entrante',
-        thumbnailUrl: '/thumbnails/stream5.jpg',
-        status: 'ended',
-        viewersCount: 0,
-        peakViewers: 890,
-        totalViews: 5600,
-        likesCount: 345,
-        category: 'Economía',
-        tags: ['bolsa', 'mercados', 'inversiones'],
-      },
-    ];
+    try {
+      const params = new URLSearchParams();
+      params.set('filter', filter);
+      if (searchQuery) params.set('search', searchQuery);
 
-    let filteredStreams = mockStreams;
-    if (filter === 'live') {
-      filteredStreams = mockStreams.filter((s) => s.status === 'live');
+      const response = await fetch(`/api/streaming?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setStreams(data.streams || []);
+    } catch (error) {
+      console.error('Error loading streams:', error);
+      toast.error('Error al cargar streams');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStartStream = async () => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
     }
 
-    setStreams(filteredStreams);
-    setIsLoading(false);
+    try {
+      const title = prompt('Título del stream:');
+      if (!title) return;
+
+      const response = await fetch('/api/streaming', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      toast.success('Stream iniciado');
+      loadStreams();
+    } catch (error: unknown) {
+      console.error('Error starting stream:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al iniciar stream');
+    }
   };
 
   const filteredStreams = streams.filter((stream) => {
@@ -141,8 +91,8 @@ export default function StreamingPage() {
       const query = searchQuery.toLowerCase();
       return (
         stream.title.toLowerCase().includes(query) ||
-        stream.displayName.toLowerCase().includes(query) ||
-        stream.tags.some((tag) => tag.toLowerCase().includes(query))
+        stream.displayName?.toLowerCase().includes(query) ||
+        stream.tags?.some((tag) => tag.toLowerCase().includes(query))
       );
     }
     return true;
@@ -168,7 +118,10 @@ export default function StreamingPage() {
             </p>
           </div>
           {user && (
-            <Button className="bg-red-600 hover:bg-red-700">
+            <Button
+              className="bg-red-600 hover:bg-red-700"
+              onClick={handleStartStream}
+            >
               <Radio className="w-4 h-4 mr-2" />
               Iniciar stream
             </Button>
@@ -197,7 +150,9 @@ export default function StreamingPage() {
               <span className="text-sm">Más visto hoy</span>
             </div>
             <p className="text-2xl font-bold">
-              {Math.max(...streams.map((s) => s.peakViewers)).toLocaleString()}
+              {streams.length > 0
+                ? Math.max(...streams.map((s) => s.peakViewers || 0)).toLocaleString()
+                : 0}
             </p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">

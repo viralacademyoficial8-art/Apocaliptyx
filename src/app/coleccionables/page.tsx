@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, ShoppingBag, Sparkles, Search, Filter } from 'lucide-react';
+import { Package, ShoppingBag, Sparkles, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -39,113 +39,28 @@ export default function ColeccionablesPage() {
 
   useEffect(() => {
     loadCollectibles();
-  }, []);
+  }, [activeTab]);
 
   const loadCollectibles = async () => {
     setIsLoading(true);
-    // Mock data - replace with actual API call
-    const mockStore: Collectible[] = [
-      {
-        id: '1',
-        name: 'Golden Frame',
-        nameEs: 'Marco Dorado',
-        description: 'Un brillante marco dorado para tu avatar',
-        type: 'frame',
-        rarity: 'rare',
-        assetUrl: '/collectibles/frames/golden.png',
-        apCost: 500,
-        isTradeable: true,
-        isLimited: false,
-        currentSupply: 0,
-      },
-      {
-        id: '2',
-        name: 'Diamond Frame',
-        nameEs: 'Marco Diamante',
-        description: 'Marco con destellos de diamante',
-        type: 'frame',
-        rarity: 'epic',
-        assetUrl: '/collectibles/frames/diamond.png',
-        apCost: 1500,
-        isTradeable: true,
-        isLimited: true,
-        maxSupply: 100,
-        currentSupply: 45,
-      },
-      {
-        id: '3',
-        name: 'Fire Effect',
-        nameEs: 'Efecto Fuego',
-        description: 'Llamas animadas alrededor de tu perfil',
-        type: 'effect',
-        rarity: 'legendary',
-        assetUrl: '/collectibles/effects/fire.gif',
-        apCost: 3000,
-        isTradeable: true,
-        isLimited: true,
-        maxSupply: 50,
-        currentSupply: 23,
-      },
-      {
-        id: '4',
-        name: 'Galaxy Background',
-        nameEs: 'Fondo Galaxia',
-        description: 'Un fondo cósmico para tu perfil',
-        type: 'background',
-        rarity: 'epic',
-        assetUrl: '/collectibles/backgrounds/galaxy.png',
-        apCost: 800,
-        isTradeable: true,
-        isLimited: false,
-        currentSupply: 0,
-      },
-      {
-        id: '5',
-        name: 'Neon Frame',
-        nameEs: 'Marco Neón',
-        description: 'Marco con efecto neón brillante',
-        type: 'frame',
-        rarity: 'rare',
-        assetUrl: '/collectibles/frames/neon.gif',
-        apCost: 750,
-        isTradeable: true,
-        isLimited: false,
-        currentSupply: 0,
-      },
-      {
-        id: '6',
-        name: 'Sparkle Effect',
-        nameEs: 'Efecto Brillante',
-        description: 'Destellos mágicos en tu perfil',
-        type: 'effect',
-        rarity: 'rare',
-        assetUrl: '/collectibles/effects/sparkle.gif',
-        apCost: 400,
-        isTradeable: true,
-        isLimited: false,
-        currentSupply: 0,
-      },
-    ];
-
-    const mockInventory: Collectible[] = [
-      {
-        id: '7',
-        name: 'Starter Frame',
-        nameEs: 'Marco Inicial',
-        type: 'frame',
-        rarity: 'common',
-        assetUrl: '/collectibles/frames/starter.png',
-        isTradeable: false,
-        isLimited: false,
-        currentSupply: 0,
-        isOwned: true,
-        isEquipped: true,
-      },
-    ];
-
-    setStoreItems(mockStore);
-    setInventory(mockInventory);
-    setIsLoading(false);
+    try {
+      if (activeTab === 'store') {
+        const response = await fetch('/api/collectibles?type=store');
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        setStoreItems(data.collectibles || []);
+      } else {
+        const response = await fetch('/api/collectibles?type=inventory');
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        setInventory(data.collectibles || []);
+      }
+    } catch (error) {
+      console.error('Error loading collectibles:', error);
+      toast.error('Error al cargar coleccionables');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePurchase = async (collectibleId: string) => {
@@ -157,19 +72,48 @@ export default function ColeccionablesPage() {
     const item = storeItems.find((i) => i.id === collectibleId);
     if (!item) return;
 
-    // Mock purchase - replace with actual API call
-    toast.success(`¡Has comprado ${item.nameEs}!`);
-    setInventory([...inventory, { ...item, isOwned: true }]);
+    try {
+      const response = await fetch('/api/collectibles/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collectibleId }),
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      toast.success(`¡Has comprado ${item.nameEs}!`);
+      // Reload both store and inventory
+      loadCollectibles();
+    } catch (error: unknown) {
+      console.error('Error purchasing collectible:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al comprar');
+    }
   };
 
   const handleEquip = async (collectibleId: string) => {
-    setInventory(
-      inventory.map((item) => ({
-        ...item,
-        isEquipped: item.id === collectibleId,
-      }))
-    );
-    toast.success('Coleccionable equipado');
+    try {
+      const response = await fetch('/api/collectibles/equip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collectibleId }),
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setInventory(
+        inventory.map((item) => ({
+          ...item,
+          isEquipped: item.id === collectibleId ? true :
+            (item.type === inventory.find(i => i.id === collectibleId)?.type ? false : item.isEquipped),
+        }))
+      );
+      toast.success('Coleccionable equipado');
+    } catch (error) {
+      console.error('Error equipping collectible:', error);
+      toast.error('Error al equipar');
+    }
   };
 
   const filteredStoreItems = storeItems.filter((item) => {
@@ -270,7 +214,15 @@ export default function ColeccionablesPage() {
 
           {/* Inventory Tab */}
           <TabsContent value="inventory">
-            <CollectibleInventory collectibles={inventory} onEquip={handleEquip} />
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="bg-gray-800/50 rounded-xl h-64 animate-pulse" />
+                ))}
+              </div>
+            ) : (
+              <CollectibleInventory collectibles={inventory} onEquip={handleEquip} />
+            )}
           </TabsContent>
         </Tabs>
       </div>
