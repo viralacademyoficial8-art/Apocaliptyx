@@ -8,10 +8,12 @@ import { useAuthStore } from "@/lib/stores";
 import { scenariosService } from "@/services/scenarios.service";
 import { predictionsService, Prediction } from "@/services/predictions.service";
 import { createClient } from "@supabase/supabase-js";
-import { 
-  Loader2, ArrowLeft, Clock, Users, Flame, 
-  TrendingUp, TrendingDown, AlertCircle, Share2, Flag, X
+import {
+  Loader2, ArrowLeft, Clock, Users, Flame,
+  TrendingUp, TrendingDown, AlertCircle, Share2, Flag, X,
+  Shield, Crown, Zap, Coins
 } from "lucide-react";
+import { useScenarioStealing } from "@/hooks/useScenarioStealing";
 import { toast } from "@/components/ui/toast";
 
 const supabase = createClient(
@@ -50,6 +52,17 @@ interface ScenarioData {
   resolved_at: string | null;
   created_at: string;
   updated_at: string;
+  // Campos de stealing system
+  current_holder_id?: string | null;
+  current_price?: number;
+  steal_count?: number;
+  theft_pool?: number;
+  is_protected?: boolean;
+  protected_until?: string | null;
+  can_be_stolen?: boolean;
+  // Para mostrar holder info
+  holder_username?: string;
+  creator_username?: string;
 }
 
 export default function EscenarioPage() {
@@ -72,6 +85,12 @@ export default function EscenarioPage() {
   const [reportReason, setReportReason] = useState('');
   const [reportDescription, setReportDescription] = useState('');
   const [reportLoading, setReportLoading] = useState(false);
+
+  // Estado para robo/protección
+  const [isStealing, setIsStealing] = useState(false);
+  const [showShieldModal, setShowShieldModal] = useState(false);
+  const [applyingShield, setApplyingShield] = useState<string | null>(null);
+  const { stealScenario, applyShield, getShieldTypes } = useScenarioStealing();
 
   const scenarioId = params.id as string;
 
@@ -239,9 +258,83 @@ export default function EscenarioPage() {
     }
   };
 
+  // Funciones de robo/protección
+  const isOwner = user?.id === (scenario?.current_holder_id || scenario?.creator_id);
+  const currentPrice = scenario?.current_price || 11;
+  const theftPool = scenario?.theft_pool || 0;
+  const stealCount = scenario?.steal_count || 0;
+  const isProtected = scenario?.is_protected && scenario?.protected_until && new Date(scenario.protected_until) > new Date();
+
+  const canSteal = () => {
+    if (!user) return false;
+    if (isOwner) return false;
+    if (scenario?.status !== "ACTIVE") return false;
+    if (isProtected) return false;
+    if ((user.apCoins || 0) < currentPrice) return false;
+    return true;
+  };
+
+  const handleSteal = async () => {
+    if (!user) {
+      toast.error("Debes iniciar sesión");
+      router.push("/login");
+      return;
+    }
+
+    if (!canSteal()) {
+      toast.error("No puedes robar este escenario");
+      return;
+    }
+
+    setIsStealing(true);
+    try {
+      const result = await stealScenario(scenarioId);
+
+      if (result.success) {
+        toast.success(`¡Escenario robado! Pagaste ${result.stealPrice} AP`);
+        // Recargar la página para ver los cambios
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        toast.error(result.error || "Error al robar escenario");
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Error al robar escenario");
+    } finally {
+      setIsStealing(false);
+    }
+  };
+
+  const handleApplyShield = async (shieldType: string) => {
+    if (!user) {
+      toast.error("Debes iniciar sesión");
+      return;
+    }
+
+    setApplyingShield(shieldType);
+    try {
+      const result = await applyShield(scenarioId, shieldType as any);
+
+      if (result.success) {
+        toast.success("¡Escudo activado!");
+        setShowShieldModal(false);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        toast.error(result.error || "Error al aplicar escudo");
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Error al aplicar escudo");
+    } finally {
+      setApplyingShield(null);
+    }
+  };
+
   // Calcular porcentajes
-  const yesPercent = scenario && scenario.total_pool > 0 
-    ? Math.round((scenario.yes_pool / scenario.total_pool) * 100) 
+  const yesPercent = scenario && scenario.total_pool > 0
+    ? Math.round((scenario.yes_pool / scenario.total_pool) * 100)
     : 50;
   const noPercent = 100 - yesPercent;
 
@@ -368,6 +461,102 @@ export default function EscenarioPage() {
             <p className="text-2xl font-bold">{yesPercent}%</p>
             <p className="text-sm text-gray-400">Dicen SÍ</p>
           </div>
+        </div>
+
+        {/* Holder & Stealing Section */}
+        <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-6 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Holder Info */}
+            <div className="flex items-center gap-4">
+              <Crown className="w-8 h-8 text-yellow-400" />
+              <div>
+                <p className="text-sm text-gray-400">Holder Actual</p>
+                <p className="text-xl font-bold text-yellow-400">
+                  @{scenario.holder_username || scenario.creator_username || 'creador'}
+                  {isOwner && <span className="ml-2 text-xs bg-yellow-500 text-black px-2 py-0.5 rounded">Tú</span>}
+                </p>
+              </div>
+            </div>
+
+            {/* Stealing Stats */}
+            <div className="flex gap-6 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-400">{theftPool} AP</p>
+                <p className="text-xs text-gray-400">Pool acumulado</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-purple-400">{currentPrice} AP</p>
+                <p className="text-xs text-gray-400">Precio para robar</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-orange-400">{stealCount}</p>
+                <p className="text-xs text-gray-400">Veces robado</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Protection indicator */}
+          {isProtected && scenario.protected_until && (
+            <div className="mt-4 flex items-center gap-2 text-blue-400 bg-blue-500/10 border border-blue-500/30 rounded-lg px-4 py-2">
+              <Shield className="w-5 h-5" />
+              <span className="text-sm">
+                Protegido hasta {new Date(scenario.protected_until).toLocaleDateString('es-ES', {
+                  day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                })}
+              </span>
+            </div>
+          )}
+
+          {/* Steal & Shield Buttons */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            {!isOwner && scenario.status === "ACTIVE" && (
+              <button
+                onClick={handleSteal}
+                disabled={!canSteal() || isStealing}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors"
+              >
+                {isStealing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Robando...
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-5 h-5" />
+                    Robar por {currentPrice} AP
+                  </>
+                )}
+              </button>
+            )}
+
+            {isOwner && (
+              <>
+                <div className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-green-500/20 border border-green-500/30 rounded-xl">
+                  <Shield className="w-5 h-5 text-green-400" />
+                  <span className="text-green-400 font-semibold">Este escenario es tuyo</span>
+                </div>
+                <button
+                  onClick={() => setShowShieldModal(true)}
+                  className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-colors"
+                >
+                  <Shield className="w-5 h-5" />
+                  Proteger
+                </button>
+              </>
+            )}
+          </div>
+
+          {!user && scenario.status === "ACTIVE" && (
+            <p className="text-center text-gray-500 text-sm mt-4">
+              <button
+                onClick={() => router.push('/login')}
+                className="text-purple-400 hover:underline"
+              >
+                Inicia sesión
+              </button>
+              {' '}para robar o proteger escenarios
+            </p>
+          )}
         </div>
 
         {/* Voting section */}
@@ -601,6 +790,84 @@ export default function EscenarioPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Escudos */}
+      {showShieldModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Shield className="w-5 h-5 text-blue-400" />
+                Proteger Escenario
+              </h2>
+              <button
+                onClick={() => setShowShieldModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-gray-400 text-sm mb-4">
+              Activa un escudo para proteger tu escenario de robos temporalmente
+            </p>
+
+            <div className="space-y-3">
+              {getShieldTypes().map((shield) => (
+                <div
+                  key={shield.id}
+                  className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xl">{shield.icon}</span>
+                        <span className="font-bold text-white">{shield.name}</span>
+                      </div>
+                      <p className="text-sm text-gray-400 mb-2">
+                        {shield.description}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Coins className="w-4 h-4 text-yellow-400" />
+                        <span className="text-yellow-400 font-semibold">
+                          {shield.price} AP
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleApplyShield(shield.id)}
+                      disabled={
+                        applyingShield !== null ||
+                        !user ||
+                        (user.apCoins || 0) < shield.price
+                      }
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
+                    >
+                      {applyingShield === shield.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Activar"
+                      )}
+                    </button>
+                  </div>
+                  {user && (user.apCoins || 0) < shield.price && (
+                    <p className="text-xs text-red-400 mt-2">
+                      No tienes suficientes AP coins
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {user && (
+              <div className="mt-4 pt-4 border-t border-gray-700 text-center">
+                <span className="text-sm text-gray-400">Tu balance: </span>
+                <span className="font-bold text-yellow-400">{user.apCoins || 0} AP</span>
+              </div>
+            )}
           </div>
         </div>
       )}
