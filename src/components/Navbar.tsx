@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, BarChart3 } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, BarChart3, Plus, TrendingUp } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function Navbar() {
@@ -72,12 +72,9 @@ export function Navbar() {
   const navItems = [
   { href: "/dashboard", label: t("nav.home") },
   { href: "/explorar", label: "Escenarios" },
-  { href: "/foro", label: t("nav.forum") },
-  { href: "/comunidades", label: "Comunidades", icon: <Users className="w-4 h-4" /> },
-  { href: "/reels", label: "Reels", icon: <Film className="w-4 h-4" />, highlight: true },
-  { href: "/streaming", label: "En Vivo", icon: <Radio className="w-4 h-4" /> },
-  { href: "/torneos", label: "Torneos", icon: <Trophy className="w-4 h-4" /> },
   { href: "/tienda", label: t("nav.shop") },
+  { href: "/rankings", label: "Rankings", icon: <TrendingUp className="w-4 h-4" /> },
+  { href: "/foro", label: t("nav.forum") },
 ];
 
   const handleLogout = async () => {
@@ -119,9 +116,7 @@ export function Navbar() {
                       ${
                         isActive
                           ? "bg-muted text-foreground"
-                          : item.highlight
-                            ? "text-pink-400 hover:text-pink-300 hover:bg-pink-500/10"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                       }
                     `}
                   >
@@ -131,6 +126,24 @@ export function Navbar() {
                 );
               })}
               
+              {/* Botón Crear Escenario */}
+              {isLoggedIn && (
+                <Link
+                  href="/crear-escenario"
+                  className={`
+                    px-3 lg:px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
+                    ${
+                      pathname === "/crear-escenario"
+                        ? "bg-green-500/20 text-green-400"
+                        : "text-muted-foreground hover:text-green-400 hover:bg-green-500/10"
+                    }
+                  `}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden xl:inline">Crear Escenario</span>
+                </Link>
+              )}
+
               {/* Link al panel de admin (solo para roles con acceso) */}
               {isAdmin && (
                 <Link
