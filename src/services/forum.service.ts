@@ -10,6 +10,8 @@ const supabase = createClient(
 // ==================== TYPES ====================
 
 export type ReactionType = 'fire' | 'love' | 'clap' | 'mindblown' | 'sad' | 'laugh';
+export type BadgeType = 'verified' | 'creator' | 'prophet' | 'og' | 'moderator' | 'apocaliptyx';
+export type NotificationType = 'mention' | 'reply' | 'reaction' | 'award' | 'follow' | 'repost' | 'poll_ended' | 'story_view' | 'story_reaction' | 'badge_awarded' | 'thread_reply';
 
 export interface ReactionCounts {
   fire: number;
@@ -18,6 +20,140 @@ export interface ReactionCounts {
   mindblown: number;
   sad: number;
   laugh: number;
+}
+
+// ==================== POLL TYPES ====================
+
+export interface ForumPoll {
+  id: string;
+  post_id: string;
+  question: string;
+  ends_at: string;
+  multiple_choice: boolean;
+  created_at: string;
+  options: ForumPollOption[];
+  total_votes: number;
+  has_voted?: boolean;
+  user_votes?: string[]; // option IDs voted by user
+}
+
+export interface ForumPollOption {
+  id: string;
+  poll_id: string;
+  option_text: string;
+  option_order: number;
+  votes_count: number;
+}
+
+// ==================== AWARD TYPES ====================
+
+export interface AwardType {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  ap_cost: number;
+  ap_reward: number;
+}
+
+export interface PostAward {
+  id: string;
+  post_id: string;
+  award_type: AwardType;
+  giver: {
+    id: string;
+    username: string;
+    avatar_url: string;
+  };
+  message?: string;
+  created_at: string;
+}
+
+// ==================== STORY TYPES ====================
+
+export interface ForumStory {
+  id: string;
+  user_id: string;
+  content?: string;
+  media_url?: string;
+  media_type?: 'image' | 'video' | 'gif';
+  background_color: string;
+  text_color: string;
+  font_style: string;
+  views_count: number;
+  expires_at: string;
+  created_at: string;
+  is_highlight: boolean;
+  highlight_name?: string;
+  // Joined
+  user?: {
+    id: string;
+    username: string;
+    avatar_url: string;
+  };
+  has_viewed?: boolean;
+}
+
+export interface StoryHighlight {
+  id: string;
+  user_id: string;
+  name: string;
+  cover_url?: string;
+  stories: ForumStory[];
+}
+
+// ==================== THREAD TYPES ====================
+
+export interface ForumThread {
+  id: string;
+  user_id: string;
+  title?: string;
+  total_posts: number;
+  created_at: string;
+  updated_at: string;
+  posts?: ForumPost[];
+  user?: {
+    id: string;
+    username: string;
+    avatar_url: string;
+  };
+}
+
+// ==================== NOTIFICATION TYPES ====================
+
+export interface ForumNotification {
+  id: string;
+  user_id: string;
+  type: NotificationType;
+  actor_username?: string;
+  actor_avatar?: string;
+  post_id?: string;
+  post_preview?: string;
+  comment_id?: string;
+  story_id?: string;
+  content?: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+// ==================== MENTION TYPES ====================
+
+export interface MentionSuggestion {
+  id: string;
+  username: string;
+  avatar_url: string;
+  badges: BadgeType[];
+}
+
+// ==================== USER BADGE TYPES ====================
+
+export interface UserBadge {
+  id: string;
+  user_id: string;
+  badge_type: BadgeType;
+  awarded_at: string;
+  reason?: string;
 }
 
 export interface ForumPost {
@@ -35,7 +171,7 @@ export interface ForumPost {
   tags: string[];
   created_at: string;
   updated_at: string;
-  // New social fields
+  // Social fields
   reactions_count?: ReactionCounts;
   bookmarks_count?: number;
   reposts_count?: number;
@@ -44,10 +180,22 @@ export interface ForumPost {
   media_count?: number;
   is_repost?: boolean;
   original_post_id?: string | null;
+  // Thread fields
+  thread_id?: string | null;
+  thread_position?: number | null;
+  // GIF fields
+  gif_url?: string | null;
+  gif_width?: number;
+  gif_height?: number;
+  // Scoring fields (Reddit-style)
+  hot_score?: number;
+  rising_score?: number;
+  controversy_score?: number;
   // User interaction state (set by UI)
   user_reactions?: ReactionType[];
   user_bookmarked?: boolean;
   user_reposted?: boolean;
+  user_has_voted?: boolean;
   // Joined data
   author?: {
     id: string;
@@ -55,6 +203,7 @@ export interface ForumPost {
     display_name: string;
     avatar_url: string;
     level: number;
+    badges?: BadgeType[];
   };
   category?: {
     id: string;
@@ -64,6 +213,9 @@ export interface ForumPost {
   };
   original_post?: ForumPost;
   media?: ForumMedia[];
+  poll?: ForumPoll;
+  awards?: PostAward[];
+  thread?: ForumThread;
 }
 
 export interface ForumMedia {
@@ -120,6 +272,27 @@ export interface CreatePostInput {
   content: string;
   category_id?: string;
   tags?: string[];
+  // GIF support
+  gif_url?: string;
+  gif_width?: number;
+  gif_height?: number;
+  // Poll support
+  poll?: {
+    question: string;
+    options: string[];
+    ends_in_hours?: number; // Default 24 hours
+    multiple_choice?: boolean;
+  };
+  // Thread support
+  thread_posts?: string[]; // Array of content for each thread post
+}
+
+export interface CreateStoryInput {
+  content?: string;
+  media_url?: string;
+  media_type?: 'image' | 'video' | 'gif';
+  background_color?: string;
+  text_color?: string;
 }
 
 export interface CreateCommentInput {
@@ -1219,6 +1392,524 @@ class ForumService {
       user_bookmarked: bookmarkSet.has(post.id),
       user_reposted: repostSet.has(post.id),
     }));
+  }
+
+  // ==================== POLLS ====================
+
+  async createPostWithPoll(userId: string, input: CreatePostInput): Promise<ForumPost | null> {
+    // First create the post
+    const { data: post, error: postError } = await supabase
+      .from('forum_posts')
+      .insert({
+        title: input.title || '',
+        content: input.content,
+        author_id: userId,
+        category_id: input.category_id || null,
+        tags: input.tags || [],
+        gif_url: input.gif_url || null,
+        gif_width: input.gif_width || null,
+        gif_height: input.gif_height || null,
+        status: 'published',
+      })
+      .select('*')
+      .single();
+
+    if (postError || !post) {
+      console.error('Error creating post:', postError);
+      return null;
+    }
+
+    // If there's a poll, create it
+    if (input.poll) {
+      const endsAt = new Date();
+      endsAt.setHours(endsAt.getHours() + (input.poll.ends_in_hours || 24));
+
+      const { data: poll, error: pollError } = await supabase
+        .from('forum_polls')
+        .insert({
+          post_id: post.id,
+          question: input.poll.question,
+          ends_at: endsAt.toISOString(),
+          multiple_choice: input.poll.multiple_choice || false,
+        })
+        .select('*')
+        .single();
+
+      if (!pollError && poll) {
+        // Create poll options
+        const options = input.poll.options.map((opt, idx) => ({
+          poll_id: poll.id,
+          option_text: opt,
+          option_order: idx,
+          votes_count: 0,
+        }));
+
+        await supabase.from('forum_poll_options').insert(options);
+      }
+    }
+
+    return post;
+  }
+
+  async getPollForPost(postId: string, userId?: string): Promise<ForumPoll | null> {
+    const { data: poll, error } = await supabase
+      .from('forum_polls')
+      .select(`
+        *,
+        options:forum_poll_options(*)
+      `)
+      .eq('post_id', postId)
+      .single();
+
+    if (error || !poll) return null;
+
+    // Calculate total votes
+    const totalVotes = (poll.options || []).reduce((sum: number, opt: any) => sum + (opt.votes_count || 0), 0);
+
+    // Check if user has voted
+    let hasVoted = false;
+    let userVotes: string[] = [];
+
+    if (userId) {
+      const { data: votes } = await supabase
+        .from('forum_poll_votes')
+        .select('option_id')
+        .eq('poll_id', poll.id)
+        .eq('user_id', userId);
+
+      hasVoted = (votes || []).length > 0;
+      userVotes = (votes || []).map(v => v.option_id);
+    }
+
+    return {
+      ...poll,
+      total_votes: totalVotes,
+      has_voted: hasVoted,
+      user_votes: userVotes,
+    };
+  }
+
+  async voteOnPoll(pollId: string, optionId: string, userId: string): Promise<{ success: boolean; error?: string; options?: ForumPollOption[] }> {
+    try {
+      const { data, error } = await supabase.rpc('vote_on_poll', {
+        p_poll_id: pollId,
+        p_option_id: optionId,
+        p_user_id: userId,
+      });
+
+      if (error) {
+        console.error('Error voting on poll:', error);
+        return { success: false, error: error.message };
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in voteOnPoll:', error);
+      return { success: false, error: 'Error al votar' };
+    }
+  }
+
+  // ==================== AWARDS ====================
+
+  async getAwardTypes(): Promise<AwardType[]> {
+    const { data, error } = await supabase
+      .from('forum_award_types')
+      .select('*')
+      .order('ap_cost', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching award types:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  async giveAward(
+    postId: string,
+    awardTypeId: string,
+    giverId: string,
+    message?: string
+  ): Promise<{ success: boolean; error?: string; award_name?: string; ap_spent?: number }> {
+    try {
+      const { data, error } = await supabase.rpc('give_post_award', {
+        p_post_id: postId,
+        p_award_type_id: awardTypeId,
+        p_giver_id: giverId,
+        p_message: message || null,
+      });
+
+      if (error) {
+        console.error('Error giving award:', error);
+        return { success: false, error: error.message };
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in giveAward:', error);
+      return { success: false, error: 'Error al dar premio' };
+    }
+  }
+
+  async getPostAwards(postId: string): Promise<PostAward[]> {
+    const { data, error } = await supabase
+      .from('forum_post_awards')
+      .select(`
+        *,
+        award_type:forum_award_types(*),
+        giver:profiles!forum_post_awards_giver_id_fkey(id, username, avatar_url)
+      `)
+      .eq('post_id', postId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching post awards:', error);
+      return [];
+    }
+
+    return (data || []).map(a => ({
+      id: a.id,
+      post_id: a.post_id,
+      award_type: a.award_type,
+      giver: a.giver,
+      message: a.message,
+      created_at: a.created_at,
+    }));
+  }
+
+  // ==================== STORIES ====================
+
+  async createStory(userId: string, input: CreateStoryInput): Promise<{ success: boolean; story_id?: string; error?: string }> {
+    try {
+      const { data, error } = await supabase.rpc('create_story', {
+        p_user_id: userId,
+        p_content: input.content || null,
+        p_media_url: input.media_url || null,
+        p_media_type: input.media_type || null,
+        p_background_color: input.background_color || '#1a1a2e',
+        p_text_color: input.text_color || '#ffffff',
+      });
+
+      if (error) {
+        console.error('Error creating story:', error);
+        return { success: false, error: error.message };
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in createStory:', error);
+      return { success: false, error: 'Error al crear historia' };
+    }
+  }
+
+  async getFollowingStories(userId: string): Promise<ForumStory[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_following_stories', {
+        p_user_id: userId,
+      });
+
+      if (error) {
+        console.error('Error fetching stories:', error);
+        return [];
+      }
+
+      // Group by user
+      return data || [];
+    } catch (error) {
+      console.error('Error in getFollowingStories:', error);
+      return [];
+    }
+  }
+
+  async viewStory(storyId: string, viewerId: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('view_story', {
+        p_story_id: storyId,
+        p_viewer_id: viewerId,
+      });
+
+      return data?.success || false;
+    } catch (error) {
+      console.error('Error viewing story:', error);
+      return false;
+    }
+  }
+
+  async reactToStory(storyId: string, userId: string, reaction: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('react_to_story', {
+        p_story_id: storyId,
+        p_user_id: userId,
+        p_reaction: reaction,
+      });
+
+      return data?.success || false;
+    } catch (error) {
+      console.error('Error reacting to story:', error);
+      return false;
+    }
+  }
+
+  async getStoryViewers(storyId: string): Promise<{ id: string; username: string; avatar_url: string; viewed_at: string }[]> {
+    const { data, error } = await supabase
+      .from('forum_story_views')
+      .select(`
+        viewed_at,
+        viewer:profiles!forum_story_views_viewer_id_fkey(id, username, avatar_url)
+      `)
+      .eq('story_id', storyId)
+      .order('viewed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching story viewers:', error);
+      return [];
+    }
+
+    return (data || []).map(v => ({
+      ...v.viewer,
+      viewed_at: v.viewed_at,
+    })) as any;
+  }
+
+  // ==================== THREADS ====================
+
+  async createThread(userId: string, title: string, posts: { content: string; tags?: string[]; gif_url?: string }[]): Promise<{ success: boolean; thread_id?: string; post_ids?: string[]; error?: string }> {
+    try {
+      const { data, error } = await supabase.rpc('create_thread', {
+        p_user_id: userId,
+        p_title: title,
+        p_posts: JSON.stringify(posts),
+      });
+
+      if (error) {
+        console.error('Error creating thread:', error);
+        return { success: false, error: error.message };
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error in createThread:', error);
+      return { success: false, error: 'Error al crear hilo' };
+    }
+  }
+
+  async getThreadPosts(threadId: string): Promise<ForumPost[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_thread_posts', {
+        p_thread_id: threadId,
+      });
+
+      if (error) {
+        console.error('Error fetching thread posts:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getThreadPosts:', error);
+      return [];
+    }
+  }
+
+  // ==================== NOTIFICATIONS ====================
+
+  async getNotifications(userId: string, limit: number = 50, unreadOnly: boolean = false): Promise<ForumNotification[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_user_notifications', {
+        p_user_id: userId,
+        p_limit: limit,
+        p_unread_only: unreadOnly,
+      });
+
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getNotifications:', error);
+      return [];
+    }
+  }
+
+  async getUnreadNotificationsCount(userId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('forum_notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('is_read', false);
+
+    if (error) {
+      console.error('Error counting unread notifications:', error);
+      return 0;
+    }
+
+    return count || 0;
+  }
+
+  async markNotificationsRead(userId: string, notificationIds?: string[]): Promise<boolean> {
+    try {
+      const { error } = await supabase.rpc('mark_notifications_read', {
+        p_user_id: userId,
+        p_notification_ids: notificationIds || null,
+      });
+
+      return !error;
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+      return false;
+    }
+  }
+
+  // ==================== MENTIONS ====================
+
+  async searchUsersForMention(query: string, limit: number = 10): Promise<MentionSuggestion[]> {
+    try {
+      const { data, error } = await supabase.rpc('search_users_for_mention', {
+        p_query: query,
+        p_limit: limit,
+      });
+
+      if (error) {
+        console.error('Error searching users:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in searchUsersForMention:', error);
+      return [];
+    }
+  }
+
+  // ==================== BADGES ====================
+
+  async getUserBadges(userId: string): Promise<UserBadge[]> {
+    const { data, error } = await supabase
+      .from('user_badges')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error fetching user badges:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  getBadgeInfo(badgeType: BadgeType): { icon: string; color: string; label: string } {
+    const badges: Record<BadgeType, { icon: string; color: string; label: string }> = {
+      verified: { icon: '✓', color: '#1DA1F2', label: 'Verificado' },
+      creator: { icon: '★', color: '#FFD700', label: 'Creador' },
+      prophet: { icon: '🔮', color: '#9B59B6', label: 'Profeta' },
+      og: { icon: '👑', color: '#2ECC71', label: 'OG' },
+      moderator: { icon: '🛡️', color: '#E74C3C', label: 'Moderador' },
+      apocaliptyx: { icon: '⚡', color: '#FF6B6B', label: 'Apocaliptyx' },
+    };
+    return badges[badgeType];
+  }
+
+  // ==================== HOT/RISING/CONTROVERSIAL SORTING ====================
+
+  async getPostsBySorting(
+    sortType: 'hot' | 'rising' | 'controversial',
+    options?: { limit?: number; offset?: number; category?: string }
+  ): Promise<ForumPost[]> {
+    const { limit = 20, offset = 0, category } = options || {};
+
+    let query = supabase
+      .from('forum_posts')
+      .select(`
+        *,
+        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+        category:forum_categories(id, name, slug, icon)
+      `)
+      .eq('status', 'published');
+
+    if (category && category !== 'all') {
+      query = query.eq('category_id', category);
+    }
+
+    // Sort by the appropriate score
+    switch (sortType) {
+      case 'hot':
+        query = query.order('hot_score', { ascending: false });
+        break;
+      case 'rising':
+        query = query.order('rising_score', { ascending: false });
+        break;
+      case 'controversial':
+        query = query.order('controversy_score', { ascending: false });
+        break;
+    }
+
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching posts by sorting:', error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  // ==================== GIF SEARCH (GIPHY/TENOR) ====================
+
+  async searchGifs(query: string, limit: number = 20): Promise<{ id: string; url: string; preview_url: string; width: number; height: number }[]> {
+    // This would integrate with GIPHY or Tenor API
+    // For now, return empty array - user would need to add API key
+    try {
+      const GIPHY_API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
+      if (!GIPHY_API_KEY) {
+        console.warn('GIPHY API key not configured');
+        return [];
+      }
+
+      const response = await fetch(
+        `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=${limit}&rating=pg-13`
+      );
+      const data = await response.json();
+
+      return (data.data || []).map((gif: any) => ({
+        id: gif.id,
+        url: gif.images.original.url,
+        preview_url: gif.images.fixed_width.url,
+        width: parseInt(gif.images.original.width),
+        height: parseInt(gif.images.original.height),
+      }));
+    } catch (error) {
+      console.error('Error searching GIFs:', error);
+      return [];
+    }
+  }
+
+  async getTrendingGifs(limit: number = 20): Promise<{ id: string; url: string; preview_url: string; width: number; height: number }[]> {
+    try {
+      const GIPHY_API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
+      if (!GIPHY_API_KEY) {
+        return [];
+      }
+
+      const response = await fetch(
+        `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=${limit}&rating=pg-13`
+      );
+      const data = await response.json();
+
+      return (data.data || []).map((gif: any) => ({
+        id: gif.id,
+        url: gif.images.original.url,
+        preview_url: gif.images.fixed_width.url,
+        width: parseInt(gif.images.original.width),
+        height: parseInt(gif.images.original.height),
+      }));
+    } catch (error) {
+      console.error('Error fetching trending GIFs:', error);
+      return [];
+    }
   }
 }
 
