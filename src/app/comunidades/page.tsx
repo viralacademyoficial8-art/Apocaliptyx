@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Users, Search, TrendingUp, Plus, Filter } from 'lucide-react';
+import { Users, Search, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CommunityCard } from '@/components/communities/CommunityCard';
@@ -22,77 +22,39 @@ interface Community {
   membersCount: number;
   postsCount: number;
   categories: string[];
+  isMember?: boolean;
 }
 
 export default function ComunidadesPage() {
   const { user } = useAuthStore();
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [myCommunities, setMyCommunities] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'joined' | 'popular'>('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadCommunities();
-  }, []);
+  }, [filter]);
 
   const loadCommunities = async () => {
     setIsLoading(true);
-    // Mock data - replace with actual API call
-    const mockCommunities: Community[] = [
-      {
-        id: '1',
-        name: 'Crypto Traders',
-        slug: 'crypto-traders',
-        description: 'Comunidad para traders de criptomonedas. Predicciones diarias de Bitcoin, Ethereum y altcoins.',
-        themeColor: '#F7931A',
-        isPublic: true,
-        isVerified: true,
-        membersCount: 15420,
-        postsCount: 8934,
-        categories: ['Crypto', 'Economía'],
-      },
-      {
-        id: '2',
-        name: 'Fútbol España',
-        slug: 'futbol-espana',
-        description: 'La mejor comunidad para predicciones de La Liga, Champions y selección española.',
-        themeColor: '#EF4444',
-        isPublic: true,
-        isVerified: true,
-        membersCount: 28750,
-        postsCount: 45230,
-        categories: ['Deportes'],
-      },
-      {
-        id: '3',
-        name: 'Tech Predictions',
-        slug: 'tech-predictions',
-        description: 'Predicciones sobre tecnología, startups, lanzamientos de productos y más.',
-        themeColor: '#8B5CF6',
-        isPublic: true,
-        isVerified: false,
-        membersCount: 5680,
-        postsCount: 2340,
-        categories: ['Tecnología'],
-      },
-      {
-        id: '4',
-        name: 'Gaming Esports',
-        slug: 'gaming-esports',
-        description: 'Comunidad de esports y gaming. Predicciones de torneos de LoL, CS2, Valorant y más.',
-        themeColor: '#22C55E',
-        isPublic: true,
-        isVerified: true,
-        membersCount: 12300,
-        postsCount: 18900,
-        categories: ['Gaming', 'Entretenimiento'],
-      },
-    ];
+    try {
+      const params = new URLSearchParams();
+      if (filter === 'popular') params.set('sort', 'popular');
+      if (filter === 'joined') params.set('filter', 'joined');
 
-    setCommunities(mockCommunities);
-    setMyCommunities(['1', '4']); // Mock joined communities
-    setIsLoading(false);
+      const response = await fetch(`/api/communities?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setCommunities(data.communities || []);
+    } catch (error) {
+      console.error('Error loading communities:', error);
+      toast.error('Error al cargar comunidades');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleJoinCommunity = async (communityId: string) => {
@@ -100,13 +62,46 @@ export default function ComunidadesPage() {
       toast.error('Debes iniciar sesión');
       return;
     }
-    setMyCommunities([...myCommunities, communityId]);
-    toast.success('Te has unido a la comunidad');
+
+    try {
+      const response = await fetch(`/api/communities/${communityId}/join`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setCommunities(communities.map(c =>
+        c.id === communityId
+          ? { ...c, isMember: true, membersCount: c.membersCount + 1 }
+          : c
+      ));
+      toast.success('Te has unido a la comunidad');
+    } catch (error) {
+      console.error('Error joining community:', error);
+      toast.error('Error al unirse a la comunidad');
+    }
   };
 
   const handleLeaveCommunity = async (communityId: string) => {
-    setMyCommunities(myCommunities.filter((id) => id !== communityId));
-    toast.success('Has salido de la comunidad');
+    try {
+      const response = await fetch(`/api/communities/${communityId}/join`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setCommunities(communities.map(c =>
+        c.id === communityId
+          ? { ...c, isMember: false, membersCount: Math.max(0, c.membersCount - 1) }
+          : c
+      ));
+      toast.success('Has salido de la comunidad');
+    } catch (error) {
+      console.error('Error leaving community:', error);
+      toast.error('Error al salir de la comunidad');
+    }
   };
 
   const handleCreateCommunity = async (data: {
@@ -117,15 +112,26 @@ export default function ComunidadesPage() {
     categories: string[];
     themeColor: string;
   }) => {
-    toast.success(`Comunidad "${data.name}" creada exitosamente`);
-    loadCommunities();
+    try {
+      const response = await fetch('/api/communities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+
+      if (result.error) throw new Error(result.error);
+
+      toast.success(`Comunidad "${data.name}" creada exitosamente`);
+      loadCommunities();
+    } catch (error) {
+      console.error('Error creating community:', error);
+      toast.error('Error al crear la comunidad');
+    }
   };
 
   const filteredCommunities = communities.filter((community) => {
     if (searchQuery && !community.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (filter === 'joined' && !myCommunities.includes(community.id)) {
       return false;
     }
     return true;
@@ -205,7 +211,7 @@ export default function ComunidadesPage() {
               <CommunityCard
                 key={community.id}
                 community={community}
-                isMember={myCommunities.includes(community.id)}
+                isMember={community.isMember || false}
                 onJoin={handleJoinCommunity}
                 onLeave={handleLeaveCommunity}
               />

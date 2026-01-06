@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Video, TrendingUp, Users, Clock } from 'lucide-react';
+import { Video, TrendingUp, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
 import { CreateReelModal } from '@/components/reels/CreateReelModal';
@@ -40,86 +40,60 @@ export default function ReelsPage() {
 
   const loadReels = async () => {
     setIsLoading(true);
-    // Mock data - replace with actual API call
-    const mockReels: Reel[] = [
-      {
-        id: '1',
-        userId: 'user1',
-        username: 'cryptomaster',
-        displayName: 'Crypto Master',
-        avatarUrl: '/avatars/user1.jpg',
-        videoUrl: 'https://example.com/reel1.mp4',
-        thumbnailUrl: '/thumbnails/reel1.jpg',
-        caption: '¡Bitcoin va a romper los 100K! Aquí mi análisis completo 📈',
-        duration: 45,
-        viewsCount: 15420,
-        likesCount: 2340,
-        commentsCount: 156,
-        sharesCount: 89,
-        isLiked: false,
-        isBookmarked: false,
-        tags: ['bitcoin', 'crypto', 'trading'],
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        userId: 'user2',
-        username: 'sportsguru',
-        displayName: 'Sports Guru',
-        avatarUrl: '/avatars/user2.jpg',
-        videoUrl: 'https://example.com/reel2.mp4',
-        thumbnailUrl: '/thumbnails/reel2.jpg',
-        caption: 'Mi predicción para el clásico de mañana ⚽',
-        duration: 30,
-        viewsCount: 8750,
-        likesCount: 1230,
-        commentsCount: 89,
-        sharesCount: 45,
-        isLiked: true,
-        isBookmarked: false,
-        tags: ['futbol', 'laliga', 'predicciones'],
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-      },
-      {
-        id: '3',
-        userId: 'user3',
-        username: 'techprophet',
-        displayName: 'Tech Prophet',
-        avatarUrl: '/avatars/user3.jpg',
-        videoUrl: 'https://example.com/reel3.mp4',
-        thumbnailUrl: '/thumbnails/reel3.jpg',
-        caption: '¿El nuevo iPhone tendrá esta función? 🤔',
-        duration: 60,
-        viewsCount: 5600,
-        likesCount: 890,
-        commentsCount: 67,
-        sharesCount: 23,
-        isLiked: false,
-        isBookmarked: true,
-        tags: ['apple', 'iphone', 'tech'],
-        createdAt: new Date(Date.now() - 7200000).toISOString(),
-      },
-    ];
+    try {
+      const response = await fetch(`/api/reels?filter=${filter}`);
+      const data = await response.json();
 
-    setReels(mockReels);
-    setIsLoading(false);
+      if (data.error) throw new Error(data.error);
+
+      setReels(data.reels || []);
+    } catch (error) {
+      console.error('Error loading reels:', error);
+      toast.error('Error al cargar reels');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLike = async (reelId: string) => {
-    setReels(
-      reels.map((reel) =>
-        reel.id === reelId
-          ? {
-              ...reel,
-              isLiked: !reel.isLiked,
-              likesCount: reel.isLiked ? reel.likesCount - 1 : reel.likesCount + 1,
-            }
-          : reel
-      )
-    );
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+
+    const reel = reels.find(r => r.id === reelId);
+    if (!reel) return;
+
+    try {
+      const method = reel.isLiked ? 'DELETE' : 'POST';
+      const response = await fetch(`/api/reels/${reelId}/like`, { method });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      setReels(
+        reels.map((r) =>
+          r.id === reelId
+            ? {
+                ...r,
+                isLiked: !r.isLiked,
+                likesCount: r.isLiked ? r.likesCount - 1 : r.likesCount + 1,
+              }
+            : r
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast.error('Error al dar like');
+    }
   };
 
   const handleBookmark = async (reelId: string) => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+
     setReels(
       reels.map((reel) =>
         reel.id === reelId
@@ -142,7 +116,6 @@ export default function ReelsPage() {
   };
 
   const handleComment = (reelId: string) => {
-    // Open comment modal
     toast('Comentarios próximamente', { icon: '💬' });
   };
 
@@ -151,8 +124,26 @@ export default function ReelsPage() {
     caption: string;
     tags: string[];
   }) => {
-    toast.success('Reel publicado exitosamente');
-    loadReels();
+    try {
+      const formData = new FormData();
+      formData.append('video', data.videoFile);
+      formData.append('caption', data.caption);
+      formData.append('tags', JSON.stringify(data.tags));
+
+      const response = await fetch('/api/reels', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+
+      if (result.error) throw new Error(result.error);
+
+      toast.success('Reel publicado exitosamente');
+      loadReels();
+    } catch (error) {
+      console.error('Error creating reel:', error);
+      toast.error('Error al publicar reel');
+    }
   };
 
   return (
