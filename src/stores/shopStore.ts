@@ -93,10 +93,14 @@ function getCurrentUserId(): string | null {
   if (authState.user?.id) {
     return authState.user.id;
   }
-  
-  // Fallback: obtener de localStorage
+
+  // Fallback: obtener de localStorage (SSR-safe)
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   try {
-    const stored = localStorage.getItem('apocaliptics-auth');
+    const stored = window.localStorage.getItem('apocaliptics-auth');
     if (stored) {
       const parsed = JSON.parse(stored);
       return parsed?.state?.user?.id || null;
@@ -104,7 +108,7 @@ function getCurrentUserId(): string | null {
   } catch (e) {
     console.error('Error reading auth from localStorage:', e);
   }
-  
+
   return null;
 }
 

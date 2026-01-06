@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Item } from '@/types';
-import { useAuthStore, useItemStore } from '@/lib/stores';
+import { useAuthStore } from '@/lib/stores';
+import { useShopStore } from '@/stores/shopStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Flame, ShoppingCart, Clock } from 'lucide-react';
@@ -14,7 +15,7 @@ interface ItemCardProps {
 
 export function ItemCard({ item }: ItemCardProps) {
   const { user } = useAuthStore();
-  const { buyItem } = useItemStore();
+  const { purchaseItem } = useShopStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleBuy = async () => {
@@ -25,8 +26,34 @@ export function ItemCard({ item }: ItemCardProps) {
 
     setIsLoading(true);
     try {
-      await buyItem(item.id);
-      toast.success(`¡${item.name} comprado!`);
+      // Convert Item to ShopItem format for purchaseItem
+      const shopItem = {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+        icon: item.icon,
+        type: 'SPECIAL' as const,
+        rarity: 'COMMON' as const,
+        price: item.priceApCoins,
+        stock: null,
+        maxPerUser: null,
+        isActive: true,
+        isFeatured: false,
+        isNew: false,
+        isOnSale: false,
+        tags: [],
+        imageUrl: null,
+        purchaseCount: 0,
+        rating: 0,
+        reviews: 0,
+      };
+
+      const result = await purchaseItem(shopItem, 1);
+      if (result.success) {
+        toast.success(`¡${item.name} comprado!`);
+      } else {
+        toast.error(result.error || 'Error al comprar el ítem');
+      }
     } catch (error: any) {
       toast.error(error.message || 'Error al comprar el ítem');
     } finally {
