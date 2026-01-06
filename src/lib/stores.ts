@@ -128,7 +128,10 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
 
   fetchNotifications: async () => {
     const { user } = useAuthStore.getState();
-    if (!user?.id) return;
+    if (!user?.id) {
+      set({ isLoading: false });
+      return;
+    }
 
     set({ isLoading: true });
     try {
@@ -170,7 +173,9 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
 
   markAllAsRead: async () => {
     const { user } = useAuthStore.getState();
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     await notificationsService.markAllAsRead(user.id);
     set((state) => ({
@@ -192,7 +197,9 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
 
   clearAll: async () => {
     const { user } = useAuthStore.getState();
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     await notificationsService.deleteAll(user.id);
     set({
@@ -269,23 +276,11 @@ export const useScenarioStore = create<ScenarioStoreState>((set, get) => ({
   },
 }));
 
-//
-// ----------------------------------------------------
-// 4) ITEM STORE (tienda) - Uses shopStore instead
-// ----------------------------------------------------
-//
-
-interface ItemStoreState {
-  items: any[];
-  buyItem: (item: any) => Promise<void>;
-}
-
-export const useItemStore = create<ItemStoreState>(() => ({
-  items: [],
-  async buyItem(item: any) {
-    console.log("useItemStore.buyItem is deprecated. Use useShopStore instead.");
-  },
-}));
+/**
+ * @deprecated This store is deprecated. Use useShopStore from '@/stores/shopStore' instead.
+ * This export is kept for backward compatibility and will be removed in a future version.
+ */
+export { useShopStore as useItemStore } from '@/stores/shopStore';
 
 //
 // ----------------------------------------------------
@@ -297,6 +292,7 @@ interface ForumState {
   posts: any[];
   comments: ForumComment[];
   isLoading: boolean;
+  error: string | null;
   filter: "recientes" | "populares" | "siguiendo";
   selectedTag: string | null;
 
@@ -310,17 +306,19 @@ interface ForumState {
   deleteComment: (commentId: string) => void;
   setFilter: (filter: "recientes" | "populares" | "siguiendo") => void;
   setSelectedTag: (tag: string | null) => void;
+  clearError: () => void;
 }
 
 export const useForumStore = create<ForumState>((set, get) => ({
   posts: [],
   comments: [],
   isLoading: false,
+  error: null,
   filter: "recientes",
   selectedTag: null,
 
   fetchPosts: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
       const { filter, selectedTag } = get();
       const sortBy = filter === 'populares' ? 'popular' : 'recent';
@@ -334,11 +332,12 @@ export const useForumStore = create<ForumState>((set, get) => ({
       set({ posts: data, isLoading: false });
     } catch (error) {
       console.error('Error fetching posts:', error);
-      set({ isLoading: false });
+      set({ isLoading: false, error: 'Error al cargar publicaciones' });
     }
   },
 
   fetchComments: async (postId: string) => {
+    set({ error: null });
     try {
       const data = await forumService.getComments(postId);
       const mapped: ForumComment[] = data.map((c: any) => ({
@@ -357,13 +356,18 @@ export const useForumStore = create<ForumState>((set, get) => ({
       set({ comments: mapped });
     } catch (error) {
       console.error('Error fetching comments:', error);
+      set({ error: 'Error al cargar comentarios' });
     }
   },
 
   createPost: async (data) => {
     const { user } = useAuthStore.getState();
-    if (!user?.id) return;
+    if (!user?.id) {
+      set({ error: 'Debes iniciar sesión para publicar' });
+      return;
+    }
 
+    set({ error: null });
     try {
       const post = await forumService.createPost(user.id, {
         content: data.content,
@@ -375,13 +379,18 @@ export const useForumStore = create<ForumState>((set, get) => ({
       }
     } catch (error) {
       console.error('Error creating post:', error);
+      set({ error: 'Error al crear publicación' });
     }
   },
 
   createComment: async (data) => {
     const { user } = useAuthStore.getState();
-    if (!user?.id) return;
+    if (!user?.id) {
+      set({ error: 'Debes iniciar sesión para comentar' });
+      return;
+    }
 
+    set({ error: null });
     try {
       const comment = await forumService.createComment(user.id, {
         post_id: data.postId,
@@ -407,6 +416,7 @@ export const useForumStore = create<ForumState>((set, get) => ({
       }
     } catch (error) {
       console.error('Error creating comment:', error);
+      set({ error: 'Error al crear comentario' });
     }
   },
 
@@ -480,12 +490,16 @@ export const useForumStore = create<ForumState>((set, get) => ({
   },
 
   setFilter: (filter) => {
-    set({ filter });
+    set({ filter, error: null });
     get().fetchPosts();
   },
 
   setSelectedTag: (tag) => {
     set({ selectedTag: tag });
+  },
+
+  clearError: () => {
+    set({ error: null });
   },
 }));
 
