@@ -75,7 +75,6 @@ export default function EscenarioPage() {
   const [error, setError] = useState<string | null>(null);
   
   // Estado para votar
-  const [betAmount, setBetAmount] = useState(100);
   const [selectedVote, setSelectedVote] = useState<"YES" | "NO" | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [userPrediction, setUserPrediction] = useState<Prediction | null>(null);
@@ -142,11 +141,6 @@ export default function EscenarioPage() {
       return;
     }
 
-    if (betAmount < (scenario?.min_bet || 10)) {
-      toast.error(`Apuesta mínima: ${scenario?.min_bet || 10} AP Coins`);
-      return;
-    }
-
     if (userPrediction) {
       toast.error("Ya has votado en este escenario");
       return;
@@ -158,12 +152,12 @@ export default function EscenarioPage() {
       const result = await predictionsService.create({
         scenarioId,
         prediction: selectedVote,
-        amount: betAmount,
+        amount: 0,
         userId: user.id,
       });
 
       if (result.success && result.data) {
-        toast.success(`¡Predicción registrada! Apostaste ${betAmount} AP Coins a ${selectedVote === "YES" ? "SÍ" : "NO"}`);
+        toast.success(`¡Voto registrado! Votaste ${selectedVote === "YES" ? "SÍ" : "NO"}`);
         
         // Recargar escenario para ver pools actualizados
         const updated = await scenariosService.getById(scenarioId);
@@ -566,7 +560,7 @@ export default function EscenarioPage() {
           {userPrediction ? (
             <div className="text-center py-8">
               <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-lg font-bold ${
-                userPrediction.prediction === "YES" 
+                userPrediction.prediction === "YES"
                   ? "bg-green-500/20 text-green-400"
                   : "bg-red-500/20 text-red-400"
               }`}>
@@ -578,7 +572,7 @@ export default function EscenarioPage() {
                 Votaste: {userPrediction.prediction === "YES" ? "SÍ" : "NO"}
               </div>
               <p className="text-gray-400 mt-3">
-                Apostaste {userPrediction.amount} AP Coins
+                Tu predicción ha sido registrada
               </p>
             </div>
           ) : scenario.status !== "ACTIVE" ? (
@@ -620,40 +614,10 @@ export default function EscenarioPage() {
                 </button>
               </div>
 
-              {/* Bet amount */}
-              <div className="mb-6">
-                <label className="text-sm text-gray-400 mb-2 block">
-                  Cantidad a apostar (AP Coins)
-                </label>
-                <div className="flex gap-2">
-                  {[50, 100, 250, 500, 1000].map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() => setBetAmount(amount)}
-                      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        betAmount === amount
-                          ? "bg-purple-500 text-white"
-                          : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                      }`}
-                    >
-                      {amount}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="number"
-                  value={betAmount}
-                  onChange={(e) => setBetAmount(parseInt(e.target.value) || 0)}
-                  min={scenario.min_bet}
-                  max={scenario.max_bet}
-                  className="w-full mt-3 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
-                />
-              </div>
-
               {/* Submit button */}
               <button
                 onClick={handleVote}
-                disabled={!selectedVote || isVoting || betAmount < scenario.min_bet}
+                disabled={!selectedVote || isVoting}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isVoting ? (
@@ -662,7 +626,7 @@ export default function EscenarioPage() {
                     Procesando...
                   </>
                 ) : (
-                  `Apostar ${betAmount} AP Coins`
+                  `Votar ${selectedVote === "YES" ? "SÍ" : selectedVote === "NO" ? "NO" : ""}`
                 )}
               </button>
             </>
@@ -673,8 +637,8 @@ export default function EscenarioPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-bold mb-4">Distribución de votos</h2>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-green-400 font-medium">SÍ: {scenario.yes_pool.toLocaleString()} AP ({yesPercent}%)</span>
-            <span className="text-red-400 font-medium">NO: {scenario.no_pool.toLocaleString()} AP ({noPercent}%)</span>
+            <span className="text-green-400 font-medium">SÍ: {scenario.yes_pool} votos ({yesPercent}%)</span>
+            <span className="text-red-400 font-medium">NO: {scenario.no_pool} votos ({noPercent}%)</span>
           </div>
           <div className="h-4 bg-gray-800 rounded-full overflow-hidden flex">
             <div 
