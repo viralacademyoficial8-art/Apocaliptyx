@@ -289,13 +289,56 @@
   "shop": {
     "title": "Shop",
     "subtitle": "Power up your predictions with special items",
+    "heroTitle": "Prophet's",
+    "heroTitleHighlight": "Shop",
+    "heroSubtitle": "Power up your predictions with exclusive items. Protect your scenarios, multiply your earnings, and stand out among other prophets.",
+    "specialOffers": "Special Offers",
+    "limitedTime": "Limited Time",
+    "exclusiveItems": "Exclusive items",
+    "activeDiscounts": "Active discounts",
+    "featuredItems": "Featured Items",
+    "mostPopular": "Most popular",
+    "viewShop": "View shop",
+    "allItems": "All Items",
+    "searchItems": "Search items",
+    "noItemsFound": "No items found",
+    "tryAdjustFilters": "Try adjusting your search filters",
+    "buyNow": "Buy Now",
+    "clearCart": "Clear cart",
+    "addToCart": "Add to cart",
+    "add": "Add",
+    "inCart": "In cart",
+    "onSale": "On sale",
+    "activeSale": "Active sale",
+    "clear": "Clear",
+    "available": "available",
+    "sold": "sold",
+    "reviews": "reviews",
+    "quantity": "Quantity",
+    "maxPerUser": "Max per user",
+    "onlyLeft": "Only {{count}} units left",
     "categories": {
       "all": "All",
       "protection": "Protection",
-      "power": "Power",
-      "boost": "Boost",
-      "cosmetic": "Cosmetic",
-      "special": "Special"
+      "power": "Powers",
+      "boost": "Boosts",
+      "cosmetic": "Cosmetics",
+      "special": "Specials",
+      "bundle": "Bundles"
+    },
+    "rarity": {
+      "all": "All rarities",
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "sortBy": {
+      "popular": "Most popular",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "newest": "Newest",
+      "rating": "Best rated"
     },
     "item": {
       "buy": "Buy",
@@ -306,7 +349,7 @@
       "featured": "Featured",
       "duration": "Duration",
       "uses": "Uses",
-      "effect": "Effect"
+      "effect": "Effects"
     },
     "cart": {
       "title": "Cart",
@@ -412,6 +455,43 @@
     "viewLeaderboard": "View Leaderboard",
     "leaderboardDescription": "Check your position among all prophets."
   },
+  "create": {
+    "title": "Create a new apocalyptic scenario",
+    "subtitle": "Describe an event that could happen in the future. If your prophecy comes true, you win AP Coins from the pool.",
+    "scenarioTitle": "Scenario title",
+    "titlePlaceholder": "E.g. Will there be a new global pandemic before 2030?",
+    "minCharsHint": "Write at least 10 characters to check for duplicates",
+    "uniqueTitle": "Unique title! We didn't find similar scenarios.",
+    "descriptionPlaceholder": "Explain in detail the conditions of the scenario and what would have to happen exactly for it to be considered fulfilled.",
+    "deadlineLabel": "Deadline for fulfillment",
+    "deadlineHint": "After this date, the community will judge whether your prophecy came true or not.",
+    "creationCost": "Creation cost",
+    "freeForNow": "Free (for now)",
+    "rewardInfo": "If your scenario comes true, you'll earn AP Coins from the prediction pool. Be a true prophet!",
+    "creating": "Creating scenario...",
+    "verifying": "Verifying...",
+    "launchScenario": "Launch scenario",
+    "success": "Scenario created successfully! 🎉",
+    "categories": {
+      "war": "War",
+      "health": "Health"
+    },
+    "duplicates": {
+      "possibleDuplicate": "Possibly duplicate scenario",
+      "similarFound": "Similar scenarios found",
+      "duplicateWarning": "A very similar scenario already exists on the platform. Please review before continuing.",
+      "similarWarning": "We found some similar scenarios. Verify it's not a repeated idea.",
+      "similar": "similar",
+      "createAnyway": "Create anyway",
+      "changeScenario": "Change my scenario"
+    },
+    "errors": {
+      "loginRequired": "You must log in to create a scenario.",
+      "allFieldsRequired": "Complete all fields to create your scenario.",
+      "duplicateWarning": "This scenario seems similar to an existing one. Review the suggestions.",
+      "createFailed": "Error creating scenario. Please try again."
+    }
+  },
   "footer": {
     "description": "The prediction platform where prophets compete for the future.",
     "links": {
@@ -455,5 +535,198 @@
     "inDays": "in {{count}} days",
     "inHours": "in {{count}} hours",
     "inMinutes": "in {{count}} minutes"
+  },
+  "forum": {
+    "title": "Community",
+    "subtitle": "Share predictions, debates and strategies with other prophets",
+    "newPost": "New Post",
+    "tabs": {
+      "feed": "Feed",
+      "reels": "Reels",
+      "lives": "Lives",
+      "communities": "Communities"
+    },
+    "filters": {
+      "recent": "Recent",
+      "hot": "Hot",
+      "rising": "Rising",
+      "top": "Top",
+      "following": "Following"
+    },
+    "reactions": {
+      "fire": "Fire",
+      "love": "Love it",
+      "clap": "Applause",
+      "mindblown": "Mind blown",
+      "laugh": "Haha",
+      "sad": "Sad"
+    },
+    "tags": {
+      "prediction": "Prediction",
+      "debate": "Debate",
+      "strategy": "Strategy",
+      "analysis": "Analysis",
+      "news": "News",
+      "humor": "Humor"
+    },
+    "sidebar": {
+      "categories": "Categories",
+      "allCategories": "All",
+      "trending": "Trending",
+      "postsThisWeek": "{{count}} posts this week",
+      "tags": "Tags",
+      "rules": "Forum Rules",
+      "rule1": "Respect other prophets",
+      "rule2": "No spam or self-promotion",
+      "rule3": "No +18 content",
+      "rule4": "No extreme politics",
+      "rule5": "Have fun predicting 🔮"
+    },
+    "posts": {
+      "noPosts": "No posts",
+      "noPostsWithTag": "No posts with this tag",
+      "beFirstToShare": "Be the first to share something with the community",
+      "createFirst": "Create first post",
+      "thread": "Thread",
+      "views": "views"
+    },
+    "createModal": {
+      "title": "New Post",
+      "post": "Post",
+      "poll": "Poll",
+      "thread": "Thread",
+      "placeholder": "What do you want to share with the community? Use @ to mention users",
+      "image": "Image",
+      "mention": "Mention",
+      "tagsOptional": "Tags (optional)",
+      "publish": "Publish",
+      "publishing": "Publishing...",
+      "createPoll": "Create Poll",
+      "publishThread": "Publish Thread"
+    },
+    "poll": {
+      "question": "Poll question",
+      "questionPlaceholder": "What do you want to ask?",
+      "options": "Options",
+      "optionPlaceholder": "Option {{number}}",
+      "addOption": "Add option",
+      "duration": "Duration",
+      "hour": "hour",
+      "hours": "hours",
+      "days": "days",
+      "week": "week",
+      "needQuestionAndOptions": "Poll needs a question and at least 2 options",
+      "created": "Poll created!",
+      "createError": "Error creating poll",
+      "vote": "vote",
+      "votes": "votes",
+      "voteRecorded": "Vote recorded!",
+      "voteError": "Error voting",
+      "pollEnded": "Poll ended",
+      "endsIn": "Ends {{time}}"
+    },
+    "thread": {
+      "titleOptional": "Thread title (optional)",
+      "titlePlaceholder": "Your thread title...",
+      "posts": "Thread posts",
+      "postPlaceholder": "Post {{number}}...",
+      "addToThread": "Add to thread",
+      "needAtLeast2": "A thread needs at least 2 posts",
+      "created": "Thread created!",
+      "createError": "Error creating thread"
+    },
+    "comments": {
+      "title": "Comments",
+      "noComments": "No comments. Be the first!",
+      "placeholder": "Write a comment...",
+      "writeComment": "Write a comment",
+      "added": "Comment added",
+      "addError": "Error commenting"
+    },
+    "actions": {
+      "deletePost": "Delete this post?",
+      "deleted": "Post deleted",
+      "savedToBookmarks": "Saved to bookmarks",
+      "removedFromBookmarks": "Removed from bookmarks",
+      "sharePost": "Share Post",
+      "addCommentOptional": "Add comment (optional)",
+      "whatDoYouThink": "What do you think about this?",
+      "share": "Share",
+      "quote": "Quote",
+      "shared": "Post shared!",
+      "shareError": "Error sharing",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "giveAward": "Give Award",
+      "by": "By",
+      "messageOptional": "Message (optional)",
+      "addMessage": "Add a message...",
+      "give": "Give",
+      "awardGiven": "{{name}} award given!",
+      "awardError": "Error giving award",
+      "apCost": "{{cost}} AP",
+      "apReward": "+{{reward}} for author",
+      "maxImages": "Maximum 4 images per post",
+      "writeToPublish": "Write something to publish",
+      "postCreated": "Post created!",
+      "postCreateError": "Error creating post",
+      "storyPublished": "Story published!"
+    },
+    "reels": {
+      "title": "Reels",
+      "subtitle": "Short videos of predictions and analysis",
+      "forYou": "For you",
+      "following": "Following",
+      "trending": "Trending",
+      "noReels": "No reels available",
+      "beFirst": "Be the first to share a prediction reel",
+      "loadError": "Error loading reels",
+      "likeError": "Error liking",
+      "removed": "Removed from saved",
+      "saved": "Saved",
+      "comingSoon": "Comments coming soon",
+      "published": "Reel published successfully",
+      "publishError": "Error publishing reel"
+    },
+    "lives": {
+      "title": "Live Broadcasts",
+      "subtitle": "Watch and create prediction streams in real time",
+      "startStream": "Start Stream",
+      "liveNow": "Live now",
+      "viewers": "Viewers",
+      "mostWatchedToday": "Most watched today",
+      "streamsToday": "Streams today",
+      "noStreams": "No live streams",
+      "beFirst": "Be the first to start a broadcast and share your predictions",
+      "startMyFirst": "Start my first stream"
+    },
+    "communities": {
+      "title": "Communities",
+      "subtitle": "Join prediction groups and share with other prophets",
+      "searchPlaceholder": "Search communities...",
+      "all": "All",
+      "myCommunities": "My Communities",
+      "popular": "Popular",
+      "members": "members",
+      "defaultDescription": "Prediction community. Join and share your analysis.",
+      "viewCommunity": "View community",
+      "leave": "Leave",
+      "join": "Join",
+      "noCommunitiesFound": "No communities found",
+      "tryOtherTerms": "Try other search terms",
+      "beFirstToCreate": "Be the first to create a community",
+      "clearSearch": "Clear search",
+      "loadError": "Error loading communities",
+      "joined": "You joined the community",
+      "joinError": "Error joining community",
+      "left": "You left the community",
+      "leaveError": "Error leaving community",
+      "loginToCreate": "You must log in to create a community",
+      "createError": "Error creating community",
+      "created": "Community \"{{name}}\" created successfully"
+    },
+    "errors": {
+      "loginRequired": "You must log in"
+    }
   }
 }

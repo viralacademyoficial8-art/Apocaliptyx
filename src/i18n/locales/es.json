@@ -288,13 +288,56 @@
   "shop": {
     "title": "Tienda",
     "subtitle": "Potencia tus predicciones con ítems especiales",
+    "heroTitle": "Tienda del",
+    "heroTitleHighlight": "Profeta",
+    "heroSubtitle": "Potencia tus predicciones con items exclusivos. Protege tus escenarios, multiplica tus ganancias y destaca entre los demás profetas.",
+    "specialOffers": "Ofertas Especiales",
+    "limitedTime": "Tiempo Limitado",
+    "exclusiveItems": "Items exclusivos",
+    "activeDiscounts": "Descuentos activos",
+    "featuredItems": "Items Destacados",
+    "mostPopular": "Los más populares",
+    "viewShop": "Ver tienda",
+    "allItems": "Todos los Items",
+    "searchItems": "Buscar items",
+    "noItemsFound": "No se encontraron items",
+    "tryAdjustFilters": "Intenta ajustar los filtros de búsqueda",
+    "buyNow": "Comprar Ahora",
+    "clearCart": "Vaciar carrito",
+    "addToCart": "Agregar al carrito",
+    "add": "Agregar",
+    "inCart": "En carrito",
+    "onSale": "En oferta",
+    "activeSale": "Oferta activa",
+    "clear": "Limpiar",
+    "available": "disponibles",
+    "sold": "vendidos",
+    "reviews": "reseñas",
+    "quantity": "Cantidad",
+    "maxPerUser": "Máx por usuario",
+    "onlyLeft": "Solo quedan {{count}} unidades disponibles",
     "categories": {
       "all": "Todos",
       "protection": "Protección",
-      "power": "Poder",
-      "boost": "Boost",
-      "cosmetic": "Cosmético",
-      "special": "Especial"
+      "power": "Poderes",
+      "boost": "Boosts",
+      "cosmetic": "Cosméticos",
+      "special": "Especiales",
+      "bundle": "Packs"
+    },
+    "rarity": {
+      "all": "Todas las rarezas",
+      "common": "Común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario"
+    },
+    "sortBy": {
+      "popular": "Más populares",
+      "priceAsc": "Precio: menor a mayor",
+      "priceDesc": "Precio: mayor a menor",
+      "newest": "Más nuevos",
+      "rating": "Mejor valorados"
     },
     "item": {
       "buy": "Comprar",
@@ -305,7 +348,7 @@
       "featured": "Destacado",
       "duration": "Duración",
       "uses": "Usos",
-      "effect": "Efecto"
+      "effect": "Efectos"
     },
     "cart": {
       "title": "Carrito",
@@ -411,6 +454,43 @@
     "viewLeaderboard": "Ver Leaderboard",
     "leaderboardDescription": "Revisa en qué posición vas entre todos los profetas."
   },
+  "create": {
+    "title": "Crea un nuevo escenario apocalíptico",
+    "subtitle": "Describe un evento que podría suceder en el futuro. Si tu profecía se cumple, ganas AP Coins del pozo.",
+    "scenarioTitle": "Título del escenario",
+    "titlePlaceholder": "Ej. ¿Habrá una nueva pandemia global antes de 2030?",
+    "minCharsHint": "Escribe al menos 10 caracteres para verificar duplicados",
+    "uniqueTitle": "¡Título único! No encontramos escenarios similares.",
+    "descriptionPlaceholder": "Explica con detalle las condiciones del escenario y qué tendría que pasar exactamente para considerarlo cumplido.",
+    "deadlineLabel": "Fecha límite para que se cumpla",
+    "deadlineHint": "Después de esta fecha, la comunidad juzgará si tu profecía se cumplió o no.",
+    "creationCost": "Coste de creación",
+    "freeForNow": "Gratis (por ahora)",
+    "rewardInfo": "Si tu escenario se hace realidad, ganarás AP Coins del pozo de predicciones. ¡Sé un verdadero profeta!",
+    "creating": "Creando escenario...",
+    "verifying": "Verificando...",
+    "launchScenario": "Lanzar escenario",
+    "success": "¡Escenario creado exitosamente! 🎉",
+    "categories": {
+      "war": "Guerra",
+      "health": "Salud"
+    },
+    "duplicates": {
+      "possibleDuplicate": "Escenario posiblemente duplicado",
+      "similarFound": "Escenarios similares encontrados",
+      "duplicateWarning": "Ya existe un escenario muy similar en la plataforma. Por favor, revisa antes de continuar.",
+      "similarWarning": "Encontramos algunos escenarios parecidos. Verifica que no sea una idea repetida.",
+      "similar": "similar",
+      "createAnyway": "Crear de todas formas",
+      "changeScenario": "Cambiar mi escenario"
+    },
+    "errors": {
+      "loginRequired": "Debes iniciar sesión para crear un escenario.",
+      "allFieldsRequired": "Completa todos los campos para crear tu escenario.",
+      "duplicateWarning": "Este escenario parece ser similar a uno existente. Revisa las sugerencias.",
+      "createFailed": "Error al crear el escenario. Intenta de nuevo."
+    }
+  },
   "footer": {
     "description": "La plataforma de predicciones donde los profetas compiten por el futuro.",
     "links": {
@@ -454,5 +534,198 @@
     "inDays": "en {{count}} días",
     "inHours": "en {{count}} horas",
     "inMinutes": "en {{count}} minutos"
+  },
+  "forum": {
+    "title": "Comunidad",
+    "subtitle": "Comparte predicciones, debates y estrategias con otros profetas",
+    "newPost": "Nueva Publicación",
+    "tabs": {
+      "feed": "Feed",
+      "reels": "Reels",
+      "lives": "Lives",
+      "communities": "Comunidades"
+    },
+    "filters": {
+      "recent": "Recientes",
+      "hot": "Hot",
+      "rising": "Rising",
+      "top": "Top",
+      "following": "Siguiendo"
+    },
+    "reactions": {
+      "fire": "Fuego",
+      "love": "Me encanta",
+      "clap": "Aplausos",
+      "mindblown": "Increíble",
+      "laugh": "Jaja",
+      "sad": "Triste"
+    },
+    "tags": {
+      "prediction": "Predicción",
+      "debate": "Debate",
+      "strategy": "Estrategia",
+      "analysis": "Análisis",
+      "news": "Noticia",
+      "humor": "Humor"
+    },
+    "sidebar": {
+      "categories": "Categorías",
+      "allCategories": "Todas",
+      "trending": "Trending",
+      "postsThisWeek": "{{count}} posts esta semana",
+      "tags": "Etiquetas",
+      "rules": "Reglas del Foro",
+      "rule1": "Respeta a otros profetas",
+      "rule2": "No spam ni autopromoción",
+      "rule3": "Nada de contenido +18",
+      "rule4": "Sin política extrema",
+      "rule5": "Diviértete prediciendo 🔮"
+    },
+    "posts": {
+      "noPosts": "No hay publicaciones",
+      "noPostsWithTag": "No hay posts con esta etiqueta",
+      "beFirstToShare": "Sé el primero en compartir algo con la comunidad",
+      "createFirst": "Crear primera publicación",
+      "thread": "Hilo",
+      "views": "vistas"
+    },
+    "createModal": {
+      "title": "Nueva Publicación",
+      "post": "Post",
+      "poll": "Encuesta",
+      "thread": "Hilo",
+      "placeholder": "¿Qué quieres compartir con la comunidad? Usa @ para mencionar usuarios",
+      "image": "Imagen",
+      "mention": "Mención",
+      "tagsOptional": "Etiquetas (opcional)",
+      "publish": "Publicar",
+      "publishing": "Publicando...",
+      "createPoll": "Crear Encuesta",
+      "publishThread": "Publicar Hilo"
+    },
+    "poll": {
+      "question": "Pregunta de la encuesta",
+      "questionPlaceholder": "¿Qué quieres preguntar?",
+      "options": "Opciones",
+      "optionPlaceholder": "Opción {{number}}",
+      "addOption": "Añadir opción",
+      "duration": "Duración",
+      "hour": "hora",
+      "hours": "horas",
+      "days": "días",
+      "week": "semana",
+      "needQuestionAndOptions": "La encuesta necesita pregunta y al menos 2 opciones",
+      "created": "¡Encuesta creada!",
+      "createError": "Error al crear la encuesta",
+      "vote": "voto",
+      "votes": "votos",
+      "voteRecorded": "¡Voto registrado!",
+      "voteError": "Error al votar",
+      "pollEnded": "Encuesta finalizada",
+      "endsIn": "Termina {{time}}"
+    },
+    "thread": {
+      "titleOptional": "Título del hilo (opcional)",
+      "titlePlaceholder": "Título de tu hilo...",
+      "posts": "Publicaciones del hilo",
+      "postPlaceholder": "Publicación {{number}}...",
+      "addToThread": "Añadir al hilo",
+      "needAtLeast2": "Un hilo necesita al menos 2 publicaciones",
+      "created": "¡Hilo creado!",
+      "createError": "Error al crear el hilo"
+    },
+    "comments": {
+      "title": "Comentarios",
+      "noComments": "No hay comentarios. ¡Sé el primero!",
+      "placeholder": "Escribe un comentario...",
+      "writeComment": "Escribe un comentario",
+      "added": "Comentario añadido",
+      "addError": "Error al comentar"
+    },
+    "actions": {
+      "deletePost": "¿Eliminar esta publicación?",
+      "deleted": "Publicación eliminada",
+      "savedToBookmarks": "Guardado en marcadores",
+      "removedFromBookmarks": "Eliminado de marcadores",
+      "sharePost": "Compartir Publicación",
+      "addCommentOptional": "Añadir comentario (opcional)",
+      "whatDoYouThink": "¿Qué piensas sobre esto?",
+      "share": "Compartir",
+      "quote": "Citar",
+      "shared": "¡Publicación compartida!",
+      "shareError": "Error al compartir",
+      "copyLink": "Copiar enlace",
+      "linkCopied": "Enlace copiado",
+      "giveAward": "Dar Premio",
+      "by": "Por",
+      "messageOptional": "Mensaje (opcional)",
+      "addMessage": "Añadir un mensaje...",
+      "give": "Dar",
+      "awardGiven": "¡Premio {{name}} otorgado!",
+      "awardError": "Error al dar premio",
+      "apCost": "{{cost}} AP",
+      "apReward": "+{{reward}} para autor",
+      "maxImages": "Máximo 4 imágenes por publicación",
+      "writeToPublish": "Escribe algo para publicar",
+      "postCreated": "¡Publicación creada!",
+      "postCreateError": "Error al crear la publicación",
+      "storyPublished": "¡Historia publicada!"
+    },
+    "reels": {
+      "title": "Reels",
+      "subtitle": "Videos cortos de predicciones y análisis",
+      "forYou": "Para ti",
+      "following": "Siguiendo",
+      "trending": "Tendencias",
+      "noReels": "No hay reels disponibles",
+      "beFirst": "Sé el primero en compartir un reel de predicciones",
+      "loadError": "Error al cargar reels",
+      "likeError": "Error al dar like",
+      "removed": "Eliminado de guardados",
+      "saved": "Guardado",
+      "comingSoon": "Comentarios próximamente",
+      "published": "Reel publicado exitosamente",
+      "publishError": "Error al publicar reel"
+    },
+    "lives": {
+      "title": "Transmisiones en Vivo",
+      "subtitle": "Mira y crea streams de predicciones en tiempo real",
+      "startStream": "Iniciar Stream",
+      "liveNow": "En vivo ahora",
+      "viewers": "Espectadores",
+      "mostWatchedToday": "Más visto hoy",
+      "streamsToday": "Streams hoy",
+      "noStreams": "No hay streams en vivo",
+      "beFirst": "Sé el primero en iniciar una transmisión y compartir tus predicciones",
+      "startMyFirst": "Iniciar mi primer stream"
+    },
+    "communities": {
+      "title": "Comunidades",
+      "subtitle": "Únete a grupos de predicciones y comparte con otros profetas",
+      "searchPlaceholder": "Buscar comunidades...",
+      "all": "Todas",
+      "myCommunities": "Mis Comunidades",
+      "popular": "Populares",
+      "members": "miembros",
+      "defaultDescription": "Comunidad de predicciones. Únete y comparte tus análisis.",
+      "viewCommunity": "Ver comunidad",
+      "leave": "Salir",
+      "join": "Unirse",
+      "noCommunitiesFound": "No se encontraron comunidades",
+      "tryOtherTerms": "Prueba con otros términos de búsqueda",
+      "beFirstToCreate": "Sé el primero en crear una comunidad",
+      "clearSearch": "Limpiar búsqueda",
+      "loadError": "Error al cargar comunidades",
+      "joined": "Te has unido a la comunidad",
+      "joinError": "Error al unirse a la comunidad",
+      "left": "Has salido de la comunidad",
+      "leaveError": "Error al salir de la comunidad",
+      "loginToCreate": "Debes iniciar sesión para crear una comunidad",
+      "createError": "Error al crear comunidad",
+      "created": "Comunidad \"{{name}}\" creada exitosamente"
+    },
+    "errors": {
+      "loginRequired": "Debes iniciar sesión"
+    }
   }
 }

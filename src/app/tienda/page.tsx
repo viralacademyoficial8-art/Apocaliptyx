@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useShopStore } from "@/stores/shopStore";
 import { Navbar } from "@/components/Navbar";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   ShopHero,
   CategoryTabs,
@@ -16,6 +17,7 @@ import {
 
 export default function TiendaPage() {
   const { setCartOpen, getCartItemCount, loadItems } = useShopStore();
+  const { t } = useTranslation();
   const cartItemCount = getCartItemCount();
 
   // Cargar items de Supabase al montar
@@ -26,14 +28,14 @@ export default function TiendaPage() {
   return (
     <div className="min-h-screen bg-gray-950">
       <Navbar />
-      
+
       {/* Floating Cart Button */}
       <button
         onClick={() => setCartOpen(true)}
         className="fixed bottom-6 right-6 z-30 flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-full shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
       >
         <ShoppingCart className="w-5 h-5" />
-        Carrito
+        {t('shop.cart.title')}
         {cartItemCount > 0 && (
           <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
             {cartItemCount}
@@ -49,7 +51,7 @@ export default function TiendaPage() {
         </div>
 
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Todos los Items</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">{t('shop.allItems')}</h2>
 
           <div className="mb-6">
             <CategoryTabs />
