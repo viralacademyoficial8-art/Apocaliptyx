@@ -419,7 +419,7 @@ export default function ForoPage() {
     isPublic: boolean;
     categories: string[];
     themeColor: string;
-  }) => {
+  }): Promise<boolean> => {
     try {
       const response = await fetch('/api/communities', {
         method: 'POST',
@@ -427,13 +427,19 @@ export default function ForoPage() {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      if (result.error) throw new Error(result.error);
+
+      if (result.error) {
+        toast.error(result.error);
+        return false;
+      }
 
       toast.success(`Comunidad "${data.name}" creada exitosamente`);
       loadCommunities();
+      return true;
     } catch (error) {
       console.error('Error creating community:', error);
       toast.error('Error al crear la comunidad');
+      return false;
     }
   };
 

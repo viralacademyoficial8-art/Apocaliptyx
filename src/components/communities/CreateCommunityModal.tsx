@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Upload, Globe, Lock, X } from 'lucide-react';
+import { Plus, Globe, Lock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,7 +22,7 @@ interface CreateCommunityModalProps {
     requiresApproval: boolean;
     categories: string[];
     themeColor: string;
-  }) => void;
+  }) => Promise<boolean>;
 }
 
 const predefinedCategories = [
@@ -49,6 +49,7 @@ const themeColors = [
 
 export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isPublic, setIsPublic] = useState(true);
@@ -56,26 +57,33 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [themeColor, setThemeColor] = useState(themeColors[0]);
 
-  const handleSubmit = () => {
-    if (!name.trim()) return;
+  const handleSubmit = async () => {
+    if (!name.trim() || isLoading) return;
 
-    onCreateCommunity({
-      name,
-      description,
-      isPublic,
-      requiresApproval,
-      categories: selectedCategories,
-      themeColor,
-    });
+    setIsLoading(true);
+    try {
+      const success = await onCreateCommunity({
+        name,
+        description,
+        isPublic,
+        requiresApproval,
+        categories: selectedCategories,
+        themeColor,
+      });
 
-    // Reset form
-    setName('');
-    setDescription('');
-    setIsPublic(true);
-    setRequiresApproval(false);
-    setSelectedCategories([]);
-    setThemeColor(themeColors[0]);
-    setIsOpen(false);
+      if (success) {
+        // Reset form only on success
+        setName('');
+        setDescription('');
+        setIsPublic(true);
+        setRequiresApproval(false);
+        setSelectedCategories([]);
+        setThemeColor(themeColors[0]);
+        setIsOpen(false);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleCategory = (category: string) => {
@@ -87,7 +95,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => !isLoading && setIsOpen(open)}>
       <DialogTrigger asChild>
         <Button className="bg-purple-600 hover:bg-purple-700">
           <Plus className="w-4 h-4 mr-2" />
@@ -126,6 +134,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
               placeholder="Ej: Predicciones de Fútbol"
               className="bg-gray-800 border-gray-700"
               maxLength={50}
+              disabled={isLoading}
             />
             <p className="text-xs text-gray-500 mt-1">{name.length}/50</p>
           </div>
@@ -141,6 +150,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
               placeholder="Describe de qué trata tu comunidad..."
               className="bg-gray-800 border-gray-700 min-h-[80px]"
               maxLength={500}
+              disabled={isLoading}
             />
             <p className="text-xs text-gray-500 mt-1">{description.length}/500</p>
           </div>
@@ -155,11 +165,12 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                 <button
                   key={cat}
                   onClick={() => toggleCategory(cat)}
+                  disabled={isLoading}
                   className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                     selectedCategories.includes(cat)
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-800 text-gray-400 hover:text-white'
-                  }`}
+                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {cat}
                 </button>
@@ -177,11 +188,12 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                 <button
                   key={color}
                   onClick={() => setThemeColor(color)}
+                  disabled={isLoading}
                   className={`w-8 h-8 rounded-lg transition-transform ${
                     themeColor === color
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110'
                       : ''
-                  }`}
+                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   style={{ backgroundColor: color }}
                 />
               ))}
@@ -206,7 +218,11 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                   </p>
                 </div>
               </div>
-              <Switch checked={isPublic} onCheckedChange={setIsPublic} />
+              <Switch
+                checked={isPublic}
+                onCheckedChange={setIsPublic}
+                disabled={isLoading}
+              />
             </div>
 
             {isPublic && (
@@ -220,6 +236,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                 <Switch
                   checked={requiresApproval}
                   onCheckedChange={setRequiresApproval}
+                  disabled={isLoading}
                 />
               </div>
             )}
@@ -228,10 +245,17 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
           {/* Submit */}
           <Button
             onClick={handleSubmit}
-            disabled={!name.trim()}
+            disabled={!name.trim() || isLoading}
             className="w-full bg-purple-600 hover:bg-purple-700"
           >
-            Crear comunidad
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Creando...
+              </>
+            ) : (
+              'Crear comunidad'
+            )}
           </Button>
         </div>
       </DialogContent>
