@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, getSupabaseAdmin } from '@/lib/supabase-server';
 import { auth } from '@/lib/auth';
 
 interface UserFollow {
@@ -118,7 +118,8 @@ export async function GET(request: NextRequest) {
 // POST /api/streaming - Start a new stream
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    // Use admin client to bypass RLS (we validate user via NextAuth)
+    const supabase = getSupabaseAdmin();
 
     const session = await auth();
     const user = session?.user;
