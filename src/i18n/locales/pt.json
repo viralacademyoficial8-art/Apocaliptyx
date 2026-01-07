@@ -44,7 +44,17 @@
     "login": "Entrar",
     "register": "Cadastrar",
     "notifications": "Notificações",
-    "messages": "Mensagens"
+    "messages": "Mensagens",
+    "social": "Social",
+    "streaming": "Ao Vivo",
+    "reels": "Reels",
+    "communities": "Comunidades",
+    "collectibles": "Colecionáveis",
+    "tournaments": "Torneios",
+    "helpCenter": "Central de Ajuda",
+    "support": "Suporte Técnico",
+    "adminPanel": "Painel Admin",
+    "createScenario": "Criar Cenário"
   },
   "auth": {
     "login": {
@@ -129,6 +139,35 @@
     "title": "Notificações",
     "markAllRead": "Marcar tudo como lido",
     "empty": "Sem notificações"
+  },
+  "streaming": {
+    "title": "Streaming",
+    "subtitle": "Transmissões ao vivo de previsões e análises",
+    "liveNow": "Ao vivo agora",
+    "viewers": "Espectadores",
+    "mostWatchedToday": "Mais assistido hoje",
+    "streamsToday": "Streams hoje",
+    "noLiveStreams": "Sem streams ao vivo agora",
+    "viewAllStreams": "Ver todos os streams",
+    "startStream": "Iniciar stream",
+    "starting": "Iniciando...",
+    "endStream": "Encerrar stream",
+    "streamTitle": "Título do stream:",
+    "broadcasting": "Transmitindo",
+    "live": "Ao vivo",
+    "all": "Todos",
+    "following": "Seguindo",
+    "streamEnded": "Este stream terminou",
+    "connecting": "Conectando ao stream...",
+    "livekitNotConfigured": "LiveKit não configurado",
+    "livekitRequired": "O streaming ao vivo requer configurar LiveKit.",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Envie uma mensagem...",
+      "send": "Enviar",
+      "loginRequired": "Entre para conversar",
+      "noMessages": "Nenhuma mensagem ainda. Seja o primeiro!"
+    }
   },
   "footer": {
     "description": "A plataforma de previsões onde profetas competem pelo futuro.",

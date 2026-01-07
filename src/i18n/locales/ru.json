@@ -44,7 +44,17 @@
     "login": "Войти",
     "register": "Регистрация",
     "notifications": "Уведомления",
-    "messages": "Сообщения"
+    "messages": "Сообщения",
+    "social": "Социальное",
+    "streaming": "Прямой Эфир",
+    "reels": "Рилсы",
+    "communities": "Сообщества",
+    "collectibles": "Коллекционные",
+    "tournaments": "Турниры",
+    "helpCenter": "Центр Помощи",
+    "support": "Техподдержка",
+    "adminPanel": "Админ Панель",
+    "createScenario": "Создать Сценарий"
   },
   "auth": {
     "login": {
@@ -129,6 +139,35 @@
     "title": "Уведомления",
     "markAllRead": "Отметить все как прочитанные",
     "empty": "Нет уведомлений"
+  },
+  "streaming": {
+    "title": "Стриминг",
+    "subtitle": "Прямые трансляции прогнозов и анализов",
+    "liveNow": "Сейчас в эфире",
+    "viewers": "Зрители",
+    "mostWatchedToday": "Самое просматриваемое сегодня",
+    "streamsToday": "Стримы сегодня",
+    "noLiveStreams": "Нет прямых трансляций",
+    "viewAllStreams": "Все стримы",
+    "startStream": "Начать стрим",
+    "starting": "Запуск...",
+    "endStream": "Завершить стрим",
+    "streamTitle": "Название стрима:",
+    "broadcasting": "Идёт трансляция",
+    "live": "В эфире",
+    "all": "Все",
+    "following": "Подписки",
+    "streamEnded": "Этот стрим завершён",
+    "connecting": "Подключение к стриму...",
+    "livekitNotConfigured": "LiveKit не настроен",
+    "livekitRequired": "Для стриминга требуется настройка LiveKit.",
+    "chat": {
+      "title": "Чат",
+      "placeholder": "Отправить сообщение...",
+      "send": "Отправить",
+      "loginRequired": "Войдите чтобы писать в чат",
+      "noMessages": "Пока нет сообщений. Будьте первым!"
+    }
   },
   "footer": {
     "description": "Платформа предсказаний, где пророки соревнуются.",
