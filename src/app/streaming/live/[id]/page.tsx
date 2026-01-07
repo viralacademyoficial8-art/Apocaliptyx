@@ -29,21 +29,18 @@ export default function LiveStreamPage() {
   const params = useParams();
   const { user } = useAuthStore();
 
-  // Get streamId from params using useParams hook
+  // Get streamId from params
   const streamId = params.id as string;
+
+  // Check if user is host from URL param
+  const hostParam = searchParams.get('host') === 'true';
 
   const [streamInfo, setStreamInfo] = useState<StreamInfo | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
-  const [isHost, setIsHost] = useState(false);
+  const [isHost, setIsHost] = useState(hostParam);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Check if user is host
-  useEffect(() => {
-    const hostParam = searchParams.get('host');
-    setIsHost(hostParam === 'true');
-  }, [searchParams]);
 
   // Load stream info and get token
   useEffect(() => {
@@ -71,13 +68,16 @@ export default function LiveStreamPage() {
           return;
         }
 
-        // Get LiveKit token
+        // Get LiveKit token - use hostParam directly to avoid state timing issues
+        const wantsToHost = hostParam && user?.id === infoData.stream.userId;
+        console.log('Token request:', { streamId, hostParam, userId: user?.id, streamUserId: infoData.stream.userId, wantsToHost });
+
         const tokenResponse = await fetch('/api/livekit/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             streamId,
-            isHost: isHost && user?.id === infoData.stream.userId,
+            isHost: wantsToHost,
           }),
         });
 
@@ -105,7 +105,7 @@ export default function LiveStreamPage() {
     };
 
     loadStream();
-  }, [streamId, isHost, user?.id]);
+  }, [streamId, hostParam, user?.id]);
 
   const handleStreamEnd = () => {
     toast.success('Stream finalizado');
