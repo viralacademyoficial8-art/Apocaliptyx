@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 interface CommunityRow {
   id: string;
@@ -21,14 +24,12 @@ interface CommunityRow {
 // GET /api/communities - Get all communities
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const filter = searchParams.get('filter'); // 'joined', 'popular', 'all'
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    let query = supabase
+    let query = supabase()
       .from('communities')
       .select('*')
       .eq('is_public', true)
@@ -46,11 +47,11 @@ export async function GET(request: NextRequest) {
 
     // Get user's joined communities
     let userCommunities: string[] = [];
-    if (user) {
-      const { data: memberships } = await supabase
+    if (session?.user?.id) {
+      const { data: memberships } = await supabase()
         .from('community_members')
         .select('community_id')
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .eq('is_banned', false);
 
       userCommunities = (memberships as { community_id: string }[] | null)?.map(m => m.community_id) || [];
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     // Filter if needed
     let filteredCommunities = communities || [];
-    if (filter === 'joined' && user) {
+    if (filter === 'joined' && session?.user?.id) {
       filteredCommunities = filteredCommunities.filter(c =>
         userCommunities.includes(c.id)
       );
@@ -93,11 +94,9 @@ export async function GET(request: NextRequest) {
 // POST /api/communities - Create a new community
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -115,7 +114,7 @@ export async function POST(request: NextRequest) {
       .replace(/(^-|-$)/g, '');
 
     // Check if slug exists
-    const { data: existing } = await supabase
+    const { data: existing } = await supabase()
       .from('communities')
       .select('id')
       .eq('slug', slug)
@@ -129,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create community
-    const { data: community, error } = await supabase
+    const { data: community, error } = await supabase()
       .from('communities')
       .insert({
         name,
@@ -139,10 +138,10 @@ export async function POST(request: NextRequest) {
         requires_approval: requiresApproval || false,
         categories: categories || [],
         theme_color: themeColor || '#6366f1',
-        creator_id: user.id,
+        creator_id: session.user.id,
         members_count: 1,
         posts_count: 0,
-      } as never)
+      })
       .select()
       .single();
 
@@ -155,11 +154,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Add creator as owner
-    const { error: memberError } = await supabase.from('community_members').insert({
-      community_id: (community as { id: string }).id,
-      user_id: user.id,
+    const { error: memberError } = await supabase().from('community_members').insert({
+      community_id: community.id,
+      user_id: session.user.id,
       role: 'owner',
-    } as never);
+    });
 
     if (memberError) {
       console.error('Error adding owner to community:', memberError);
