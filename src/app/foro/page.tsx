@@ -59,7 +59,7 @@ import {
   Search,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, type Locale } from 'date-fns';
 import { es, enUS, pt, fr, de, ru } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { useTranslation } from '@/hooks/useTranslation';
