@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/communities/[id]/posts/[postId]/like - Like a post
 export async function POST(
   request: NextRequest,

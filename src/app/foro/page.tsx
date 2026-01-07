@@ -183,27 +183,26 @@ export default function ForoPage() {
   const [storiesKey, setStoriesKey] = useState(0); // For refreshing StoriesBar
 
   // Tab navigation for social hub - persist with localStorage and URL
-  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>('feed');
-  const [tabInitialized, setTabInitialized] = useState(false);
+  // Use lazy initialization to read from localStorage immediately on client
+  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>(() => {
+    // This runs only on client side
+    if (typeof window !== 'undefined') {
+      const savedTab = localStorage.getItem('foro_active_tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
+      if (savedTab && ['feed', 'reels', 'lives', 'comunidades'].includes(savedTab)) {
+        return savedTab;
+      }
+    }
+    return 'feed';
+  });
 
-  // Initialize tab from URL or localStorage on mount
+  // Sync with URL params on mount (URL takes priority if present)
   useEffect(() => {
-    if (tabInitialized) return;
-
-    // First check URL params
     const urlTab = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
     if (urlTab && ['feed', 'reels', 'lives', 'comunidades'].includes(urlTab)) {
       setActiveTab(urlTab);
       localStorage.setItem('foro_active_tab', urlTab);
-    } else {
-      // Fallback to localStorage
-      const savedTab = localStorage.getItem('foro_active_tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
-      if (savedTab && ['feed', 'reels', 'lives', 'comunidades'].includes(savedTab)) {
-        setActiveTab(savedTab);
-      }
     }
-    setTabInitialized(true);
-  }, [searchParams, tabInitialized]);
+  }, [searchParams]);
 
   // Function to change tab and update URL + localStorage
   const changeTab = useCallback((tab: 'feed' | 'reels' | 'lives' | 'comunidades') => {
@@ -447,9 +446,15 @@ export default function ForoPage() {
     name: string;
     description: string;
     isPublic: boolean;
+    requiresApproval: boolean;
     categories: string[];
     themeColor: string;
   }): Promise<boolean> => {
+    if (!user) {
+      toast.error('Debes iniciar sesión para crear una comunidad');
+      return false;
+    }
+
     try {
       const response = await fetch('/api/communities', {
         method: 'POST',
@@ -458,8 +463,9 @@ export default function ForoPage() {
       });
       const result = await response.json();
 
-      if (result.error) {
-        toast.error(result.error);
+      if (!response.ok || result.error) {
+        console.error('Community creation error:', result);
+        toast.error(result.error || 'Error al crear comunidad');
         return false;
       }
 
@@ -1424,6 +1430,7 @@ export default function ForoPage() {
                     name: data.name,
                     description: data.description,
                     isPublic: data.isPublic,
+                    requiresApproval: data.requiresApproval,
                     categories: data.categories,
                     themeColor: data.themeColor,
                   })}
