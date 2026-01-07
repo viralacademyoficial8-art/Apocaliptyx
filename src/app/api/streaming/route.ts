@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
 
 interface UserFollow {
   following_id: string;
@@ -40,7 +41,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const category = searchParams.get('category');
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await auth();
+    const user = session?.user;
 
     let query = supabase
       .from('live_streams')
@@ -118,9 +120,10 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = createServerSupabaseClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await auth();
+    const user = session?.user;
 
-    if (!user) {
+    if (!user || !user.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
