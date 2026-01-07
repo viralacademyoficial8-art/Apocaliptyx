@@ -49,7 +49,7 @@ export function LiveStreamCard({ stream, onWatch }: LiveStreamCardProps) {
 
   return (
     <Link
-      href={`/streaming/${stream.id}`}
+      href={isLive ? `/streaming/live/${stream.id}` : `/streaming/${stream.id}`}
       className="block group"
       onClick={(e) => {
         if (onWatch) {
