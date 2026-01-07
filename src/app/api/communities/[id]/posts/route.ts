@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 interface CommunityPostUser {
   id: string;
@@ -36,16 +39,14 @@ export async function GET(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    const sort = searchParams.get('sort') || 'recent'; // 'recent', 'popular', 'pinned'
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const sort = searchParams.get('sort') || 'recent';
 
     // Check if community exists
-    const { data: communityRaw } = await supabase
+    const { data: communityRaw } = await supabase()
       .from('communities')
       .select('id, name, is_public')
       .eq('id', communityId)
@@ -58,12 +59,12 @@ export async function GET(
     }
 
     // Check membership for private communities
-    if (!community.is_public && user) {
-      const { data: membership } = await supabase
+    if (!community.is_public && session?.user?.id) {
+      const { data: membership } = await supabase()
         .from('community_members')
         .select('id')
         .eq('community_id', communityId)
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .single();
 
       if (!membership) {
@@ -71,7 +72,7 @@ export async function GET(
       }
     }
 
-    let query = supabase
+    let query = supabase()
       .from('community_posts')
       .select(`
         *,
@@ -97,12 +98,12 @@ export async function GET(
 
     // Get user's likes if logged in
     let likedPostIds: string[] = [];
-    if (user && posts && posts.length > 0) {
+    if (session?.user?.id && posts && posts.length > 0) {
       const postIds = posts.map(p => p.id);
-      const { data: likesRaw } = await supabase
+      const { data: likesRaw } = await supabase()
         .from('community_post_likes')
         .select('post_id')
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .in('post_id', postIds);
 
       const likes = likesRaw as PostLike[] | null;
@@ -147,29 +148,25 @@ export async function POST(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Check if user is member
-    const { data: membershipRaw } = await supabase
+    const { data: membership } = await supabase()
       .from('community_members')
       .select('id, is_banned')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
-
-    const membership = membershipRaw as { id: string; is_banned?: boolean } | null;
 
     if (!membership) {
       return NextResponse.json({ error: 'Debes ser miembro para publicar' }, { status: 403 });
     }
 
-    if (membership.is_banned) {
+    if ((membership as any).is_banned) {
       return NextResponse.json({ error: 'Has sido baneado de esta comunidad' }, { status: 403 });
     }
 
@@ -185,14 +182,14 @@ export async function POST(
     }
 
     // Create post
-    const { data: post, error } = await supabase
+    const { data: post, error } = await supabase()
       .from('community_posts')
       .insert({
         community_id: communityId,
-        author_id: user.id,
+        author_id: session.user.id,
         content: content.trim(),
         image_url: imageUrl || null,
-      } as never)
+      })
       .select(`
         *,
         author:users(id, username, display_name, avatar_url, level)
@@ -202,21 +199,17 @@ export async function POST(
     if (error) throw error;
 
     // Increment posts count
-    try {
-      await supabase.rpc('increment_community_posts' as never, { community_id: communityId } as never);
-    } catch {
-      // Fallback: manually increment
-      const { data: comm } = await supabase
+    const { data: comm } = await supabase()
+      .from('communities')
+      .select('posts_count')
+      .eq('id', communityId)
+      .single();
+
+    if (comm) {
+      await supabase()
         .from('communities')
-        .select('posts_count')
-        .eq('id', communityId)
-        .single();
-      if (comm) {
-        await supabase
-          .from('communities')
-          .update({ posts_count: ((comm as any).posts_count || 0) + 1 } as never)
-          .eq('id', communityId);
-      }
+        .update({ posts_count: ((comm as any).posts_count || 0) + 1 })
+        .eq('id', communityId);
     }
 
     return NextResponse.json({
