@@ -5,9 +5,10 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 // POST /api/communities/[id]/join - Join a community
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: communityId } = await params;
     const supabase = createServerSupabaseClient();
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -15,8 +16,6 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-
-    const communityId = params.id;
 
     // Check if community exists
     const { data: community, error: communityError } = await supabase
@@ -86,9 +85,10 @@ export async function POST(
 // DELETE /api/communities/[id]/join - Leave a community
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: communityId } = await params;
     const supabase = createServerSupabaseClient();
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -96,8 +96,6 @@ export async function DELETE(
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-
-    const communityId = params.id;
 
     // Get membership
     const { data: membershipRaw } = await supabase

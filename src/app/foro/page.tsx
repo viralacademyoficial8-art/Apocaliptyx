@@ -65,6 +65,8 @@ import toast from 'react-hot-toast';
 import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories';
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
 import { CreateReelModal } from '@/components/reels/CreateReelModal';
+import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
+import Link from 'next/link';
 
 // Reaction definitions
 const REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[] = [
@@ -1381,25 +1383,15 @@ export default function ForoPage() {
                 <p className="text-gray-400 mt-1">Únete a grupos de predicciones y comparte con otros profetas</p>
               </div>
               {isAuthenticated && (
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700"
-                  onClick={() => {
-                    const name = prompt('Nombre de la comunidad:');
-                    if (name) {
-                      const description = prompt('Descripción:') || '';
-                      handleCreateCommunity({
-                        name,
-                        description,
-                        isPublic: true,
-                        categories: [],
-                        themeColor: '#6366f1'
-                      });
-                    }
-                  }}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Crear Comunidad
-                </Button>
+                <CreateCommunityModal
+                  onCreateCommunity={(data) => handleCreateCommunity({
+                    name: data.name,
+                    description: data.description,
+                    isPublic: data.isPublic,
+                    categories: data.categories,
+                    themeColor: data.themeColor,
+                  })}
+                />
               )}
             </div>
 
@@ -1455,62 +1447,82 @@ export default function ForoPage() {
                 {filteredCommunities.map((community, i) => (
                   <div
                     key={community.id}
-                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors cursor-pointer"
+                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors"
                   >
-                    <div
-                      className="h-20"
-                      style={{
-                        background: community.bannerUrl
-                          ? `url(${community.bannerUrl}) center/cover`
-                          : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}88)`
-                      }}
-                    />
+                    <Link href={`/foro/comunidad/${community.slug}`}>
+                      <div
+                        className="h-20 cursor-pointer"
+                        style={{
+                          background: community.bannerUrl
+                            ? `url(${community.bannerUrl}) center/cover`
+                            : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}88)`
+                        }}
+                      />
+                    </Link>
                     <div className="p-4">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div
-                          className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
-                          style={{
-                            background: community.iconUrl
-                              ? `url(${community.iconUrl}) center/cover`
-                              : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}cc)`
-                          }}
-                        >
-                          {!community.iconUrl && community.name[0].toUpperCase()}
+                      <Link href={`/foro/comunidad/${community.slug}`}>
+                        <div className="flex items-center gap-3 mb-2 cursor-pointer hover:opacity-80 transition-opacity">
+                          <div
+                            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+                            style={{
+                              background: community.iconUrl
+                                ? `url(${community.iconUrl}) center/cover`
+                                : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}cc)`
+                            }}
+                          >
+                            {!community.iconUrl && community.name[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold flex items-center gap-1">
+                              {community.name}
+                              {community.isVerified && (
+                                <Check className="w-4 h-4 text-blue-400" />
+                              )}
+                            </h3>
+                            <p className="text-xs text-gray-500">
+                              {community.membersCount.toLocaleString()} miembros
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-semibold flex items-center gap-1">
-                            {community.name}
-                            {community.isVerified && (
-                              <Check className="w-4 h-4 text-blue-400" />
-                            )}
-                          </h3>
-                          <p className="text-xs text-gray-500">
-                            {community.membersCount.toLocaleString()} miembros
-                          </p>
-                        </div>
-                      </div>
+                      </Link>
                       <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                         {community.description || `Comunidad de predicciones. Únete y comparte tus análisis.`}
                       </p>
-                      {community.isMember ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full border-gray-600 text-gray-400 hover:text-red-400 hover:border-red-500/50"
-                          onClick={() => handleLeaveCommunity(community.id)}
-                        >
-                          Salir
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
-                          onClick={() => handleJoinCommunity(community.id)}
-                        >
-                          Unirse
-                        </Button>
-                      )}
+                      <div className="flex gap-2">
+                        <Link href={`/foro/comunidad/${community.slug}`} className="flex-1">
+                          <Button
+                            size="sm"
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                          >
+                            Ver comunidad
+                          </Button>
+                        </Link>
+                        {community.isMember ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-gray-600 text-gray-400 hover:text-red-400 hover:border-red-500/50"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleLeaveCommunity(community.id);
+                            }}
+                          >
+                            Salir
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleJoinCommunity(community.id);
+                            }}
+                          >
+                            Unirse
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
