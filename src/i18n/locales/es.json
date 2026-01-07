@@ -44,7 +44,17 @@
     "login": "Iniciar sesión",
     "register": "Registrarse",
     "notifications": "Notificaciones",
-    "messages": "Mensajes"
+    "messages": "Mensajes",
+    "social": "Social",
+    "streaming": "En Vivo",
+    "reels": "Reels",
+    "communities": "Comunidades",
+    "collectibles": "Coleccionables",
+    "tournaments": "Torneos",
+    "helpCenter": "Centro de Ayuda",
+    "support": "Soporte Técnico",
+    "adminPanel": "Panel de Admin",
+    "createScenario": "Crear Escenario"
   },
   "auth": {
     "login": {
@@ -308,6 +318,35 @@
       "comment": "{{user}} comentó en tu escenario",
       "follow": "{{user}} te está siguiendo",
       "mention": "{{user}} te mencionó"
+    }
+  },
+  "streaming": {
+    "title": "Streaming",
+    "subtitle": "Transmisiones en vivo de predicciones y análisis",
+    "liveNow": "En vivo ahora",
+    "viewers": "Espectadores",
+    "mostWatchedToday": "Más visto hoy",
+    "streamsToday": "Streams hoy",
+    "noLiveStreams": "No hay streams en vivo ahora",
+    "viewAllStreams": "Ver todos los streams",
+    "startStream": "Iniciar stream",
+    "starting": "Iniciando...",
+    "endStream": "Terminar stream",
+    "streamTitle": "Título del stream:",
+    "broadcasting": "Transmitiendo",
+    "live": "En vivo",
+    "all": "Todos",
+    "following": "Siguiendo",
+    "streamEnded": "Este stream ha terminado",
+    "connecting": "Conectando al stream...",
+    "livekitNotConfigured": "LiveKit no configurado",
+    "livekitRequired": "El streaming en vivo requiere configurar LiveKit.",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Envía un mensaje...",
+      "send": "Enviar",
+      "loginRequired": "Inicia sesión para chatear",
+      "noMessages": "No hay mensajes aún. ¡Sé el primero en chatear!"
     }
   },
   "footer": {

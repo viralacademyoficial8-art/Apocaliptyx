@@ -44,7 +44,17 @@
     "login": "Log in",
     "register": "Sign up",
     "notifications": "Notifications",
-    "messages": "Messages"
+    "messages": "Messages",
+    "social": "Social",
+    "streaming": "Live",
+    "reels": "Reels",
+    "communities": "Communities",
+    "collectibles": "Collectibles",
+    "tournaments": "Tournaments",
+    "helpCenter": "Help Center",
+    "support": "Tech Support",
+    "adminPanel": "Admin Panel",
+    "createScenario": "Create Scenario"
   },
   "auth": {
     "login": {
@@ -110,12 +120,48 @@
         "predictions": "Predictions made",
         "rewards": "In rewards"
       }
+    },
+    "features": {
+      "title": "How does it work?",
+      "subtitle": "Apocaliptics is a platform where your predictions matter",
+      "create": {
+        "title": "Create scenarios",
+        "description": "Publish your predictions about technology, sports, economy and more"
+      },
+      "compete": {
+        "title": "Compete for them",
+        "description": "Other users can steal your scenarios by paying more"
+      },
+      "win": {
+        "title": "Win rewards",
+        "description": "If your prediction comes true, the holder wins the entire pool"
+      }
+    },
+    "trending": {
+      "title": "Trending scenarios",
+      "subtitle": "The most popular scenarios right now",
+      "viewAll": "View all"
+    },
+    "categories": {
+      "title": "Explore by category",
+      "technology": "Technology",
+      "sports": "Sports",
+      "economy": "Economy",
+      "politics": "Politics",
+      "entertainment": "Entertainment",
+      "science": "Science"
+    },
+    "cta": {
+      "title": "Ready to predict the future?",
+      "subtitle": "Join thousands of prophets and prove your vision",
+      "button": "Create free account"
     }
   },
   "scenarios": {
     "title": "Scenarios",
     "subtitle": "Explore all community predictions",
     "createScenario": "Create scenario",
+    "create": "Create",
     "filters": {
       "all": "All",
       "active": "Active",
@@ -175,23 +221,148 @@
   },
   "rankings": {
     "title": "Rankings",
-    "subtitle": "The best prophets on the platform"
+    "subtitle": "The best prophets on the platform",
+    "tabs": {
+      "global": "Global",
+      "monthly": "Monthly",
+      "weekly": "Weekly"
+    },
+    "metrics": {
+      "winRate": "Win Rate",
+      "predictions": "Predictions",
+      "earnings": "Earnings",
+      "streak": "Streak"
+    },
+    "badges": {
+      "top1": "Supreme Nostradamus",
+      "top10": "Oracle",
+      "top100": "Seer"
+    },
+    "you": "You",
+    "position": "Position"
   },
   "shop": {
     "title": "Shop",
-    "subtitle": "Power up your predictions with special items"
+    "subtitle": "Power up your predictions with special items",
+    "categories": {
+      "all": "All",
+      "protection": "Protection",
+      "power": "Power",
+      "boost": "Boost",
+      "cosmetic": "Cosmetic",
+      "special": "Special"
+    },
+    "item": {
+      "buy": "Buy",
+      "owned": "Already owned",
+      "soldOut": "Sold out",
+      "limited": "Limited",
+      "new": "New",
+      "featured": "Featured",
+      "duration": "Duration",
+      "uses": "Uses",
+      "effect": "Effect"
+    },
+    "cart": {
+      "title": "Cart",
+      "empty": "Your cart is empty",
+      "total": "Total",
+      "checkout": "Checkout"
+    },
+    "balance": {
+      "title": "Your balance",
+      "buyCoins": "Buy AP Coins"
+    }
   },
   "profile": {
     "title": "Profile",
-    "editProfile": "Edit profile"
+    "editProfile": "Edit profile",
+    "stats": {
+      "scenarios": "Scenarios",
+      "wins": "Wins",
+      "winRate": "Win Rate",
+      "earnings": "Earnings",
+      "rank": "Ranking",
+      "joined": "Member since"
+    },
+    "tabs": {
+      "scenarios": "Scenarios",
+      "activity": "Activity",
+      "achievements": "Achievements",
+      "inventory": "Inventory"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "locked": "Locked",
+      "unlocked": "Unlocked"
+    },
+    "settings": {
+      "title": "Settings",
+      "account": "Account",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
+      "appearance": "Appearance",
+      "language": "Language",
+      "theme": "Theme",
+      "darkMode": "Dark mode",
+      "lightMode": "Light mode"
+    }
   },
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Mark all as read",
-    "empty": "No notifications"
+    "empty": "No notifications",
+    "types": {
+      "steal": "{{user}} stole your scenario",
+      "win": "Your prediction came true!",
+      "loss": "Your prediction didn't come true",
+      "comment": "{{user}} commented on your scenario",
+      "follow": "{{user}} is now following you",
+      "mention": "{{user}} mentioned you"
+    }
+  },
+  "streaming": {
+    "title": "Streaming",
+    "subtitle": "Live broadcasts of predictions and analysis",
+    "liveNow": "Live now",
+    "viewers": "Viewers",
+    "mostWatchedToday": "Most watched today",
+    "streamsToday": "Streams today",
+    "noLiveStreams": "No live streams right now",
+    "viewAllStreams": "View all streams",
+    "startStream": "Start stream",
+    "starting": "Starting...",
+    "endStream": "End stream",
+    "streamTitle": "Stream title:",
+    "broadcasting": "Broadcasting",
+    "live": "Live",
+    "all": "All",
+    "following": "Following",
+    "streamEnded": "This stream has ended",
+    "connecting": "Connecting to stream...",
+    "livekitNotConfigured": "LiveKit not configured",
+    "livekitRequired": "Live streaming requires LiveKit configuration.",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Send a message...",
+      "send": "Send",
+      "loginRequired": "Log in to chat",
+      "noMessages": "No messages yet. Be the first to chat!"
+    }
   },
   "footer": {
     "description": "The prediction platform where prophets compete for the future.",
+    "links": {
+      "about": "About us",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "contact": "Contact",
+      "help": "Help",
+      "blog": "Blog"
+    },
+    "social": {
+      "followUs": "Follow us"
+    },
     "copyright": "© {{year}} Apocaliptics. All rights reserved."
   },
   "errors": {
@@ -199,6 +370,16 @@
       "title": "Page not found",
       "subtitle": "The page you're looking for doesn't exist or was moved",
       "backHome": "Back to home"
+    },
+    "serverError": {
+      "title": "Server error",
+      "subtitle": "Something went wrong. Please try again later",
+      "retry": "Retry"
+    },
+    "unauthorized": {
+      "title": "Unauthorized",
+      "subtitle": "You don't have permission to view this page",
+      "login": "Log in"
     }
   },
   "time": {

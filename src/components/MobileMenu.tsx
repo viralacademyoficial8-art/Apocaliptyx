@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/stores";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
 import {
   X,
@@ -19,6 +20,9 @@ import {
   Settings,
   LogOut,
   Flame,
+  Radio,
+  Film,
+  Users,
 } from "lucide-react";
 
 interface MobileMenuProps {
@@ -51,7 +55,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   const navItems = isAuthenticated
     ? [
-        { href: "/dashboard", label: t("nav.home"), icon: LayoutDashboard }, // puedes crear nav.dashboard luego si quieres
+        { href: "/dashboard", label: t("nav.home"), icon: LayoutDashboard },
+        { href: "/explorar", label: t("nav.scenarios"), icon: Home },
         { href: "/tienda", label: t("nav.shop"), icon: ShoppingBag },
         { href: "/leaderboard", label: t("nav.rankings"), icon: Trophy },
         { href: "/foro", label: t("nav.forum"), icon: MessageCircle },
@@ -62,6 +67,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         { href: "/foro", label: t("nav.forum"), icon: MessageCircle },
         { href: "/leaderboard", label: t("nav.rankings"), icon: Trophy },
       ];
+
+  const socialItems = isAuthenticated
+    ? [
+        { href: "/streaming", label: t("nav.streaming"), icon: Radio, color: "text-red-400" },
+        { href: "/reels", label: t("nav.reels"), icon: Film, color: "text-pink-400" },
+        { href: "/comunidades", label: t("nav.communities"), icon: Users, color: "text-blue-400" },
+      ]
+    : [];
 
   const handleLogout = () => {
     logout();
@@ -156,9 +169,43 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               })}
             </div>
 
+            {/* Social Section */}
+            {isAuthenticated && socialItems.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-border">
+                <span className="px-4 text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  {t("nav.social")}
+                </span>
+                <div className="space-y-1 mt-2">
+                  {socialItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.href;
+
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={onClose}
+                        className={`
+                          flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                          ${
+                            isActive
+                              ? "bg-purple-600 text-white"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          }
+                        `}
+                      >
+                        <Icon className={`w-5 h-5 ${!isActive ? item.color : ""}`} />
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* User Actions */}
             {isAuthenticated && user && (
-              <div className="mt-6 pt-6 border-t border-border space-y-1">
+              <div className="mt-4 pt-4 border-t border-border space-y-1">
                 <Link
                   href={`/perfil/${user.username}`}
                   onClick={onClose}
@@ -177,6 +224,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   <span className="font-medium">{t("nav.settings")}</span>
                 </Link>
 
+                {/* Language Selector */}
+                <LanguageSelector variant="mobile" />
+
                 <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors"
@@ -191,6 +241,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           {/* Footer (no logueado) */}
           {!isAuthenticated && (
             <div className="p-4 border-t border-border space-y-3">
+              {/* Language Selector for non-authenticated users */}
+              <div className="pb-3 border-b border-border">
+                <LanguageSelector variant="mobile" />
+              </div>
               <Link href="/login" onClick={onClose} className="block">
                 <Button variant="outline" className="w-full border-border text-foreground">
                   {t("nav.login")}

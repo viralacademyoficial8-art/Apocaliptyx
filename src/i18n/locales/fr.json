@@ -44,7 +44,17 @@
     "login": "Connexion",
     "register": "S'inscrire",
     "notifications": "Notifications",
-    "messages": "Messages"
+    "messages": "Messages",
+    "social": "Social",
+    "streaming": "En Direct",
+    "reels": "Reels",
+    "communities": "Communautés",
+    "collectibles": "Objets de Collection",
+    "tournaments": "Tournois",
+    "helpCenter": "Centre d'Aide",
+    "support": "Support Technique",
+    "adminPanel": "Panneau Admin",
+    "createScenario": "Créer Scénario"
   },
   "auth": {
     "login": {
@@ -129,6 +139,35 @@
     "title": "Notifications",
     "markAllRead": "Tout marquer comme lu",
     "empty": "Pas de notifications"
+  },
+  "streaming": {
+    "title": "Streaming",
+    "subtitle": "Diffusions en direct de prédictions et analyses",
+    "liveNow": "En direct maintenant",
+    "viewers": "Spectateurs",
+    "mostWatchedToday": "Plus regardé aujourd'hui",
+    "streamsToday": "Streams aujourd'hui",
+    "noLiveStreams": "Aucun stream en direct",
+    "viewAllStreams": "Voir tous les streams",
+    "startStream": "Démarrer le stream",
+    "starting": "Démarrage...",
+    "endStream": "Terminer le stream",
+    "streamTitle": "Titre du stream:",
+    "broadcasting": "Diffusion en cours",
+    "live": "En direct",
+    "all": "Tous",
+    "following": "Abonnements",
+    "streamEnded": "Ce stream est terminé",
+    "connecting": "Connexion au stream...",
+    "livekitNotConfigured": "LiveKit non configuré",
+    "livekitRequired": "Le streaming en direct nécessite LiveKit.",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Envoyer un message...",
+      "send": "Envoyer",
+      "loginRequired": "Connectez-vous pour chatter",
+      "noMessages": "Pas encore de messages. Soyez le premier!"
+    }
   },
   "footer": {
     "description": "La plateforme de prédictions où les prophètes rivalisent.",

@@ -44,7 +44,17 @@
     "login": "Anmelden",
     "register": "Registrieren",
     "notifications": "Benachrichtigungen",
-    "messages": "Nachrichten"
+    "messages": "Nachrichten",
+    "social": "Soziales",
+    "streaming": "Live",
+    "reels": "Reels",
+    "communities": "Communities",
+    "collectibles": "Sammlerstücke",
+    "tournaments": "Turniere",
+    "helpCenter": "Hilfe-Center",
+    "support": "Technischer Support",
+    "adminPanel": "Admin-Panel",
+    "createScenario": "Szenario Erstellen"
   },
   "auth": {
     "login": {
@@ -129,6 +139,35 @@
     "title": "Benachrichtigungen",
     "markAllRead": "Alle als gelesen markieren",
     "empty": "Keine Benachrichtigungen"
+  },
+  "streaming": {
+    "title": "Streaming",
+    "subtitle": "Live-Übertragungen von Vorhersagen und Analysen",
+    "liveNow": "Jetzt live",
+    "viewers": "Zuschauer",
+    "mostWatchedToday": "Meist gesehen heute",
+    "streamsToday": "Streams heute",
+    "noLiveStreams": "Keine Live-Streams gerade",
+    "viewAllStreams": "Alle Streams anzeigen",
+    "startStream": "Stream starten",
+    "starting": "Startet...",
+    "endStream": "Stream beenden",
+    "streamTitle": "Stream-Titel:",
+    "broadcasting": "Übertragung läuft",
+    "live": "Live",
+    "all": "Alle",
+    "following": "Folge ich",
+    "streamEnded": "Dieser Stream ist beendet",
+    "connecting": "Verbindung zum Stream...",
+    "livekitNotConfigured": "LiveKit nicht konfiguriert",
+    "livekitRequired": "Live-Streaming erfordert LiveKit-Konfiguration.",
+    "chat": {
+      "title": "Chat",
+      "placeholder": "Nachricht senden...",
+      "send": "Senden",
+      "loginRequired": "Melde dich an um zu chatten",
+      "noMessages": "Noch keine Nachrichten. Sei der Erste!"
+    }
   },
   "footer": {
     "description": "Die Vorhersage-Plattform, auf der Propheten kämpfen.",

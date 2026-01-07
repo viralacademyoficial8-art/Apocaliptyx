@@ -71,9 +71,9 @@ export function Navbar() {
 
   const navItems = [
     { href: "/dashboard", label: t("nav.home") },
-    { href: "/explorar", label: "Escenarios" },
+    { href: "/explorar", label: t("nav.scenarios") },
     { href: "/tienda", label: t("nav.shop") },
-    { href: "/leaderboard", label: "Rankings" },
+    { href: "/leaderboard", label: t("nav.rankings") },
     { href: "/foro", label: t("nav.forum") },
   ];
 
@@ -138,7 +138,7 @@ export function Navbar() {
                     }
                   `}
                 >
-                  Crear Escenario
+                  {t("nav.createScenario")}
                 </Link>
               )}
 
@@ -276,7 +276,7 @@ export function Navbar() {
                         {/* Separador - Social */}
                         <div className="my-1 h-px bg-border" />
                         <div className="px-2 py-1">
-                          <span className="text-xs text-muted-foreground font-medium">Social</span>
+                          <span className="text-xs text-muted-foreground font-medium">{t("nav.social")}</span>
                         </div>
 
                         <DropdownMenuItem
@@ -284,7 +284,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-muted"
                         >
                           <Users className="mr-2 h-4 w-4 text-blue-400" />
-                          Comunidades
+                          {t("nav.communities")}
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
@@ -292,7 +292,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-pink-500/10"
                         >
                           <Film className="mr-2 h-4 w-4 text-pink-400" />
-                          Reels
+                          {t("nav.reels")}
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
@@ -300,7 +300,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-red-500/10"
                         >
                           <Radio className="mr-2 h-4 w-4 text-red-400" />
-                          En Vivo
+                          {t("nav.streaming")}
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
@@ -308,7 +308,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-yellow-500/10"
                         >
                           <Sparkles className="mr-2 h-4 w-4 text-yellow-400" />
-                          Coleccionables
+                          {t("nav.collectibles")}
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
@@ -316,7 +316,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-orange-500/10"
                         >
                           <Trophy className="mr-2 h-4 w-4 text-orange-400" />
-                          Torneos
+                          {t("nav.tournaments")}
                         </DropdownMenuItem>
 
                         {/* Separador */}
@@ -328,7 +328,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-muted"
                         >
                           <HelpCircle className="mr-2 h-4 w-4" />
-                          Centro de Ayuda
+                          {t("nav.helpCenter")}
                         </DropdownMenuItem>
 
                         {/* Soporte Técnico */}
@@ -337,7 +337,7 @@ export function Navbar() {
                           className="cursor-pointer hover:bg-purple-500/10 text-purple-400"
                         >
                           <MessageCircle className="mr-2 h-4 w-4" />
-                          Soporte Técnico
+                          {t("nav.support")}
                         </DropdownMenuItem>
 
                         {/* Link al admin panel */}
@@ -349,7 +349,7 @@ export function Navbar() {
                               className="cursor-pointer hover:bg-red-500/10 text-red-400"
                             >
                               <Shield className="mr-2 h-4 w-4" />
-                              Panel de Admin
+                              {t("nav.adminPanel")}
                             </DropdownMenuItem>
                           </>
                         )}
