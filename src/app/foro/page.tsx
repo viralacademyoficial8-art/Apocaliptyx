@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
@@ -182,18 +182,36 @@ export default function ForoPage() {
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false);
   const [storiesKey, setStoriesKey] = useState(0); // For refreshing StoriesBar
 
-  // Tab navigation for social hub - read from URL params
-  const tabParam = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
-  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>(
-    tabParam && ['feed', 'reels', 'lives', 'comunidades'].includes(tabParam) ? tabParam : 'feed'
-  );
+  // Tab navigation for social hub - persist with localStorage and URL
+  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>('feed');
+  const [tabInitialized, setTabInitialized] = useState(false);
 
-  // Function to change tab and update URL
+  // Initialize tab from URL or localStorage on mount
+  useEffect(() => {
+    if (tabInitialized) return;
+
+    // First check URL params
+    const urlTab = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
+    if (urlTab && ['feed', 'reels', 'lives', 'comunidades'].includes(urlTab)) {
+      setActiveTab(urlTab);
+      localStorage.setItem('foro_active_tab', urlTab);
+    } else {
+      // Fallback to localStorage
+      const savedTab = localStorage.getItem('foro_active_tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
+      if (savedTab && ['feed', 'reels', 'lives', 'comunidades'].includes(savedTab)) {
+        setActiveTab(savedTab);
+      }
+    }
+    setTabInitialized(true);
+  }, [searchParams, tabInitialized]);
+
+  // Function to change tab and update URL + localStorage
   const changeTab = useCallback((tab: 'feed' | 'reels' | 'lives' | 'comunidades') => {
     setActiveTab(tab);
+    localStorage.setItem('foro_active_tab', tab);
     const params = new URLSearchParams(searchParams.toString());
     params.set('tab', tab);
-    router.push(`/foro?${params.toString()}`, { scroll: false });
+    router.replace(`/foro?${params.toString()}`, { scroll: false });
   }, [router, searchParams]);
 
   // Reels state
@@ -494,14 +512,6 @@ export default function ForoPage() {
     loadStories();
     loadAwardTypes();
   }, [loadPosts, loadCategories, loadTrendingTags, loadStories, loadAwardTypes]);
-
-  // Sync active tab from URL when searchParams changes
-  useEffect(() => {
-    const tab = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
-    if (tab && ['feed', 'reels', 'lives', 'comunidades'].includes(tab)) {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
 
   // Load reels when tab changes to reels or filter changes
   useEffect(() => {
