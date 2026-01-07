@@ -31,11 +31,11 @@ interface StreamRow {
 // GET /api/streaming/[id] - Get stream details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createServerSupabaseClient();
-    const streamId = params.id;
+    const { id: streamId } = await params;
 
     const { data: streamRaw, error } = await supabase
       .from('live_streams')
@@ -102,18 +102,17 @@ export async function GET(
 // PATCH /api/streaming/[id] - Update stream (title, end stream, etc.)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createServerSupabaseClient();
+    const { id: streamId } = await params;
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-
-    const streamId = params.id;
     const body = await request.json();
     const { title, description, action } = body;
 
@@ -164,18 +163,17 @@ export async function PATCH(
 // DELETE /api/streaming/[id] - Delete stream
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createServerSupabaseClient();
+    const { id: streamId } = await params;
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-
-    const streamId = params.id;
 
     // Verify ownership
     const { data: streamRaw2 } = await supabase

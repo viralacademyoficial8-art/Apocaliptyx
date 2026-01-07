@@ -5,18 +5,17 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 // POST /api/streaming/[id]/like - Like a stream
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createServerSupabaseClient();
+    const { id: streamId } = await params;
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-
-    const streamId = params.id;
 
     // Check if already liked
     const { data: existingLike } = await supabase
@@ -67,18 +66,17 @@ export async function POST(
 // DELETE /api/streaming/[id]/like - Unlike a stream
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createServerSupabaseClient();
+    const { id: streamId } = await params;
 
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
-
-    const streamId = params.id;
 
     // Remove like
     const { error: unlikeError } = await supabase
