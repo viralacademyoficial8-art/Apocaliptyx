@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 interface MemberUser {
   id: string;
@@ -28,13 +31,12 @@ export async function GET(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
-    const role = searchParams.get('role'); // Filter by role
+    const role = searchParams.get('role');
 
-    let query = supabase
+    let query = supabase()
       .from('community_members')
       .select(`
         *,
@@ -44,7 +46,6 @@ export async function GET(
       .eq('is_banned', false)
       .range((page - 1) * limit, page * limit - 1);
 
-    // Sort by role priority and then join date
     query = query.order('role').order('joined_at', { ascending: true });
 
     if (role) {
@@ -57,7 +58,6 @@ export async function GET(
 
     const members = membersRaw as MemberRow[] | null;
 
-    // Sort members by role priority
     const rolePriority: Record<string, number> = {
       owner: 1,
       admin: 2,
@@ -101,20 +101,18 @@ export async function PATCH(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Check if current user has permission
-    const { data: currentMembership } = await supabase
+    const { data: currentMembership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
 
     if (!currentMembership || !['owner', 'admin'].includes((currentMembership as any).role)) {
@@ -129,7 +127,7 @@ export async function PATCH(
     }
 
     // Can't change owner role
-    const { data: targetMembership } = await supabase
+    const { data: targetMembership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
@@ -149,9 +147,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Solo el propietario puede promover a admin' }, { status: 403 });
     }
 
-    const { error } = await supabase
+    const { error } = await supabase()
       .from('community_members')
-      .update({ role: newRole } as never)
+      .update({ role: newRole })
       .eq('community_id', communityId)
       .eq('user_id', userId);
 
@@ -174,20 +172,18 @@ export async function DELETE(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Check if current user has permission
-    const { data: currentMembership } = await supabase
+    const { data: currentMembership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
 
     if (!currentMembership || !['owner', 'admin', 'moderator'].includes((currentMembership as any).role)) {
@@ -203,7 +199,7 @@ export async function DELETE(
     }
 
     // Get target membership
-    const { data: targetMembership } = await supabase
+    const { data: targetMembership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
@@ -225,17 +221,15 @@ export async function DELETE(
     }
 
     if (ban) {
-      // Ban user
-      const { error } = await supabase
+      const { error } = await supabase()
         .from('community_members')
-        .update({ is_banned: true } as never)
+        .update({ is_banned: true })
         .eq('community_id', communityId)
         .eq('user_id', userId);
 
       if (error) throw error;
     } else {
-      // Remove user
-      const { error } = await supabase
+      const { error } = await supabase()
         .from('community_members')
         .delete()
         .eq('community_id', communityId)
@@ -245,16 +239,16 @@ export async function DELETE(
     }
 
     // Decrement member count
-    const { data: community } = await supabase
+    const { data: community } = await supabase()
       .from('communities')
       .select('members_count')
       .eq('id', communityId)
       .single();
 
     if (community) {
-      await supabase
+      await supabase()
         .from('communities')
-        .update({ members_count: Math.max(0, (community as any).members_count - 1) } as never)
+        .update({ members_count: Math.max(0, (community as any).members_count - 1) })
         .eq('id', communityId);
     }
 

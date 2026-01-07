@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 // POST /api/communities/[id]/join - Join a community
 export async function POST(
@@ -10,16 +13,14 @@ export async function POST(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Check if community exists
-    const { data: community, error: communityError } = await supabase
+    const { data: community, error: communityError } = await supabase()
       .from('communities')
       .select('*')
       .eq('id', communityId)
@@ -30,17 +31,15 @@ export async function POST(
     }
 
     // Check if already a member
-    const { data: existingMemberRaw } = await supabase
+    const { data: existingMember } = await supabase()
       .from('community_members')
       .select('id, is_banned')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
 
-    const existingMember = existingMemberRaw as { id: string; is_banned?: boolean } | null;
-
     if (existingMember) {
-      if (existingMember.is_banned) {
+      if ((existingMember as any).is_banned) {
         return NextResponse.json(
           { error: 'Has sido baneado de esta comunidad' },
           { status: 403 }
@@ -53,21 +52,20 @@ export async function POST(
     }
 
     // Join community
-    const { error: joinError } = await supabase
+    const { error: joinError } = await supabase()
       .from('community_members')
       .insert({
         community_id: communityId,
-        user_id: user.id,
+        user_id: session.user.id,
         role: 'member',
-      } as never);
+      });
 
     if (joinError) throw joinError;
 
     // Increment member count
-    const communityData = community as { members_count: number };
-    await supabase
+    await supabase()
       .from('communities')
-      .update({ members_count: communityData.members_count + 1 } as never)
+      .update({ members_count: (community as any).members_count + 1 })
       .eq('id', communityId);
 
     return NextResponse.json({
@@ -90,23 +88,19 @@ export async function DELETE(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Get membership
-    const { data: membershipRaw } = await supabase
+    const { data: membership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
-
-    const membership = membershipRaw as { role: string } | null;
 
     if (!membership) {
       return NextResponse.json(
@@ -115,7 +109,7 @@ export async function DELETE(
       );
     }
 
-    if (membership.role === 'owner') {
+    if ((membership as any).role === 'owner') {
       return NextResponse.json(
         { error: 'El dueño no puede abandonar la comunidad' },
         { status: 400 }
@@ -123,27 +117,25 @@ export async function DELETE(
     }
 
     // Leave community
-    const { error: leaveError } = await supabase
+    const { error: leaveError } = await supabase()
       .from('community_members')
       .delete()
       .eq('community_id', communityId)
-      .eq('user_id', user.id);
+      .eq('user_id', session.user.id);
 
     if (leaveError) throw leaveError;
 
     // Decrement member count
-    const { data: communityRaw } = await supabase
+    const { data: community } = await supabase()
       .from('communities')
       .select('members_count')
       .eq('id', communityId)
       .single();
 
-    const community = communityRaw as { members_count: number } | null;
-
     if (community) {
-      await supabase
+      await supabase()
         .from('communities')
-        .update({ members_count: Math.max(0, community.members_count - 1) } as never)
+        .update({ members_count: Math.max(0, (community as any).members_count - 1) })
         .eq('id', communityId);
     }
 

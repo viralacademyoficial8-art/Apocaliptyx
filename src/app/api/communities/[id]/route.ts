@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 interface CommunityRow {
   id: string;
@@ -29,12 +32,10 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = createServerSupabaseClient();
-
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await auth();
 
     // Try to find by ID first, then by slug
-    let query = supabase.from('communities').select('*');
+    let query = supabase().from('communities').select('*');
 
     // Check if it's a UUID format (for ID) or slug
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
@@ -57,12 +58,12 @@ export async function GET(
     let isMember = false;
     let userRole: string | null = null;
 
-    if (user) {
-      const { data: membership } = await supabase
+    if (session?.user?.id) {
+      const { data: membership } = await supabase()
         .from('community_members')
         .select('role, is_banned')
         .eq('community_id', community.id)
-        .eq('user_id', user.id)
+        .eq('user_id', session.user.id)
         .single();
 
       if (membership && !(membership as any).is_banned) {
@@ -134,20 +135,18 @@ export async function PATCH(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Check if user is owner or admin
-    const { data: membership } = await supabase
+    const { data: membership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
 
     if (!membership || !['owner', 'admin'].includes((membership as any).role)) {
@@ -168,9 +167,9 @@ export async function PATCH(
     if (rules !== undefined) updates.rules = rules;
     if (categories !== undefined) updates.categories = categories;
 
-    const { error } = await supabase
+    const { error } = await supabase()
       .from('communities')
-      .update(updates as never)
+      .update(updates)
       .eq('id', communityId);
 
     if (error) throw error;
@@ -192,20 +191,18 @@ export async function DELETE(
 ) {
   try {
     const { id: communityId } = await params;
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     // Check if user is owner
-    const { data: membership } = await supabase
+    const { data: membership } = await supabase()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .single();
 
     if (!membership || (membership as any).role !== 'owner') {
@@ -213,7 +210,7 @@ export async function DELETE(
     }
 
     // Delete community (cascade will delete members and posts)
-    const { error } = await supabase
+    const { error } = await supabase()
       .from('communities')
       .delete()
       .eq('id', communityId);
