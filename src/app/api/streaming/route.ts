@@ -170,7 +170,13 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: `Error de base de datos: ${error.message}`, details: error },
+        { status: 500 }
+      );
+    }
 
     const stream = streamRaw as { id: string; title?: string } | null;
 
@@ -184,8 +190,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error starting stream:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Error al iniciar stream' },
+      { error: 'Error al iniciar stream', details: errorMessage },
       { status: 500 }
     );
   }
