@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
 import { generateToken, createRoomName, isLiveKitConfigured } from '@/lib/livekit';
 
 interface StreamRow {
   id: string;
   user_id: string;
   status: string;
-}
-
-interface ProfileRow {
-  username: string;
-  display_name: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -23,10 +19,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createServerSupabaseClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const session = await auth();
+    const user = session?.user;
 
-    if (!user) {
+    if (!user || !user.id) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
@@ -37,6 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get stream info to verify it exists
+    const supabase = createServerSupabaseClient();
     const { data: streamData, error: streamError } = await supabase
       .from('live_streams')
       .select('id, user_id, status')
@@ -52,15 +49,8 @@ export async function POST(request: NextRequest) {
     // Verify host permission
     const requestingHost = isHost && stream.user_id === user.id;
 
-    // Get user profile for display name
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('username, display_name')
-      .eq('id', user.id)
-      .single();
-
-    const profile = profileData as ProfileRow | null;
-    const participantName = profile?.display_name || profile?.username || 'Anonymous';
+    // Use session user info for participant name
+    const participantName = user.username || user.name || 'Anonymous';
     const roomName = createRoomName(streamId);
 
     // Generate token
