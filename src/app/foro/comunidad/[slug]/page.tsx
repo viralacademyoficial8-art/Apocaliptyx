@@ -36,6 +36,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { CommunitySettingsModal } from '@/components/communities/CommunitySettingsModal';
 
 interface CommunityMember {
   id: string;
@@ -102,6 +103,7 @@ export default function CommunityPage() {
   const [isMember, setIsMember] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'posts' | 'members' | 'about'>('posts');
+  const [showSettings, setShowSettings] = useState(false);
 
   // Create post state
   const [newPostContent, setNewPostContent] = useState('');
@@ -257,6 +259,10 @@ export default function CommunityPage() {
       setPosts([data.post, ...posts]);
       setNewPostContent('');
       setNewPostImage(null);
+      // Update posts count in community state
+      if (community) {
+        setCommunity({ ...community, postsCount: community.postsCount + 1 });
+      }
       toast.success('Publicación creada');
     } catch (error) {
       console.error('Error creating post:', error);
@@ -410,7 +416,11 @@ export default function CommunityPage() {
                     Salir
                   </Button>
                   {(userRole === 'owner' || userRole === 'admin') && (
-                    <Button variant="outline" className="border-gray-700">
+                    <Button
+                      variant="outline"
+                      className="border-gray-700"
+                      onClick={() => setShowSettings(true)}
+                    >
                       <Settings className="w-4 h-4" />
                     </Button>
                   )}
@@ -851,6 +861,22 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      {community && (userRole === 'owner' || userRole === 'admin') && (
+        <CommunitySettingsModal
+          community={community}
+          userRole={userRole}
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          onUpdate={(updates) => {
+            setCommunity({ ...community, ...updates });
+          }}
+          onDelete={() => {
+            router.push('/foro');
+          }}
+        />
+      )}
     </div>
   );
 }
