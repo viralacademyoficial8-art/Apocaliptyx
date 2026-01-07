@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { auth } from '@/lib/auth';
 
 interface StreamUser {
   id: string;
@@ -105,12 +107,15 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    // Use admin client to bypass RLS
+    const supabase = getSupabaseAdmin();
     const { id: streamId } = await params;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    // Use NextAuth for authentication
+    const session = await auth();
+    const user = session?.user;
 
-    if (!user) {
+    if (!user || !user.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const body = await request.json();
@@ -166,12 +171,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    // Use admin client to bypass RLS
+    const supabase = getSupabaseAdmin();
     const { id: streamId } = await params;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    // Use NextAuth for authentication
+    const session = await auth();
+    const user = session?.user;
 
-    if (!user) {
+    if (!user || !user.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
