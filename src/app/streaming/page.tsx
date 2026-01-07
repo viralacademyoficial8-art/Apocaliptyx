@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Radio, Search, TrendingUp, Users, Clock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -28,11 +29,13 @@ interface LiveStream {
 }
 
 export default function StreamingPage() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'live' | 'all' | 'following'>('live');
   const [isLoading, setIsLoading] = useState(true);
+  const [isStartingStream, setIsStartingStream] = useState(false);
 
   useEffect(() => {
     loadStreams();
@@ -65,10 +68,11 @@ export default function StreamingPage() {
       return;
     }
 
-    try {
-      const title = prompt('Título del stream:');
-      if (!title) return;
+    const title = prompt('Título del stream:');
+    if (!title) return;
 
+    setIsStartingStream(true);
+    try {
       const response = await fetch('/api/streaming', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,11 +82,14 @@ export default function StreamingPage() {
 
       if (data.error) throw new Error(data.error);
 
-      toast.success('Stream iniciado');
-      loadStreams();
+      toast.success('Preparando stream...');
+
+      // Redirect to the live stream page as host
+      router.push(`/streaming/live/${data.stream.id}?host=true`);
     } catch (error: unknown) {
       console.error('Error starting stream:', error);
       toast.error(error instanceof Error ? error.message : 'Error al iniciar stream');
+      setIsStartingStream(false);
     }
   };
 
@@ -121,9 +128,10 @@ export default function StreamingPage() {
             <Button
               className="bg-red-600 hover:bg-red-700"
               onClick={handleStartStream}
+              disabled={isStartingStream}
             >
-              <Radio className="w-4 h-4 mr-2" />
-              Iniciar stream
+              <Radio className={`w-4 h-4 mr-2 ${isStartingStream ? 'animate-pulse' : ''}`} />
+              {isStartingStream ? 'Iniciando...' : 'Iniciar stream'}
             </Button>
           )}
         </div>
