@@ -114,13 +114,39 @@
     "create": "Criar cenário",
     "filters": { "all": "Todos", "active": "Ativos", "completed": "Completados", "failed": "Falhados", "mine": "Meus cenários" },
     "sort": { "latest": "Mais recentes", "popular": "Mais populares", "ending": "Terminando", "price": "Maior preço" },
-    "card": { "holder": "Holder", "currentPrice": "Preço atual", "steal": "Roubar", "daysLeft": "{{days}} dias" }
+    "card": { "holder": "Holder", "currentPrice": "Preço atual", "steal": "Roubar", "daysLeft": "{{days}} dias", "hot": "Hot", "closed": "Fechado" }
   },
   "rankings": {
     "title": "Rankings",
     "subtitle": "Os melhores profetas",
     "tabs": { "global": "Global", "monthly": "Mensal", "weekly": "Semanal" },
-    "metrics": { "winRate": "Taxa de Vitória", "predictions": "Previsões", "earnings": "Ganhos" }
+    "metrics": { "winRate": "Taxa de Vitória", "predictions": "Previsões", "earnings": "Ganhos" },
+    "position": "Posição"
+  },
+  "leaderboard": {
+    "loading": "Carregando ranking...",
+    "loadError": "Erro ao carregar o ranking",
+    "yourPosition": "Sua posição atual",
+    "keepWinning": "Continue ganhando cenários para subir no ranking",
+    "viewMyProfile": "Ver meu perfil",
+    "totalProphets": "Total de Profetas",
+    "currentLeader": "Líder Atual",
+    "avgWinRate": "Taxa de Vitória Média",
+    "sortByLabel": "Ordenar por:",
+    "prophet": "Profeta",
+    "noProphets": "Ainda não há profetas no ranking",
+    "infoText1": "O ranking é atualizado em tempo real com base na atividade dos profetas.",
+    "infoText2": "Quer chegar ao topo? Crie cenários precisos e aumente sua taxa de vitória",
+    "sortBy": {
+      "apCoins": "AP Coins",
+      "apCoinsDesc": "Moedas totais",
+      "level": "Nível",
+      "levelDesc": "Nível do profeta",
+      "accuracy": "Acertos",
+      "accuracyDesc": "Previsões corretas",
+      "earnings": "Ganhos",
+      "earningsDesc": "AP Coins ganhos"
+    }
   },
   "shop": {
     "title": "Loja",
@@ -168,6 +194,23 @@
       "loginRequired": "Entre para conversar",
       "noMessages": "Nenhuma mensagem ainda. Seja o primeiro!"
     }
+  },
+  "dashboard": {
+    "welcomeTitle": "Bem-vindo ao Apocaliptics",
+    "welcomeMessage": "Ainda não há um profeta ativo nesta sessão. Mais tarde você poderá ver seu resumo pessoal aqui (nível, cenários, moedas, etc.).",
+    "featuredScenarios": "Cenários em Destaque",
+    "noFeaturedScenarios": "Não há cenários em destaque ainda.",
+    "welcomeBack": "Bem-vindo de volta,",
+    "memberSince": "No Apocaliptics desde",
+    "apCoins": "AP Coins",
+    "scenariosWon": "Cenários ganhos",
+    "scenariosCreated": "Cenários criados",
+    "loadingScenarios": "Carregando cenários...",
+    "createFirst": "Criar o primeiro",
+    "goToShop": "Ir para a Loja",
+    "shopDescription": "Compre itens para proteger, roubar ou potencializar seus cenários.",
+    "viewLeaderboard": "Ver Leaderboard",
+    "leaderboardDescription": "Confira sua posição entre todos os profetas."
   },
   "footer": {
     "description": "A plataforma de previsões onde profetas competem pelo futuro.",

@@ -114,13 +114,39 @@
     "create": "Szenario erstellen",
     "filters": { "all": "Alle", "active": "Aktiv", "completed": "Abgeschlossen", "failed": "Fehlgeschlagen", "mine": "Meine Szenarien" },
     "sort": { "latest": "Neueste", "popular": "Beliebteste", "ending": "Bald endend", "price": "Höchster Preis" },
-    "card": { "holder": "Halter", "currentPrice": "Aktueller Preis", "steal": "Stehlen", "daysLeft": "{{days}} Tage" }
+    "card": { "holder": "Halter", "currentPrice": "Aktueller Preis", "steal": "Stehlen", "daysLeft": "{{days}} Tage", "hot": "Hot", "closed": "Geschlossen" }
   },
   "rankings": {
     "title": "Ranglisten",
     "subtitle": "Die besten Propheten",
     "tabs": { "global": "Global", "monthly": "Monatlich", "weekly": "Wöchentlich" },
-    "metrics": { "winRate": "Gewinnrate", "predictions": "Vorhersagen", "earnings": "Einnahmen" }
+    "metrics": { "winRate": "Gewinnrate", "predictions": "Vorhersagen", "earnings": "Einnahmen" },
+    "position": "Position"
+  },
+  "leaderboard": {
+    "loading": "Rangliste wird geladen...",
+    "loadError": "Fehler beim Laden der Rangliste",
+    "yourPosition": "Deine aktuelle Position",
+    "keepWinning": "Gewinne weiter Szenarien, um in der Rangliste aufzusteigen",
+    "viewMyProfile": "Mein Profil ansehen",
+    "totalProphets": "Propheten Gesamt",
+    "currentLeader": "Aktueller Anführer",
+    "avgWinRate": "Durchschnittliche Gewinnrate",
+    "sortByLabel": "Sortieren nach:",
+    "prophet": "Prophet",
+    "noProphets": "Noch keine Propheten in der Rangliste",
+    "infoText1": "Die Rangliste wird in Echtzeit basierend auf der Aktivität der Propheten aktualisiert.",
+    "infoText2": "Willst du an die Spitze? Erstelle präzise Szenarien und erhöhe deine Gewinnrate",
+    "sortBy": {
+      "apCoins": "AP Coins",
+      "apCoinsDesc": "Gesamte Münzen",
+      "level": "Level",
+      "levelDesc": "Propheten-Level",
+      "accuracy": "Genauigkeit",
+      "accuracyDesc": "Korrekte Vorhersagen",
+      "earnings": "Einnahmen",
+      "earningsDesc": "Verdiente AP Coins"
+    }
   },
   "shop": {
     "title": "Shop",
@@ -168,6 +194,23 @@
       "loginRequired": "Melde dich an um zu chatten",
       "noMessages": "Noch keine Nachrichten. Sei der Erste!"
     }
+  },
+  "dashboard": {
+    "welcomeTitle": "Willkommen bei Apocaliptics",
+    "welcomeMessage": "Es gibt noch keinen aktiven Propheten in dieser Sitzung. Später kannst du hier deine persönliche Zusammenfassung sehen (Level, Szenarien, Münzen, etc.).",
+    "featuredScenarios": "Hervorgehobene Szenarien",
+    "noFeaturedScenarios": "Noch keine hervorgehobenen Szenarien.",
+    "welcomeBack": "Willkommen zurück,",
+    "memberSince": "Bei Apocaliptics seit",
+    "apCoins": "AP Coins",
+    "scenariosWon": "Gewonnene Szenarien",
+    "scenariosCreated": "Erstellte Szenarien",
+    "loadingScenarios": "Szenarien werden geladen...",
+    "createFirst": "Erstelle das erste",
+    "goToShop": "Zum Shop",
+    "shopDescription": "Kaufe Gegenstände, um deine Szenarien zu schützen, zu stehlen oder zu verstärken.",
+    "viewLeaderboard": "Rangliste ansehen",
+    "leaderboardDescription": "Überprüfe deine Position unter allen Propheten."
   },
   "footer": {
     "description": "Die Vorhersage-Plattform, auf der Propheten kämpfen.",

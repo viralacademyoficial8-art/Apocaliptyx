@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { LiveStreamCard } from '@/components/streaming/LiveStreamCard';
 import { useAuthStore } from '@/lib/stores';
+import { useTranslation } from '@/hooks/useTranslation';
 import toast from 'react-hot-toast';
 
 interface LiveStream {
@@ -31,6 +32,7 @@ interface LiveStream {
 export default function StreamingPage() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'live' | 'all' | 'following'>('live');
@@ -56,7 +58,7 @@ export default function StreamingPage() {
       setStreams(data.streams || []);
     } catch (error) {
       console.error('Error loading streams:', error);
-      toast.error('Error al cargar streams');
+      toast.error(t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -64,11 +66,11 @@ export default function StreamingPage() {
 
   const handleStartStream = async () => {
     if (!user) {
-      toast.error('Debes iniciar sesión');
+      toast.error(t('streaming.chat.loginRequired'));
       return;
     }
 
-    const title = prompt('Título del stream:');
+    const title = prompt(t('streaming.streamTitle'));
     if (!title) return;
 
     setIsStartingStream(true);
@@ -82,13 +84,13 @@ export default function StreamingPage() {
 
       if (data.error) throw new Error(data.error);
 
-      toast.success('Preparando stream...');
+      toast.success(t('streaming.connecting'));
 
       // Redirect to the live stream page as host
       router.push(`/streaming/live/${data.stream.id}?host=true`);
     } catch (error: unknown) {
       console.error('Error starting stream:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al iniciar stream');
+      toast.error(error instanceof Error ? error.message : t('common.error'));
       setIsStartingStream(false);
     }
   };
@@ -118,10 +120,10 @@ export default function StreamingPage() {
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-3">
               <Radio className="w-8 h-8 text-red-500" />
-              Streaming
+              {t('streaming.title')}
             </h1>
             <p className="text-gray-400 mt-1">
-              Transmisiones en vivo de predicciones y análisis
+              {t('streaming.subtitle')}
             </p>
           </div>
           {user && (
@@ -131,7 +133,7 @@ export default function StreamingPage() {
               disabled={isStartingStream}
             >
               <Radio className={`w-4 h-4 mr-2 ${isStartingStream ? 'animate-pulse' : ''}`} />
-              {isStartingStream ? 'Iniciando...' : 'Iniciar stream'}
+              {isStartingStream ? t('streaming.starting') : t('streaming.startStream')}
             </Button>
           )}
         </div>
@@ -141,21 +143,21 @@ export default function StreamingPage() {
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-red-400 mb-1">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-sm">En vivo ahora</span>
+              <span className="text-sm">{t('streaming.liveNow')}</span>
             </div>
             <p className="text-2xl font-bold">{liveCount}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-gray-400 mb-1">
               <Users className="w-4 h-4" />
-              <span className="text-sm">Espectadores</span>
+              <span className="text-sm">{t('streaming.viewers')}</span>
             </div>
             <p className="text-2xl font-bold">{totalViewers.toLocaleString()}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-gray-400 mb-1">
               <TrendingUp className="w-4 h-4" />
-              <span className="text-sm">Más visto hoy</span>
+              <span className="text-sm">{t('streaming.mostWatchedToday')}</span>
             </div>
             <p className="text-2xl font-bold">
               {streams.length > 0
@@ -166,7 +168,7 @@ export default function StreamingPage() {
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-gray-400 mb-1">
               <Clock className="w-4 h-4" />
-              <span className="text-sm">Streams hoy</span>
+              <span className="text-sm">{t('streaming.streamsToday')}</span>
             </div>
             <p className="text-2xl font-bold">{streams.length}</p>
           </div>
@@ -179,7 +181,7 @@ export default function StreamingPage() {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar streams..."
+              placeholder={`${t('common.search')}...`}
               className="pl-10 bg-gray-800 border-gray-700"
             />
           </div>
@@ -190,14 +192,14 @@ export default function StreamingPage() {
               className={filter === 'live' ? 'bg-red-600' : 'border-gray-700'}
             >
               <span className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse" />
-              En vivo
+              {t('streaming.live')}
             </Button>
             <Button
               variant={filter === 'all' ? 'default' : 'outline'}
               onClick={() => setFilter('all')}
               className={filter === 'all' ? 'bg-purple-600' : 'border-gray-700'}
             >
-              Todos
+              {t('streaming.all')}
             </Button>
             <Button
               variant={filter === 'following' ? 'default' : 'outline'}
@@ -205,7 +207,7 @@ export default function StreamingPage() {
               className={filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}
             >
               <Users className="w-4 h-4 mr-1" />
-              Siguiendo
+              {t('streaming.following')}
             </Button>
           </div>
         </div>
@@ -228,8 +230,8 @@ export default function StreamingPage() {
             <Radio className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg">
               {filter === 'live'
-                ? 'No hay streams en vivo ahora'
-                : 'No se encontraron streams'}
+                ? t('streaming.noLiveStreams')
+                : t('streaming.noLiveStreams')}
             </p>
             {filter === 'live' && (
               <Button
@@ -237,7 +239,7 @@ export default function StreamingPage() {
                 onClick={() => setFilter('all')}
                 className="text-purple-400 mt-2"
               >
-                Ver todos los streams
+                {t('streaming.viewAllStreams')}
               </Button>
             )}
           </div>

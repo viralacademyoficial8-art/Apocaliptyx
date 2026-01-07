@@ -187,7 +187,9 @@
       "endsIn": "Termina en",
       "expired": "Expirado",
       "daysLeft": "{{days}} días",
-      "hoursLeft": "{{hours}} horas"
+      "hoursLeft": "{{hours}} horas",
+      "hot": "Hot",
+      "closed": "Cerrado"
     },
     "detail": {
       "description": "Descripción",
@@ -239,6 +241,31 @@
     },
     "you": "Tú",
     "position": "Posición"
+  },
+  "leaderboard": {
+    "loading": "Cargando ranking...",
+    "loadError": "Error al cargar el ranking",
+    "yourPosition": "Tu posición actual",
+    "keepWinning": "Sigue ganando escenarios para subir en el ranking",
+    "viewMyProfile": "Ver mi perfil",
+    "totalProphets": "Total Profetas",
+    "currentLeader": "Líder Actual",
+    "avgWinRate": "Win Rate Promedio",
+    "sortByLabel": "Ordenar por:",
+    "prophet": "Profeta",
+    "noProphets": "No hay profetas en el ranking aún",
+    "infoText1": "El ranking se actualiza en tiempo real basado en la actividad de los profetas.",
+    "infoText2": "¿Quieres llegar al top? Crea escenarios precisos y sube tu win rate",
+    "sortBy": {
+      "apCoins": "AP Coins",
+      "apCoinsDesc": "Monedas totales",
+      "level": "Nivel",
+      "levelDesc": "Nivel de profeta",
+      "accuracy": "Aciertos",
+      "accuracyDesc": "Predicciones correctas",
+      "earnings": "Ganancias",
+      "earningsDesc": "AP Coins ganadas"
+    }
   },
   "shop": {
     "title": "Tienda",
@@ -348,6 +375,23 @@
       "loginRequired": "Inicia sesión para chatear",
       "noMessages": "No hay mensajes aún. ¡Sé el primero en chatear!"
     }
+  },
+  "dashboard": {
+    "welcomeTitle": "Bienvenido a Apocaliptics",
+    "welcomeMessage": "Todavía no hay un profeta activo en esta sesión. Más adelante aquí podrás ver tu resumen personal (nivel, escenarios, monedas, etc.).",
+    "featuredScenarios": "Escenarios Destacados",
+    "noFeaturedScenarios": "No hay escenarios destacados aún.",
+    "welcomeBack": "Bienvenido de nuevo,",
+    "memberSince": "En Apocaliptics desde",
+    "apCoins": "AP Coins",
+    "scenariosWon": "Escenarios ganados",
+    "scenariosCreated": "Escenarios creados",
+    "loadingScenarios": "Cargando escenarios...",
+    "createFirst": "Crear el primero",
+    "goToShop": "Ir a la Tienda",
+    "shopDescription": "Compra ítems para proteger, robar o potenciar tus escenarios.",
+    "viewLeaderboard": "Ver Leaderboard",
+    "leaderboardDescription": "Revisa en qué posición vas entre todos los profetas."
   },
   "footer": {
     "description": "La plataforma de predicciones donde los profetas compiten por el futuro.",

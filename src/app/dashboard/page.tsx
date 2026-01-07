@@ -6,9 +6,10 @@ import { Navbar } from '@/components/Navbar';
 import { useAuthStore } from '@/lib/stores';
 import { formatDate } from '@/lib/utils';
 import { scenariosService } from '@/services';
-import { 
-  Flame, Trophy, ShoppingBag, ArrowRight, TrendingUp, 
-  Users, Clock, Loader2, AlertCircle 
+import { useTranslation } from '@/hooks/useTranslation';
+import {
+  Flame, Trophy, ShoppingBag, ArrowRight, TrendingUp,
+  Users, Clock, Loader2, AlertCircle
 } from 'lucide-react';
 
 // Importamos las animaciones
@@ -36,7 +37,8 @@ interface ScenarioData {
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
-  
+  const { t } = useTranslation();
+
   // Estados para datos de Supabase
   const [featuredScenarios, setFeaturedScenarios] = useState<ScenarioData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,15 +69,14 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gray-950 text-white">
         <Navbar />
         <div className="container mx-auto px-4 py-16">
-          <h1 className="text-3xl font-bold mb-4">Bienvenido a Apocaliptics</h1>
+          <h1 className="text-3xl font-bold mb-4">{t('dashboard.welcomeTitle')}</h1>
           <p className="text-gray-400 mb-6">
-            Todavía no hay un profeta activo en esta sesión. Más adelante aquí
-            podrás ver tu resumen personal (nivel, escenarios, monedas, etc.).
+            {t('dashboard.welcomeMessage')}
           </p>
           
           {/* Mostrar escenarios aunque no esté logueado */}
           <div className="mt-8">
-            <h2 className="text-xl font-bold mb-4">🔥 Escenarios Destacados</h2>
+            <h2 className="text-xl font-bold mb-4">🔥 {t('dashboard.featuredScenarios')}</h2>
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -86,7 +87,7 @@ export default function DashboardPage() {
                 {error}
               </div>
             ) : featuredScenarios.length === 0 ? (
-              <p className="text-gray-500">No hay escenarios destacados aún.</p>
+              <p className="text-gray-500">{t('dashboard.noFeaturedScenarios')}</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {featuredScenarios.map((scenario) => (
@@ -100,7 +101,7 @@ export default function DashboardPage() {
             onClick={() => router.push('/login')}
             className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-sm font-medium transition-colors"
           >
-            Iniciar Sesión
+            {t('nav.login')}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
@@ -117,12 +118,12 @@ export default function DashboardPage() {
         {/* HEADER */}
         <FadeInView direction="up" delay={0.05}>
           <section>
-            <p className="text-xs text-zinc-400">Bienvenido de nuevo,</p>
+            <p className="text-xs text-zinc-400">{t('dashboard.welcomeBack')}</p>
             <h1 className="text-2xl font-bold text-zinc-50">
               {user.displayName || user.username}
             </h1>
             <p className="text-xs text-zinc-500 mt-1">
-              En Apocaliptics desde {formatDate(user.createdAt)}
+              {t('dashboard.memberSince')} {formatDate(user.createdAt)}
             </p>
           </section>
         </FadeInView>
@@ -134,7 +135,7 @@ export default function DashboardPage() {
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
                 <Flame className="w-6 h-6 text-orange-400" />
                 <div>
-                  <p className="text-xs text-zinc-400">AP Coins</p>
+                  <p className="text-xs text-zinc-400">{t('dashboard.apCoins')}</p>
                   <p className="text-xl font-bold">
                     {user.apCoins?.toLocaleString() || '0'}
                   </p>
@@ -146,7 +147,7 @@ export default function DashboardPage() {
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
                 <Trophy className="w-6 h-6 text-yellow-400" />
                 <div>
-                  <p className="text-xs text-zinc-400">Escenarios ganados</p>
+                  <p className="text-xs text-zinc-400">{t('dashboard.scenariosWon')}</p>
                   <p className="text-xl font-bold">{user.scenariosWon || 0}</p>
                 </div>
               </div>
@@ -156,7 +157,7 @@ export default function DashboardPage() {
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
                 <ShoppingBag className="w-6 h-6 text-emerald-400" />
                 <div>
-                  <p className="text-xs text-zinc-400">Escenarios creados</p>
+                  <p className="text-xs text-zinc-400">{t('dashboard.scenariosCreated')}</p>
                   <p className="text-xl font-bold">{user.scenariosCreated || 0}</p>
                 </div>
               </div>
@@ -170,13 +171,13 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-purple-400" />
-                Escenarios Destacados
+                {t('dashboard.featuredScenarios')}
               </h2>
-              <button 
+              <button
                 onClick={() => router.push('/explorar')}
                 className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
               >
-                Ver todos
+                {t('common.viewAll')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -184,7 +185,7 @@ export default function DashboardPage() {
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-                <span className="ml-2 text-gray-400">Cargando escenarios...</span>
+                <span className="ml-2 text-gray-400">{t('dashboard.loadingScenarios')}</span>
               </div>
             ) : error ? (
               <div className="flex items-center gap-2 text-red-400 py-4 bg-red-500/10 rounded-lg px-4">
@@ -193,12 +194,12 @@ export default function DashboardPage() {
               </div>
             ) : featuredScenarios.length === 0 ? (
               <div className="text-center py-12 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                <p className="text-gray-500 mb-4">No hay escenarios destacados aún.</p>
+                <p className="text-gray-500 mb-4">{t('dashboard.noFeaturedScenarios')}</p>
                 <button
                   onClick={() => router.push('/crear')}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium"
                 >
-                  Crear el primero
+                  {t('dashboard.createFirst')}
                 </button>
               </div>
             ) : (
@@ -221,9 +222,9 @@ export default function DashboardPage() {
                 onClick={() => router.push('/tienda')}
                 className="w-full rounded-xl border border-purple-500/30 bg-purple-500/10 p-4 text-left hover:bg-purple-500/20 transition-colors"
               >
-                <h2 className="text-lg font-semibold mb-1">Ir a la Tienda</h2>
+                <h2 className="text-lg font-semibold mb-1">{t('dashboard.goToShop')}</h2>
                 <p className="text-xs text-zinc-300">
-                  Compra ítems para proteger, robar o potenciar tus escenarios.
+                  {t('dashboard.shopDescription')}
                 </p>
               </button>
             </StaggerItem>
@@ -233,9 +234,9 @@ export default function DashboardPage() {
                 onClick={() => router.push('/leaderboard')}
                 className="w-full rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-left hover:bg-yellow-500/20 transition-colors"
               >
-                <h2 className="text-lg font-semibold mb-1">Ver Leaderboard</h2>
+                <h2 className="text-lg font-semibold mb-1">{t('dashboard.viewLeaderboard')}</h2>
                 <p className="text-xs text-zinc-300">
-                  Revisa en qué posición vas entre todos los profetas.
+                  {t('dashboard.leaderboardDescription')}
                 </p>
               </button>
             </StaggerItem>
@@ -249,8 +250,9 @@ export default function DashboardPage() {
 // Componente de tarjeta de escenario
 function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
   const router = useRouter();
-  const yesPercent = scenario.total_pool > 0 
-    ? Math.round((scenario.yes_pool / scenario.total_pool) * 100) 
+  const { t } = useTranslation();
+  const yesPercent = scenario.total_pool > 0
+    ? Math.round((scenario.yes_pool / scenario.total_pool) * 100)
     : 50;
   const noPercent = 100 - yesPercent;
 
@@ -270,7 +272,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
         </span>
         {scenario.is_hot && (
           <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full flex items-center gap-1">
-            🔥 Hot
+            🔥 {t('scenarios.card.hot')}
           </span>
         )}
       </div>
@@ -283,8 +285,8 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       {/* Progress bar */}
       <div className="mb-3">
         <div className="flex justify-between text-xs mb-1">
-          <span className="text-green-400">Sí {yesPercent}%</span>
-          <span className="text-red-400">No {noPercent}%</span>
+          <span className="text-green-400">{t('common.yes')} {yesPercent}%</span>
+          <span className="text-red-400">{t('common.no')} {noPercent}%</span>
         </div>
         <div className="h-2 bg-zinc-800 rounded-full overflow-hidden flex">
           <div 
@@ -310,7 +312,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
         </div>
         <div className="flex items-center gap-1">
           <Clock className="w-3 h-3" />
-          <span>{daysLeft > 0 ? `${daysLeft}d` : 'Cerrado'}</span>
+          <span>{daysLeft > 0 ? `${daysLeft}d` : t('scenarios.card.closed')}</span>
         </div>
       </div>
     </div>

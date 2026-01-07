@@ -6,6 +6,7 @@ import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { usersService } from '@/services';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Trophy,
   TrendingUp,
@@ -40,7 +41,8 @@ type SortOption = 'ap_coins' | 'level' | 'correct_predictions' | 'total_earnings
 export default function LeaderboardPage() {
   const router = useRouter();
   const { user } = useAuthStore();
-  
+  const { t } = useTranslation();
+
   const [users, setUsers] = useState<UserData[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('ap_coins');
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +58,7 @@ export default function LeaderboardPage() {
         setError(null);
       } catch (err) {
         console.error('Error loading leaderboard:', err);
-        setError('Error al cargar el ranking');
+        setError(t('leaderboard.loadError'));
       } finally {
         setIsLoading(false);
       }
@@ -99,36 +101,36 @@ export default function LeaderboardPage() {
   const sortOptions = [
     {
       id: 'ap_coins' as SortOption,
-      label: 'AP Coins',
+      label: t('leaderboard.sortBy.apCoins'),
       icon: Award,
-      description: 'Monedas totales',
+      description: t('leaderboard.sortBy.apCoinsDesc'),
       color: 'text-yellow-400',
       bgColor: 'bg-yellow-500/10',
       borderColor: 'border-yellow-500/30',
     },
     {
       id: 'level' as SortOption,
-      label: 'Nivel',
+      label: t('leaderboard.sortBy.level'),
       icon: Flame,
-      description: 'Nivel de profeta',
+      description: t('leaderboard.sortBy.levelDesc'),
       color: 'text-orange-400',
       bgColor: 'bg-orange-500/10',
       borderColor: 'border-orange-500/30',
     },
     {
       id: 'correct_predictions' as SortOption,
-      label: 'Aciertos',
+      label: t('leaderboard.sortBy.accuracy'),
       icon: Target,
-      description: 'Predicciones correctas',
+      description: t('leaderboard.sortBy.accuracyDesc'),
       color: 'text-green-400',
       bgColor: 'bg-green-500/10',
       borderColor: 'border-green-500/30',
     },
     {
       id: 'total_earnings' as SortOption,
-      label: 'Ganancias',
+      label: t('leaderboard.sortBy.earnings'),
       icon: TrendingUp,
-      description: 'AP Coins ganadas',
+      description: t('leaderboard.sortBy.earningsDesc'),
       color: 'text-purple-400',
       bgColor: 'bg-purple-500/10',
       borderColor: 'border-purple-500/30',
@@ -142,7 +144,7 @@ export default function LeaderboardPage() {
         <div className="flex items-center justify-center px-4 py-16">
           <div className="text-center">
             <Loader2 className="w-12 h-12 animate-spin text-yellow-500 mx-auto mb-4" />
-            <p className="text-gray-400">Cargando ranking...</p>
+            <p className="text-gray-400">{t('leaderboard.loading')}</p>
           </div>
         </div>
       </div>
@@ -160,7 +162,7 @@ export default function LeaderboardPage() {
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
           >
-            Reintentar
+            {t('errors.serverError.retry')}
           </button>
         </div>
       </div>
@@ -180,10 +182,10 @@ export default function LeaderboardPage() {
             </div>
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
-                Leaderboard
+                {t('rankings.title')}
               </h1>
               <p className="text-sm sm:text-base text-gray-400">
-                Ranking de los mejores profetas de Apocaliptics
+                {t('rankings.subtitle')}
               </p>
             </div>
           </div>
@@ -197,13 +199,13 @@ export default function LeaderboardPage() {
                 <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-400 flex-shrink-0" />
                 <div>
                   <div className="text-xs sm:text-sm text-gray-200/80">
-                    Tu posición actual
+                    {t('leaderboard.yourPosition')}
                   </div>
                   <div className="text-2xl sm:text-3xl font-bold text-yellow-400">
                     #{currentPosition}
                   </div>
                   <p className="text-xs text-gray-200/80 mt-1">
-                    Sigue ganando escenarios para subir en el ranking 🔥
+                    {t('leaderboard.keepWinning')} 🔥
                   </p>
                 </div>
               </div>
@@ -211,7 +213,7 @@ export default function LeaderboardPage() {
                 onClick={() => router.push(`/perfil/${user.username}`)}
                 className="px-4 py-2 border border-yellow-500/30 hover:bg-yellow-500/10 rounded-lg text-sm"
               >
-                Ver mi perfil
+                {t('leaderboard.viewMyProfile')}
               </button>
             </div>
           </section>
@@ -223,7 +225,7 @@ export default function LeaderboardPage() {
             <Users className="w-6 h-6 text-blue-400" />
             <div>
               <div className="text-xs sm:text-sm text-gray-400">
-                Total Profetas
+                {t('leaderboard.totalProphets')}
               </div>
               <div className="text-2xl font-bold">{users.length}</div>
             </div>
@@ -233,11 +235,11 @@ export default function LeaderboardPage() {
             <Trophy className="w-6 h-6 text-yellow-400" />
             <div>
               <div className="text-xs sm:text-sm text-gray-400">
-                Líder Actual
+                {t('leaderboard.currentLeader')}
               </div>
               <div className="text-base sm:text-lg font-bold truncate">
-                {sortedUsers.length > 0 
-                  ? sortedUsers[0].display_name || sortedUsers[0].username 
+                {sortedUsers.length > 0
+                  ? sortedUsers[0].display_name || sortedUsers[0].username
                   : '-'}
               </div>
             </div>
@@ -247,7 +249,7 @@ export default function LeaderboardPage() {
             <TrendingUp className="w-6 h-6 text-green-400" />
             <div>
               <div className="text-xs sm:text-sm text-gray-400">
-                Win Rate Promedio
+                {t('leaderboard.avgWinRate')}
               </div>
               <div className="text-2xl font-bold">
                 {avgWinRate.toFixed(1)}%
@@ -259,7 +261,7 @@ export default function LeaderboardPage() {
         {/* Sort Options */}
         <section>
           <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
-            Ordenar por:
+            {t('leaderboard.sortByLabel')}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {sortOptions.map((option) => {
@@ -301,22 +303,22 @@ export default function LeaderboardPage() {
               <thead className="bg-gray-800/50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Posición
+                    {t('rankings.position')}
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Profeta
+                    {t('leaderboard.prophet')}
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Nivel
+                    {t('leaderboard.sortBy.level')}
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    AP Coins
+                    {t('leaderboard.sortBy.apCoins')}
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Aciertos
+                    {t('leaderboard.sortBy.accuracy')}
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Win Rate
+                    {t('rankings.metrics.winRate')}
                   </th>
                 </tr>
               </thead>
@@ -422,7 +424,7 @@ export default function LeaderboardPage() {
 
             {sortedUsers.length === 0 && (
               <div className="text-center py-12 text-gray-500">
-                No hay profetas en el ranking aún
+                {t('leaderboard.noProphets')}
               </div>
             )}
           </div>
@@ -431,10 +433,10 @@ export default function LeaderboardPage() {
         {/* Info Footer */}
         <section className="text-center text-xs sm:text-sm text-gray-500 pb-4 sm:pb-8">
           <p>
-            El ranking se actualiza en tiempo real basado en la actividad de los profetas.
+            {t('leaderboard.infoText1')}
           </p>
           <p className="mt-2">
-            ¿Quieres llegar al top? Crea escenarios precisos y sube tu win rate 📈
+            {t('leaderboard.infoText2')} 📈
           </p>
         </section>
       </div>
