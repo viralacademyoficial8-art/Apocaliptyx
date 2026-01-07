@@ -188,7 +188,9 @@
       "endsIn": "Ends in",
       "expired": "Expired",
       "daysLeft": "{{days}} days",
-      "hoursLeft": "{{hours}} hours"
+      "hoursLeft": "{{hours}} hours",
+      "hot": "Hot",
+      "closed": "Closed"
     },
     "detail": {
       "description": "Description",
@@ -240,6 +242,31 @@
     },
     "you": "You",
     "position": "Position"
+  },
+  "leaderboard": {
+    "loading": "Loading rankings...",
+    "loadError": "Error loading rankings",
+    "yourPosition": "Your current position",
+    "keepWinning": "Keep winning scenarios to climb the ranks",
+    "viewMyProfile": "View my profile",
+    "totalProphets": "Total Prophets",
+    "currentLeader": "Current Leader",
+    "avgWinRate": "Average Win Rate",
+    "sortByLabel": "Sort by:",
+    "prophet": "Prophet",
+    "noProphets": "No prophets in the ranking yet",
+    "infoText1": "Rankings update in real-time based on prophet activity.",
+    "infoText2": "Want to reach the top? Create accurate scenarios and increase your win rate",
+    "sortBy": {
+      "apCoins": "AP Coins",
+      "apCoinsDesc": "Total coins",
+      "level": "Level",
+      "levelDesc": "Prophet level",
+      "accuracy": "Accuracy",
+      "accuracyDesc": "Correct predictions",
+      "earnings": "Earnings",
+      "earningsDesc": "AP Coins earned"
+    }
   },
   "shop": {
     "title": "Shop",
@@ -349,6 +376,23 @@
       "loginRequired": "Log in to chat",
       "noMessages": "No messages yet. Be the first to chat!"
     }
+  },
+  "dashboard": {
+    "welcomeTitle": "Welcome to Apocaliptics",
+    "welcomeMessage": "There's no active prophet in this session yet. Later you'll be able to see your personal summary here (level, scenarios, coins, etc.).",
+    "featuredScenarios": "Featured Scenarios",
+    "noFeaturedScenarios": "No featured scenarios yet.",
+    "welcomeBack": "Welcome back,",
+    "memberSince": "On Apocaliptics since",
+    "apCoins": "AP Coins",
+    "scenariosWon": "Scenarios won",
+    "scenariosCreated": "Scenarios created",
+    "loadingScenarios": "Loading scenarios...",
+    "createFirst": "Create the first one",
+    "goToShop": "Go to Shop",
+    "shopDescription": "Buy items to protect, steal or boost your scenarios.",
+    "viewLeaderboard": "View Leaderboard",
+    "leaderboardDescription": "Check your position among all prophets."
   },
   "footer": {
     "description": "The prediction platform where prophets compete for the future.",

@@ -114,13 +114,39 @@
     "create": "Создать сценарий",
     "filters": { "all": "Все", "active": "Активные", "completed": "Завершённые", "failed": "Неудачные", "mine": "Мои сценарии" },
     "sort": { "latest": "Новейшие", "popular": "Популярные", "ending": "Скоро заканчиваются", "price": "Высшая цена" },
-    "card": { "holder": "Держатель", "currentPrice": "Текущая цена", "steal": "Украсть", "daysLeft": "{{days}} дней" }
+    "card": { "holder": "Держатель", "currentPrice": "Текущая цена", "steal": "Украсть", "daysLeft": "{{days}} дней", "hot": "Hot", "closed": "Закрыто" }
   },
   "rankings": {
     "title": "Рейтинги",
     "subtitle": "Лучшие пророки",
     "tabs": { "global": "Глобальный", "monthly": "Месячный", "weekly": "Недельный" },
-    "metrics": { "winRate": "Процент побед", "predictions": "Предсказания", "earnings": "Заработок" }
+    "metrics": { "winRate": "Процент побед", "predictions": "Предсказания", "earnings": "Заработок" },
+    "position": "Позиция"
+  },
+  "leaderboard": {
+    "loading": "Загрузка рейтинга...",
+    "loadError": "Ошибка при загрузке рейтинга",
+    "yourPosition": "Ваша текущая позиция",
+    "keepWinning": "Продолжайте выигрывать сценарии, чтобы подняться в рейтинге",
+    "viewMyProfile": "Посмотреть мой профиль",
+    "totalProphets": "Всего Пророков",
+    "currentLeader": "Текущий Лидер",
+    "avgWinRate": "Средний Процент Побед",
+    "sortByLabel": "Сортировать по:",
+    "prophet": "Пророк",
+    "noProphets": "В рейтинге пока нет пророков",
+    "infoText1": "Рейтинг обновляется в реальном времени на основе активности пророков.",
+    "infoText2": "Хотите добраться до вершины? Создавайте точные сценарии и повышайте процент побед",
+    "sortBy": {
+      "apCoins": "AP Coins",
+      "apCoinsDesc": "Всего монет",
+      "level": "Уровень",
+      "levelDesc": "Уровень пророка",
+      "accuracy": "Точность",
+      "accuracyDesc": "Правильные предсказания",
+      "earnings": "Заработок",
+      "earningsDesc": "Заработанные AP Coins"
+    }
   },
   "shop": {
     "title": "Магазин",
@@ -168,6 +194,23 @@
       "loginRequired": "Войдите чтобы писать в чат",
       "noMessages": "Пока нет сообщений. Будьте первым!"
     }
+  },
+  "dashboard": {
+    "welcomeTitle": "Добро пожаловать в Apocaliptics",
+    "welcomeMessage": "В этой сессии пока нет активного пророка. Позже здесь вы сможете увидеть свою личную сводку (уровень, сценарии, монеты и т.д.).",
+    "featuredScenarios": "Избранные Сценарии",
+    "noFeaturedScenarios": "Пока нет избранных сценариев.",
+    "welcomeBack": "С возвращением,",
+    "memberSince": "В Apocaliptics с",
+    "apCoins": "AP Coins",
+    "scenariosWon": "Выигранные сценарии",
+    "scenariosCreated": "Созданные сценарии",
+    "loadingScenarios": "Загрузка сценариев...",
+    "createFirst": "Создать первый",
+    "goToShop": "В Магазин",
+    "shopDescription": "Покупайте предметы для защиты, кражи или усиления ваших сценариев.",
+    "viewLeaderboard": "Посмотреть Рейтинг",
+    "leaderboardDescription": "Проверьте свою позицию среди всех пророков."
   },
   "footer": {
     "description": "Платформа предсказаний, где пророки соревнуются.",

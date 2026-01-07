@@ -114,13 +114,39 @@
     "create": "Créer un scénario",
     "filters": { "all": "Tous", "active": "Actifs", "completed": "Terminés", "failed": "Échoués", "mine": "Mes scénarios" },
     "sort": { "latest": "Plus récents", "popular": "Plus populaires", "ending": "Bientôt terminés", "price": "Prix le plus élevé" },
-    "card": { "holder": "Détenteur", "currentPrice": "Prix actuel", "steal": "Voler", "daysLeft": "{{days}} jours" }
+    "card": { "holder": "Détenteur", "currentPrice": "Prix actuel", "steal": "Voler", "daysLeft": "{{days}} jours", "hot": "Hot", "closed": "Terminé" }
   },
   "rankings": {
     "title": "Classements",
     "subtitle": "Les meilleurs prophètes",
     "tabs": { "global": "Global", "monthly": "Mensuel", "weekly": "Hebdomadaire" },
-    "metrics": { "winRate": "Taux de victoire", "predictions": "Prédictions", "earnings": "Gains" }
+    "metrics": { "winRate": "Taux de victoire", "predictions": "Prédictions", "earnings": "Gains" },
+    "position": "Position"
+  },
+  "leaderboard": {
+    "loading": "Chargement du classement...",
+    "loadError": "Erreur lors du chargement du classement",
+    "yourPosition": "Votre position actuelle",
+    "keepWinning": "Continuez à gagner des scénarios pour grimper dans le classement",
+    "viewMyProfile": "Voir mon profil",
+    "totalProphets": "Total des Prophètes",
+    "currentLeader": "Leader Actuel",
+    "avgWinRate": "Taux de Victoire Moyen",
+    "sortByLabel": "Trier par:",
+    "prophet": "Prophète",
+    "noProphets": "Pas encore de prophètes dans le classement",
+    "infoText1": "Le classement est mis à jour en temps réel en fonction de l'activité des prophètes.",
+    "infoText2": "Vous voulez atteindre le sommet? Créez des scénarios précis et augmentez votre taux de victoire",
+    "sortBy": {
+      "apCoins": "AP Coins",
+      "apCoinsDesc": "Total des pièces",
+      "level": "Niveau",
+      "levelDesc": "Niveau du prophète",
+      "accuracy": "Précision",
+      "accuracyDesc": "Prédictions correctes",
+      "earnings": "Gains",
+      "earningsDesc": "AP Coins gagnées"
+    }
   },
   "shop": {
     "title": "Boutique",
@@ -168,6 +194,23 @@
       "loginRequired": "Connectez-vous pour chatter",
       "noMessages": "Pas encore de messages. Soyez le premier!"
     }
+  },
+  "dashboard": {
+    "welcomeTitle": "Bienvenue sur Apocaliptics",
+    "welcomeMessage": "Il n'y a pas encore de prophète actif dans cette session. Plus tard, vous pourrez voir votre résumé personnel ici (niveau, scénarios, pièces, etc.).",
+    "featuredScenarios": "Scénarios en Vedette",
+    "noFeaturedScenarios": "Pas de scénarios en vedette pour le moment.",
+    "welcomeBack": "Bon retour,",
+    "memberSince": "Sur Apocaliptics depuis",
+    "apCoins": "AP Coins",
+    "scenariosWon": "Scénarios gagnés",
+    "scenariosCreated": "Scénarios créés",
+    "loadingScenarios": "Chargement des scénarios...",
+    "createFirst": "Créer le premier",
+    "goToShop": "Aller à la Boutique",
+    "shopDescription": "Achetez des objets pour protéger, voler ou booster vos scénarios.",
+    "viewLeaderboard": "Voir le Classement",
+    "leaderboardDescription": "Vérifiez votre position parmi tous les prophètes."
   },
   "footer": {
     "description": "La plateforme de prédictions où les prophètes rivalisent.",
