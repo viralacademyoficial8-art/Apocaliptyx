@@ -914,7 +914,7 @@ function ForoContent() {
       );
 
       if (result.success) {
-        toast.success(t('forum.actions.awardGiven', { name: result.award_name }));
+        toast.success(t('forum.actions.awardGiven', { name: result.award_name || 'Award' }));
         setAwardModalOpen(false);
         setAwardingPost(null);
         setSelectedAward(null);
