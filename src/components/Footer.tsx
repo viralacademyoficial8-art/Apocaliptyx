@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useMemo, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -365,11 +366,13 @@ export function Footer() {
           {/* Logo y Descripción */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <Skull className="w-8 h-8 text-red-500" />
-              <span className="text-xl font-bold">
-                <span className="text-red-500">APOCAL</span>
-                <span className="text-yellow-500">IPTICS</span>
-              </span>
+              <Image
+                src="/apocaliptyx-logo.png"
+                alt="Apocaliptyx"
+                width={160}
+                height={45}
+                className="h-12 w-auto"
+              />
             </Link>
 
             <p className="text-gray-400 text-sm mb-6 max-w-xs">{t.description}</p>
@@ -539,7 +542,13 @@ export function Footer() {
             {/* Centro */}
             <div className="flex items-center gap-2 text-sm">
               <span className="text-gray-500">{t.labels.madeWith}</span>
-              <Skull className="w-4 h-4 text-red-500" />
+              <Image
+                src="/apocaliptyx-logo.png"
+                alt="Apocaliptyx"
+                width={24}
+                height={24}
+                className="h-5 w-auto"
+              />
               <span className="text-gray-500">{t.labels.global}</span>
             </div>
 
@@ -573,8 +582,13 @@ export function FooterCompact() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <Skull className="w-5 h-5 text-red-500" />
-            <span className="font-bold text-foreground">APOCALIPTICS</span>
+            <Image
+              src="/apocaliptyx-logo.png"
+              alt="Apocaliptyx"
+              width={120}
+              height={35}
+              className="h-8 w-auto"
+            />
           </Link>
 
           <nav className="flex flex-wrap items-center justify-center gap-4">
