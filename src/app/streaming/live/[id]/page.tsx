@@ -68,9 +68,10 @@ export default function LiveStreamPage() {
           return;
         }
 
-        // Get LiveKit token - use hostParam directly to avoid state timing issues
-        const wantsToHost = hostParam && user?.id === infoData.stream.userId;
-        console.log('Token request:', { streamId, hostParam, userId: user?.id, streamUserId: infoData.stream.userId, wantsToHost });
+        // Get LiveKit token - owner is always host regardless of URL param
+        const isOwner = user?.id === infoData.stream.userId;
+        const wantsToHost = isOwner; // Owner is automatically host
+        console.log('Token request:', { streamId, hostParam, userId: user?.id, streamUserId: infoData.stream.userId, isOwner, wantsToHost });
 
         const tokenResponse = await fetch('/api/livekit/token', {
           method: 'POST',
