@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X, ShoppingCart, Star, Shield, Check, Minus, Plus, Sparkles } from 'lucide-react';
 import { useShopStore } from '@/stores/shopStore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const rarityGradients: Record<string, string> = {
   COMMON: 'from-gray-700 to-gray-900',
@@ -23,6 +24,7 @@ const typeIcons: Record<string, string> = {
 export function PurchaseModal() {
   const { selectedItem: item, isPurchaseModalOpen, setPurchaseModalOpen, setSelectedItem, addToCart, purchaseItem, isLoading, cart } =
     useShopStore();
+  const { t } = useTranslation();
 
   const [quantity, setQuantity] = useState(1);
 
@@ -70,7 +72,7 @@ export function PurchaseModal() {
           <div className="absolute top-4 left-4 flex flex-col gap-2">
             {item.isNew && (
               <span className="px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> NUEVO
+                <Sparkles className="w-3 h-3" /> {t('shop.item.new').toUpperCase()}
               </span>
             )}
             {item.isOnSale && item.originalPrice && (
@@ -109,7 +111,7 @@ export function PurchaseModal() {
             <div className="flex items-center gap-1 text-sm">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               <span className="text-white font-medium">{item.rating}</span>
-              <span className="text-gray-500">({item.reviews} reseñas)</span>
+              <span className="text-gray-500">({item.reviews} {t('shop.reviews')})</span>
             </div>
           </div>
 
@@ -117,7 +119,7 @@ export function PurchaseModal() {
 
           {item.effects && item.effects.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-300 mb-3">Efectos</h3>
+              <h3 className="text-sm font-medium text-gray-300 mb-3">{t('shop.item.effect')}</h3>
               <div className="space-y-2">
                 {item.effects.map((effect, i) => (
                   <div key={i} className="flex items-center gap-3 bg-gray-800 rounded-lg p-3">
@@ -132,7 +134,7 @@ export function PurchaseModal() {
 
           <div className="flex items-center justify-between mb-6 p-4 bg-gray-800 rounded-lg">
             <div>
-              <p className="text-sm text-gray-400 mb-1">Cantidad</p>
+              <p className="text-sm text-gray-400 mb-1">{t('shop.quantity')}</p>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -149,7 +151,7 @@ export function PurchaseModal() {
                   <Plus className="w-4 h-4 text-white" />
                 </button>
               </div>
-              {item.maxPerUser && <p className="text-xs text-gray-500 mt-1">Máx: {item.maxPerUser} por usuario</p>}
+              {item.maxPerUser && <p className="text-xs text-gray-500 mt-1">{t('shop.maxPerUser')}: {item.maxPerUser}</p>}
             </div>
 
             <div className="text-right">
@@ -165,7 +167,7 @@ export function PurchaseModal() {
           {item.stock !== null && item.stock <= 20 && item.stock > 0 && (
             <div className="mb-6 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg flex items-center gap-2 text-yellow-400 text-sm">
               <Shield className="w-4 h-4" />
-              Solo quedan {item.stock} unidades disponibles
+              {t('shop.onlyLeft', { count: item.stock })}
             </div>
           )}
 
@@ -176,7 +178,7 @@ export function PurchaseModal() {
               className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
             >
               <ShoppingCart className="w-5 h-5" />
-              Agregar al carrito
+              {t('shop.addToCart')}
             </button>
             <button
               onClick={handleBuyNow}
@@ -186,7 +188,7 @@ export function PurchaseModal() {
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                'Comprar Ahora'
+                t('shop.buyNow')
               )}
             </button>
           </div>

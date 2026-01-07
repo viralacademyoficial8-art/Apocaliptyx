@@ -60,33 +60,17 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { es, enUS, pt, fr, de, ru } from 'date-fns/locale';
 import toast from 'react-hot-toast';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories';
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
 import { CreateReelModal } from '@/components/reels/CreateReelModal';
 import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
 import Link from 'next/link';
 
-// Reaction definitions
-const REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[] = [
-  { type: 'fire', emoji: '🔥', label: 'Fuego', color: 'text-orange-400' },
-  { type: 'love', emoji: '❤️', label: 'Me encanta', color: 'text-red-400' },
-  { type: 'clap', emoji: '👏', label: 'Aplausos', color: 'text-yellow-400' },
-  { type: 'mindblown', emoji: '🤯', label: 'Increíble', color: 'text-purple-400' },
-  { type: 'laugh', emoji: '😂', label: 'Jaja', color: 'text-green-400' },
-  { type: 'sad', emoji: '😢', label: 'Triste', color: 'text-blue-400' },
-];
-
-// Tags disponibles
-const FORUM_TAGS = [
-  { id: 'prediccion', label: '🔮 Predicción', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-  { id: 'debate', label: '💬 Debate', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  { id: 'estrategia', label: '🎯 Estrategia', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-  { id: 'analisis', label: '📊 Análisis', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
-  { id: 'noticia', label: '📰 Noticia', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
-  { id: 'humor', label: '😂 Humor', color: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
-];
+// Reaction and tag definitions are now inside ForoContent component for i18n support
 
 // Badge colors
 const BADGE_STYLES: Record<BadgeType, { icon: string; color: string; bg: string }> = {
@@ -123,6 +107,32 @@ function ForoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+
+  // Map language to date-fns locale
+  const dateLocales: Record<string, Locale> = { es, en: enUS, pt, fr, de, ru };
+  const dateLocale = dateLocales[language] || es;
+
+  // Reaction definitions with translations
+  const REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[] = [
+    { type: 'fire', emoji: '🔥', label: t('forum.reactions.fire'), color: 'text-orange-400' },
+    { type: 'love', emoji: '❤️', label: t('forum.reactions.love'), color: 'text-red-400' },
+    { type: 'clap', emoji: '👏', label: t('forum.reactions.clap'), color: 'text-yellow-400' },
+    { type: 'mindblown', emoji: '🤯', label: t('forum.reactions.mindblown'), color: 'text-purple-400' },
+    { type: 'laugh', emoji: '😂', label: t('forum.reactions.laugh'), color: 'text-green-400' },
+    { type: 'sad', emoji: '😢', label: t('forum.reactions.sad'), color: 'text-blue-400' },
+  ];
+
+  // Forum tags with translations
+  const FORUM_TAGS = [
+    { id: 'prediccion', label: `🔮 ${t('forum.tags.prediction')}`, color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
+    { id: 'debate', label: `💬 ${t('forum.tags.debate')}`, color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+    { id: 'estrategia', label: `🎯 ${t('forum.tags.strategy')}`, color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+    { id: 'analisis', label: `📊 ${t('forum.tags.analysis')}`, color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+    { id: 'noticia', label: `📰 ${t('forum.tags.news')}`, color: 'bg-red-500/20 text-red-400 border-red-500/30' },
+    { id: 'humor', label: `😂 ${t('forum.tags.humor')}`, color: 'bg-pink-500/20 text-pink-400 border-pink-500/30' },
+  ];
 
   const [posts, setPosts] = useState<ForumPost[]>([]);
   const [categories, setCategories] = useState<ForumCategory[]>([]);
@@ -316,7 +326,7 @@ function ForoContent() {
       setReels(data.reels || []);
     } catch (error) {
       console.error('Error loading reels:', error);
-      toast.error('Error al cargar reels');
+      toast.error(t('forum.reels.loadError'));
     } finally {
       setReelsLoading(false);
     }
@@ -325,7 +335,7 @@ function ForoContent() {
   // Reels handlers
   const handleReelLike = async (reelId: string) => {
     if (!user) {
-      toast.error('Debes iniciar sesión');
+      toast.error(t('forum.errors.loginRequired'));
       return;
     }
     const reel = reels.find(r => r.id === reelId);
@@ -344,20 +354,20 @@ function ForoContent() {
       ));
     } catch (error) {
       console.error('Error toggling like:', error);
-      toast.error('Error al dar like');
+      toast.error(t('forum.reels.likeError'));
     }
   };
 
   const handleReelBookmark = (reelId: string) => {
     if (!user) {
-      toast.error('Debes iniciar sesión');
+      toast.error(t('forum.errors.loginRequired'));
       return;
     }
     setReels(reels.map((reel) =>
       reel.id === reelId ? { ...reel, isBookmarked: !reel.isBookmarked } : reel
     ));
     const reel = reels.find((r) => r.id === reelId);
-    toast.success(reel?.isBookmarked ? 'Eliminado de guardados' : 'Guardado');
+    toast.success(reel?.isBookmarked ? t('forum.reels.removed') : t('forum.reels.saved'));
   };
 
   const handleReelShare = async (reelId: string) => {
@@ -366,12 +376,12 @@ function ForoContent() {
       await navigator.share({ url });
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copiado');
+      toast.success(t('forum.actions.linkCopied'));
     }
   };
 
   const handleReelComment = (reelId: string) => {
-    toast('Comentarios próximamente', { icon: '💬' });
+    toast(t('forum.reels.comingSoon'), { icon: '💬' });
   };
 
   const handleCreateReel = async (data: { videoFile: File; caption: string; tags: string[] }) => {
@@ -388,11 +398,11 @@ function ForoContent() {
       const result = await response.json();
       if (result.error) throw new Error(result.error);
 
-      toast.success('Reel publicado exitosamente');
+      toast.success(t('forum.reels.published'));
       loadReels();
     } catch (error) {
       console.error('Error creating reel:', error);
-      toast.error('Error al publicar reel');
+      toast.error(t('forum.reels.publishError'));
     }
   };
 
@@ -411,7 +421,7 @@ function ForoContent() {
       setCommunities(data.communities || []);
     } catch (error) {
       console.error('Error loading communities:', error);
-      toast.error('Error al cargar comunidades');
+      toast.error(t('forum.communities.loadError'));
     } finally {
       setCommunitiesLoading(false);
     }
@@ -420,7 +430,7 @@ function ForoContent() {
   // Communities handlers
   const handleJoinCommunity = async (communityId: string) => {
     if (!user) {
-      toast.error('Debes iniciar sesión');
+      toast.error(t('forum.errors.loginRequired'));
       return;
     }
 
@@ -436,10 +446,10 @@ function ForoContent() {
           ? { ...c, isMember: true, membersCount: c.membersCount + 1 }
           : c
       ));
-      toast.success('Te has unido a la comunidad');
+      toast.success(t('forum.communities.joined'));
     } catch (error) {
       console.error('Error joining community:', error);
-      toast.error('Error al unirse a la comunidad');
+      toast.error(t('forum.communities.joinError'));
     }
   };
 
@@ -456,10 +466,10 @@ function ForoContent() {
           ? { ...c, isMember: false, membersCount: Math.max(0, c.membersCount - 1) }
           : c
       ));
-      toast.success('Has salido de la comunidad');
+      toast.success(t('forum.communities.left'));
     } catch (error) {
       console.error('Error leaving community:', error);
-      toast.error('Error al salir de la comunidad');
+      toast.error(t('forum.communities.leaveError'));
     }
   };
 
@@ -472,7 +482,7 @@ function ForoContent() {
     themeColor: string;
   }): Promise<boolean> => {
     if (!user) {
-      toast.error('Debes iniciar sesión para crear una comunidad');
+      toast.error(t('forum.communities.loginToCreate'));
       return false;
     }
 
@@ -486,16 +496,16 @@ function ForoContent() {
 
       if (!response.ok || result.error) {
         console.error('Community creation error:', result);
-        toast.error(result.error || 'Error al crear comunidad');
+        toast.error(result.error || t('forum.communities.createError'));
         return false;
       }
 
-      toast.success(`Comunidad "${data.name}" creada exitosamente`);
+      toast.success(t('forum.communities.created', { name: data.name }));
       loadCommunities();
       return true;
     } catch (error) {
       console.error('Error creating community:', error);
-      toast.error('Error al crear la comunidad');
+      toast.error(t('forum.communities.createError'));
       return false;
     }
   };
@@ -601,7 +611,7 @@ function ForoContent() {
 
     if (createMode === 'poll') {
       if (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) {
-        toast.error('La encuesta necesita pregunta y al menos 2 opciones');
+        toast.error(t('forum.poll.needQuestionAndOptions'));
         return;
       }
 
@@ -619,12 +629,12 @@ function ForoContent() {
         });
 
         if (post) {
-          toast.success('¡Encuesta creada!');
+          toast.success(t('forum.poll.created'));
           resetCreateModal();
           loadPosts();
         }
       } catch (error) {
-        toast.error('Error al crear la encuesta');
+        toast.error(t('forum.poll.createError'));
       } finally {
         setCreating(false);
       }
@@ -634,7 +644,7 @@ function ForoContent() {
     if (createMode === 'thread') {
       const validPosts = threadPosts.filter(p => p.trim());
       if (validPosts.length < 2) {
-        toast.error('Un hilo necesita al menos 2 publicaciones');
+        toast.error(t('forum.thread.needAtLeast2'));
         return;
       }
 
@@ -642,17 +652,17 @@ function ForoContent() {
       try {
         const result = await forumService.createThread(
           user.id,
-          newPostContent || 'Hilo',
+          newPostContent || t('forum.createModal.thread'),
           validPosts.map(content => ({ content, tags: newPostTags }))
         );
 
         if (result.success) {
-          toast.success('¡Hilo creado!');
+          toast.success(t('forum.thread.created'));
           resetCreateModal();
           loadPosts();
         }
       } catch (error) {
-        toast.error('Error al crear el hilo');
+        toast.error(t('forum.thread.createError'));
       } finally {
         setCreating(false);
       }
@@ -661,7 +671,7 @@ function ForoContent() {
 
     // Regular post
     if (!newPostContent.trim() && !selectedGif) {
-      toast.error('Escribe algo para publicar');
+      toast.error(t('forum.actions.writeToPublish'));
       return;
     }
 
@@ -677,14 +687,14 @@ function ForoContent() {
       });
 
       if (post) {
-        toast.success('¡Publicación creada!');
+        toast.success(t('forum.actions.postCreated'));
         resetCreateModal();
         loadPosts();
       } else {
-        toast.error('Error al crear la publicación');
+        toast.error(t('forum.actions.postCreateError'));
       }
     } catch (error) {
-      toast.error('Error al crear la publicación');
+      toast.error(t('forum.actions.postCreateError'));
     } finally {
       setCreating(false);
     }
@@ -726,7 +736,7 @@ function ForoContent() {
     if (!user?.id || !selectedPostId) return;
 
     if (!newComment.trim()) {
-      toast.error('Escribe un comentario');
+      toast.error(t('forum.comments.writeComment'));
       return;
     }
 
@@ -745,10 +755,10 @@ function ForoContent() {
             ? { ...p, comments_count: (p.comments_count || 0) + 1 }
             : p
         ));
-        toast.success('Comentario añadido');
+        toast.success(t('forum.comments.added'));
       }
     } catch (error) {
-      toast.error('Error al comentar');
+      toast.error(t('forum.comments.addError'));
     } finally {
       setSubmittingComment(false);
     }
@@ -757,12 +767,12 @@ function ForoContent() {
   // Eliminar post
   const handleDeletePost = async (postId: string) => {
     if (!user?.id) return;
-    if (!confirm('¿Eliminar esta publicación?')) return;
+    if (!confirm(t('forum.actions.deletePost'))) return;
 
     const success = await forumService.deletePost(postId, user.id);
     if (success) {
       setPosts(prev => prev.filter(p => p.id !== postId));
-      toast.success('Publicación eliminada');
+      toast.success(t('forum.actions.deleted'));
     }
   };
 
@@ -810,7 +820,7 @@ function ForoContent() {
             : p
         )
       );
-      toast.success(result.bookmarked ? 'Guardado en marcadores' : 'Eliminado de marcadores');
+      toast.success(result.bookmarked ? t('forum.actions.savedToBookmarks') : t('forum.actions.removedFromBookmarks'));
     } catch (error) {
       console.error('Error toggling bookmark:', error);
     }
@@ -840,7 +850,7 @@ function ForoContent() {
       );
 
       if (result.success) {
-        toast.success('¡Publicación compartida!');
+        toast.success(t('forum.actions.shared'));
         setPosts(prev =>
           prev.map(p =>
             p.id === repostingPost.id
@@ -852,10 +862,10 @@ function ForoContent() {
         setRepostingPost(null);
         setQuoteContent('');
       } else {
-        toast.error(result.error || 'Error al compartir');
+        toast.error(result.error || t('forum.actions.shareError'));
       }
     } catch (error) {
-      toast.error('Error al compartir');
+      toast.error(t('forum.actions.shareError'));
     } finally {
       setIsReposting(false);
     }
@@ -868,7 +878,7 @@ function ForoContent() {
 
     if (type === 'clipboard') {
       await navigator.clipboard.writeText(url);
-      toast.success('Enlace copiado');
+      toast.success(t('forum.actions.linkCopied'));
     } else if (type === 'twitter') {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     } else if (type === 'whatsapp') {
@@ -904,16 +914,16 @@ function ForoContent() {
       );
 
       if (result.success) {
-        toast.success(`¡Premio ${result.award_name} otorgado!`);
+        toast.success(t('forum.actions.awardGiven', { name: result.award_name }));
         setAwardModalOpen(false);
         setAwardingPost(null);
         setSelectedAward(null);
         setAwardMessage('');
       } else {
-        toast.error(result.error || 'Error al dar premio');
+        toast.error(result.error || t('forum.actions.awardError'));
       }
     } catch (error) {
-      toast.error('Error al dar premio');
+      toast.error(t('forum.actions.awardError'));
     } finally {
       setGivingAward(false);
     }
@@ -923,7 +933,7 @@ function ForoContent() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + selectedImages.length > 4) {
-      toast.error('Máximo 4 imágenes por publicación');
+      toast.error(t('forum.actions.maxImages'));
       return;
     }
     setSelectedImages(prev => [...prev, ...files].slice(0, 4));
@@ -1029,7 +1039,7 @@ function ForoContent() {
             }`}
           >
             <Users className="w-4 h-4" />
-            Comunidades
+            {t('forum.tabs.communities')}
           </button>
         </div>
 
@@ -1043,10 +1053,10 @@ function ForoContent() {
               <div>
                 <h1 className="text-3xl font-bold flex items-center gap-3">
                   <MessageCircle className="w-8 h-8 text-purple-400" />
-                  Comunidad
+                  {t('forum.title')}
                 </h1>
                 <p className="text-gray-400 mt-1">
-                  Comparte predicciones, debates y estrategias con otros profetas
+                  {t('forum.subtitle')}
                 </p>
               </div>
 
@@ -1061,7 +1071,7 @@ function ForoContent() {
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 <MessageSquarePlus className="w-5 h-5 mr-2" />
-                Nueva Publicación
+                {t('forum.newPost')}
               </Button>
             </div>
 
@@ -1077,7 +1087,7 @@ function ForoContent() {
                   }`}
                 >
                   <Clock className="w-4 h-4" />
-                  Recientes
+                  {t('forum.filters.recent')}
                 </button>
                 <button
                   onClick={() => setFilter('hot')}
@@ -1088,7 +1098,7 @@ function ForoContent() {
                   }`}
                 >
                   <Flame className="w-4 h-4" />
-                  Hot
+                  {t('forum.filters.hot')}
                 </button>
                 <button
                   onClick={() => setFilter('rising')}
@@ -1099,7 +1109,7 @@ function ForoContent() {
                   }`}
                 >
                   <TrendingUp className="w-4 h-4" />
-                  Rising
+                  {t('forum.filters.rising')}
                 </button>
                 <button
                   onClick={() => setFilter('popular')}
@@ -1110,7 +1120,7 @@ function ForoContent() {
                   }`}
                 >
                   <Sparkles className="w-4 h-4" />
-                  Top
+                  {t('forum.filters.top')}
                 </button>
                 {isAuthenticated && (
                   <button
@@ -1122,7 +1132,7 @@ function ForoContent() {
                     }`}
                   >
                     <Users className="w-4 h-4" />
-                    Siguiendo
+                    {t('forum.filters.following')}
                   </button>
                 )}
               </div>
@@ -1147,17 +1157,17 @@ function ForoContent() {
             ) : posts.length === 0 ? (
               <div className="text-center py-20">
                 <MessageCircle className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">No hay publicaciones</h3>
+                <h3 className="text-xl font-bold mb-2">{t('forum.posts.noPosts')}</h3>
                 <p className="text-gray-400 mb-6">
                   {selectedTag
-                    ? 'No hay posts con esta etiqueta'
-                    : 'Sé el primero en compartir algo con la comunidad'}
+                    ? t('forum.posts.noPostsWithTag')
+                    : t('forum.posts.beFirstToShare')}
                 </p>
                 <Button
                   onClick={() => setIsCreateModalOpen(true)}
                   className="bg-purple-600 hover:bg-purple-700"
                 >
-                  Crear primera publicación
+                  {t('forum.posts.createFirst')}
                 </Button>
               </div>
             ) : (
@@ -1174,6 +1184,9 @@ function ForoContent() {
                     onRepost={openRepostModal}
                     onShare={handleShare}
                     onAward={openAwardModal}
+                    REACTIONS={REACTIONS}
+                    FORUM_TAGS={FORUM_TAGS}
+                    dateLocale={dateLocale}
                   />
                 ))}
               </div>
@@ -1185,7 +1198,7 @@ function ForoContent() {
             {/* Categories */}
             {categories.length > 0 && (
               <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-lg font-semibold mb-4">Categorías</h3>
+                <h3 className="text-lg font-semibold mb-4">{t('forum.sidebar.categories')}</h3>
                 <div className="space-y-2">
                   <button
                     onClick={() => setSelectedCategory('all')}
@@ -1195,7 +1208,7 @@ function ForoContent() {
                         : 'text-gray-400 hover:bg-gray-800'
                     }`}
                   >
-                    Todas
+                    {t('forum.sidebar.allCategories')}
                   </button>
                   {categories.map((cat) => (
                     <button
@@ -1220,7 +1233,7 @@ function ForoContent() {
               <div className="bg-gradient-to-br from-orange-500/10 to-pink-500/10 border border-orange-500/20 rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-orange-400" />
-                  Trending
+                  {t('forum.sidebar.trending')}
                 </h3>
                 <div className="space-y-3">
                   {trendingTags.map((trend, index) => {
@@ -1238,7 +1251,7 @@ function ForoContent() {
                               {tagInfo?.label || `#${trend.tag}`}
                             </span>
                             <p className="text-xs text-gray-500">
-                              {trend.post_count} {trend.post_count === 1 ? 'post' : 'posts'} esta semana
+                              {t('forum.sidebar.postsThisWeek', { count: trend.post_count })}
                             </p>
                           </div>
                         </div>
@@ -1253,7 +1266,7 @@ function ForoContent() {
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Hash className="w-5 h-5 text-purple-400" />
-                Etiquetas
+                {t('forum.sidebar.tags')}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {FORUM_TAGS.map((tag) => (
@@ -1275,14 +1288,14 @@ function ForoContent() {
             {/* Rules */}
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-3 text-yellow-400">
-                📜 Reglas del Foro
+                📜 {t('forum.sidebar.rules')}
               </h3>
               <ul className="space-y-2 text-sm text-yellow-200/80">
-                <li>• Respeta a otros profetas</li>
-                <li>• No spam ni autopromoción</li>
-                <li>• Nada de contenido +18</li>
-                <li>• Sin política extrema</li>
-                <li>• Diviértete prediciendo 🔮</li>
+                <li>• {t('forum.sidebar.rule1')}</li>
+                <li>• {t('forum.sidebar.rule2')}</li>
+                <li>• {t('forum.sidebar.rule3')}</li>
+                <li>• {t('forum.sidebar.rule4')}</li>
+                <li>• {t('forum.sidebar.rule5')}</li>
               </ul>
             </div>
           </div>
@@ -1296,9 +1309,9 @@ function ForoContent() {
               <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">
                   <Video className="w-7 h-7 text-pink-400" />
-                  Reels
+                  {t('forum.reels.title')}
                 </h2>
-                <p className="text-gray-400 mt-1">Videos cortos de predicciones y análisis</p>
+                <p className="text-gray-400 mt-1">{t('forum.reels.subtitle')}</p>
               </div>
               {isAuthenticated && (
                 <CreateReelModal onCreateReel={handleCreateReel} />
@@ -1313,7 +1326,7 @@ function ForoContent() {
                 className={reelsFilter === 'foryou' ? 'bg-pink-600' : 'border-gray-700'}
                 size="sm"
               >
-                Para ti
+                {t('forum.reels.forYou')}
               </Button>
               <Button
                 variant={reelsFilter === 'following' ? 'default' : 'outline'}
@@ -1322,7 +1335,7 @@ function ForoContent() {
                 size="sm"
               >
                 <Users className="w-4 h-4 mr-1" />
-                Siguiendo
+                {t('forum.reels.following')}
               </Button>
               <Button
                 variant={reelsFilter === 'trending' ? 'default' : 'outline'}
@@ -1331,7 +1344,7 @@ function ForoContent() {
                 size="sm"
               >
                 <TrendingUp className="w-4 h-4 mr-1" />
-                Tendencias
+                {t('forum.reels.trending')}
               </Button>
             </div>
 
@@ -1354,9 +1367,9 @@ function ForoContent() {
             ) : (
               <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
                 <Video className="w-16 h-16 text-pink-400/50 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No hay reels disponibles</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('forum.reels.noReels')}</h3>
                 <p className="text-gray-400 mb-4">
-                  Sé el primero en compartir un reel de predicciones
+                  {t('forum.reels.beFirst')}
                 </p>
                 {isAuthenticated && (
                   <CreateReelModal onCreateReel={handleCreateReel} />
@@ -1373,14 +1386,14 @@ function ForoContent() {
               <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">
                   <Radio className="w-7 h-7 text-red-400" />
-                  Transmisiones en Vivo
+                  {t('forum.lives.title')}
                 </h2>
-                <p className="text-gray-400 mt-1">Mira y crea streams de predicciones en tiempo real</p>
+                <p className="text-gray-400 mt-1">{t('forum.lives.subtitle')}</p>
               </div>
               {isAuthenticated && (
                 <Button className="bg-red-600 hover:bg-red-700">
                   <Radio className="w-4 h-4 mr-2" />
-                  Iniciar Stream
+                  {t('forum.lives.startStream')}
                 </Button>
               )}
             </div>
@@ -1390,28 +1403,28 @@ function ForoContent() {
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-red-400 mb-1">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                  <span className="text-sm">En vivo ahora</span>
+                  <span className="text-sm">{t('forum.lives.liveNow')}</span>
                 </div>
                 <p className="text-2xl font-bold">0</p>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <Users className="w-4 h-4" />
-                  <span className="text-sm">Espectadores</span>
+                  <span className="text-sm">{t('forum.lives.viewers')}</span>
                 </div>
                 <p className="text-2xl font-bold">0</p>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <TrendingUp className="w-4 h-4" />
-                  <span className="text-sm">Más visto hoy</span>
+                  <span className="text-sm">{t('forum.lives.mostWatchedToday')}</span>
                 </div>
                 <p className="text-2xl font-bold">0</p>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <Clock className="w-4 h-4" />
-                  <span className="text-sm">Streams hoy</span>
+                  <span className="text-sm">{t('forum.lives.streamsToday')}</span>
                 </div>
                 <p className="text-2xl font-bold">0</p>
               </div>
@@ -1420,14 +1433,14 @@ function ForoContent() {
             {/* Lives Grid Placeholder */}
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
               <Radio className="w-16 h-16 text-red-400/50 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No hay streams en vivo</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('forum.lives.noStreams')}</h3>
               <p className="text-gray-400 mb-4">
-                Sé el primero en iniciar una transmisión y compartir tus predicciones
+                {t('forum.lives.beFirst')}
               </p>
               {isAuthenticated && (
                 <Button className="bg-red-600 hover:bg-red-700">
                   <Radio className="w-4 h-4 mr-2" />
-                  Iniciar mi primer stream
+                  {t('forum.lives.startMyFirst')}
                 </Button>
               )}
             </div>
@@ -1441,9 +1454,9 @@ function ForoContent() {
               <div>
                 <h2 className="text-2xl font-bold flex items-center gap-3">
                   <Users className="w-7 h-7 text-blue-400" />
-                  Comunidades
+                  {t('forum.communities.title')}
                 </h2>
-                <p className="text-gray-400 mt-1">Únete a grupos de predicciones y comparte con otros profetas</p>
+                <p className="text-gray-400 mt-1">{t('forum.communities.subtitle')}</p>
               </div>
               {isAuthenticated && (
                 <CreateCommunityModal
@@ -1466,7 +1479,7 @@ function ForoContent() {
                 <Input
                   value={communitySearch}
                   onChange={(e) => setCommunitySearch(e.target.value)}
-                  placeholder="Buscar comunidades..."
+                  placeholder={t('forum.communities.searchPlaceholder')}
                   className="pl-10 bg-gray-800 border-gray-700"
                 />
               </div>
@@ -1477,7 +1490,7 @@ function ForoContent() {
                   className={communitiesFilter === 'all' ? 'bg-blue-600' : 'border-gray-700'}
                   size="sm"
                 >
-                  Todas
+                  {t('forum.communities.all')}
                 </Button>
                 <Button
                   variant={communitiesFilter === 'joined' ? 'default' : 'outline'}
@@ -1485,7 +1498,7 @@ function ForoContent() {
                   className={communitiesFilter === 'joined' ? 'bg-blue-600' : 'border-gray-700'}
                   size="sm"
                 >
-                  Mis Comunidades
+                  {t('forum.communities.myCommunities')}
                 </Button>
                 <Button
                   variant={communitiesFilter === 'popular' ? 'default' : 'outline'}
@@ -1494,7 +1507,7 @@ function ForoContent() {
                   size="sm"
                 >
                   <TrendingUp className="w-4 h-4 mr-1" />
-                  Populares
+                  {t('forum.communities.popular')}
                 </Button>
               </div>
             </div>
@@ -1544,13 +1557,13 @@ function ForoContent() {
                               )}
                             </h3>
                             <p className="text-xs text-gray-500">
-                              {community.membersCount.toLocaleString()} miembros
+                              {community.membersCount.toLocaleString()} {t('forum.communities.members')}
                             </p>
                           </div>
                         </div>
                       </Link>
                       <p className="text-sm text-gray-400 mb-3 line-clamp-2">
-                        {community.description || `Comunidad de predicciones. Únete y comparte tus análisis.`}
+                        {community.description || t('forum.communities.defaultDescription')}
                       </p>
                       <div className="flex gap-2">
                         <Link href={`/foro/comunidad/${community.slug}`} className="flex-1">
@@ -1558,7 +1571,7 @@ function ForoContent() {
                             size="sm"
                             className="w-full bg-blue-600 hover:bg-blue-700"
                           >
-                            Ver comunidad
+                            {t('forum.communities.viewCommunity')}
                           </Button>
                         </Link>
                         {community.isMember ? (
@@ -1571,7 +1584,7 @@ function ForoContent() {
                               handleLeaveCommunity(community.id);
                             }}
                           >
-                            Salir
+                            {t('forum.communities.leave')}
                           </Button>
                         ) : (
                           <Button
@@ -1583,7 +1596,7 @@ function ForoContent() {
                               handleJoinCommunity(community.id);
                             }}
                           >
-                            Unirse
+                            {t('forum.communities.join')}
                           </Button>
                         )}
                       </div>
@@ -1594,11 +1607,11 @@ function ForoContent() {
             ) : (
               <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
                 <Users className="w-16 h-16 text-blue-400/50 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No se encontraron comunidades</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('forum.communities.noCommunitiesFound')}</h3>
                 <p className="text-gray-400 mb-4">
                   {communitySearch
-                    ? 'Prueba con otros términos de búsqueda'
-                    : 'Sé el primero en crear una comunidad'}
+                    ? t('forum.communities.tryOtherTerms')
+                    : t('forum.communities.beFirstToCreate')}
                 </p>
                 {communitySearch && (
                   <Button
@@ -1606,7 +1619,7 @@ function ForoContent() {
                     onClick={() => setCommunitySearch('')}
                     className="text-blue-400"
                   >
-                    Limpiar búsqueda
+                    {t('forum.communities.clearSearch')}
                   </Button>
                 )}
               </div>
@@ -1618,7 +1631,7 @@ function ForoContent() {
       {/* Create Post Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="bg-gray-900 border-gray-800 max-w-lg max-h-[90vh] overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4">Nueva Publicación</h2>
+          <h2 className="text-xl font-bold mb-4">{t('forum.createModal.title')}</h2>
 
           {/* Post Type Selector */}
           <div className="flex gap-2 mb-4">
@@ -1631,7 +1644,7 @@ function ForoContent() {
               }`}
             >
               <MessageCircle className="w-4 h-4" />
-              Post
+              {t('forum.createModal.post')}
             </button>
             <button
               onClick={() => setCreateMode('poll')}
@@ -1642,7 +1655,7 @@ function ForoContent() {
               }`}
             >
               <BarChart3 className="w-4 h-4" />
-              Encuesta
+              {t('forum.createModal.poll')}
             </button>
             <button
               onClick={() => setCreateMode('thread')}
@@ -1653,7 +1666,7 @@ function ForoContent() {
               }`}
             >
               <ListPlus className="w-4 h-4" />
-              Hilo
+              {t('forum.createModal.thread')}
             </button>
           </div>
 
@@ -1664,7 +1677,7 @@ function ForoContent() {
                 <textarea
                   value={newPostContent}
                   onChange={(e) => handleContentChange(e.target.value, e.target.selectionStart)}
-                  placeholder="¿Qué quieres compartir con la comunidad? Usa @ para mencionar usuarios"
+                  placeholder={t('forum.createModal.placeholder')}
                   rows={4}
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 />
@@ -1751,7 +1764,7 @@ function ForoContent() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
                 >
                   <ImageIcon className="w-5 h-5" />
-                  Imagen
+                  {t('forum.createModal.image')}
                 </button>
                 <button
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
@@ -1762,7 +1775,7 @@ function ForoContent() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                 >
                   <AtSign className="w-5 h-5" />
-                  Mención
+                  {t('forum.createModal.mention')}
                 </button>
               </div>
             </>
@@ -1772,18 +1785,18 @@ function ForoContent() {
           {createMode === 'poll' && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">Pregunta de la encuesta</label>
+                <label className="text-sm text-gray-400 mb-1 block">{t('forum.poll.question')}</label>
                 <input
                   type="text"
                   value={pollQuestion}
                   onChange={(e) => setPollQuestion(e.target.value)}
-                  placeholder="¿Qué quieres preguntar?"
+                  placeholder={t('forum.poll.questionPlaceholder')}
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Opciones</label>
+                <label className="text-sm text-gray-400 mb-2 block">{t('forum.poll.options')}</label>
                 <div className="space-y-2">
                   {pollOptions.map((option, index) => (
                     <div key={index} className="flex gap-2">
@@ -1795,7 +1808,7 @@ function ForoContent() {
                           newOptions[index] = e.target.value;
                           setPollOptions(newOptions);
                         }}
-                        placeholder={`Opción ${index + 1}`}
+                        placeholder={t('forum.poll.optionPlaceholder', { number: index + 1 })}
                         className="flex-1 p-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       />
                       {pollOptions.length > 2 && (
@@ -1815,24 +1828,24 @@ function ForoContent() {
                     className="mt-2 text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"
                   >
                     <Plus className="w-4 h-4" />
-                    Añadir opción
+                    {t('forum.poll.addOption')}
                   </button>
                 )}
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">Duración</label>
+                <label className="text-sm text-gray-400 mb-1 block">{t('forum.poll.duration')}</label>
                 <select
                   value={pollDuration}
                   onChange={(e) => setPollDuration(Number(e.target.value))}
                   className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
-                  <option value={1}>1 hora</option>
-                  <option value={6}>6 horas</option>
-                  <option value={12}>12 horas</option>
-                  <option value={24}>24 horas</option>
-                  <option value={48}>2 días</option>
-                  <option value={168}>1 semana</option>
+                  <option value={1}>1 {t('forum.poll.hour')}</option>
+                  <option value={6}>6 {t('forum.poll.hours')}</option>
+                  <option value={12}>12 {t('forum.poll.hours')}</option>
+                  <option value={24}>24 {t('forum.poll.hours')}</option>
+                  <option value={48}>2 {t('forum.poll.days')}</option>
+                  <option value={168}>1 {t('forum.poll.week')}</option>
                 </select>
               </div>
             </div>
@@ -1842,18 +1855,18 @@ function ForoContent() {
           {createMode === 'thread' && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">Título del hilo (opcional)</label>
+                <label className="text-sm text-gray-400 mb-1 block">{t('forum.thread.titleOptional')}</label>
                 <input
                   type="text"
                   value={newPostContent}
                   onChange={(e) => setNewPostContent(e.target.value)}
-                  placeholder="Título de tu hilo..."
+                  placeholder={t('forum.thread.titlePlaceholder')}
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Publicaciones del hilo</label>
+                <label className="text-sm text-gray-400 mb-2 block">{t('forum.thread.posts')}</label>
                 <div className="space-y-3">
                   {threadPosts.map((post, index) => (
                     <div key={index} className="relative">
@@ -1869,7 +1882,7 @@ function ForoContent() {
                             newPosts[index] = e.target.value;
                             setThreadPosts(newPosts);
                           }}
-                          placeholder={`Publicación ${index + 1}...`}
+                          placeholder={t('forum.thread.postPlaceholder', { number: index + 1 })}
                           rows={3}
                           className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         />
@@ -1883,7 +1896,7 @@ function ForoContent() {
                     className="mt-3 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
                   >
                     <Plus className="w-4 h-4" />
-                    Añadir al hilo
+                    {t('forum.thread.addToThread')}
                   </button>
                 )}
               </div>
@@ -1892,7 +1905,7 @@ function ForoContent() {
 
           {/* Tags */}
           <div className="mt-4">
-            <p className="text-sm text-gray-400 mb-2">Etiquetas (opcional)</p>
+            <p className="text-sm text-gray-400 mb-2">{t('forum.createModal.tagsOptional')}</p>
             <div className="flex flex-wrap gap-2">
               {FORUM_TAGS.map((tag) => (
                 <button
@@ -1916,7 +1929,7 @@ function ForoContent() {
               onClick={resetCreateModal}
               className="border-gray-700"
             >
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleCreatePost}
@@ -1932,12 +1945,12 @@ function ForoContent() {
               {creating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Publicando...
+                  {t('forum.createModal.publishing')}
                 </>
               ) : (
-                createMode === 'poll' ? 'Crear Encuesta' :
-                createMode === 'thread' ? 'Publicar Hilo' :
-                'Publicar'
+                createMode === 'poll' ? t('forum.createModal.createPoll') :
+                createMode === 'thread' ? t('forum.createModal.publishThread') :
+                t('forum.createModal.publish')
               )}
             </Button>
           </div>
@@ -1947,7 +1960,7 @@ function ForoContent() {
       {/* Comments Modal */}
       <Dialog open={!!selectedPostId} onOpenChange={() => setSelectedPostId(null)}>
         <DialogContent className="bg-gray-900 border-gray-800 max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-          <h2 className="text-xl font-bold mb-4">Comentarios</h2>
+          <h2 className="text-xl font-bold mb-4">{t('forum.comments.title')}</h2>
 
           {selectedPost && (
             <div className="flex-1 overflow-y-auto space-y-4">
@@ -1976,7 +1989,7 @@ function ForoContent() {
                 </div>
               ) : comments.length === 0 ? (
                 <p className="text-center text-gray-500 py-8">
-                  No hay comentarios. ¡Sé el primero!
+                  {t('forum.comments.noComments')}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -1990,7 +2003,7 @@ function ForoContent() {
                           {comment.author?.display_name || comment.author?.username}
                         </span>
                         <span className="text-gray-500 text-xs">
-                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: es })}
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
                         </span>
                       </div>
                       <p className="text-gray-300 text-sm ml-8">{comment.content}</p>
@@ -2009,7 +2022,7 @@ function ForoContent() {
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Escribe un comentario..."
+                  placeholder={t('forum.comments.placeholder')}
                   className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreateComment()}
                 />
@@ -2035,7 +2048,7 @@ function ForoContent() {
         <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Repeat2 className="w-5 h-5 text-green-400" />
-            Compartir Publicación
+            {t('forum.actions.sharePost')}
           </h2>
 
           {repostingPost && (
@@ -2054,12 +2067,12 @@ function ForoContent() {
 
               <div className="mb-4">
                 <label className="text-sm text-gray-400 mb-2 block">
-                  Añadir comentario (opcional)
+                  {t('forum.actions.addCommentOptional')}
                 </label>
                 <textarea
                   value={quoteContent}
                   onChange={(e) => setQuoteContent(e.target.value)}
-                  placeholder="¿Qué piensas sobre esto?"
+                  placeholder={t('forum.actions.whatDoYouThink')}
                   rows={3}
                   className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                 />
@@ -2073,7 +2086,7 @@ function ForoContent() {
                   className="flex-1 border-gray-700 hover:border-green-500 hover:text-green-400"
                 >
                   {isReposting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Repeat2 className="w-4 h-4 mr-2" />}
-                  Compartir
+                  {t('forum.actions.share')}
                 </Button>
                 <Button
                   onClick={() => handleRepost(true)}
@@ -2081,7 +2094,7 @@ function ForoContent() {
                   className="flex-1 bg-green-600 hover:bg-green-700"
                 >
                   {isReposting ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4 mr-2" />}
-                  Citar
+                  {t('forum.actions.quote')}
                 </Button>
               </div>
             </>
@@ -2094,7 +2107,7 @@ function ForoContent() {
         <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-yellow-400" />
-            Dar Premio
+            {t('forum.actions.giveAward')}
           </h2>
 
           {awardingPost && (
@@ -2102,7 +2115,7 @@ function ForoContent() {
               <div className="bg-gray-800/50 rounded-lg p-3 mb-4 border border-gray-700">
                 <p className="text-gray-300 text-sm line-clamp-2">{awardingPost.content}</p>
                 <span className="text-xs text-gray-500 mt-1 block">
-                  Por @{awardingPost.author?.username}
+                  {t('forum.actions.by')} @{awardingPost.author?.username}
                 </span>
               </div>
 
@@ -2125,9 +2138,9 @@ function ForoContent() {
                     </div>
                     <p className="text-xs text-gray-500 mb-2">{award.description}</p>
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-yellow-400">{award.ap_cost} AP</span>
+                      <span className="text-yellow-400">{t('forum.actions.apCost', { cost: award.ap_cost })}</span>
                       <span className="text-gray-600">→</span>
-                      <span className="text-green-400">+{award.ap_reward} para autor</span>
+                      <span className="text-green-400">{t('forum.actions.apReward', { reward: award.ap_reward })}</span>
                     </div>
                   </button>
                 ))}
@@ -2136,13 +2149,13 @@ function ForoContent() {
               {selectedAward && (
                 <div className="mb-4">
                   <label className="text-sm text-gray-400 mb-2 block">
-                    Mensaje (opcional)
+                    {t('forum.actions.messageOptional')}
                   </label>
                   <input
                     type="text"
                     value={awardMessage}
                     onChange={(e) => setAwardMessage(e.target.value)}
-                    placeholder="Añadir un mensaje..."
+                    placeholder={t('forum.actions.addMessage')}
                     className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   />
                 </div>
@@ -2154,7 +2167,7 @@ function ForoContent() {
                   onClick={() => setAwardModalOpen(false)}
                   className="border-gray-700"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   onClick={handleGiveAward}
@@ -2166,7 +2179,7 @@ function ForoContent() {
                   ) : (
                     <Gift className="w-4 h-4 mr-2" />
                   )}
-                  Dar {selectedAward?.name || 'Premio'}
+                  {t('forum.actions.give')} {selectedAward?.name || t('forum.actions.giveAward')}
                 </Button>
               </div>
             </>
@@ -2193,7 +2206,7 @@ function ForoContent() {
         <CreateStoryModal
           onClose={() => setCreateStoryModalOpen(false)}
           onSuccess={() => {
-            toast.success('¡Historia publicada!');
+            toast.success(t('forum.actions.storyPublished'));
             // Refresh stories bar
             setStoriesKey(prev => prev + 1);
           }}
@@ -2214,6 +2227,9 @@ function PostCard({
   onRepost,
   onShare,
   onAward,
+  REACTIONS,
+  FORUM_TAGS,
+  dateLocale,
 }: {
   post: ForumPost;
   currentUserId?: string;
@@ -2224,7 +2240,11 @@ function PostCard({
   onRepost: (post: ForumPost) => void;
   onShare: (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp') => void;
   onAward: (post: ForumPost) => void;
+  REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[];
+  FORUM_TAGS: { id: string; label: string; color: string }[];
+  dateLocale: Locale;
 }) {
+  const { t } = useTranslation();
   const [showReactions, setShowReactions] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const isAuthor = currentUserId === post.author_id;
@@ -2250,7 +2270,7 @@ function PostCard({
       {post.thread_id && (
         <div className="flex items-center gap-2 text-blue-400 text-sm mb-3">
           <ListPlus className="w-4 h-4" />
-          <span>Hilo {post.thread_position}/{post.thread?.total_posts || '?'}</span>
+          <span>{t('forum.posts.thread')} {post.thread_position}/{post.thread?.total_posts || '?'}</span>
         </div>
       )}
 
@@ -2286,7 +2306,7 @@ function PostCard({
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <span>@{post.author?.username}</span>
               <span>•</span>
-              <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: es })}</span>
+              <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: dateLocale })}</span>
             </div>
           </div>
         </div>
@@ -2347,7 +2367,7 @@ function PostCard({
 
       {/* Poll */}
       {post.poll && (
-        <PollDisplay poll={post.poll} postId={post.id} currentUserId={currentUserId} />
+        <PollDisplay poll={post.poll} postId={post.id} currentUserId={currentUserId} dateLocale={dateLocale} />
       )}
 
       {/* Tags */}
@@ -2453,7 +2473,7 @@ function PostCard({
                 }}
                 className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
               >
-                📋 Copiar enlace
+                📋 {t('forum.actions.copyLink')}
               </button>
               <button
                 onClick={() => {
@@ -2495,7 +2515,7 @@ function PostCard({
 
         {/* Views */}
         <span className="text-gray-500 text-sm">
-          {post.views_count || 0} vistas
+          {post.views_count || 0} {t('forum.posts.views')}
         </span>
       </div>
     </div>
@@ -2506,12 +2526,15 @@ function PostCard({
 function PollDisplay({
   poll,
   postId,
-  currentUserId
+  currentUserId,
+  dateLocale
 }: {
   poll: ForumPoll;
   postId: string;
   currentUserId?: string;
+  dateLocale: Locale;
 }) {
+  const { t } = useTranslation();
   const [localPoll, setLocalPoll] = useState(poll);
   const [voting, setVoting] = useState(false);
 
@@ -2529,10 +2552,10 @@ function PollDisplay({
           options: result.options!,
           total_votes: result.options!.reduce((sum, opt) => sum + opt.votes_count, 0),
         }));
-        toast.success('¡Voto registrado!');
+        toast.success(t('forum.poll.voteRecorded'));
       }
     } catch (error) {
-      toast.error('Error al votar');
+      toast.error(t('forum.poll.voteError'));
     } finally {
       setVoting(false);
     }
@@ -2595,12 +2618,12 @@ function PollDisplay({
       </div>
 
       <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-        <span>{localPoll.total_votes} {localPoll.total_votes === 1 ? 'voto' : 'votos'}</span>
+        <span>{localPoll.total_votes} {localPoll.total_votes === 1 ? t('forum.poll.vote') : t('forum.poll.votes')}</span>
         <span>
           {isExpired ? (
-            'Encuesta finalizada'
+            t('forum.poll.pollEnded')
           ) : (
-            `Termina ${formatDistanceToNow(new Date(localPoll.ends_at), { addSuffix: true, locale: es })}`
+            `${t('forum.poll.endsIn')} ${formatDistanceToNow(new Date(localPoll.ends_at), { addSuffix: false, locale: dateLocale })}`
           )}
         </span>
       </div>

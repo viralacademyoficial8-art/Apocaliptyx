@@ -2,9 +2,11 @@
 
 import { Search, Tag, X } from 'lucide-react';
 import { useShopStore } from '@/stores/shopStore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function ShopFilters() {
   const { filters, setFilters, resetFilters } = useShopStore();
+  const { t } = useTranslation();
 
   const hasActiveFilters = Boolean(filters.search) || filters.rarity !== 'all' || filters.showOnSale;
 
@@ -16,7 +18,7 @@ export function ShopFilters() {
           type="text"
           value={filters.search}
           onChange={(e) => setFilters({ search: e.target.value })}
-          placeholder="Buscar items..."
+          placeholder={`${t('shop.searchItems')}...`}
           className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
@@ -26,11 +28,11 @@ export function ShopFilters() {
         onChange={(e) => setFilters({ rarity: e.target.value })}
         className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
-        <option value="all">Todas las rarezas</option>
-        <option value="COMMON">Común</option>
-        <option value="RARE">Raro</option>
-        <option value="EPIC">Épico</option>
-        <option value="LEGENDARY">Legendario</option>
+        <option value="all">{t('shop.rarity.all')}</option>
+        <option value="COMMON">{t('shop.rarity.common')}</option>
+        <option value="RARE">{t('shop.rarity.rare')}</option>
+        <option value="EPIC">{t('shop.rarity.epic')}</option>
+        <option value="LEGENDARY">{t('shop.rarity.legendary')}</option>
       </select>
 
       <select
@@ -38,11 +40,11 @@ export function ShopFilters() {
         onChange={(e) => setFilters({ sortBy: e.target.value as any })}
         className="px-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
       >
-        <option value="popular">Más populares</option>
-        <option value="price_asc">Precio: menor a mayor</option>
-        <option value="price_desc">Precio: mayor a menor</option>
-        <option value="newest">Más nuevos</option>
-        <option value="rating">Mejor valorados</option>
+        <option value="popular">{t('shop.sortBy.popular')}</option>
+        <option value="price_asc">{t('shop.sortBy.priceAsc')}</option>
+        <option value="price_desc">{t('shop.sortBy.priceDesc')}</option>
+        <option value="newest">{t('shop.sortBy.newest')}</option>
+        <option value="rating">{t('shop.sortBy.rating')}</option>
       </select>
 
       <button
@@ -54,7 +56,7 @@ export function ShopFilters() {
         }`}
       >
         <Tag className="w-4 h-4" />
-        En oferta
+        {t('shop.onSale')}
       </button>
 
       {hasActiveFilters && (
@@ -63,7 +65,7 @@ export function ShopFilters() {
           className="flex items-center gap-2 px-4 py-2.5 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
         >
           <X className="w-4 h-4" />
-          Limpiar
+          {t('shop.clear')}
         </button>
       )}
     </div>

@@ -2,19 +2,21 @@
 
 import { Shield, Zap, Sparkles, Crown, Package, Gift, LayoutGrid } from 'lucide-react';
 import { useShopStore } from '@/stores/shopStore';
-
-const categories = [
-  { id: 'all', label: 'Todos', icon: LayoutGrid },
-  { id: 'PROTECTION', label: 'Protección', icon: Shield },
-  { id: 'BOOST', label: 'Boosts', icon: Zap },
-  { id: 'POWER', label: 'Poderes', icon: Sparkles },
-  { id: 'COSMETIC', label: 'Cosméticos', icon: Crown },
-  { id: 'BUNDLE', label: 'Packs', icon: Package },
-  { id: 'SPECIAL', label: 'Especiales', icon: Gift },
-];
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function CategoryTabs() {
   const { filters, setFilters } = useShopStore();
+  const { t } = useTranslation();
+
+  const categories = [
+    { id: 'all', label: t('shop.categories.all'), icon: LayoutGrid },
+    { id: 'PROTECTION', label: t('shop.categories.protection'), icon: Shield },
+    { id: 'BOOST', label: t('shop.categories.boost'), icon: Zap },
+    { id: 'POWER', label: t('shop.categories.power'), icon: Sparkles },
+    { id: 'COSMETIC', label: t('shop.categories.cosmetic'), icon: Crown },
+    { id: 'BUNDLE', label: t('shop.categories.bundle'), icon: Package },
+    { id: 'SPECIAL', label: t('shop.categories.special'), icon: Gift },
+  ];
 
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">

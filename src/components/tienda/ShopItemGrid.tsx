@@ -3,17 +3,19 @@
 import { useShopStore } from '@/stores/shopStore';
 import { ShopItemCard } from './ShopItemCard';
 import { Package } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function ShopItemGrid() {
   const { getFilteredItems, setSelectedItem, setPurchaseModalOpen } = useShopStore();
+  const { t } = useTranslation();
   const items = getFilteredItems();
 
   if (items.length === 0) {
     return (
       <div className="text-center py-16">
         <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">No se encontraron items</h3>
-        <p className="text-gray-400">Intenta ajustar los filtros de búsqueda</p>
+        <h3 className="text-xl font-bold text-white mb-2">{t('shop.noItemsFound')}</h3>
+        <p className="text-gray-400">{t('shop.tryAdjustFilters')}</p>
       </div>
     );
   }

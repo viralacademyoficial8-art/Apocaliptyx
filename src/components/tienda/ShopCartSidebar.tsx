@@ -2,10 +2,12 @@
 
 import { X, ShoppingCart, Trash2, Plus, Minus, CreditCard } from 'lucide-react';
 import { useShopStore } from '@/stores/shopStore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function ShopCartSidebar() {
   const { cart, isCartOpen, setCartOpen, removeFromCart, updateCartQuantity, getCartTotal, clearCart, purchaseCart, isLoading } =
     useShopStore();
+  const { t } = useTranslation();
 
   const total = getCartTotal();
 
@@ -19,7 +21,7 @@ export function ShopCartSidebar() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
           <div className="flex items-center gap-3">
             <ShoppingCart className="w-6 h-6 text-purple-400" />
-            <h2 className="text-xl font-bold text-white">Carrito</h2>
+            <h2 className="text-xl font-bold text-white">{t('shop.cart.title')}</h2>
             <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-sm rounded-full">{cart.length}</span>
           </div>
           <button
@@ -34,7 +36,7 @@ export function ShopCartSidebar() {
           {cart.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingCart className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-              <p className="text-gray-400">Tu carrito está vacío</p>
+              <p className="text-gray-400">{t('shop.cart.empty')}</p>
             </div>
           ) : (
             cart.map(({ item, quantity }) => (
@@ -99,12 +101,12 @@ export function ShopCartSidebar() {
                 ) : (
                   <>
                     <CreditCard className="w-5 h-5" />
-                    Comprar Ahora
+                    {t('shop.buyNow')}
                   </>
                 )}
               </button>
               <button onClick={clearCart} className="w-full py-2 text-gray-400 hover:text-red-400 transition-colors text-sm">
-                Vaciar carrito
+                {t('shop.clearCart')}
               </button>
             </div>
           </div>
