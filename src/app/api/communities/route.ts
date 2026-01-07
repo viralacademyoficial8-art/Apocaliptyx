@@ -139,18 +139,29 @@ export async function POST(request: NextRequest) {
         theme_color: themeColor || '#6366f1',
         creator_id: user.id,
         members_count: 1,
+        posts_count: 0,
       } as never)
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error creating community:', error);
+      return NextResponse.json(
+        { error: error.message || 'Error al crear comunidad' },
+        { status: 400 }
+      );
+    }
 
     // Add creator as owner
-    await supabase.from('community_members').insert({
+    const { error: memberError } = await supabase.from('community_members').insert({
       community_id: (community as { id: string }).id,
       user_id: user.id,
       role: 'owner',
     } as never);
+
+    if (memberError) {
+      console.error('Error adding owner to community:', memberError);
+    }
 
     return NextResponse.json({
       success: true,

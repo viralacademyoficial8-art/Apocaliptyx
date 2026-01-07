@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import {
@@ -100,6 +100,7 @@ const BADGE_STYLES: Record<BadgeType, { icon: string; color: string; bg: string 
 
 export default function ForoPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuthStore();
 
   const [posts, setPosts] = useState<ForumPost[]>([]);
@@ -181,8 +182,19 @@ export default function ForoPage() {
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false);
   const [storiesKey, setStoriesKey] = useState(0); // For refreshing StoriesBar
 
-  // Tab navigation for social hub
-  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>('feed');
+  // Tab navigation for social hub - read from URL params
+  const tabParam = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
+  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>(
+    tabParam && ['feed', 'reels', 'lives', 'comunidades'].includes(tabParam) ? tabParam : 'feed'
+  );
+
+  // Function to change tab and update URL
+  const changeTab = useCallback((tab: 'feed' | 'reels' | 'lives' | 'comunidades') => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+    router.push(`/foro?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   // Reels state
   interface Reel {
@@ -482,6 +494,14 @@ export default function ForoPage() {
     loadStories();
     loadAwardTypes();
   }, [loadPosts, loadCategories, loadTrendingTags, loadStories, loadAwardTypes]);
+
+  // Sync active tab from URL when searchParams changes
+  useEffect(() => {
+    const tab = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
+    if (tab && ['feed', 'reels', 'lives', 'comunidades'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
 
   // Load reels when tab changes to reels or filter changes
   useEffect(() => {
@@ -929,7 +949,7 @@ export default function ForoPage() {
         {/* Social Hub Tabs */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
           <button
-            onClick={() => setActiveTab('feed')}
+            onClick={() => changeTab('feed')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'feed'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
@@ -940,7 +960,7 @@ export default function ForoPage() {
             Feed
           </button>
           <button
-            onClick={() => setActiveTab('reels')}
+            onClick={() => changeTab('reels')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'reels'
                 ? 'bg-pink-600 text-white shadow-lg shadow-pink-500/25'
@@ -951,7 +971,7 @@ export default function ForoPage() {
             Reels
           </button>
           <button
-            onClick={() => setActiveTab('lives')}
+            onClick={() => changeTab('lives')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all relative ${
               activeTab === 'lives'
                 ? 'bg-red-600 text-white shadow-lg shadow-red-500/25'
@@ -964,7 +984,7 @@ export default function ForoPage() {
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
           </button>
           <button
-            onClick={() => setActiveTab('comunidades')}
+            onClick={() => changeTab('comunidades')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'comunidades'
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
