@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { checkEmailExists, checkUsernameExists } from "@/lib/actions/auth.actions";
 import { SocialButtons } from "./SocialButtons";
@@ -68,6 +69,20 @@ export function RegisterForm() {
 
   return (
     <div className="w-full max-w-md mx-auto">
+      {/* Logo */}
+      <div className="flex justify-center mb-6">
+        <Link href="/">
+          <Image
+            src="/apocaliptyx-logo.png"
+            alt="Apocaliptyx"
+            width={180}
+            height={50}
+            className="h-14 w-auto"
+            priority
+          />
+        </Link>
+      </div>
+
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
         <p className="text-gray-400">Únete a la comunidad de profetas</p>

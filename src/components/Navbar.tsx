@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/lib/stores";
@@ -92,10 +93,14 @@ export function Navbar() {
               href={isLoggedIn ? "/dashboard" : "/"}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <Skull className="w-7 h-7 sm:w-8 sm:h-8 text-red-500" />
-              <span className="text-lg sm:text-xl font-bold text-yellow-500 hidden sm:block">
-                Apocaliptics
-              </span>
+              <Image
+                src="/apocaliptyx-logo.png"
+                alt="Apocaliptyx"
+                width={140}
+                height={40}
+                className="h-8 sm:h-10 w-auto"
+                priority
+              />
             </Link>
 
             {/* Search Bar - Desktop */}
