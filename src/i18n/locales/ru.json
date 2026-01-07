@@ -56,6 +56,24 @@
     "adminPanel": "Админ Панель",
     "createScenario": "Создать Сценарий"
   },
+  "sidebar": {
+    "search": "Поиск",
+    "explore": "Обзор",
+    "predictions": "Предсказания",
+    "features": "Функции"
+  },
+  "explore": {
+    "title": "Обзор Сценариев",
+    "subtitle": "Открывайте предсказания и ставьте AP Coins на будущее",
+    "loadError": "Ошибка при загрузке сценариев",
+    "clearFilters": "Очистить фильтры",
+    "scenariosFound": "сценариев найдено",
+    "noScenarios": "Сценарии не найдены",
+    "tryOtherFilters": "Попробуйте другие фильтры поиска",
+    "beFirstToCreate": "Будьте первым кто создаст",
+    "highestPool": "Наибольший пул",
+    "other": "Другое"
+  },
   "auth": {
     "login": {
       "title": "С возвращением",

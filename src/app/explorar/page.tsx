@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { scenariosService } from '@/services';
-import { 
-  Search, Filter, Flame, Users, Clock, TrendingUp, 
+import { useTranslation } from '@/hooks/useTranslation';
+import {
+  Search, Filter, Flame, Users, Clock, TrendingUp,
   Loader2, AlertCircle, ChevronDown, X
 } from 'lucide-react';
 
@@ -26,37 +27,43 @@ interface ScenarioData {
   created_at: string;
 }
 
-// Categorías disponibles
-const CATEGORIES = [
-  'Todos',
-  'Crypto',
-  'Deportes',
-  'Tecnología',
-  'Política',
-  'Entretenimiento',
-  'Economía',
-  'Ciencia',
-  'Gaming',
-  'Otros'
-];
-
-// Opciones de ordenamiento
-const SORT_OPTIONS = [
-  { value: 'recent', label: 'Más recientes' },
-  { value: 'popular', label: 'Más populares' },
-  { value: 'pool', label: 'Mayor pool' },
-  { value: 'ending', label: 'Por terminar' },
+// Category keys for translations
+const CATEGORY_KEYS = [
+  'all', 'crypto', 'sports', 'technology', 'politics',
+  'entertainment', 'economy', 'science', 'gaming', 'other'
 ];
 
 export default function ExplorarPage() {
   const router = useRouter();
-  
+  const { t } = useTranslation();
+
+  // Translated categories and sort options
+  const CATEGORIES = [
+    { key: 'all', label: t('common.all'), value: 'Todos' },
+    { key: 'crypto', label: 'Crypto', value: 'Crypto' },
+    { key: 'sports', label: t('home.categories.sports'), value: 'Deportes' },
+    { key: 'technology', label: t('home.categories.technology'), value: 'Tecnología' },
+    { key: 'politics', label: t('home.categories.politics'), value: 'Política' },
+    { key: 'entertainment', label: t('home.categories.entertainment'), value: 'Entretenimiento' },
+    { key: 'economy', label: t('home.categories.economy'), value: 'Economía' },
+    { key: 'science', label: t('home.categories.science'), value: 'Ciencia' },
+    { key: 'gaming', label: 'Gaming', value: 'Gaming' },
+    { key: 'other', label: t('explore.other'), value: 'Otros' },
+  ];
+
+  const SORT_OPTIONS = [
+    { value: 'recent', label: t('scenarios.sort.latest') },
+    { value: 'popular', label: t('scenarios.sort.popular') },
+    { value: 'pool', label: t('explore.highestPool') },
+    { value: 'ending', label: t('scenarios.sort.ending') },
+  ];
+
   // Estados
   const [scenarios, setScenarios] = useState<ScenarioData[]>([]);
   const [filteredScenarios, setFilteredScenarios] = useState<ScenarioData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Filtros
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
@@ -74,7 +81,7 @@ export default function ExplorarPage() {
         setError(null);
       } catch (err) {
         console.error('Error loading scenarios:', err);
-        setError('Error al cargar escenarios');
+        setError(t('explore.loadError'));
       } finally {
         setLoading(false);
       }
@@ -140,9 +147,9 @@ export default function ExplorarPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Explorar Escenarios</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('explore.title')}</h1>
           <p className="text-gray-400">
-            Descubre predicciones y apuesta AP Coins en el futuro
+            {t('explore.subtitle')}
           </p>
         </div>
 
@@ -154,7 +161,7 @@ export default function ExplorarPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="text"
-                placeholder="Buscar escenarios..."
+                placeholder={`${t('common.search')}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -177,7 +184,7 @@ export default function ExplorarPage() {
               }`}
             >
               <Filter className="w-5 h-5" />
-              Filtros
+              {t('common.filter')}
               {hasActiveFilters && (
                 <span className="w-2 h-2 bg-purple-500 rounded-full" />
               )}
@@ -189,19 +196,19 @@ export default function ExplorarPage() {
             <div className="p-4 bg-gray-900 border border-gray-800 rounded-xl space-y-4">
               {/* Categories */}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Categoría</label>
+                <label className="text-sm text-gray-400 mb-2 block">{t('scenarios.create.category')}</label>
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map((cat) => (
                     <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
+                      key={cat.key}
+                      onClick={() => setSelectedCategory(cat.value)}
                       className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                        selectedCategory === cat
+                        selectedCategory === cat.value
                           ? 'bg-purple-500 text-white'
                           : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                       }`}
                     >
-                      {cat}
+                      {cat.label}
                     </button>
                   ))}
                 </div>
@@ -209,7 +216,7 @@ export default function ExplorarPage() {
 
               {/* Sort */}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Ordenar por</label>
+                <label className="text-sm text-gray-400 mb-2 block">{t('leaderboard.sortByLabel')}</label>
                 <div className="flex flex-wrap gap-2">
                   {SORT_OPTIONS.map((option) => (
                     <button
@@ -233,7 +240,7 @@ export default function ExplorarPage() {
                   onClick={clearFilters}
                   className="text-sm text-purple-400 hover:text-purple-300"
                 >
-                  Limpiar filtros
+                  {t('explore.clearFilters')}
                 </button>
               )}
             </div>
@@ -242,14 +249,14 @@ export default function ExplorarPage() {
 
         {/* Results count */}
         <div className="mb-4 text-sm text-gray-400">
-          {filteredScenarios.length} escenario{filteredScenarios.length !== 1 ? 's' : ''} encontrado{filteredScenarios.length !== 1 ? 's' : ''}
+          {filteredScenarios.length} {t('explore.scenariosFound')}
         </div>
 
         {/* Scenarios grid */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-            <span className="ml-3 text-gray-400">Cargando escenarios...</span>
+            <span className="ml-3 text-gray-400">{t('dashboard.loadingScenarios')}</span>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -259,17 +266,17 @@ export default function ExplorarPage() {
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
             >
-              Reintentar
+              {t('errors.serverError.retry')}
             </button>
           </div>
         ) : filteredScenarios.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <Search className="w-12 h-12 text-gray-600 mb-4" />
-            <p className="text-gray-400 mb-2">No se encontraron escenarios</p>
+            <p className="text-gray-400 mb-2">{t('explore.noScenarios')}</p>
             <p className="text-gray-500 text-sm mb-4">
-              {hasActiveFilters 
-                ? 'Intenta con otros filtros de búsqueda'
-                : 'Sé el primero en crear uno'
+              {hasActiveFilters
+                ? t('explore.tryOtherFilters')
+                : t('explore.beFirstToCreate')
               }
             </p>
             {hasActiveFilters ? (
@@ -277,14 +284,14 @@ export default function ExplorarPage() {
                 onClick={clearFilters}
                 className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg"
               >
-                Limpiar filtros
+                {t('explore.clearFilters')}
               </button>
             ) : (
               <button
                 onClick={() => router.push('/crear')}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
               >
-                Crear escenario
+                {t('scenarios.createScenario')}
               </button>
             )}
           </div>
@@ -305,8 +312,9 @@ export default function ExplorarPage() {
 // Componente de tarjeta de escenario
 function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
   const router = useRouter();
-  const yesPercent = scenario.total_pool > 0 
-    ? Math.round((scenario.yes_pool / scenario.total_pool) * 100) 
+  const { t } = useTranslation();
+  const yesPercent = scenario.total_pool > 0
+    ? Math.round((scenario.yes_pool / scenario.total_pool) * 100)
     : 50;
   const noPercent = 100 - yesPercent;
 
@@ -315,7 +323,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
   );
 
   return (
-    <div 
+    <div
       onClick={() => router.push(`/escenarios/${scenario.id}`)}
       className="rounded-xl border border-gray-800 bg-gray-900/60 p-5 hover:border-purple-500/50 hover:bg-gray-900 transition-all cursor-pointer group"
     >
@@ -326,12 +334,12 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
         </span>
         {scenario.is_featured && (
           <span className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full">
-            ⭐ Destacado
+            ⭐ {t('shop.item.featured')}
           </span>
         )}
         {scenario.is_hot && (
           <span className="text-xs px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">
-            🔥 Hot
+            🔥 {t('scenarios.card.hot')}
           </span>
         )}
       </div>
@@ -349,15 +357,15 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       {/* Progress bar */}
       <div className="mb-4">
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-green-400 font-medium">Sí {yesPercent}%</span>
-          <span className="text-red-400 font-medium">No {noPercent}%</span>
+          <span className="text-green-400 font-medium">{t('common.yes')} {yesPercent}%</span>
+          <span className="text-red-400 font-medium">{t('common.no')} {noPercent}%</span>
         </div>
         <div className="h-2.5 bg-gray-800 rounded-full overflow-hidden flex">
-          <div 
+          <div
             className="bg-green-500 transition-all"
             style={{ width: `${yesPercent}%` }}
           />
-          <div 
+          <div
             className="bg-red-500 transition-all"
             style={{ width: `${noPercent}%` }}
           />
@@ -377,7 +385,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
           <span className={daysLeft <= 3 ? 'text-red-400' : ''}>
-            {daysLeft > 0 ? `${daysLeft}d` : 'Cerrado'}
+            {daysLeft > 0 ? `${daysLeft}d` : t('scenarios.card.closed')}
           </span>
         </div>
       </div>

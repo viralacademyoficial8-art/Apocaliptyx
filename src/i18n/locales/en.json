@@ -56,6 +56,24 @@
     "adminPanel": "Admin Panel",
     "createScenario": "Create Scenario"
   },
+  "sidebar": {
+    "search": "Search",
+    "explore": "Explore",
+    "predictions": "Predictions",
+    "features": "Features"
+  },
+  "explore": {
+    "title": "Explore Scenarios",
+    "subtitle": "Discover predictions and bet AP Coins on the future",
+    "loadError": "Error loading scenarios",
+    "clearFilters": "Clear filters",
+    "scenariosFound": "scenarios found",
+    "noScenarios": "No scenarios found",
+    "tryOtherFilters": "Try other search filters",
+    "beFirstToCreate": "Be the first to create one",
+    "highestPool": "Highest pool",
+    "other": "Other"
+  },
   "auth": {
     "login": {
       "title": "Welcome back",
