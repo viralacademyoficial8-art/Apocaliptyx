@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/api/scenarios/steal/leaderboard/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';

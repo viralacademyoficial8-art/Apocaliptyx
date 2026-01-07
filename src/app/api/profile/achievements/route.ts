@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/api/profile/achievements/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
