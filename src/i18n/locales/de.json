@@ -56,6 +56,24 @@
     "adminPanel": "Admin-Panel",
     "createScenario": "Szenario Erstellen"
   },
+  "sidebar": {
+    "search": "Suchen",
+    "explore": "Entdecken",
+    "predictions": "Vorhersagen",
+    "features": "Funktionen"
+  },
+  "explore": {
+    "title": "Szenarien Entdecken",
+    "subtitle": "Entdecke Vorhersagen und setze AP Coins auf die Zukunft",
+    "loadError": "Fehler beim Laden der Szenarien",
+    "clearFilters": "Filter löschen",
+    "scenariosFound": "Szenarien gefunden",
+    "noScenarios": "Keine Szenarien gefunden",
+    "tryOtherFilters": "Versuche andere Suchfilter",
+    "beFirstToCreate": "Sei der Erste der eines erstellt",
+    "highestPool": "Höchster Pool",
+    "other": "Andere"
+  },
   "auth": {
     "login": {
       "title": "Willkommen zurück",

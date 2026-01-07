@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Home,
   Search,
@@ -38,33 +39,34 @@ interface NavItem {
   requiresAuth?: boolean;
 }
 
-const mainNavItems: NavItem[] = [
-  { icon: <Home className="w-6 h-6" />, label: 'Inicio', href: '/' },
-  { icon: <Search className="w-6 h-6" />, label: 'Buscar', href: '/buscar' },
-  { icon: <Compass className="w-6 h-6" />, label: 'Explorar', href: '/explorar' },
-  { icon: <Film className="w-6 h-6" />, label: 'Reels', href: '/reels', highlight: true },
-  { icon: <MessageCircle className="w-6 h-6" />, label: 'Foro', href: '/foro' },
-  { icon: <Users className="w-6 h-6" />, label: 'Comunidades', href: '/comunidades' },
-  { icon: <Radio className="w-6 h-6" />, label: 'En Vivo', href: '/streaming' },
-];
-
-const socialNavItems: NavItem[] = [
-  { icon: <Heart className="w-6 h-6" />, label: 'Notificaciones', href: '/notificaciones', requiresAuth: true },
-  { icon: <MessageCircle className="w-6 h-6" />, label: 'Mensajes', href: '/mensajes', requiresAuth: true },
-];
-
-const featureNavItems: NavItem[] = [
-  { icon: <Trophy className="w-6 h-6" />, label: 'Torneos', href: '/torneos' },
-  { icon: <Target className="w-6 h-6" />, label: 'Predicciones', href: '/dashboard' },
-  { icon: <TrendingUp className="w-6 h-6" />, label: 'Leaderboard', href: '/leaderboard' },
-  { icon: <ShoppingBag className="w-6 h-6" />, label: 'Tienda', href: '/tienda' },
-  { icon: <Sparkles className="w-6 h-6" />, label: 'Coleccionables', href: '/coleccionables' },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
   const { user, isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const mainNavItems: NavItem[] = [
+    { icon: <Home className="w-6 h-6" />, label: t('nav.home'), href: '/' },
+    { icon: <Search className="w-6 h-6" />, label: t('sidebar.search'), href: '/buscar' },
+    { icon: <Compass className="w-6 h-6" />, label: t('sidebar.explore'), href: '/explorar' },
+    { icon: <Film className="w-6 h-6" />, label: t('nav.reels'), href: '/reels', highlight: true },
+    { icon: <MessageCircle className="w-6 h-6" />, label: t('nav.forum'), href: '/foro' },
+    { icon: <Users className="w-6 h-6" />, label: t('nav.communities'), href: '/comunidades' },
+    { icon: <Radio className="w-6 h-6" />, label: t('nav.streaming'), href: '/streaming' },
+  ];
+
+  const socialNavItems: NavItem[] = [
+    { icon: <Heart className="w-6 h-6" />, label: t('nav.notifications'), href: '/notificaciones', requiresAuth: true },
+    { icon: <MessageCircle className="w-6 h-6" />, label: t('nav.messages'), href: '/mensajes', requiresAuth: true },
+  ];
+
+  const featureNavItems: NavItem[] = [
+    { icon: <Trophy className="w-6 h-6" />, label: t('nav.tournaments'), href: '/torneos' },
+    { icon: <Target className="w-6 h-6" />, label: t('sidebar.predictions'), href: '/dashboard' },
+    { icon: <TrendingUp className="w-6 h-6" />, label: t('nav.rankings'), href: '/leaderboard' },
+    { icon: <ShoppingBag className="w-6 h-6" />, label: t('nav.shop'), href: '/tienda' },
+    { icon: <Sparkles className="w-6 h-6" />, label: t('nav.collectibles'), href: '/coleccionables' },
+  ];
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
   const [messages, setMessages] = useState(0);
@@ -209,7 +211,7 @@ export function Sidebar() {
           )}>
             {(isExpanded || isMobileOpen) && (
               <p className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Funciones
+                {t('sidebar.features')}
               </p>
             )}
             <div className="space-y-1">
@@ -233,7 +235,7 @@ export function Sidebar() {
               )}
             >
               <PlusSquare className="w-5 h-5" />
-              {(isExpanded || isMobileOpen) && <span>Crear</span>}
+              {(isExpanded || isMobileOpen) && <span>{t('common.create')}</span>}
             </Link>
           </div>
         )}
@@ -272,7 +274,7 @@ export function Sidebar() {
                 'text-gray-300 hover:text-white font-medium transition-all duration-200'
               )}
             >
-              {(isExpanded || isMobileOpen) ? 'Iniciar Sesión' : <Crown className="w-5 h-5" />}
+              {(isExpanded || isMobileOpen) ? t('nav.login') : <Crown className="w-5 h-5" />}
             </Link>
           )}
 
@@ -282,7 +284,7 @@ export function Sidebar() {
             className="flex items-center gap-3 px-3 py-2 mt-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors"
           >
             <Settings className="w-5 h-5" />
-            {(isExpanded || isMobileOpen) && <span className="text-sm">Configuración</span>}
+            {(isExpanded || isMobileOpen) && <span className="text-sm">{t('nav.settings')}</span>}
           </Link>
         </div>
       </aside>
