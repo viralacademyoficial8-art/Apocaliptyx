@@ -37,6 +37,7 @@ import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { CommunitySettingsModal } from '@/components/communities/CommunitySettingsModal';
+import { PostCard } from '@/components/communities/PostCard';
 
 interface CommunityMember {
   id: string;
@@ -298,6 +299,21 @@ export default function CommunityPage() {
       console.error('Error toggling like:', error);
       toast.error('Error al procesar like');
     }
+  };
+
+  // Delete post handler
+  const handleDeletePost = (postId: string) => {
+    setPosts(posts.filter(p => p.id !== postId));
+    if (community) {
+      setCommunity({ ...community, postsCount: Math.max(0, community.postsCount - 1) });
+    }
+  };
+
+  // Pin/Unpin post handler
+  const handlePinPost = (postId: string, isPinned: boolean) => {
+    setPosts(posts.map(p =>
+      p.id === postId ? { ...p, isPinned } : p
+    ));
   };
 
   // Role badge
@@ -574,93 +590,19 @@ export default function CommunityPage() {
                 ) : posts.length > 0 ? (
                   <div className="space-y-4">
                     {posts.map((post) => (
-                      <div
+                      <PostCard
                         key={post.id}
-                        className={`bg-gray-900/50 border border-gray-800 rounded-xl p-4 ${
-                          post.isPinned ? 'border-yellow-500/30' : ''
-                        }`}
-                      >
-                        {post.isPinned && (
-                          <div className="flex items-center gap-1 text-xs text-yellow-400 mb-3">
-                            <Pin className="w-3 h-3" />
-                            Publicación fijada
-                          </div>
-                        )}
-                        <div className="flex gap-3">
-                          <Link href={`/perfil/${post.author?.username}`}>
-                            <div
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all"
-                              style={{
-                                background: post.author?.avatarUrl
-                                  ? `url(${post.author.avatarUrl}) center/cover`
-                                  : 'linear-gradient(135deg, #6366f1, #ec4899)',
-                              }}
-                            >
-                              {!post.author?.avatarUrl && post.author?.username?.[0]?.toUpperCase()}
-                            </div>
-                          </Link>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <Link
-                                href={`/perfil/${post.author?.username}`}
-                                className="font-semibold hover:text-purple-400 transition-colors"
-                              >
-                                {post.author?.displayName || post.author?.username}
-                              </Link>
-                              {post.author?.level && (
-                                <span className="px-1.5 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded">
-                                  Lvl {post.author.level}
-                                </span>
-                              )}
-                              <span className="text-gray-500 text-sm">
-                                {formatDistanceToNow(new Date(post.createdAt), {
-                                  addSuffix: true,
-                                  locale: es,
-                                })}
-                              </span>
-                            </div>
-                            <p className="mt-2 text-gray-200 whitespace-pre-wrap">
-                              {post.content}
-                            </p>
-                            {post.imageUrl && (
-                              <img
-                                src={post.imageUrl}
-                                alt=""
-                                className="mt-3 rounded-xl max-h-96 object-cover"
-                              />
-                            )}
-                            <div className="flex items-center gap-4 mt-4">
-                              <button
-                                onClick={() => handleLikePost(post.id)}
-                                className={`flex items-center gap-1 ${
-                                  post.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'
-                                } transition-colors`}
-                              >
-                                <Heart
-                                  className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`}
-                                />
-                                <span className="text-sm">{post.likesCount}</span>
-                              </button>
-                              <button className="flex items-center gap-1 text-gray-400 hover:text-blue-400 transition-colors">
-                                <MessageCircle className="w-5 h-5" />
-                                <span className="text-sm">{post.commentsCount}</span>
-                              </button>
-                              <button className="flex items-center gap-1 text-gray-400 hover:text-green-400 transition-colors">
-                                <Share2 className="w-5 h-5" />
-                              </button>
-                              <div className="flex-1" />
-                              {(user?.id === post.authorId ||
-                                userRole === 'owner' ||
-                                userRole === 'admin' ||
-                                userRole === 'moderator') && (
-                                <button className="text-gray-400 hover:text-white transition-colors">
-                                  <MoreHorizontal className="w-5 h-5" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                        post={post}
+                        communityId={community.id}
+                        communitySlug={community.slug}
+                        currentUserId={user?.id}
+                        userRole={userRole}
+                        isAuthenticated={isAuthenticated}
+                        isMember={isMember}
+                        onLike={handleLikePost}
+                        onDelete={handleDeletePost}
+                        onPin={handlePinPost}
+                      />
                     ))}
                   </div>
                 ) : (
