@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { Radio, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveKitRoom } from '@/components/streaming/LiveKitRoom';
@@ -23,27 +23,21 @@ interface StreamInfo {
   startedAt?: string;
 }
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function LiveStreamPage({ params }: PageProps) {
+export default function LiveStreamPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
   const { user } = useAuthStore();
 
-  const [streamId, setStreamId] = useState<string | null>(null);
+  // Get streamId from params using useParams hook
+  const streamId = params.id as string;
+
   const [streamInfo, setStreamInfo] = useState<StreamInfo | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Resolve params
-  useEffect(() => {
-    params.then((p) => setStreamId(p.id));
-  }, [params]);
 
   // Check if user is host
   useEffect(() => {
@@ -209,7 +203,7 @@ export default function LiveStreamPage({ params }: PageProps) {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         <LiveKitRoom
-          streamId={streamId!}
+          streamId={streamId}
           isHost={isHost}
           token={token}
           serverUrl={serverUrl}
