@@ -98,7 +98,28 @@ const BADGE_STYLES: Record<BadgeType, { icon: string; color: string; bg: string 
   apocaliptyx: { icon: '⚡', color: 'text-pink-400', bg: 'bg-pink-500/20' },
 };
 
+// Loading fallback component
+function ForoLoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
+      <Navbar />
+      <div className="flex items-center justify-center h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      </div>
+    </div>
+  );
+}
+
+// Main page wrapper with Suspense
 export default function ForoPage() {
+  return (
+    <Suspense fallback={<ForoLoadingFallback />}>
+      <ForoContent />
+    </Suspense>
+  );
+}
+
+function ForoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isAuthenticated } = useAuthStore();
