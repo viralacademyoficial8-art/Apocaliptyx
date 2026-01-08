@@ -231,21 +231,15 @@ export default {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        console.log("=== AUTH ATTEMPT ===");
-        
         if (!credentials?.email || !credentials?.password) {
-          console.log("Missing credentials");
           return null;
         }
 
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
 
-        console.log("Email:", email);
-
         const supabase = getSupabase();
         if (!supabase) {
-          console.log("Supabase not available");
           return null;
         }
 
@@ -256,11 +250,8 @@ export default {
         });
 
         if (authError || !authData.user) {
-          console.log("Supabase auth error:", authError?.message);
           return null;
         }
-
-        console.log("Supabase auth successful for:", email);
 
         // Obtener datos del usuario de nuestra tabla users
         const { data: user, error: userError } = await supabase
@@ -270,8 +261,6 @@ export default {
           .single();
 
         if (userError || !user) {
-          console.log("User profile not found, creating...");
-          
           // Si no existe el perfil, crearlo
           const { data: newUser, error: createError } = await supabase
             .from("users")
@@ -296,11 +285,9 @@ export default {
             .single();
 
           if (createError || !newUser) {
-            console.log("Error creating user profile:", createError);
             return null;
           }
 
-          console.log("Login successful (new profile) for:", email);
           return {
             id: newUser.id,
             email: newUser.email,
@@ -316,11 +303,9 @@ export default {
         }
 
         if (user.is_banned) {
-          console.log("User is banned:", email);
           return null;
         }
 
-        console.log("Login successful for:", email, "Role:", user.role);
         return {
           id: user.id,
           email: user.email,
