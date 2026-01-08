@@ -321,7 +321,7 @@ class ForumService {
           link_url: linkUrl,
           image_url: imageUrl || null,
           is_read: false,
-        });
+        } as never);
     } catch (error) {
       console.error('Error sending notification:', error);
     }
@@ -423,7 +423,7 @@ class ForumService {
         views_count: 0,
         likes_count: 0,
         comments_count: 0,
-      })
+      } as never)
       .select(`
         *,
         author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level)
@@ -508,7 +508,7 @@ class ForumService {
       // Agregar like
       await getSupabase()
         .from('forum_post_likes')
-        .insert({ post_id: postId, user_id: userId });
+        .insert({ post_id: postId, user_id: userId } as never);
 
       // Incrementar contador
       const { data: post } = await getSupabase()
@@ -591,7 +591,7 @@ class ForumService {
         parent_id: input.parent_id || null,
         status: 'published',
         likes_count: 0,
-      })
+      } as never)
       .select(`
         *,
         author:users!forum_comments_author_id_fkey(id, username, display_name, avatar_url, level)
@@ -723,7 +723,7 @@ class ForumService {
     } else {
       await getSupabase()
         .from('forum_comment_likes')
-        .insert({ comment_id: commentId, user_id: userId });
+        .insert({ comment_id: commentId, user_id: userId } as never);
 
       const { data: comment } = await getSupabase()
         .from('forum_comments')
@@ -875,7 +875,7 @@ class ForumService {
       // Add reaction
       await getSupabase()
         .from('forum_post_reactions')
-        .insert({ post_id: postId, user_id: userId, reaction_type: reactionType });
+        .insert({ post_id: postId, user_id: userId, reaction_type: reactionType } as never);
       counts[reactionType] += 1;
     }
 
@@ -956,7 +956,7 @@ class ForumService {
       await getSupabase().from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
       return { bookmarked: false, count: newCount };
     } else {
-      await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId });
+      await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId } as never);
       const { data: post } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
@@ -1099,7 +1099,7 @@ class ForumService {
 
     const { error } = await getSupabase()
       .from('forum_post_media')
-      .insert(mediaItems);
+      .insert(mediaItems as never[]);
 
     if (!error) {
       await getSupabase()
@@ -1267,7 +1267,7 @@ class ForumService {
       await getSupabase().from('users').update({ following_count: getSupabase().rpc('greatest', { a: 0, b: 'following_count - 1' }) }).eq('id', followerId);
       return { following: false };
     } else {
-      await getSupabase().from('user_follows').insert({ follower_id: followerId, following_id: followingId });
+      await getSupabase().from('user_follows').insert({ follower_id: followerId, following_id: followingId } as never);
       return { following: true };
     }
   }
@@ -1311,7 +1311,7 @@ class ForumService {
       post_id: postId,
       user_id: userId,
       share_type: shareType,
-    });
+    } as never);
 
     await getSupabase()
       .from('forum_posts')
@@ -1408,7 +1408,7 @@ class ForumService {
         gif_width: input.gif_width || null,
         gif_height: input.gif_height || null,
         status: 'published',
-      })
+      } as never)
       .select('*')
       .single();
 
@@ -1429,7 +1429,7 @@ class ForumService {
           question: input.poll.question,
           ends_at: endsAt.toISOString(),
           multiple_choice: input.poll.multiple_choice || false,
-        })
+        } as never)
         .select('*')
         .single();
 
@@ -1442,7 +1442,7 @@ class ForumService {
           votes_count: 0,
         }));
 
-        await getSupabase().from('forum_poll_options').insert(options);
+        await getSupabase().from('forum_poll_options').insert(options as never[]);
       }
     }
 
