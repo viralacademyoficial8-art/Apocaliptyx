@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+
+export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 // POST /api/stories/[id]/react - React to a story
 export async function POST(
@@ -7,14 +12,13 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const user = session.user;
     const storyId = params.id;
     const body = await request.json();
     const { reaction } = body;
@@ -27,7 +31,7 @@ export async function POST(
     }
 
     // Check if story exists
-    const { data: storyRaw, error: storyError } = await supabase
+    const { data: storyRaw, error: storyError } = await supabase()
       .from('forum_stories')
       .select('id, user_id, expires_at')
       .eq('id', storyId)
@@ -45,14 +49,14 @@ export async function POST(
     }
 
     // Remove existing reaction if any
-    await supabase
+    await supabase()
       .from('forum_story_reactions')
       .delete()
       .eq('story_id', storyId)
       .eq('user_id', user.id);
 
     // Add new reaction
-    const { error: reactError } = await supabase
+    const { error: reactError } = await supabase()
       .from('forum_story_reactions')
       .insert({
         story_id: storyId,
@@ -65,7 +69,7 @@ export async function POST(
     // Notify story owner (if not self)
     if (story.user_id !== user.id) {
       // Get reactor info
-      const { data: reactorData } = await supabase
+      const { data: reactorData } = await supabase()
         .from('users')
         .select('username, display_name')
         .eq('id', user.id)
@@ -74,7 +78,7 @@ export async function POST(
       const reactor = reactorData as { username?: string; display_name?: string } | null;
 
       // Create notification
-      await supabase
+      await supabase()
         .from('notifications')
         .insert({
           user_id: story.user_id,
@@ -107,17 +111,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const user = session.user;
     const storyId = params.id;
 
-    const { error } = await supabase
+    const { error } = await supabase()
       .from('forum_story_reactions')
       .delete()
       .eq('story_id', storyId)
