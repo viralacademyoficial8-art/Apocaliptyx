@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LandingNavbar } from '@/components/LandingNavbar';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import {
   FadeInView,
@@ -589,28 +590,7 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 border-t border-zinc-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600">
-                <Skull className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-lg">Apocaliptics</span>
-            </div>
-
-            <div className="flex gap-8 text-sm text-zinc-500">
-              <Link href="/privacidad" className="hover:text-white transition-colors">Privacidad</Link>
-              <Link href="/terminos-y-condiciones" className="hover:text-white transition-colors">Terminos</Link>
-              <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
-            </div>
-
-            <div className="text-sm text-zinc-600">
-              2024 Apocaliptics
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
