@@ -444,7 +444,7 @@ class ForumService {
       .update({
         ...updates,
         updated_at: new Date().toISOString(),
-      })
+      } as never)
       .eq('id', postId)
       .eq('author_id', userId);
 
