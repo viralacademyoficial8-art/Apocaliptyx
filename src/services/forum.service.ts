@@ -1,11 +1,9 @@
 // src/services/forum.service.ts
 
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from '@/lib/supabase/client';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Use the authenticated browser client
+const getSupabase = () => getSupabaseClient();
 
 // ==================== TYPES ====================
 
@@ -313,7 +311,7 @@ class ForumService {
     imageUrl?: string
   ): Promise<void> {
     try {
-      await supabase
+      await getSupabase()
         .from('notifications')
         .insert({
           user_id: userId,
@@ -386,7 +384,7 @@ class ForumService {
   }
 
   async getPostById(postId: string): Promise<ForumPost | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_posts')
       .select(`
         *,
@@ -402,7 +400,7 @@ class ForumService {
     }
 
     // Incrementar vistas
-    await supabase
+    await getSupabase()
       .from('forum_posts')
       .update({ views_count: (data.views_count || 0) + 1 })
       .eq('id', postId);
@@ -411,7 +409,7 @@ class ForumService {
   }
 
   async createPost(userId: string, input: CreatePostInput): Promise<ForumPost | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_posts')
       .insert({
         title: input.title || '',
@@ -441,7 +439,7 @@ class ForumService {
   }
 
   async updatePost(postId: string, userId: string, updates: Partial<CreatePostInput>): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('forum_posts')
       .update({
         ...updates,
@@ -460,7 +458,7 @@ class ForumService {
 
   async deletePost(postId: string, userId: string): Promise<boolean> {
     // Soft delete - cambiar status a deleted
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('forum_posts')
       .update({ status: 'deleted' })
       .eq('id', postId)
@@ -476,7 +474,7 @@ class ForumService {
 
   async toggleLikePost(postId: string, userId: string): Promise<{ liked: boolean; likesCount: number }> {
     // Verificar si ya existe el like
-    const { data: existingLike } = await supabase
+    const { data: existingLike } = await getSupabase()
       .from('forum_post_likes')
       .select('id')
       .eq('post_id', postId)
@@ -485,14 +483,14 @@ class ForumService {
 
     if (existingLike) {
       // Quitar like
-      await supabase
+      await getSupabase()
         .from('forum_post_likes')
         .delete()
         .eq('post_id', postId)
         .eq('user_id', userId);
 
       // Decrementar contador
-      const { data: post } = await supabase
+      const { data: post } = await getSupabase()
         .from('forum_posts')
         .select('likes_count')
         .eq('id', postId)
@@ -500,7 +498,7 @@ class ForumService {
 
       const newCount = Math.max(0, (post?.likes_count || 1) - 1);
       
-      await supabase
+      await getSupabase()
         .from('forum_posts')
         .update({ likes_count: newCount })
         .eq('id', postId);
@@ -508,12 +506,12 @@ class ForumService {
       return { liked: false, likesCount: newCount };
     } else {
       // Agregar like
-      await supabase
+      await getSupabase()
         .from('forum_post_likes')
         .insert({ post_id: postId, user_id: userId });
 
       // Incrementar contador
-      const { data: post } = await supabase
+      const { data: post } = await getSupabase()
         .from('forum_posts')
         .select('likes_count, author_id, title, content')
         .eq('id', postId)
@@ -521,14 +519,14 @@ class ForumService {
 
       const newCount = (post?.likes_count || 0) + 1;
       
-      await supabase
+      await getSupabase()
         .from('forum_posts')
         .update({ likes_count: newCount })
         .eq('id', postId);
 
       // 🔔 NOTIFICACIÓN: Like en post (solo si no es el propio autor)
       if (post && post.author_id !== userId) {
-        const { data: liker } = await supabase
+        const { data: liker } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
@@ -552,7 +550,7 @@ class ForumService {
   }
 
   async hasUserLikedPost(postId: string, userId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('forum_post_likes')
       .select('id')
       .eq('post_id', postId)
@@ -565,7 +563,7 @@ class ForumService {
   // ==================== COMMENTS ====================
 
   async getComments(postId: string): Promise<ForumComment[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_comments')
       .select(`
         *,
@@ -584,7 +582,7 @@ class ForumService {
   }
 
   async createComment(userId: string, input: CreateCommentInput): Promise<ForumComment | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_comments')
       .insert({
         post_id: input.post_id,
@@ -606,17 +604,17 @@ class ForumService {
     }
 
     // Incrementar contador de comentarios en el post
-    await supabase.rpc('increment_comments_count', { post_id: input.post_id });
+    await getSupabase().rpc('increment_comments_count', { post_id: input.post_id });
 
     // 🔔 NOTIFICACIÓN: Comentario en post
-    const { data: post } = await supabase
+    const { data: post } = await getSupabase()
       .from('forum_posts')
       .select('author_id, title, content')
       .eq('id', input.post_id)
       .single();
 
     if (post && post.author_id !== userId) {
-      const { data: commenter } = await supabase
+      const { data: commenter } = await getSupabase()
         .from('users')
         .select('username, avatar_url')
         .eq('id', userId)
@@ -637,14 +635,14 @@ class ForumService {
 
     // 🔔 NOTIFICACIÓN: Respuesta a comentario (si es reply)
     if (input.parent_id) {
-      const { data: parentComment } = await supabase
+      const { data: parentComment } = await getSupabase()
         .from('forum_comments')
         .select('author_id')
         .eq('id', input.parent_id)
         .single();
 
       if (parentComment && parentComment.author_id !== userId) {
-        const { data: replier } = await supabase
+        const { data: replier } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
@@ -668,13 +666,13 @@ class ForumService {
 
   async deleteComment(commentId: string, userId: string): Promise<boolean> {
     // Obtener el post_id antes de eliminar
-    const { data: comment } = await supabase
+    const { data: comment } = await getSupabase()
       .from('forum_comments')
       .select('post_id')
       .eq('id', commentId)
       .single();
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('forum_comments')
       .update({ status: 'deleted' })
       .eq('id', commentId)
@@ -687,14 +685,14 @@ class ForumService {
 
     // Decrementar contador
     if (comment) {
-      await supabase.rpc('decrement_comments_count', { post_id: comment.post_id });
+      await getSupabase().rpc('decrement_comments_count', { post_id: comment.post_id });
     }
 
     return true;
   }
 
   async toggleLikeComment(commentId: string, userId: string): Promise<{ liked: boolean; likesCount: number }> {
-    const { data: existingLike } = await supabase
+    const { data: existingLike } = await getSupabase()
       .from('forum_comment_likes')
       .select('id')
       .eq('comment_id', commentId)
@@ -702,13 +700,13 @@ class ForumService {
       .single();
 
     if (existingLike) {
-      await supabase
+      await getSupabase()
         .from('forum_comment_likes')
         .delete()
         .eq('comment_id', commentId)
         .eq('user_id', userId);
 
-      const { data: comment } = await supabase
+      const { data: comment } = await getSupabase()
         .from('forum_comments')
         .select('likes_count')
         .eq('id', commentId)
@@ -716,18 +714,18 @@ class ForumService {
 
       const newCount = Math.max(0, (comment?.likes_count || 1) - 1);
       
-      await supabase
+      await getSupabase()
         .from('forum_comments')
         .update({ likes_count: newCount })
         .eq('id', commentId);
 
       return { liked: false, likesCount: newCount };
     } else {
-      await supabase
+      await getSupabase()
         .from('forum_comment_likes')
         .insert({ comment_id: commentId, user_id: userId });
 
-      const { data: comment } = await supabase
+      const { data: comment } = await getSupabase()
         .from('forum_comments')
         .select('likes_count, author_id, content')
         .eq('id', commentId)
@@ -735,14 +733,14 @@ class ForumService {
 
       const newCount = (comment?.likes_count || 0) + 1;
       
-      await supabase
+      await getSupabase()
         .from('forum_comments')
         .update({ likes_count: newCount })
         .eq('id', commentId);
 
       // 🔔 NOTIFICACIÓN: Like en comentario
       if (comment && comment.author_id !== userId) {
-        const { data: liker } = await supabase
+        const { data: liker } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
@@ -768,7 +766,7 @@ class ForumService {
   // ==================== CATEGORIES ====================
 
   async getCategories(): Promise<ForumCategory[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_categories')
       .select('*')
       .eq('is_active', true)
@@ -790,7 +788,7 @@ class ForumService {
     reactionType: ReactionType
   ): Promise<{ added: boolean; counts: ReactionCounts }> {
     try {
-      const { data, error } = await supabase.rpc('toggle_post_reaction', {
+      const { data, error } = await getSupabase().rpc('toggle_post_reaction', {
         p_post_id: postId,
         p_user_id: userId,
         p_reaction_type: reactionType,
@@ -804,14 +802,14 @@ class ForumService {
 
       // Notify post author if reaction was added
       if (data.added) {
-        const { data: post } = await supabase
+        const { data: post } = await getSupabase()
           .from('forum_posts')
           .select('author_id, title, content')
           .eq('id', postId)
           .single();
 
         if (post && post.author_id !== userId) {
-          const { data: reactor } = await supabase
+          const { data: reactor } = await getSupabase()
             .from('users')
             .select('username, avatar_url')
             .eq('id', userId)
@@ -848,7 +846,7 @@ class ForumService {
     reactionType: ReactionType
   ): Promise<{ added: boolean; counts: ReactionCounts }> {
     // Check if reaction exists
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('forum_post_reactions')
       .select('id')
       .eq('post_id', postId)
@@ -856,7 +854,7 @@ class ForumService {
       .eq('reaction_type', reactionType)
       .single();
 
-    const { data: post } = await supabase
+    const { data: post } = await getSupabase()
       .from('forum_posts')
       .select('reactions_count')
       .eq('id', postId)
@@ -868,21 +866,21 @@ class ForumService {
 
     if (existing) {
       // Remove reaction
-      await supabase
+      await getSupabase()
         .from('forum_post_reactions')
         .delete()
         .eq('id', existing.id);
       counts[reactionType] = Math.max(0, counts[reactionType] - 1);
     } else {
       // Add reaction
-      await supabase
+      await getSupabase()
         .from('forum_post_reactions')
         .insert({ post_id: postId, user_id: userId, reaction_type: reactionType });
       counts[reactionType] += 1;
     }
 
     // Update counts
-    await supabase
+    await getSupabase()
       .from('forum_posts')
       .update({ reactions_count: counts })
       .eq('id', postId);
@@ -891,7 +889,7 @@ class ForumService {
   }
 
   async getUserReactions(postId: string, userId: string): Promise<ReactionType[]> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('forum_post_reactions')
       .select('reaction_type')
       .eq('post_id', postId)
@@ -916,7 +914,7 @@ class ForumService {
 
   async toggleBookmark(postId: string, userId: string): Promise<{ bookmarked: boolean; count: number }> {
     try {
-      const { data, error } = await supabase.rpc('toggle_bookmark', {
+      const { data, error } = await getSupabase().rpc('toggle_bookmark', {
         p_post_id: postId,
         p_user_id: userId,
       });
@@ -940,7 +938,7 @@ class ForumService {
     postId: string,
     userId: string
   ): Promise<{ bookmarked: boolean; count: number }> {
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('forum_bookmarks')
       .select('id')
       .eq('post_id', postId)
@@ -948,30 +946,30 @@ class ForumService {
       .single();
 
     if (existing) {
-      await supabase.from('forum_bookmarks').delete().eq('id', existing.id);
-      const { data: post } = await supabase
+      await getSupabase().from('forum_bookmarks').delete().eq('id', existing.id);
+      const { data: post } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
         .eq('id', postId)
         .single();
       const newCount = Math.max(0, (post?.bookmarks_count || 1) - 1);
-      await supabase.from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
+      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
       return { bookmarked: false, count: newCount };
     } else {
-      await supabase.from('forum_bookmarks').insert({ post_id: postId, user_id: userId });
-      const { data: post } = await supabase
+      await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId });
+      const { data: post } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
         .eq('id', postId)
         .single();
       const newCount = (post?.bookmarks_count || 0) + 1;
-      await supabase.from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
+      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
       return { bookmarked: true, count: newCount };
     }
   }
 
   async isBookmarked(postId: string, userId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('forum_bookmarks')
       .select('id')
       .eq('post_id', postId)
@@ -981,7 +979,7 @@ class ForumService {
   }
 
   async getUserBookmarks(userId: string): Promise<ForumPost[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_bookmarks')
       .select(`
         post:forum_posts(
@@ -1009,7 +1007,7 @@ class ForumService {
     quoteContent?: string
   ): Promise<{ success: boolean; error?: string; repost_id?: string }> {
     try {
-      const { data, error } = await supabase.rpc('create_repost', {
+      const { data, error } = await getSupabase().rpc('create_repost', {
         p_original_post_id: originalPostId,
         p_user_id: userId,
         p_quote_content: quoteContent || null,
@@ -1025,14 +1023,14 @@ class ForumService {
       }
 
       // Notify original post author
-      const { data: originalPost } = await supabase
+      const { data: originalPost } = await getSupabase()
         .from('forum_posts')
         .select('author_id, title, content')
         .eq('id', originalPostId)
         .single();
 
       if (originalPost && originalPost.author_id !== userId) {
-        const { data: reposter } = await supabase
+        const { data: reposter } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
@@ -1059,7 +1057,7 @@ class ForumService {
   }
 
   async hasReposted(postId: string, userId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('forum_reposts')
       .select('id')
       .eq('original_post_id', postId)
@@ -1069,16 +1067,16 @@ class ForumService {
   }
 
   async removeRepost(postId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('forum_reposts')
       .delete()
       .eq('original_post_id', postId)
       .eq('user_id', userId);
 
     if (!error) {
-      await supabase
+      await getSupabase()
         .from('forum_posts')
-        .update({ reposts_count: supabase.rpc('greatest', { a: 0, b: 'reposts_count - 1' }) })
+        .update({ reposts_count: getSupabase().rpc('greatest', { a: 0, b: 'reposts_count - 1' }) })
         .eq('id', postId);
     }
 
@@ -1099,12 +1097,12 @@ class ForumService {
       sort_order: index,
     }));
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('forum_post_media')
       .insert(mediaItems);
 
     if (!error) {
-      await supabase
+      await getSupabase()
         .from('forum_posts')
         .update({
           has_media: true,
@@ -1117,7 +1115,7 @@ class ForumService {
   }
 
   async getPostMedia(postId: string): Promise<ForumMedia[]> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('forum_post_media')
       .select('*')
       .eq('post_id', postId)
@@ -1130,7 +1128,7 @@ class ForumService {
 
   async getTrendingTags(limit: number = 10): Promise<TrendingTag[]> {
     try {
-      const { data, error } = await supabase.rpc('get_trending_tags', { p_limit: limit });
+      const { data, error } = await getSupabase().rpc('get_trending_tags', { p_limit: limit });
 
       if (error) {
         console.error('Error fetching trending tags:', error);
@@ -1146,7 +1144,7 @@ class ForumService {
 
   private async getTrendingTagsManual(limit: number): Promise<TrendingTag[]> {
     // Fallback: count tags from recent posts
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('forum_posts')
       .select('tags')
       .eq('status', 'published')
@@ -1172,7 +1170,7 @@ class ForumService {
   async getFollowingFeed(userId: string, limit: number = 20, offset: number = 0): Promise<ForumPost[]> {
     try {
       // Get users being followed
-      const { data: follows } = await supabase
+      const { data: follows } = await getSupabase()
         .from('user_follows')
         .select('following_id')
         .eq('follower_id', userId);
@@ -1183,7 +1181,7 @@ class ForumService {
 
       const followingIds = follows.map(f => f.following_id);
 
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('forum_posts')
         .select(`
           *,
@@ -1215,7 +1213,7 @@ class ForumService {
     }
 
     try {
-      const { data, error } = await supabase.rpc('toggle_follow_user', {
+      const { data, error } = await getSupabase().rpc('toggle_follow_user', {
         p_follower_id: followerId,
         p_following_id: followingId,
       });
@@ -1227,7 +1225,7 @@ class ForumService {
 
       // Send notification if now following
       if (data.following) {
-        const { data: follower } = await supabase
+        const { data: follower } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', followerId)
@@ -1256,7 +1254,7 @@ class ForumService {
     followerId: string,
     followingId: string
   ): Promise<{ following: boolean }> {
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabase()
       .from('user_follows')
       .select('id')
       .eq('follower_id', followerId)
@@ -1264,18 +1262,18 @@ class ForumService {
       .single();
 
     if (existing) {
-      await supabase.from('user_follows').delete().eq('id', existing.id);
-      await supabase.from('users').update({ followers_count: supabase.rpc('greatest', { a: 0, b: 'followers_count - 1' }) }).eq('id', followingId);
-      await supabase.from('users').update({ following_count: supabase.rpc('greatest', { a: 0, b: 'following_count - 1' }) }).eq('id', followerId);
+      await getSupabase().from('user_follows').delete().eq('id', existing.id);
+      await getSupabase().from('users').update({ followers_count: getSupabase().rpc('greatest', { a: 0, b: 'followers_count - 1' }) }).eq('id', followingId);
+      await getSupabase().from('users').update({ following_count: getSupabase().rpc('greatest', { a: 0, b: 'following_count - 1' }) }).eq('id', followerId);
       return { following: false };
     } else {
-      await supabase.from('user_follows').insert({ follower_id: followerId, following_id: followingId });
+      await getSupabase().from('user_follows').insert({ follower_id: followerId, following_id: followingId });
       return { following: true };
     }
   }
 
   async isFollowing(followerId: string, followingId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('user_follows')
       .select('id')
       .eq('follower_id', followerId)
@@ -1285,7 +1283,7 @@ class ForumService {
   }
 
   async getFollowers(userId: string): Promise<{ id: string; username: string; display_name: string; avatar_url: string }[]> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('user_follows')
       .select(`
         follower:users!user_follows_follower_id_fkey(id, username, display_name, avatar_url)
@@ -1296,7 +1294,7 @@ class ForumService {
   }
 
   async getFollowing(userId: string): Promise<{ id: string; username: string; display_name: string; avatar_url: string }[]> {
-    const { data } = await supabase
+    const { data } = await getSupabase()
       .from('user_follows')
       .select(`
         following:users!user_follows_following_id_fkey(id, username, display_name, avatar_url)
@@ -1309,15 +1307,15 @@ class ForumService {
   // ==================== SHARES TRACKING ====================
 
   async trackShare(postId: string, userId: string | null, shareType: 'clipboard' | 'twitter' | 'whatsapp' | 'facebook'): Promise<void> {
-    await supabase.from('forum_shares').insert({
+    await getSupabase().from('forum_shares').insert({
       post_id: postId,
       user_id: userId,
       share_type: shareType,
     });
 
-    await supabase
+    await getSupabase()
       .from('forum_posts')
-      .update({ shares_count: supabase.rpc('increment_value', { amount: 1 }) })
+      .update({ shares_count: getSupabase().rpc('increment_value', { amount: 1 }) })
       .eq('id', postId);
   }
 
@@ -1356,21 +1354,21 @@ class ForumService {
     const postIds = posts.map(p => p.id);
 
     // Get user reactions
-    const { data: reactions } = await supabase
+    const { data: reactions } = await getSupabase()
       .from('forum_post_reactions')
       .select('post_id, reaction_type')
       .eq('user_id', userId)
       .in('post_id', postIds);
 
     // Get user bookmarks
-    const { data: bookmarks } = await supabase
+    const { data: bookmarks } = await getSupabase()
       .from('forum_bookmarks')
       .select('post_id')
       .eq('user_id', userId)
       .in('post_id', postIds);
 
     // Get user reposts
-    const { data: reposts } = await supabase
+    const { data: reposts } = await getSupabase()
       .from('forum_reposts')
       .select('original_post_id')
       .eq('user_id', userId)
@@ -1398,7 +1396,7 @@ class ForumService {
 
   async createPostWithPoll(userId: string, input: CreatePostInput): Promise<ForumPost | null> {
     // First create the post
-    const { data: post, error: postError } = await supabase
+    const { data: post, error: postError } = await getSupabase()
       .from('forum_posts')
       .insert({
         title: input.title || '',
@@ -1424,7 +1422,7 @@ class ForumService {
       const endsAt = new Date();
       endsAt.setHours(endsAt.getHours() + (input.poll.ends_in_hours || 24));
 
-      const { data: poll, error: pollError } = await supabase
+      const { data: poll, error: pollError } = await getSupabase()
         .from('forum_polls')
         .insert({
           post_id: post.id,
@@ -1444,7 +1442,7 @@ class ForumService {
           votes_count: 0,
         }));
 
-        await supabase.from('forum_poll_options').insert(options);
+        await getSupabase().from('forum_poll_options').insert(options);
       }
     }
 
@@ -1452,7 +1450,7 @@ class ForumService {
   }
 
   async getPollForPost(postId: string, userId?: string): Promise<ForumPoll | null> {
-    const { data: poll, error } = await supabase
+    const { data: poll, error } = await getSupabase()
       .from('forum_polls')
       .select(`
         *,
@@ -1471,7 +1469,7 @@ class ForumService {
     let userVotes: string[] = [];
 
     if (userId) {
-      const { data: votes } = await supabase
+      const { data: votes } = await getSupabase()
         .from('forum_poll_votes')
         .select('option_id')
         .eq('poll_id', poll.id)
@@ -1491,7 +1489,7 @@ class ForumService {
 
   async voteOnPoll(pollId: string, optionId: string, userId: string): Promise<{ success: boolean; error?: string; options?: ForumPollOption[] }> {
     try {
-      const { data, error } = await supabase.rpc('vote_on_poll', {
+      const { data, error } = await getSupabase().rpc('vote_on_poll', {
         p_poll_id: pollId,
         p_option_id: optionId,
         p_user_id: userId,
@@ -1512,7 +1510,7 @@ class ForumService {
   // ==================== AWARDS ====================
 
   async getAwardTypes(): Promise<AwardType[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_award_types')
       .select('*')
       .order('ap_cost', { ascending: true });
@@ -1532,7 +1530,7 @@ class ForumService {
     message?: string
   ): Promise<{ success: boolean; error?: string; award_name?: string; ap_spent?: number }> {
     try {
-      const { data, error } = await supabase.rpc('give_post_award', {
+      const { data, error } = await getSupabase().rpc('give_post_award', {
         p_post_id: postId,
         p_award_type_id: awardTypeId,
         p_giver_id: giverId,
@@ -1552,7 +1550,7 @@ class ForumService {
   }
 
   async getPostAwards(postId: string): Promise<PostAward[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_post_awards')
       .select(`
         *,
@@ -1581,7 +1579,7 @@ class ForumService {
 
   async createStory(userId: string, input: CreateStoryInput): Promise<{ success: boolean; story_id?: string; error?: string }> {
     try {
-      const { data, error } = await supabase.rpc('create_story', {
+      const { data, error } = await getSupabase().rpc('create_story', {
         p_user_id: userId,
         p_content: input.content || null,
         p_media_url: input.media_url || null,
@@ -1604,7 +1602,7 @@ class ForumService {
 
   async getFollowingStories(userId: string): Promise<ForumStory[]> {
     try {
-      const { data, error } = await supabase.rpc('get_following_stories', {
+      const { data, error } = await getSupabase().rpc('get_following_stories', {
         p_user_id: userId,
       });
 
@@ -1623,7 +1621,7 @@ class ForumService {
 
   async viewStory(storyId: string, viewerId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase.rpc('view_story', {
+      const { data, error } = await getSupabase().rpc('view_story', {
         p_story_id: storyId,
         p_viewer_id: viewerId,
       });
@@ -1637,7 +1635,7 @@ class ForumService {
 
   async reactToStory(storyId: string, userId: string, reaction: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase.rpc('react_to_story', {
+      const { data, error } = await getSupabase().rpc('react_to_story', {
         p_story_id: storyId,
         p_user_id: userId,
         p_reaction: reaction,
@@ -1651,7 +1649,7 @@ class ForumService {
   }
 
   async getStoryViewers(storyId: string): Promise<{ id: string; username: string; avatar_url: string; viewed_at: string }[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('forum_story_views')
       .select(`
         viewed_at,
@@ -1675,7 +1673,7 @@ class ForumService {
 
   async createThread(userId: string, title: string, posts: { content: string; tags?: string[]; gif_url?: string }[]): Promise<{ success: boolean; thread_id?: string; post_ids?: string[]; error?: string }> {
     try {
-      const { data, error } = await supabase.rpc('create_thread', {
+      const { data, error } = await getSupabase().rpc('create_thread', {
         p_user_id: userId,
         p_title: title,
         p_posts: JSON.stringify(posts),
@@ -1695,7 +1693,7 @@ class ForumService {
 
   async getThreadPosts(threadId: string): Promise<ForumPost[]> {
     try {
-      const { data, error } = await supabase.rpc('get_thread_posts', {
+      const { data, error } = await getSupabase().rpc('get_thread_posts', {
         p_thread_id: threadId,
       });
 
@@ -1715,7 +1713,7 @@ class ForumService {
 
   async getNotifications(userId: string, limit: number = 50, unreadOnly: boolean = false): Promise<ForumNotification[]> {
     try {
-      const { data, error } = await supabase.rpc('get_user_notifications', {
+      const { data, error } = await getSupabase().rpc('get_user_notifications', {
         p_user_id: userId,
         p_limit: limit,
         p_unread_only: unreadOnly,
@@ -1734,7 +1732,7 @@ class ForumService {
   }
 
   async getUnreadNotificationsCount(userId: string): Promise<number> {
-    const { count, error } = await supabase
+    const { count, error } = await getSupabase()
       .from('forum_notifications')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
@@ -1750,7 +1748,7 @@ class ForumService {
 
   async markNotificationsRead(userId: string, notificationIds?: string[]): Promise<boolean> {
     try {
-      const { error } = await supabase.rpc('mark_notifications_read', {
+      const { error } = await getSupabase().rpc('mark_notifications_read', {
         p_user_id: userId,
         p_notification_ids: notificationIds || null,
       });
@@ -1766,7 +1764,7 @@ class ForumService {
 
   async searchUsersForMention(query: string, limit: number = 10): Promise<MentionSuggestion[]> {
     try {
-      const { data, error } = await supabase.rpc('search_users_for_mention', {
+      const { data, error } = await getSupabase().rpc('search_users_for_mention', {
         p_query: query,
         p_limit: limit,
       });
@@ -1786,7 +1784,7 @@ class ForumService {
   // ==================== BADGES ====================
 
   async getUserBadges(userId: string): Promise<UserBadge[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('user_badges')
       .select('*')
       .eq('user_id', userId);
