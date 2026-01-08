@@ -83,8 +83,16 @@ export async function GET() {
     }));
 
     // Formatear actividad reciente
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recentActivity = (recentActivityResult.data as any[] || []).map((scenario) => ({
+    type ScenarioData = {
+      id: string;
+      title: string;
+      category: string;
+      status: string;
+      current_price: number;
+      created_at: string;
+      creator: { username: string; avatar_url: string | null }[] | { username: string; avatar_url: string | null } | null;
+    };
+    const recentActivity = ((recentActivityResult.data || []) as unknown as ScenarioData[]).map((scenario) => ({
       id: scenario.id,
       title: scenario.title,
       category: scenario.category,
