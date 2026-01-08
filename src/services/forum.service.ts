@@ -338,7 +338,7 @@ class ForumService {
   }): Promise<ForumPost[]> {
     const { limit = 20, offset = 0, category, sortBy = 'recent', tag } = options || {};
 
-    let query = supabase
+    let query = getSupabase()
       .from('forum_posts')
       .select(`
         *,
@@ -1817,7 +1817,7 @@ class ForumService {
   ): Promise<ForumPost[]> {
     const { limit = 20, offset = 0, category } = options || {};
 
-    let query = supabase
+    let query = getSupabase()
       .from('forum_posts')
       .select(`
         *,
