@@ -1,19 +1,31 @@
 // src/app/api/follow/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseClient } from '@/lib/supabase';
+import { auth } from '@/lib/auth';
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 
 // POST - Seguir a un usuario
 export async function POST(request: NextRequest) {
   try {
+    // Verificar autenticación
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'No autenticado' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
-    const { followerId, followingId, followerUsername, followerAvatar } = body;
+    const { followingId, followerUsername, followerAvatar } = body;
+
+    // Usar el ID del usuario autenticado como followerId (seguridad)
+    const followerId = session.user.id;
 
     // Validaciones
-    if (!followerId || !followingId) {
+    if (!followingId) {
       return NextResponse.json(
-        { success: false, error: 'Faltan campos requeridos' },
+        { success: false, error: 'Falta el ID del usuario a seguir' },
         { status: 400 }
       );
     }
@@ -84,13 +96,24 @@ export async function POST(request: NextRequest) {
 // DELETE - Dejar de seguir a un usuario
 export async function DELETE(request: NextRequest) {
   try {
+    // Verificar autenticación
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'No autenticado' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const followerId = searchParams.get('followerId');
     const followingId = searchParams.get('followingId');
 
-    if (!followerId || !followingId) {
+    // Usar el ID del usuario autenticado como followerId (seguridad)
+    const followerId = session.user.id;
+
+    if (!followingId) {
       return NextResponse.json(
-        { success: false, error: 'Faltan campos requeridos' },
+        { success: false, error: 'Falta el ID del usuario' },
         { status: 400 }
       );
     }
@@ -124,13 +147,24 @@ export async function DELETE(request: NextRequest) {
 // GET - Verificar si sigue a un usuario
 export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticación
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'No autenticado' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
-    const followerId = searchParams.get('followerId');
     const followingId = searchParams.get('followingId');
 
-    if (!followerId || !followingId) {
+    // Usar el ID del usuario autenticado como followerId (seguridad)
+    const followerId = session.user.id;
+
+    if (!followingId) {
       return NextResponse.json(
-        { success: false, error: 'Faltan campos requeridos' },
+        { success: false, error: 'Falta el ID del usuario' },
         { status: 400 }
       );
     }

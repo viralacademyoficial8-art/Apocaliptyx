@@ -206,7 +206,7 @@ export function CookieConsent() {
           {/* Privacy Policy Link */}
           <p className="text-center text-xs text-gray-500 mt-4">
             Al continuar navegando, aceptas nuestros{' '}
-            <a href="/terminos" className="text-purple-400 hover:text-purple-300 underline">
+            <a href="/terminos-y-condiciones" className="text-purple-400 hover:text-purple-300 underline">
               Terminos de Servicio
             </a>{' '}
             y{' '}

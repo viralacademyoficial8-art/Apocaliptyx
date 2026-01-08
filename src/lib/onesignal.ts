@@ -8,10 +8,10 @@ export async function initOneSignal() {
   if (initialized) return;
   if (typeof window === 'undefined') return;
 
-  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || 'e8d7db97-26b0-4832-bc24-713132671228';
-  
+  const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+
   if (!appId) {
-    console.warn('OneSignal App ID not found');
+    // OneSignal not configured - skip initialization silently
     return;
   }
 
@@ -22,9 +22,8 @@ export async function initOneSignal() {
     });
 
     initialized = true;
-    console.log('OneSignal initialized successfully');
   } catch (error) {
-    console.error('Error initializing OneSignal:', error);
+    // OneSignal initialization failed - notifications won't work
   }
 }
 
