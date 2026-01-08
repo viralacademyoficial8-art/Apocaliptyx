@@ -460,7 +460,7 @@ class ForumService {
     // Soft delete - cambiar status a deleted
     const { error } = await getSupabase()
       .from('forum_posts')
-      .update({ status: 'deleted' })
+      .update({ status: 'deleted' } as never)
       .eq('id', postId)
       .eq('author_id', userId);
 
@@ -500,7 +500,7 @@ class ForumService {
       
       await getSupabase()
         .from('forum_posts')
-        .update({ likes_count: newCount })
+        .update({ likes_count: newCount } as never)
         .eq('id', postId);
 
       return { liked: false, likesCount: newCount };
@@ -521,7 +521,7 @@ class ForumService {
       
       await getSupabase()
         .from('forum_posts')
-        .update({ likes_count: newCount })
+        .update({ likes_count: newCount } as never)
         .eq('id', postId);
 
       // 🔔 NOTIFICACIÓN: Like en post (solo si no es el propio autor)
@@ -674,7 +674,7 @@ class ForumService {
 
     const { error } = await getSupabase()
       .from('forum_comments')
-      .update({ status: 'deleted' })
+      .update({ status: 'deleted' } as never)
       .eq('id', commentId)
       .eq('author_id', userId);
 
@@ -716,7 +716,7 @@ class ForumService {
       
       await getSupabase()
         .from('forum_comments')
-        .update({ likes_count: newCount })
+        .update({ likes_count: newCount } as never)
         .eq('id', commentId);
 
       return { liked: false, likesCount: newCount };
@@ -735,7 +735,7 @@ class ForumService {
       
       await getSupabase()
         .from('forum_comments')
-        .update({ likes_count: newCount })
+        .update({ likes_count: newCount } as never)
         .eq('id', commentId);
 
       // 🔔 NOTIFICACIÓN: Like en comentario
@@ -882,7 +882,7 @@ class ForumService {
     // Update counts
     await getSupabase()
       .from('forum_posts')
-      .update({ reactions_count: counts })
+      .update({ reactions_count: counts } as never)
       .eq('id', postId);
 
     return { added: !existing, counts };
@@ -953,7 +953,7 @@ class ForumService {
         .eq('id', postId)
         .single();
       const newCount = Math.max(0, (post?.bookmarks_count || 1) - 1);
-      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
+      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount } as never).eq('id', postId);
       return { bookmarked: false, count: newCount };
     } else {
       await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId } as never);
@@ -963,7 +963,7 @@ class ForumService {
         .eq('id', postId)
         .single();
       const newCount = (post?.bookmarks_count || 0) + 1;
-      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount }).eq('id', postId);
+      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount } as never).eq('id', postId);
       return { bookmarked: true, count: newCount };
     }
   }
@@ -1076,7 +1076,7 @@ class ForumService {
     if (!error) {
       await getSupabase()
         .from('forum_posts')
-        .update({ reposts_count: getSupabase().rpc('greatest', { a: 0, b: 'reposts_count - 1' }) })
+        .update({ reposts_count: getSupabase().rpc('greatest', { a: 0, b: 'reposts_count - 1' }) } as never)
         .eq('id', postId);
     }
 
@@ -1107,7 +1107,7 @@ class ForumService {
         .update({
           has_media: true,
           media_count: media.length,
-        })
+        } as never)
         .eq('id', postId);
     }
 
@@ -1263,8 +1263,8 @@ class ForumService {
 
     if (existing) {
       await getSupabase().from('user_follows').delete().eq('id', existing.id);
-      await getSupabase().from('users').update({ followers_count: getSupabase().rpc('greatest', { a: 0, b: 'followers_count - 1' }) }).eq('id', followingId);
-      await getSupabase().from('users').update({ following_count: getSupabase().rpc('greatest', { a: 0, b: 'following_count - 1' }) }).eq('id', followerId);
+      await getSupabase().from('users').update({ followers_count: getSupabase().rpc('greatest', { a: 0, b: 'followers_count - 1' }) } as never).eq('id', followingId);
+      await getSupabase().from('users').update({ following_count: getSupabase().rpc('greatest', { a: 0, b: 'following_count - 1' }) } as never).eq('id', followerId);
       return { following: false };
     } else {
       await getSupabase().from('user_follows').insert({ follower_id: followerId, following_id: followingId } as never);
@@ -1315,7 +1315,7 @@ class ForumService {
 
     await getSupabase()
       .from('forum_posts')
-      .update({ shares_count: getSupabase().rpc('increment_value', { amount: 1 }) })
+      .update({ shares_count: getSupabase().rpc('increment_value', { amount: 1 }) } as never)
       .eq('id', postId);
   }
 
