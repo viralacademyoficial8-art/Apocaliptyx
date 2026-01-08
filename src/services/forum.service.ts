@@ -375,7 +375,7 @@ class ForumService {
     }
 
     // Filtrar por tag si se especifica
-    let posts = data || [];
+    let posts = (data || []) as ForumPost[];
     if (tag) {
       posts = posts.filter(post => post.tags?.includes(tag));
     }
