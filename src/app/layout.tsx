@@ -5,6 +5,7 @@ import './globals.css';
 import { PWAProvider } from '@/components/pwa';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { SessionProvider } from '@/components/providers/SessionProvider';
+import CookieConsent from '@/components/CookieConsent';
 
 export const metadata: Metadata = {
   title: 'Apocaliptics - Predice el Futuro',
@@ -46,6 +47,7 @@ export default function RootLayout({
           <LanguageProvider>
             <PWAProvider>
               {children}
+              <CookieConsent />
             </PWAProvider>
           </LanguageProvider>
         </SessionProvider>
