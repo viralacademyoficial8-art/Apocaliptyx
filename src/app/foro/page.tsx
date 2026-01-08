@@ -707,23 +707,30 @@ function ForoContent() {
 
     setCreating(true);
     try {
-      const post = await forumService.createPost(user.id, {
-        content: newPostContent,
-        tags: newPostTags,
-        category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
-        gif_url: selectedGif?.url,
-        gif_width: selectedGif?.width,
-        gif_height: selectedGif?.height,
+      const response = await fetch('/api/forum/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: newPostContent,
+          tags: newPostTags,
+          category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
+          gif_url: selectedGif?.url,
+          gif_width: selectedGif?.width,
+          gif_height: selectedGif?.height,
+        }),
       });
 
-      if (post) {
+      const data = await response.json();
+
+      if (response.ok && data.success) {
         toast.success(t('forum.actions.postCreated'));
         resetCreateModal();
         loadPosts();
       } else {
-        toast.error(t('forum.actions.postCreateError'));
+        toast.error(data.error || t('forum.actions.postCreateError'));
       }
     } catch (error) {
+      console.error('Error creating post:', error);
       toast.error(t('forum.actions.postCreateError'));
     } finally {
       setCreating(false);

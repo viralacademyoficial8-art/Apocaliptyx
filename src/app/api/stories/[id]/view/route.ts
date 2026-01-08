@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+
+export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 // POST /api/stories/[id]/view - Mark story as viewed
 export async function POST(
@@ -7,18 +12,17 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const user = session.user;
     const storyId = params.id;
 
     // Check if story exists and is not expired
-    const { data: storyRaw, error: storyError } = await supabase
+    const { data: storyRaw, error: storyError } = await supabase()
       .from('forum_stories')
       .select('id, user_id, views_count, expires_at')
       .eq('id', storyId)
@@ -41,7 +45,7 @@ export async function POST(
     }
 
     // Check if already viewed
-    const { data: existingView } = await supabase
+    const { data: existingView } = await supabase()
       .from('forum_story_views')
       .select('id')
       .eq('story_id', storyId)
@@ -53,7 +57,7 @@ export async function POST(
     }
 
     // Record view
-    const { error: viewError } = await supabase
+    const { error: viewError } = await supabase()
       .from('forum_story_views')
       .insert({
         story_id: storyId,
@@ -63,7 +67,7 @@ export async function POST(
     if (viewError) throw viewError;
 
     // Increment view count
-    await supabase
+    await supabase()
       .from('forum_stories')
       .update({ views_count: story.views_count + 1 } as never)
       .eq('id', storyId);
@@ -84,18 +88,17 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const user = session.user;
     const storyId = params.id;
 
     // Verify ownership
-    const { data: storyRaw } = await supabase
+    const { data: storyRaw } = await supabase()
       .from('forum_stories')
       .select('user_id')
       .eq('id', storyId)
@@ -111,7 +114,7 @@ export async function GET(
     }
 
     // Get viewers
-    const { data: viewersRaw, error } = await supabase
+    const { data: viewersRaw, error } = await supabase()
       .from('forum_story_views')
       .select(`
         viewer_id,

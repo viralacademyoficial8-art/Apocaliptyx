@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+
+export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 interface StoryRow {
   id: string;
@@ -29,10 +34,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
     const storyId = params.id;
 
-    const { data: storyRaw, error } = await supabase
+    const { data: storyRaw, error } = await supabase()
       .from('forum_stories')
       .select(`
         *,
@@ -53,7 +57,7 @@ export async function GET(
     }
 
     // Get reactions count
-    const { count: reactionsCount } = await supabase
+    const { count: reactionsCount } = await supabase()
       .from('forum_story_reactions')
       .select('*', { count: 'exact', head: true })
       .eq('story_id', storyId);
@@ -94,18 +98,17 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const user = session.user;
     const storyId = params.id;
 
     // Verify ownership
-    const { data: storyRaw } = await supabase
+    const { data: storyRaw } = await supabase()
       .from('forum_stories')
       .select('user_id, media_url')
       .eq('id', storyId)
@@ -124,12 +127,12 @@ export async function DELETE(
     if (story.media_url && story.media_url.includes('stories/')) {
       const path = story.media_url.split('stories/')[1];
       if (path) {
-        await supabase.storage.from('stories').remove([path]);
+        await supabase().storage.from('stories').remove([path]);
       }
     }
 
     // Delete story (cascades to views and reactions)
-    const { error } = await supabase
+    const { error } = await supabase()
       .from('forum_stories')
       .delete()
       .eq('id', storyId);

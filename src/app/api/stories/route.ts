@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
+
+export const dynamic = 'force-dynamic';
+
+const supabase = () => getSupabaseAdmin();
 
 interface StoryUser {
   id: string;
@@ -36,15 +41,15 @@ interface UserFollow {
 // GET /api/stories - Get stories feed
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId'); // Get specific user's stories
     const includeOwn = searchParams.get('includeOwn') === 'true';
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = session?.user;
 
     // Build query for active (non-expired) stories
-    let query = supabase
+    let query = supabase()
       .from('forum_stories')
       .select(`
         *,
@@ -58,7 +63,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('user_id', userId);
     } else if (user) {
       // Get stories from followed users + own stories
-      const { data: followingRaw } = await supabase
+      const { data: followingRaw } = await supabase()
         .from('user_follows')
         .select('following_id')
         .eq('follower_id', user.id);
@@ -85,7 +90,7 @@ export async function GET(request: NextRequest) {
     let viewedStoryIds: string[] = [];
     if (user && stories && stories.length > 0) {
       const storyIds = stories.map(s => s.id);
-      const { data: viewsRaw } = await supabase
+      const { data: viewsRaw } = await supabase()
         .from('forum_story_views')
         .select('story_id')
         .eq('viewer_id', user.id)
@@ -165,7 +170,7 @@ export async function GET(request: NextRequest) {
 
     // Add current user at the beginning if they have no stories (for "Add story" UI)
     if (user && !groupedStories.some(g => g.userId === user.id)) {
-      const { data: userData } = await supabase
+      const { data: userData } = await supabase()
         .from('users')
         .select('id, username, display_name, avatar_url')
         .eq('id', user.id)
@@ -198,14 +203,13 @@ export async function GET(request: NextRequest) {
 // POST /api/stories - Create a new story
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerSupabaseClient();
+    const session = await auth();
 
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    const user = session.user;
     const contentType = request.headers.get('content-type') || '';
 
     let content: string | undefined;
@@ -234,13 +238,13 @@ export async function POST(request: NextRequest) {
 
         // Upload to storage
         const fileName = `${user.id}/${Date.now()}-${file.name}`;
-        const { error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase().storage
           .from('stories')
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = supabase().storage
           .from('stories')
           .getPublicUrl(fileName);
 
@@ -263,7 +267,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create story
-    const { data: story, error: createError } = await supabase
+    const { data: story, error: createError } = await supabase()
       .from('forum_stories')
       .insert({
         user_id: user.id,
