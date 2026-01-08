@@ -16,7 +16,7 @@ const protectedRoutes = [
 const adminRoutes = ["/admin"];
 
 // Rutas públicas (no requieren auth)
-const publicRoutes = ["/", "/login", "/registro", "/about", "/faq"];
+const publicRoutes = ["/", "/login", "/registro", "/about", "/faq", "/privacidad", "/terminos-y-condiciones"];
 
 // Roles que pueden acceder al panel de admin
 const adminRoles = ["ADMIN", "SUPER_ADMIN", "STAFF", "MODERATOR"];
