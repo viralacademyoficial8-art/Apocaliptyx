@@ -496,7 +496,7 @@ class ForumService {
         .eq('id', postId)
         .single();
 
-      const newCount = Math.max(0, (post?.likes_count || 1) - 1);
+      const newCount = Math.max(0, ((post as { likes_count?: number } | null)?.likes_count || 1) - 1);
       
       await getSupabase()
         .from('forum_posts')
@@ -517,7 +517,8 @@ class ForumService {
         .eq('id', postId)
         .single();
 
-      const newCount = (post?.likes_count || 0) + 1;
+      const postData = post as { likes_count?: number; author_id?: string; title?: string; content?: string } | null;
+      const newCount = (postData?.likes_count || 0) + 1;
       
       await getSupabase()
         .from('forum_posts')
@@ -525,17 +526,18 @@ class ForumService {
         .eq('id', postId);
 
       // 🔔 NOTIFICACIÓN: Like en post (solo si no es el propio autor)
-      if (post && post.author_id !== userId) {
-        const { data: liker } = await getSupabase()
+      if (postData && postData.author_id !== userId) {
+        const { data: likerRaw } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
           .single();
 
+        const liker = likerRaw as { username?: string; avatar_url?: string } | null;
         if (liker) {
-          const postTitle = post.title || post.content.substring(0, 30) + '...';
+          const postTitle = postData.title || (postData as { content?: string }).content?.substring(0, 30) + '...';
           await this.sendNotification(
-            post.author_id,
+            postData.author_id!,
             'like_received',
             'Nuevo Like ❤️',
             `A @${liker.username} le gustó tu publicación "${postTitle}"`,
@@ -604,26 +606,28 @@ class ForumService {
     }
 
     // Incrementar contador de comentarios en el post
-    await getSupabase().rpc('increment_comments_count', { post_id: input.post_id });
+    await (getSupabase().rpc as any)('increment_comments_count', { post_id: input.post_id });
 
     // 🔔 NOTIFICACIÓN: Comentario en post
-    const { data: post } = await getSupabase()
+    const { data: postRaw } = await getSupabase()
       .from('forum_posts')
       .select('author_id, title, content')
       .eq('id', input.post_id)
       .single();
 
+    const post = postRaw as { author_id?: string; title?: string; content?: string } | null;
     if (post && post.author_id !== userId) {
-      const { data: commenter } = await getSupabase()
+      const { data: commenterRaw } = await getSupabase()
         .from('users')
         .select('username, avatar_url')
         .eq('id', userId)
         .single();
 
+      const commenter = commenterRaw as { username?: string; avatar_url?: string } | null;
       if (commenter) {
-        const postTitle = post.title || post.content.substring(0, 30) + '...';
+        const postTitle = post.title || post.content?.substring(0, 30) + '...';
         await this.sendNotification(
-          post.author_id,
+          post.author_id!,
           'comment_received',
           'Nuevo Comentario 💬',
           `@${commenter.username} comentó en tu publicación "${postTitle}"`,
@@ -635,22 +639,24 @@ class ForumService {
 
     // 🔔 NOTIFICACIÓN: Respuesta a comentario (si es reply)
     if (input.parent_id) {
-      const { data: parentComment } = await getSupabase()
+      const { data: parentCommentRaw } = await getSupabase()
         .from('forum_comments')
         .select('author_id')
         .eq('id', input.parent_id)
         .single();
 
+      const parentComment = parentCommentRaw as { author_id?: string } | null;
       if (parentComment && parentComment.author_id !== userId) {
-        const { data: replier } = await getSupabase()
+        const { data: replierRaw } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
           .single();
 
+        const replier = replierRaw as { username?: string; avatar_url?: string } | null;
         if (replier) {
           await this.sendNotification(
-            parentComment.author_id,
+            parentComment.author_id!,
             'comment_reply',
             'Nueva Respuesta 💬',
             `@${replier.username} respondió a tu comentario`,
@@ -685,7 +691,10 @@ class ForumService {
 
     // Decrementar contador
     if (comment) {
-      await getSupabase().rpc('decrement_comments_count', { post_id: comment.post_id });
+      const commentData = comment as { post_id?: string } | null;
+      if (commentData?.post_id) {
+        await (getSupabase().rpc as any)('decrement_comments_count', { post_id: commentData.post_id });
+      }
     }
 
     return true;
@@ -712,7 +721,7 @@ class ForumService {
         .eq('id', commentId)
         .single();
 
-      const newCount = Math.max(0, (comment?.likes_count || 1) - 1);
+      const newCount = Math.max(0, ((comment as { likes_count?: number } | null)?.likes_count || 1) - 1);
       
       await getSupabase()
         .from('forum_comments')
@@ -731,7 +740,8 @@ class ForumService {
         .eq('id', commentId)
         .single();
 
-      const newCount = (comment?.likes_count || 0) + 1;
+      const commentData = comment as { likes_count?: number; author_id?: string; content?: string } | null;
+      const newCount = (commentData?.likes_count || 0) + 1;
       
       await getSupabase()
         .from('forum_comments')
@@ -739,17 +749,18 @@ class ForumService {
         .eq('id', commentId);
 
       // 🔔 NOTIFICACIÓN: Like en comentario
-      if (comment && comment.author_id !== userId) {
-        const { data: liker } = await getSupabase()
+      if (commentData && commentData.author_id !== userId) {
+        const { data: likerRaw } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
           .single();
 
+        const liker = likerRaw as { username?: string; avatar_url?: string } | null;
         if (liker) {
-          const commentPreview = comment.content.substring(0, 30) + '...';
+          const commentPreview = commentData.content?.substring(0, 30) + '...';
           await this.sendNotification(
-            comment.author_id,
+            commentData.author_id!,
             'like_received',
             'Nuevo Like ❤️',
             `A @${liker.username} le gustó tu comentario "${commentPreview}"`,
@@ -788,7 +799,7 @@ class ForumService {
     reactionType: ReactionType
   ): Promise<{ added: boolean; counts: ReactionCounts }> {
     try {
-      const { data, error } = await getSupabase().rpc('toggle_post_reaction', {
+      const { data, error } = await (getSupabase().rpc as any)('toggle_post_reaction', {
         p_post_id: postId,
         p_user_id: userId,
         p_reaction_type: reactionType,
@@ -800,26 +811,30 @@ class ForumService {
         return this.toggleReactionManual(postId, userId, reactionType);
       }
 
+      const rpcData = data as { added?: boolean; counts?: ReactionCounts } | null;
+
       // Notify post author if reaction was added
-      if (data.added) {
-        const { data: post } = await getSupabase()
+      if (rpcData?.added) {
+        const { data: postRaw } = await getSupabase()
           .from('forum_posts')
           .select('author_id, title, content')
           .eq('id', postId)
           .single();
 
+        const post = postRaw as { author_id?: string; title?: string; content?: string } | null;
         if (post && post.author_id !== userId) {
-          const { data: reactor } = await getSupabase()
+          const { data: reactorRaw } = await getSupabase()
             .from('users')
             .select('username, avatar_url')
             .eq('id', userId)
             .single();
 
+          const reactor = reactorRaw as { username?: string; avatar_url?: string } | null;
           if (reactor) {
             const reactionEmoji = this.getReactionEmoji(reactionType);
-            const postTitle = post.title || post.content.substring(0, 30) + '...';
+            const postTitle = post.title || post.content?.substring(0, 30) + '...';
             await this.sendNotification(
-              post.author_id,
+              post.author_id!,
               'reaction_received',
               `${reactionEmoji} Nueva Reacción`,
               `@${reactor.username} reaccionó ${reactionEmoji} a tu publicación "${postTitle}"`,
@@ -831,8 +846,8 @@ class ForumService {
       }
 
       return {
-        added: data.added,
-        counts: data.counts,
+        added: rpcData?.added || false,
+        counts: rpcData?.counts || { fire: 0, love: 0, clap: 0, mindblown: 0, sad: 0, laugh: 0 },
       };
     } catch (error) {
       console.error('Error in toggleReaction:', error);
@@ -846,7 +861,7 @@ class ForumService {
     reactionType: ReactionType
   ): Promise<{ added: boolean; counts: ReactionCounts }> {
     // Check if reaction exists
-    const { data: existing } = await getSupabase()
+    const { data: existingRaw } = await getSupabase()
       .from('forum_post_reactions')
       .select('id')
       .eq('post_id', postId)
@@ -854,12 +869,15 @@ class ForumService {
       .eq('reaction_type', reactionType)
       .single();
 
-    const { data: post } = await getSupabase()
+    const existing = existingRaw as { id?: string } | null;
+
+    const { data: postRaw } = await getSupabase()
       .from('forum_posts')
       .select('reactions_count')
       .eq('id', postId)
       .single();
 
+    const post = postRaw as { reactions_count?: ReactionCounts } | null;
     let counts: ReactionCounts = post?.reactions_count || {
       fire: 0, love: 0, clap: 0, mindblown: 0, sad: 0, laugh: 0
     };
@@ -869,7 +887,7 @@ class ForumService {
       await getSupabase()
         .from('forum_post_reactions')
         .delete()
-        .eq('id', existing.id);
+        .eq('id', existing.id!);
       counts[reactionType] = Math.max(0, counts[reactionType] - 1);
     } else {
       // Add reaction
@@ -895,7 +913,7 @@ class ForumService {
       .eq('post_id', postId)
       .eq('user_id', userId);
 
-    return (data || []).map(r => r.reaction_type as ReactionType);
+    return ((data || []) as { reaction_type?: string }[]).map(r => r.reaction_type as ReactionType);
   }
 
   private getReactionEmoji(type: ReactionType): string {
@@ -914,7 +932,7 @@ class ForumService {
 
   async toggleBookmark(postId: string, userId: string): Promise<{ bookmarked: boolean; count: number }> {
     try {
-      const { data, error } = await getSupabase().rpc('toggle_bookmark', {
+      const { data, error } = await (getSupabase().rpc as any)('toggle_bookmark', {
         p_post_id: postId,
         p_user_id: userId,
       });
@@ -924,9 +942,10 @@ class ForumService {
         return this.toggleBookmarkManual(postId, userId);
       }
 
+      const rpcData = data as { bookmarked?: boolean; count?: number } | null;
       return {
-        bookmarked: data.bookmarked,
-        count: data.count,
+        bookmarked: rpcData?.bookmarked || false,
+        count: rpcData?.count || 0,
       };
     } catch (error) {
       console.error('Error in toggleBookmark:', error);
@@ -938,30 +957,34 @@ class ForumService {
     postId: string,
     userId: string
   ): Promise<{ bookmarked: boolean; count: number }> {
-    const { data: existing } = await getSupabase()
+    const { data: existingRaw } = await getSupabase()
       .from('forum_bookmarks')
       .select('id')
       .eq('post_id', postId)
       .eq('user_id', userId)
       .single();
 
+    const existing = existingRaw as { id?: string } | null;
+
     if (existing) {
-      await getSupabase().from('forum_bookmarks').delete().eq('id', existing.id);
-      const { data: post } = await getSupabase()
+      await getSupabase().from('forum_bookmarks').delete().eq('id', existing.id!);
+      const { data: postRaw } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
         .eq('id', postId)
         .single();
+      const post = postRaw as { bookmarks_count?: number } | null;
       const newCount = Math.max(0, (post?.bookmarks_count || 1) - 1);
       await getSupabase().from('forum_posts').update({ bookmarks_count: newCount } as never).eq('id', postId);
       return { bookmarked: false, count: newCount };
     } else {
       await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId } as never);
-      const { data: post } = await getSupabase()
+      const { data: postRaw } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
         .eq('id', postId)
         .single();
+      const post = postRaw as { bookmarks_count?: number } | null;
       const newCount = (post?.bookmarks_count || 0) + 1;
       await getSupabase().from('forum_posts').update({ bookmarks_count: newCount } as never).eq('id', postId);
       return { bookmarked: true, count: newCount };
@@ -1007,7 +1030,7 @@ class ForumService {
     quoteContent?: string
   ): Promise<{ success: boolean; error?: string; repost_id?: string }> {
     try {
-      const { data, error } = await getSupabase().rpc('create_repost', {
+      const { data, error } = await (getSupabase().rpc as any)('create_repost', {
         p_original_post_id: originalPostId,
         p_user_id: userId,
         p_quote_content: quoteContent || null,
@@ -1018,28 +1041,31 @@ class ForumService {
         return { success: false, error: error.message };
       }
 
-      if (!data.success) {
-        return { success: false, error: data.error };
+      const rpcData = data as { success?: boolean; error?: string; repost_id?: string } | null;
+      if (!rpcData?.success) {
+        return { success: false, error: rpcData?.error };
       }
 
       // Notify original post author
-      const { data: originalPost } = await getSupabase()
+      const { data: originalPostRaw } = await getSupabase()
         .from('forum_posts')
         .select('author_id, title, content')
         .eq('id', originalPostId)
         .single();
 
+      const originalPost = originalPostRaw as { author_id?: string; title?: string; content?: string } | null;
       if (originalPost && originalPost.author_id !== userId) {
-        const { data: reposter } = await getSupabase()
+        const { data: reposterRaw } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', userId)
           .single();
 
+        const reposter = reposterRaw as { username?: string; avatar_url?: string } | null;
         if (reposter) {
-          const postTitle = originalPost.title || originalPost.content.substring(0, 30) + '...';
+          const postTitle = originalPost.title || originalPost.content?.substring(0, 30) + '...';
           await this.sendNotification(
-            originalPost.author_id,
+            originalPost.author_id!,
             'repost_received',
             '🔁 Compartieron tu Post',
             `@${reposter.username} compartió tu publicación "${postTitle}"`,
@@ -1049,7 +1075,7 @@ class ForumService {
         }
       }
 
-      return { success: true, repost_id: data.repost_id };
+      return { success: true, repost_id: rpcData?.repost_id };
     } catch (error) {
       console.error('Error in createRepost:', error);
       return { success: false, error: 'Error al compartir' };
@@ -1074,9 +1100,17 @@ class ForumService {
       .eq('user_id', userId);
 
     if (!error) {
+      // Get current count and decrement manually
+      const { data: postRaw } = await getSupabase()
+        .from('forum_posts')
+        .select('reposts_count')
+        .eq('id', postId)
+        .single();
+      const post = postRaw as { reposts_count?: number } | null;
+      const newCount = Math.max(0, (post?.reposts_count || 1) - 1);
       await getSupabase()
         .from('forum_posts')
-        .update({ reposts_count: getSupabase().rpc('greatest', { a: 0, b: 'reposts_count - 1' }) } as never)
+        .update({ reposts_count: newCount } as never)
         .eq('id', postId);
     }
 
@@ -1128,7 +1162,7 @@ class ForumService {
 
   async getTrendingTags(limit: number = 10): Promise<TrendingTag[]> {
     try {
-      const { data, error } = await getSupabase().rpc('get_trending_tags', { p_limit: limit });
+      const { data, error } = await (getSupabase().rpc as any)('get_trending_tags', { p_limit: limit });
 
       if (error) {
         console.error('Error fetching trending tags:', error);
@@ -1153,7 +1187,7 @@ class ForumService {
     if (!data) return [];
 
     const tagCounts: Record<string, number> = {};
-    data.forEach(post => {
+    (data as { tags?: string[] }[]).forEach(post => {
       (post.tags || []).forEach((tag: string) => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
@@ -1179,7 +1213,7 @@ class ForumService {
         return [];
       }
 
-      const followingIds = follows.map(f => f.following_id);
+      const followingIds = (follows as { following_id?: string }[]).map(f => f.following_id).filter(Boolean) as string[];
 
       const { data, error } = await getSupabase()
         .from('forum_posts')
@@ -1213,7 +1247,7 @@ class ForumService {
     }
 
     try {
-      const { data, error } = await getSupabase().rpc('toggle_follow_user', {
+      const { data, error } = await (getSupabase().rpc as any)('toggle_follow_user', {
         p_follower_id: followerId,
         p_following_id: followingId,
       });
@@ -1223,14 +1257,17 @@ class ForumService {
         return this.toggleFollowManual(followerId, followingId);
       }
 
+      const rpcData = data as { following?: boolean } | null;
+
       // Send notification if now following
-      if (data.following) {
-        const { data: follower } = await getSupabase()
+      if (rpcData?.following) {
+        const { data: followerRaw } = await getSupabase()
           .from('users')
           .select('username, avatar_url')
           .eq('id', followerId)
           .single();
 
+        const follower = followerRaw as { username?: string; avatar_url?: string } | null;
         if (follower) {
           await this.sendNotification(
             followingId,
@@ -1243,7 +1280,7 @@ class ForumService {
         }
       }
 
-      return { following: data.following };
+      return { following: rpcData?.following || false };
     } catch (error) {
       console.error('Error in toggleFollow:', error);
       return this.toggleFollowManual(followerId, followingId);
@@ -1254,17 +1291,25 @@ class ForumService {
     followerId: string,
     followingId: string
   ): Promise<{ following: boolean }> {
-    const { data: existing } = await getSupabase()
+    const { data: existingRaw } = await getSupabase()
       .from('user_follows')
       .select('id')
       .eq('follower_id', followerId)
       .eq('following_id', followingId)
       .single();
 
+    const existing = existingRaw as { id?: string } | null;
+
     if (existing) {
-      await getSupabase().from('user_follows').delete().eq('id', existing.id);
-      await getSupabase().from('users').update({ followers_count: getSupabase().rpc('greatest', { a: 0, b: 'followers_count - 1' }) } as never).eq('id', followingId);
-      await getSupabase().from('users').update({ following_count: getSupabase().rpc('greatest', { a: 0, b: 'following_count - 1' }) } as never).eq('id', followerId);
+      await getSupabase().from('user_follows').delete().eq('id', existing.id!);
+      // Decrement followers_count manually
+      const { data: followingUserRaw } = await getSupabase().from('users').select('followers_count').eq('id', followingId).single();
+      const followingUser = followingUserRaw as { followers_count?: number } | null;
+      await getSupabase().from('users').update({ followers_count: Math.max(0, (followingUser?.followers_count || 1) - 1) } as never).eq('id', followingId);
+      // Decrement following_count manually
+      const { data: followerUserRaw } = await getSupabase().from('users').select('following_count').eq('id', followerId).single();
+      const followerUser = followerUserRaw as { following_count?: number } | null;
+      await getSupabase().from('users').update({ following_count: Math.max(0, (followerUser?.following_count || 1) - 1) } as never).eq('id', followerId);
       return { following: false };
     } else {
       await getSupabase().from('user_follows').insert({ follower_id: followerId, following_id: followingId } as never);
@@ -1290,7 +1335,8 @@ class ForumService {
       `)
       .eq('following_id', userId);
 
-    return (data || []).map(f => f.follower).filter(Boolean) as any[];
+    type FollowerRow = { follower?: { id: string; username: string; display_name: string; avatar_url: string } };
+    return ((data || []) as FollowerRow[]).map(f => f.follower).filter(Boolean) as any[];
   }
 
   async getFollowing(userId: string): Promise<{ id: string; username: string; display_name: string; avatar_url: string }[]> {
@@ -1301,7 +1347,8 @@ class ForumService {
       `)
       .eq('follower_id', userId);
 
-    return (data || []).map(f => f.following).filter(Boolean) as any[];
+    type FollowingRow = { following?: { id: string; username: string; display_name: string; avatar_url: string } };
+    return ((data || []) as FollowingRow[]).map(f => f.following).filter(Boolean) as any[];
   }
 
   // ==================== SHARES TRACKING ====================
@@ -1313,9 +1360,16 @@ class ForumService {
       share_type: shareType,
     } as never);
 
+    // Increment shares_count manually
+    const { data: postRaw } = await getSupabase()
+      .from('forum_posts')
+      .select('shares_count')
+      .eq('id', postId)
+      .single();
+    const post = postRaw as { shares_count?: number } | null;
     await getSupabase()
       .from('forum_posts')
-      .update({ shares_count: getSupabase().rpc('increment_value', { amount: 1 }) } as never)
+      .update({ shares_count: (post?.shares_count || 0) + 1 } as never)
       .eq('id', postId);
   }
 
@@ -1374,15 +1428,21 @@ class ForumService {
       .eq('user_id', userId)
       .in('original_post_id', postIds);
 
+    type ReactionRow = { post_id?: string; reaction_type?: string };
+    type BookmarkRow = { post_id?: string };
+    type RepostRow = { original_post_id?: string };
+
     const reactionMap = new Map<string, ReactionType[]>();
-    (reactions || []).forEach(r => {
-      const existing = reactionMap.get(r.post_id) || [];
-      existing.push(r.reaction_type);
-      reactionMap.set(r.post_id, existing);
+    ((reactions || []) as ReactionRow[]).forEach(r => {
+      if (r.post_id) {
+        const existing = reactionMap.get(r.post_id) || [];
+        existing.push(r.reaction_type as ReactionType);
+        reactionMap.set(r.post_id, existing);
+      }
     });
 
-    const bookmarkSet = new Set((bookmarks || []).map(b => b.post_id));
-    const repostSet = new Set((reposts || []).map(r => r.original_post_id));
+    const bookmarkSet = new Set(((bookmarks || []) as BookmarkRow[]).map(b => b.post_id).filter(Boolean) as string[]);
+    const repostSet = new Set(((reposts || []) as RepostRow[]).map(r => r.original_post_id).filter(Boolean) as string[]);
 
     return posts.map(post => ({
       ...post,
@@ -1396,7 +1456,7 @@ class ForumService {
 
   async createPostWithPoll(userId: string, input: CreatePostInput): Promise<ForumPost | null> {
     // First create the post
-    const { data: post, error: postError } = await getSupabase()
+    const { data: postRaw, error: postError } = await getSupabase()
       .from('forum_posts')
       .insert({
         title: input.title || '',
@@ -1412,6 +1472,7 @@ class ForumService {
       .select('*')
       .single();
 
+    const post = postRaw as ForumPost | null;
     if (postError || !post) {
       console.error('Error creating post:', postError);
       return null;
@@ -1422,7 +1483,7 @@ class ForumService {
       const endsAt = new Date();
       endsAt.setHours(endsAt.getHours() + (input.poll.ends_in_hours || 24));
 
-      const { data: poll, error: pollError } = await getSupabase()
+      const { data: pollRaw, error: pollError } = await getSupabase()
         .from('forum_polls')
         .insert({
           post_id: post.id,
@@ -1433,7 +1494,8 @@ class ForumService {
         .select('*')
         .single();
 
-      if (!pollError && poll) {
+      const poll = pollRaw as { id?: string } | null;
+      if (!pollError && poll?.id) {
         // Create poll options
         const options = input.poll.options.map((opt, idx) => ({
           poll_id: poll.id,
@@ -1450,7 +1512,7 @@ class ForumService {
   }
 
   async getPollForPost(postId: string, userId?: string): Promise<ForumPoll | null> {
-    const { data: poll, error } = await getSupabase()
+    const { data: pollRaw, error } = await getSupabase()
       .from('forum_polls')
       .select(`
         *,
@@ -1459,24 +1521,28 @@ class ForumService {
       .eq('post_id', postId)
       .single();
 
-    if (error || !poll) return null;
+    if (error || !pollRaw) return null;
+
+    type PollRow = ForumPoll & { options?: ForumPollOption[] };
+    const poll = pollRaw as PollRow;
 
     // Calculate total votes
-    const totalVotes = (poll.options || []).reduce((sum: number, opt: any) => sum + (opt.votes_count || 0), 0);
+    const totalVotes = (poll.options || []).reduce((sum: number, opt: ForumPollOption) => sum + (opt.votes_count || 0), 0);
 
     // Check if user has voted
     let hasVoted = false;
     let userVotes: string[] = [];
 
-    if (userId) {
+    if (userId && poll.id) {
       const { data: votes } = await getSupabase()
         .from('forum_poll_votes')
         .select('option_id')
         .eq('poll_id', poll.id)
         .eq('user_id', userId);
 
+      type VoteRow = { option_id?: string };
       hasVoted = (votes || []).length > 0;
-      userVotes = (votes || []).map(v => v.option_id);
+      userVotes = ((votes || []) as VoteRow[]).map(v => v.option_id).filter(Boolean) as string[];
     }
 
     return {
@@ -1489,7 +1555,7 @@ class ForumService {
 
   async voteOnPoll(pollId: string, optionId: string, userId: string): Promise<{ success: boolean; error?: string; options?: ForumPollOption[] }> {
     try {
-      const { data, error } = await getSupabase().rpc('vote_on_poll', {
+      const { data, error } = await (getSupabase().rpc as any)('vote_on_poll', {
         p_poll_id: pollId,
         p_option_id: optionId,
         p_user_id: userId,
@@ -1500,7 +1566,7 @@ class ForumService {
         return { success: false, error: error.message };
       }
 
-      return data;
+      return data || { success: true };
     } catch (error) {
       console.error('Error in voteOnPoll:', error);
       return { success: false, error: 'Error al votar' };
@@ -1530,7 +1596,7 @@ class ForumService {
     message?: string
   ): Promise<{ success: boolean; error?: string; award_name?: string; ap_spent?: number }> {
     try {
-      const { data, error } = await getSupabase().rpc('give_post_award', {
+      const { data, error } = await (getSupabase().rpc as any)('give_post_award', {
         p_post_id: postId,
         p_award_type_id: awardTypeId,
         p_giver_id: giverId,
@@ -1542,7 +1608,7 @@ class ForumService {
         return { success: false, error: error.message };
       }
 
-      return data;
+      return data || { success: true };
     } catch (error) {
       console.error('Error in giveAward:', error);
       return { success: false, error: 'Error al dar premio' };
@@ -1565,13 +1631,22 @@ class ForumService {
       return [];
     }
 
-    return (data || []).map(a => ({
-      id: a.id,
-      post_id: a.post_id,
-      award_type: a.award_type,
-      giver: a.giver,
+    type AwardRow = {
+      id?: string;
+      post_id?: string;
+      award_type?: AwardType;
+      giver?: { id: string; username: string; avatar_url: string };
+      message?: string;
+      created_at?: string;
+    };
+
+    return ((data || []) as AwardRow[]).map(a => ({
+      id: a.id!,
+      post_id: a.post_id!,
+      award_type: a.award_type!,
+      giver: a.giver!,
       message: a.message,
-      created_at: a.created_at,
+      created_at: a.created_at!,
     }));
   }
 
@@ -1579,7 +1654,7 @@ class ForumService {
 
   async createStory(userId: string, input: CreateStoryInput): Promise<{ success: boolean; story_id?: string; error?: string }> {
     try {
-      const { data, error } = await getSupabase().rpc('create_story', {
+      const { data, error } = await (getSupabase().rpc as any)('create_story', {
         p_user_id: userId,
         p_content: input.content || null,
         p_media_url: input.media_url || null,
@@ -1593,7 +1668,7 @@ class ForumService {
         return { success: false, error: error.message };
       }
 
-      return data;
+      return data || { success: true };
     } catch (error) {
       console.error('Error in createStory:', error);
       return { success: false, error: 'Error al crear historia' };
@@ -1602,7 +1677,7 @@ class ForumService {
 
   async getFollowingStories(userId: string): Promise<ForumStory[]> {
     try {
-      const { data, error } = await getSupabase().rpc('get_following_stories', {
+      const { data, error } = await (getSupabase().rpc as any)('get_following_stories', {
         p_user_id: userId,
       });
 
@@ -1621,12 +1696,13 @@ class ForumService {
 
   async viewStory(storyId: string, viewerId: string): Promise<boolean> {
     try {
-      const { data, error } = await getSupabase().rpc('view_story', {
+      const { data, error } = await (getSupabase().rpc as any)('view_story', {
         p_story_id: storyId,
         p_viewer_id: viewerId,
       });
 
-      return data?.success || false;
+      const rpcData = data as { success?: boolean } | null;
+      return rpcData?.success || false;
     } catch (error) {
       console.error('Error viewing story:', error);
       return false;
@@ -1635,13 +1711,14 @@ class ForumService {
 
   async reactToStory(storyId: string, userId: string, reaction: string): Promise<boolean> {
     try {
-      const { data, error } = await getSupabase().rpc('react_to_story', {
+      const { data, error } = await (getSupabase().rpc as any)('react_to_story', {
         p_story_id: storyId,
         p_user_id: userId,
         p_reaction: reaction,
       });
 
-      return data?.success || false;
+      const rpcData = data as { success?: boolean } | null;
+      return rpcData?.success || false;
     } catch (error) {
       console.error('Error reacting to story:', error);
       return false;
@@ -1663,17 +1740,22 @@ class ForumService {
       return [];
     }
 
-    return (data || []).map(v => ({
-      ...v.viewer,
-      viewed_at: v.viewed_at,
-    })) as any;
+    type ViewerRow = {
+      viewed_at?: string;
+      viewer?: { id: string; username: string; avatar_url: string };
+    };
+
+    return ((data || []) as ViewerRow[]).map(v => ({
+      ...(v.viewer || { id: '', username: '', avatar_url: '' }),
+      viewed_at: v.viewed_at || '',
+    }));
   }
 
   // ==================== THREADS ====================
 
   async createThread(userId: string, title: string, posts: { content: string; tags?: string[]; gif_url?: string }[]): Promise<{ success: boolean; thread_id?: string; post_ids?: string[]; error?: string }> {
     try {
-      const { data, error } = await getSupabase().rpc('create_thread', {
+      const { data, error } = await (getSupabase().rpc as any)('create_thread', {
         p_user_id: userId,
         p_title: title,
         p_posts: JSON.stringify(posts),
@@ -1684,7 +1766,7 @@ class ForumService {
         return { success: false, error: error.message };
       }
 
-      return data;
+      return data || { success: true };
     } catch (error) {
       console.error('Error in createThread:', error);
       return { success: false, error: 'Error al crear hilo' };
@@ -1693,7 +1775,7 @@ class ForumService {
 
   async getThreadPosts(threadId: string): Promise<ForumPost[]> {
     try {
-      const { data, error } = await getSupabase().rpc('get_thread_posts', {
+      const { data, error } = await (getSupabase().rpc as any)('get_thread_posts', {
         p_thread_id: threadId,
       });
 
@@ -1713,7 +1795,7 @@ class ForumService {
 
   async getNotifications(userId: string, limit: number = 50, unreadOnly: boolean = false): Promise<ForumNotification[]> {
     try {
-      const { data, error } = await getSupabase().rpc('get_user_notifications', {
+      const { data, error } = await (getSupabase().rpc as any)('get_user_notifications', {
         p_user_id: userId,
         p_limit: limit,
         p_unread_only: unreadOnly,
@@ -1748,7 +1830,7 @@ class ForumService {
 
   async markNotificationsRead(userId: string, notificationIds?: string[]): Promise<boolean> {
     try {
-      const { error } = await getSupabase().rpc('mark_notifications_read', {
+      const { error } = await (getSupabase().rpc as any)('mark_notifications_read', {
         p_user_id: userId,
         p_notification_ids: notificationIds || null,
       });
@@ -1764,7 +1846,7 @@ class ForumService {
 
   async searchUsersForMention(query: string, limit: number = 10): Promise<MentionSuggestion[]> {
     try {
-      const { data, error } = await getSupabase().rpc('search_users_for_mention', {
+      const { data, error } = await (getSupabase().rpc as any)('search_users_for_mention', {
         p_query: query,
         p_limit: limit,
       });
