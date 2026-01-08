@@ -206,8 +206,29 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
           );
         })}
 
-        {/* Empty state - show if no stories at all */}
-        {userStories.length === 0 && (
+        {/* Empty state - show create button if user is logged in */}
+        {userStories.length === 0 && currentUserId && (
+          <button
+            onClick={onCreateStory}
+            className="flex flex-col items-center gap-2 min-w-[72px] group"
+          >
+            <div className="relative">
+              <div className="w-[68px] h-[68px] rounded-full p-[3px] bg-gradient-to-tr from-blue-400 via-purple-500 to-pink-500">
+                <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-gray-800 flex items-center justify-center">
+                    <Plus className="w-8 h-8 text-gray-400 group-hover:text-white transition-colors" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span className="text-xs text-gray-300 group-hover:text-white transition-colors">
+              Crear Story
+            </span>
+          </button>
+        )}
+
+        {/* Show message if not logged in and no stories */}
+        {userStories.length === 0 && !currentUserId && (
           <div className="flex items-center justify-center w-full py-4 text-gray-500">
             No hay stories disponibles. ¡Sé el primero en publicar!
           </div>
