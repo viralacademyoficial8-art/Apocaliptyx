@@ -402,7 +402,7 @@ class ForumService {
     // Incrementar vistas
     await getSupabase()
       .from('forum_posts')
-      .update({ views_count: (data.views_count || 0) + 1 })
+      .update({ views_count: ((data as ForumPost).views_count || 0) + 1 } as never)
       .eq('id', postId);
 
     return data;
