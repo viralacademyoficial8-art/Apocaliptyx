@@ -134,16 +134,25 @@ export async function GET(
         username?: string;
         display_name?: string;
         avatar_url?: string;
-      };
+      } | {
+        id: string;
+        username?: string;
+        display_name?: string;
+        avatar_url?: string;
+      }[];
     }
 
-    const viewers = (viewersRaw as ViewerRow[] | null)?.map(v => ({
-      userId: v.viewer_id,
-      username: v.viewer?.username,
-      displayName: v.viewer?.display_name,
-      avatarUrl: v.viewer?.avatar_url,
-      viewedAt: v.viewed_at,
-    })) || [];
+    const viewers = (viewersRaw as unknown as ViewerRow[] | null)?.map(v => {
+      // Handle both single object and array cases from Supabase
+      const viewerData = Array.isArray(v.viewer) ? v.viewer[0] : v.viewer;
+      return {
+        userId: v.viewer_id,
+        username: viewerData?.username,
+        displayName: viewerData?.display_name,
+        avatarUrl: viewerData?.avatar_url,
+        viewedAt: v.viewed_at,
+      };
+    }) || [];
 
     return NextResponse.json({ viewers });
   } catch (error) {
