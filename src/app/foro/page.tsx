@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import {
@@ -106,9 +107,38 @@ export default function ForoPage() {
 function ForoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, isAuthenticated } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, isAuthenticated, login } = useAuthStore();
   const { t } = useTranslation();
   const { language } = useLanguage();
+
+  // Sync NextAuth session with Zustand store
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user && !user) {
+      const sessionUser = session.user;
+      login({
+        id: sessionUser.id || '',
+        email: sessionUser.email || '',
+        username: sessionUser.username || sessionUser.email?.split('@')[0] || 'user',
+        displayName: sessionUser.name || 'Usuario',
+        avatarUrl: sessionUser.image || '',
+        prophetLevel: 'vidente',
+        reputationScore: 0,
+        apCoins: sessionUser.apCoins || 1000,
+        scenariosCreated: 0,
+        scenariosWon: 0,
+        winRate: 0,
+        followers: 0,
+        following: 0,
+        createdAt: new Date(),
+        role: sessionUser.role || 'USER',
+      });
+    }
+  }, [status, session, user, login]);
+
+  // Determine if user is logged in (check both NextAuth and Zustand)
+  const isLoggedIn = (status === 'authenticated' && !!session?.user) || isAuthenticated;
+  const currentUserId = user?.id || session?.user?.id;
 
   // Map language to date-fns locale
   const dateLocales: Record<string, Locale> = { es, en: enUS, pt, fr, de, ru };
@@ -981,10 +1011,10 @@ function ForoContent() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Stories Section - Instagram Style */}
-        {isAuthenticated && (
+        {isLoggedIn && (
           <StoriesBar
             key={storiesKey}
-            currentUserId={user?.id}
+            currentUserId={currentUserId}
             onCreateStory={() => setCreateStoryModalOpen(true)}
             onViewStories={(userStories) => {
               setViewingUserStories(userStories);
@@ -1062,7 +1092,7 @@ function ForoContent() {
 
               <Button
                 onClick={() => {
-                  if (!isAuthenticated) {
+                  if (!isLoggedIn) {
                     router.push('/login');
                     return;
                   }
@@ -1122,7 +1152,7 @@ function ForoContent() {
                   <Sparkles className="w-4 h-4" />
                   {t('forum.filters.top')}
                 </button>
-                {isAuthenticated && (
+                {isLoggedIn && (
                   <button
                     onClick={() => setFilter('following')}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
@@ -1313,7 +1343,7 @@ function ForoContent() {
                 </h2>
                 <p className="text-gray-400 mt-1">{t('forum.reels.subtitle')}</p>
               </div>
-              {isAuthenticated && (
+              {isLoggedIn && (
                 <CreateReelModal onCreateReel={handleCreateReel} />
               )}
             </div>
@@ -1371,7 +1401,7 @@ function ForoContent() {
                 <p className="text-gray-400 mb-4">
                   {t('forum.reels.beFirst')}
                 </p>
-                {isAuthenticated && (
+                {isLoggedIn && (
                   <CreateReelModal onCreateReel={handleCreateReel} />
                 )}
               </div>
@@ -1390,7 +1420,7 @@ function ForoContent() {
                 </h2>
                 <p className="text-gray-400 mt-1">{t('forum.lives.subtitle')}</p>
               </div>
-              {isAuthenticated && (
+              {isLoggedIn && (
                 <Button className="bg-red-600 hover:bg-red-700">
                   <Radio className="w-4 h-4 mr-2" />
                   {t('forum.lives.startStream')}
@@ -1437,7 +1467,7 @@ function ForoContent() {
               <p className="text-gray-400 mb-4">
                 {t('forum.lives.beFirst')}
               </p>
-              {isAuthenticated && (
+              {isLoggedIn && (
                 <Button className="bg-red-600 hover:bg-red-700">
                   <Radio className="w-4 h-4 mr-2" />
                   {t('forum.lives.startMyFirst')}
@@ -1458,7 +1488,7 @@ function ForoContent() {
                 </h2>
                 <p className="text-gray-400 mt-1">{t('forum.communities.subtitle')}</p>
               </div>
-              {isAuthenticated && (
+              {isLoggedIn && (
                 <CreateCommunityModal
                   onCreateCommunity={(data) => handleCreateCommunity({
                     name: data.name,
@@ -2015,7 +2045,7 @@ function ForoContent() {
           )}
 
           {/* Input para nuevo comentario */}
-          {isAuthenticated && (
+          {isLoggedIn && (
             <div className="mt-4 pt-4 border-t border-gray-800">
               <div className="flex gap-2">
                 <input
