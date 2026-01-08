@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSession } from 'next-auth/react';
 
 export type CookiePreferences = {
   necessary: boolean; // Siempre true - cookies esenciales
@@ -20,36 +21,115 @@ const defaultPreferences: CookiePreferences = {
 };
 
 export function useCookieConsent() {
+  const { data: session, status } = useSession();
   const [hasConsent, setHasConsent] = useState<boolean | null>(null);
   const [preferences, setPreferences] = useState<CookiePreferences>(defaultPreferences);
   const [showBanner, setShowBanner] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const hasSyncedRef = useRef(false);
 
-  // Load consent state from localStorage
+  // Sync preferences to database for logged-in users
+  const syncToDatabase = useCallback(async (prefs: CookiePreferences) => {
+    if (!session?.user?.id || isSyncing) return;
+
+    setIsSyncing(true);
+    try {
+      await fetch('/api/cookies/preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(prefs),
+      });
+    } catch (error) {
+      console.error('Error syncing cookie preferences:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [session?.user?.id, isSyncing]);
+
+  // Load preferences from database for logged-in users
+  const loadFromDatabase = useCallback(async () => {
+    if (!session?.user?.id) return null;
+
+    try {
+      const response = await fetch('/api/cookies/preferences');
+      const data = await response.json();
+
+      if (data.hasPreferences && data.preferences) {
+        return data.preferences as CookiePreferences;
+      }
+    } catch (error) {
+      console.error('Error loading cookie preferences from database:', error);
+    }
+    return null;
+  }, [session?.user?.id]);
+
+  // Load consent state from localStorage (and database for logged-in users)
   useEffect(() => {
-    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
-    const savedPreferences = localStorage.getItem(COOKIE_PREFERENCES_KEY);
+    const loadPreferences = async () => {
+      setIsLoading(true);
 
-    if (consent === 'true') {
-      setHasConsent(true);
-      setShowBanner(false);
-      if (savedPreferences) {
+      // First check localStorage
+      const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+      const savedPreferences = localStorage.getItem(COOKIE_PREFERENCES_KEY);
+
+      let localPrefs: CookiePreferences | null = null;
+
+      if (consent === 'true' && savedPreferences) {
         try {
-          const parsed = JSON.parse(savedPreferences);
-          setPreferences({ ...defaultPreferences, ...parsed, necessary: true });
+          localPrefs = { ...defaultPreferences, ...JSON.parse(savedPreferences), necessary: true };
         } catch {
-          setPreferences(defaultPreferences);
+          localPrefs = null;
         }
       }
-    } else if (consent === 'false') {
-      setHasConsent(false);
-      setShowBanner(false);
-      setPreferences(defaultPreferences);
-    } else {
-      // No consent decision yet
-      setHasConsent(null);
-      setShowBanner(true);
-    }
-  }, []);
+
+      // If user is logged in, try to load from database
+      if (status === 'authenticated' && session?.user?.id && !hasSyncedRef.current) {
+        hasSyncedRef.current = true;
+        const dbPrefs = await loadFromDatabase();
+
+        if (dbPrefs) {
+          // Database preferences take priority
+          setHasConsent(true);
+          setPreferences(dbPrefs);
+          setShowBanner(false);
+
+          // Update localStorage to match database
+          localStorage.setItem(COOKIE_CONSENT_KEY, 'true');
+          localStorage.setItem(COOKIE_PREFERENCES_KEY, JSON.stringify(dbPrefs));
+        } else if (localPrefs) {
+          // If we have local preferences but not in DB, sync to DB
+          setHasConsent(true);
+          setPreferences(localPrefs);
+          setShowBanner(false);
+          syncToDatabase(localPrefs);
+        } else {
+          // No preferences anywhere, show banner
+          setHasConsent(null);
+          setShowBanner(true);
+        }
+      } else if (status === 'unauthenticated' || status === 'loading') {
+        // For non-logged-in users, use localStorage only
+        if (consent === 'true' && localPrefs) {
+          setHasConsent(true);
+          setPreferences(localPrefs);
+          setShowBanner(false);
+        } else if (consent === 'false') {
+          setHasConsent(false);
+          setShowBanner(false);
+          setPreferences(defaultPreferences);
+        } else if (status !== 'loading') {
+          // Only show banner if we're done loading auth state
+          setHasConsent(null);
+          setShowBanner(true);
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    loadPreferences();
+  }, [status, session?.user?.id, loadFromDatabase, syncToDatabase]);
 
   // Accept all cookies
   const acceptAll = useCallback(() => {
@@ -66,9 +146,14 @@ export function useCookieConsent() {
     setPreferences(allAccepted);
     setShowBanner(false);
 
+    // Sync to database if logged in
+    if (session?.user?.id) {
+      syncToDatabase(allAccepted);
+    }
+
     // Dispatch event for other components to react
     window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: allAccepted }));
-  }, []);
+  }, [session?.user?.id, syncToDatabase]);
 
   // Accept only necessary cookies
   const acceptNecessary = useCallback(() => {
@@ -85,8 +170,13 @@ export function useCookieConsent() {
     setPreferences(necessaryOnly);
     setShowBanner(false);
 
+    // Sync to database if logged in
+    if (session?.user?.id) {
+      syncToDatabase(necessaryOnly);
+    }
+
     window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: necessaryOnly }));
-  }, []);
+  }, [session?.user?.id, syncToDatabase]);
 
   // Save custom preferences
   const savePreferences = useCallback((newPreferences: Partial<CookiePreferences>) => {
@@ -102,17 +192,28 @@ export function useCookieConsent() {
     setPreferences(updated);
     setShowBanner(false);
 
+    // Sync to database if logged in
+    if (session?.user?.id) {
+      syncToDatabase(updated);
+    }
+
     window.dispatchEvent(new CustomEvent('cookieConsentChanged', { detail: updated }));
-  }, [preferences]);
+  }, [preferences, session?.user?.id, syncToDatabase]);
 
   // Reset consent (for testing or user request)
-  const resetConsent = useCallback(() => {
+  const resetConsent = useCallback(async () => {
     localStorage.removeItem(COOKIE_CONSENT_KEY);
     localStorage.removeItem(COOKIE_PREFERENCES_KEY);
     setHasConsent(null);
     setPreferences(defaultPreferences);
     setShowBanner(true);
-  }, []);
+    hasSyncedRef.current = false;
+
+    // Also reset in database if logged in
+    if (session?.user?.id) {
+      syncToDatabase(defaultPreferences);
+    }
+  }, [session?.user?.id, syncToDatabase]);
 
   // Open settings modal
   const openSettings = useCallback(() => {
@@ -123,6 +224,9 @@ export function useCookieConsent() {
     hasConsent,
     preferences,
     showBanner,
+    isLoading,
+    isSyncing,
+    isLoggedIn: !!session?.user?.id,
     acceptAll,
     acceptNecessary,
     savePreferences,
