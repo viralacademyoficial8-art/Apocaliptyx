@@ -26,6 +26,7 @@ import {
   Sparkles,
   ChevronRight,
   Zap,
+  Target,
 } from "lucide-react";
 
 interface MobileMenuProps {
@@ -60,6 +61,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     ? [
         { href: "/dashboard", label: t("nav.home"), icon: LayoutDashboard, gradient: "from-purple-500 to-indigo-500" },
         { href: "/explorar", label: t("nav.scenarios"), icon: Home, gradient: "from-blue-500 to-cyan-500" },
+        { href: "/misiones", label: "Misiones", icon: Target, gradient: "from-blue-500 to-teal-500" },
         { href: "/tienda", label: t("nav.shop"), icon: ShoppingBag, gradient: "from-pink-500 to-rose-500" },
         { href: "/leaderboard", label: t("nav.rankings"), icon: Trophy, gradient: "from-yellow-500 to-orange-500" },
         { href: "/foro", label: t("nav.forum"), icon: MessageCircle, gradient: "from-green-500 to-emerald-500" },
