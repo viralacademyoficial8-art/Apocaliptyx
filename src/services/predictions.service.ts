@@ -76,7 +76,7 @@ export const predictionsService = {
         total_pool: totalParticipants,
         participant_count: totalParticipants,
         updated_at: new Date().toISOString(),
-      })
+      } as never)
       .eq('id', input.scenarioId);
 
     return { success: true, data: data as Prediction };

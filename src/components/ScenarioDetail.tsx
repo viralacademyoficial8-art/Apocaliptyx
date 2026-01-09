@@ -262,6 +262,11 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
       const result = await applyShield(scenario.id, shieldType as any);
 
       if (result.success) {
+        // Obtener el precio del escudo para actualizar balance
+        const shieldTypes = getShieldTypes();
+        const shield = shieldTypes.find(s => s.id === shieldType);
+        const shieldPrice = shield?.price || 0;
+
         toast.success(
           <div className="flex flex-col gap-1">
             <span className="font-bold">¡Escudo activado!</span>
@@ -272,6 +277,11 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
           { duration: 4000 }
         );
         setShowShieldModal(false);
+
+        // Actualizar balance del usuario en tiempo real
+        if (user && shieldPrice > 0) {
+          updateApCoins(user.apCoins - shieldPrice);
+        }
 
         // Recargar para ver cambios
         setTimeout(() => {
