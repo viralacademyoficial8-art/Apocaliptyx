@@ -61,6 +61,7 @@ interface AuthState {
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
   updateApCoins: (newBalance: number) => void;
+  refreshBalance: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -91,6 +92,21 @@ export const useAuthStore = create<AuthState>()(
 
         const updatedUser = { ...currentUser, apCoins: newBalance };
         set({ user: updatedUser });
+      },
+
+      refreshBalance: async () => {
+        try {
+          const response = await fetch('/api/me');
+          if (response.ok) {
+            const data = await response.json();
+            const currentUser = get().user;
+            if (currentUser && data.apCoins !== undefined) {
+              set({ user: { ...currentUser, apCoins: data.apCoins } });
+            }
+          }
+        } catch (error) {
+          console.error('Error refreshing balance:', error);
+        }
       },
     }),
     {

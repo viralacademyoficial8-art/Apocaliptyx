@@ -56,7 +56,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
   const router = useRouter();
-  const { user, updateApCoins } = useAuthStore();
+  const { user, updateApCoins, refreshBalance } = useAuthStore();
   const { stealScenario, applyShield, getShieldTypes, isLoading: isStealLoading } = useScenarioStealing();
   const [isStealing, setIsStealing] = useState(false);
   const [showShieldModal, setShowShieldModal] = useState(false);
@@ -232,12 +232,10 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
           { duration: 4000 }
         );
 
-        // Actualizar balance del usuario
-        if (user && result.stealPrice) {
-          updateApCoins(user.apCoins - result.stealPrice);
-        }
+        // Refrescar balance desde la base de datos
+        await refreshBalance();
 
-        // Recargar la página para ver los cambios
+        // Recargar la página para ver los cambios del escenario
         setTimeout(() => {
           window.location.reload();
         }, 1500);
@@ -262,11 +260,6 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
       const result = await applyShield(scenario.id, shieldType as any);
 
       if (result.success) {
-        // Obtener el precio del escudo para actualizar balance
-        const shieldTypes = getShieldTypes();
-        const shield = shieldTypes.find(s => s.id === shieldType);
-        const shieldPrice = shield?.price || 0;
-
         toast.success(
           <div className="flex flex-col gap-1">
             <span className="font-bold">¡Escudo activado!</span>
@@ -278,10 +271,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
         );
         setShowShieldModal(false);
 
-        // Actualizar balance del usuario en tiempo real
-        if (user && shieldPrice > 0) {
-          updateApCoins(user.apCoins - shieldPrice);
-        }
+        // Refrescar balance desde la base de datos
+        await refreshBalance();
 
         // Recargar para ver cambios
         setTimeout(() => {
