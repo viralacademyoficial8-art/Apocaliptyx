@@ -23,6 +23,13 @@ import {
   Trophy,
   Store,
   LucideIcon,
+  Target,
+  Sparkles,
+  Award,
+  Medal,
+  UsersRound,
+  Flame,
+  Send,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -49,23 +56,36 @@ const allMenuItems: MenuSection[] = [
       { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
       { href: '/admin/usuarios', label: 'Usuarios', icon: Users, permission: 'admin.users.view' },
       { href: '/admin/escenarios', label: 'Escenarios', icon: FileText, permission: 'admin.scenarios.view' },
-      { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, badge: 23, permission: 'admin.reports.view' },
+      { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, permission: 'admin.reports.view' },
       { href: '/admin/foro', label: 'Foro', icon: MessageSquare, permission: 'admin.scenarios.view' },
+      { href: '/admin/comunidades', label: 'Comunidades', icon: UsersRound, permission: 'admin.scenarios.view' },
     ],
   },
   {
-    title: 'Tienda',
+    title: 'Tienda & Items',
     items: [
       { href: '/admin/tienda', label: 'Tienda', icon: Store, permission: 'admin.shop.view' },
-      { href: '/admin/items', label: 'Ítems', icon: ShoppingBag, permission: 'admin.shop.view' },
       { href: '/admin/promociones', label: 'Promociones', icon: Tag, permission: 'admin.shop.edit' },
+      { href: '/admin/coleccionables', label: 'Coleccionables', icon: Sparkles, permission: 'admin.shop.edit' },
+    ],
+  },
+  {
+    title: 'Gamificación',
+    items: [
       { href: '/admin/logros', label: 'Logros', icon: Trophy, permission: 'admin.shop.edit' },
+      { href: '/admin/misiones', label: 'Misiones', icon: Target, permission: 'admin.shop.edit' },
+      { href: '/admin/titulos', label: 'Títulos', icon: Award, permission: 'admin.shop.edit' },
+      { href: '/admin/rangos', label: 'Rangos', icon: Shield, permission: 'admin.shop.edit' },
+      { href: '/admin/torneos', label: 'Torneos', icon: Medal, permission: 'admin.shop.edit' },
+      { href: '/admin/streaks', label: 'Rachas', icon: Flame, permission: 'admin.users.view' },
+      { href: '/admin/leaderboards', label: 'Leaderboards', icon: BarChart3, permission: 'admin.analytics.view' },
     ],
   },
   {
     title: 'Comunicación',
     items: [
       { href: '/admin/anuncios', label: 'Anuncios', icon: Bell, permission: 'admin.notifications.send' },
+      { href: '/admin/notificaciones', label: 'Notificaciones', icon: Send, permission: 'admin.notifications.send' },
     ],
   },
   {
