@@ -64,6 +64,21 @@ export const predictionsService = {
       return { success: false, error: error.message };
     }
 
+    // Actualizar los pools del escenario después de crear la predicción
+    const votes = await this.countVotes(input.scenarioId);
+    const totalParticipants = votes.yes + votes.no;
+
+    await supabase
+      .from('scenarios')
+      .update({
+        yes_pool: votes.yes,
+        no_pool: votes.no,
+        total_pool: totalParticipants,
+        participant_count: totalParticipants,
+        updated_at: new Date().toISOString(),
+      } as never)
+      .eq('id', input.scenarioId);
+
     return { success: true, data: data as Prediction };
   },
 
