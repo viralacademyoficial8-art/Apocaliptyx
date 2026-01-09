@@ -185,11 +185,12 @@ export default function StreamingPage() {
               className="pl-10 bg-gray-800 border-gray-700"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant={filter === 'live' ? 'default' : 'outline'}
               onClick={() => setFilter('live')}
-              className={filter === 'live' ? 'bg-red-600' : 'border-gray-700'}
+              className={`text-sm ${filter === 'live' ? 'bg-red-600' : 'border-gray-700'}`}
+              size="sm"
             >
               <span className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse" />
               {t('streaming.live')}
@@ -197,17 +198,20 @@ export default function StreamingPage() {
             <Button
               variant={filter === 'all' ? 'default' : 'outline'}
               onClick={() => setFilter('all')}
-              className={filter === 'all' ? 'bg-purple-600' : 'border-gray-700'}
+              className={`text-sm ${filter === 'all' ? 'bg-purple-600' : 'border-gray-700'}`}
+              size="sm"
             >
               {t('streaming.all')}
             </Button>
             <Button
               variant={filter === 'following' ? 'default' : 'outline'}
               onClick={() => setFilter('following')}
-              className={filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}
+              className={`text-sm ${filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}`}
+              size="sm"
             >
               <Users className="w-4 h-4 mr-1" />
-              {t('streaming.following')}
+              <span className="hidden sm:inline">{t('streaming.following')}</span>
+              <span className="sm:hidden">Seguidos</span>
             </Button>
           </div>
         </div>

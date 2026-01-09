@@ -95,14 +95,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       {/* Menu Panel */}
       <div
         className={`
-          fixed inset-y-0 right-0 w-full max-w-sm bg-background z-50 
+          fixed inset-y-0 right-0 w-full max-w-sm bg-background z-50
           transform transition-transform duration-300 ease-in-out
-          translate-x-0
+          translate-x-0 safe-area-all
         `}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center justify-between p-4 pt-2 border-b border-border">
             <span className="text-xl font-bold text-red-500">Apocaliptics</span>
             <button
               onClick={onClose}
