@@ -27,14 +27,14 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const { user, isAuthenticated, logout, login } = useAuthStore();
+  const { user, isAuthenticated, logout, login, refreshBalance } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
   const { hasInfiniteCoins, isAdmin, roleName, roleIcon, roleColor } = usePermissions();
 
   // Determinar si está autenticado (priorizar session de NextAuth)
   const isLoggedIn = status === "authenticated" && !!session?.user;
-  
+
   // Usar datos de Zustand si existen, sino de la session
   const currentUser = user || (session?.user ? {
     id: session.user.id || "",
@@ -69,6 +69,13 @@ export function Navbar() {
       });
     }
   }, [status, session, user, login]);
+
+  // Sincronizar AP coins desde la base de datos al cargar
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      refreshBalance();
+    }
+  }, [status, session, refreshBalance]);
 
   const navItems = [
     { href: "/dashboard", label: t("nav.home") },
