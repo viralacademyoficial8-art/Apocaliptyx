@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { MobileMenu } from "@/components/MobileMenu";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Menu, MessageCircle, Trophy, Sparkles } from "lucide-react";
 
 export function LandingNavbar() {
@@ -77,21 +78,33 @@ export function LandingNavbar() {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center gap-3">
-              {/* Mobile: Nav icons */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Mobile/Tablet: Nav icons with gradient style */}
               <div className="flex md:hidden items-center gap-1">
                 {navItems.map((item) => {
                   const Icon = item.icon;
+                  const gradients: Record<string, string> = {
+                    "/foro": "from-green-500 to-emerald-500",
+                    "/leaderboard": "from-yellow-500 to-orange-500",
+                  };
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="p-2.5 text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-xl transition-all"
+                      className="relative group p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
                     >
-                      <Icon className="w-5 h-5" />
+                      <div className={`absolute inset-0 bg-gradient-to-br ${gradients[item.href]} rounded-xl opacity-0 group-hover:opacity-20 transition-opacity`} />
+                      <div className={`p-1.5 bg-gradient-to-br ${gradients[item.href]} rounded-lg`}>
+                        <Icon className="w-4 h-4 text-white" />
+                      </div>
                     </Link>
                   );
                 })}
+              </div>
+
+              {/* Language Selector - All devices */}
+              <div className="hidden xs:block sm:block">
+                <LanguageSelector variant="minimal" />
               </div>
 
               {/* Auth Buttons - Desktop */}
@@ -113,23 +126,31 @@ export function LandingNavbar() {
                 </Link>
               </div>
 
-              {/* Mobile: Login + Menu */}
+              {/* Mobile/Tablet: Gradient Register Button + Menu */}
               <div className="flex sm:hidden items-center gap-2">
-                <Link href="/registro">
+                <Link href="/registro" className="relative group">
+                  {/* Glow effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur opacity-40 group-hover:opacity-60 transition-opacity" />
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm rounded-xl px-4 shadow-lg shadow-purple-500/25"
+                    className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-semibold rounded-xl px-4 shadow-lg shadow-purple-500/30 transition-all hover:scale-105 active:scale-95"
                   >
                     <Sparkles className="w-3.5 h-3.5 mr-1.5" />
                     Unirse
                   </Button>
                 </Link>
+
+                {/* Gradient Menu Button */}
                 <button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="p-2.5 hover:bg-zinc-800/50 rounded-xl transition-colors"
+                  className="relative group p-2.5 rounded-xl transition-all hover:scale-105 active:scale-95"
                   aria-label="Abrir menu"
                 >
-                  <Menu className="w-6 h-6 text-zinc-300" />
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                  <div className="relative p-1 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 rounded-lg group-hover:border-purple-500/30 transition-colors">
+                    <Menu className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" />
+                  </div>
                 </button>
               </div>
             </div>

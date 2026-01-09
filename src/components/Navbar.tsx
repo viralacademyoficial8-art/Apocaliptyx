@@ -373,13 +373,17 @@ export function Navbar() {
                     </DropdownMenu>
                   </div>
 
-                  {/* Botón menú móvil */}
+                  {/* Botón menú móvil - Gradient Style */}
                   <button
                     onClick={() => setMobileMenuOpen(true)}
-                    className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+                    className="md:hidden relative group p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
                     aria-label={t("common.open")}
                   >
-                    <Menu className="w-6 h-6 text-foreground" />
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                    <div className="relative p-1 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 rounded-lg group-hover:border-purple-500/30 transition-colors">
+                      <Menu className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" />
+                    </div>
                   </button>
                 </>
               ) : (
@@ -401,19 +405,31 @@ export function Navbar() {
                     </Link>
                   </div>
 
-                  {/* Mobile no logueado */}
+                  {/* Mobile no logueado - Gradient Style */}
                   <div className="flex sm:hidden items-center gap-2">
-                    <Link href="/login">
-                      <Button variant="outline" size="sm" className="border-border text-foreground">
+                    {/* Login button with gradient border */}
+                    <Link href="/login" className="relative group">
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600/50 to-pink-600/50 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="relative border-zinc-700/50 bg-zinc-900/50 text-zinc-300 hover:text-white hover:border-purple-500/30 hover:bg-zinc-800/50 transition-all"
+                      >
                         {t("nav.login")}
                       </Button>
                     </Link>
+
+                    {/* Gradient menu button */}
                     <button
                       onClick={() => setMobileMenuOpen(true)}
-                      className="p-2 hover:bg-muted rounded-lg transition-colors"
+                      className="relative group p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
                       aria-label={t("common.open")}
                     >
-                      <Menu className="w-6 h-6 text-foreground" />
+                      {/* Glow effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                      <div className="relative p-1 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 rounded-lg group-hover:border-purple-500/30 transition-colors">
+                        <Menu className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" />
+                      </div>
                     </button>
                   </div>
                 </>
