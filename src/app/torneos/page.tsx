@@ -34,7 +34,7 @@ interface Tournament {
 }
 
 export default function TorneosPage() {
-  const { user } = useAuthStore();
+  const { user, refreshBalance } = useAuthStore();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'active' | 'ended'>('all');
@@ -86,6 +86,8 @@ export default function TorneosPage() {
       ));
 
       toast.success(data.message || 'Te has inscrito al torneo');
+      // Actualizar balance de AP coins si hubo fee de entrada
+      await refreshBalance();
     } catch (error: unknown) {
       console.error('Error joining tournament:', error);
       toast.error(error instanceof Error ? error.message : 'Error al inscribirse');

@@ -29,7 +29,7 @@ interface Collectible {
 }
 
 export default function ColeccionablesPage() {
-  const { user } = useAuthStore();
+  const { user, refreshBalance } = useAuthStore();
   const [activeTab, setActiveTab] = useState('store');
   const [storeItems, setStoreItems] = useState<Collectible[]>([]);
   const [inventory, setInventory] = useState<Collectible[]>([]);
@@ -85,6 +85,8 @@ export default function ColeccionablesPage() {
       toast.success(`¡Has comprado ${item.nameEs}!`);
       // Reload both store and inventory
       loadCollectibles();
+      // Actualizar balance de AP coins
+      await refreshBalance();
     } catch (error: unknown) {
       console.error('Error purchasing collectible:', error);
       toast.error(error instanceof Error ? error.message : 'Error al comprar');
