@@ -80,6 +80,7 @@ export function Navbar() {
   const navItems = [
     { href: "/dashboard", label: t("nav.home") },
     { href: "/explorar", label: t("nav.scenarios") },
+    { href: "/misiones", label: "Misiones" },
     { href: "/tienda", label: t("nav.shop") },
     { href: "/leaderboard", label: t("nav.rankings") },
     { href: "/foro", label: t("nav.forum") },
