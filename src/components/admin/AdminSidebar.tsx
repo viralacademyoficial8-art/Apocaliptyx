@@ -30,6 +30,8 @@ import {
   UsersRound,
   Flame,
   Send,
+  MessageCircle,
+  Film,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -79,6 +81,13 @@ const allMenuItems: MenuSection[] = [
       { href: '/admin/torneos', label: 'Torneos', icon: Medal, permission: 'admin.shop.edit' },
       { href: '/admin/streaks', label: 'Rachas', icon: Flame, permission: 'admin.users.view' },
       { href: '/admin/leaderboards', label: 'Leaderboards', icon: BarChart3, permission: 'admin.analytics.view' },
+    ],
+  },
+  {
+    title: 'Moderación',
+    items: [
+      { href: '/admin/chat', label: 'Chat', icon: MessageCircle, permission: 'admin.scenarios.view' },
+      { href: '/admin/contenido', label: 'Contenido', icon: Film, permission: 'admin.scenarios.view' },
     ],
   },
   {
