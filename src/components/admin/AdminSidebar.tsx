@@ -23,6 +23,14 @@ import {
   Trophy,
   Store,
   LucideIcon,
+  Target,
+  Award,
+  Gift,
+  Gem,
+  HeadphonesIcon,
+  FileVideo,
+  History,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -49,8 +57,26 @@ const allMenuItems: MenuSection[] = [
       { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, permission: 'admin.dashboard' },
       { href: '/admin/usuarios', label: 'Usuarios', icon: Users, permission: 'admin.users.view' },
       { href: '/admin/escenarios', label: 'Escenarios', icon: FileText, permission: 'admin.scenarios.view' },
-      { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, badge: 23, permission: 'admin.reports.view' },
+      { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, permission: 'admin.reports.view' },
+      { href: '/admin/advertencias', label: 'Advertencias', icon: Shield, permission: 'admin.users.ban' },
+    ],
+  },
+  {
+    title: 'Contenido',
+    items: [
       { href: '/admin/foro', label: 'Foro', icon: MessageSquare, permission: 'admin.scenarios.view' },
+      { href: '/admin/contenido', label: 'Moderación', icon: FileVideo, permission: 'admin.scenarios.view' },
+      { href: '/admin/torneos', label: 'Torneos', icon: Trophy, permission: 'admin.shop.view' },
+    ],
+  },
+  {
+    title: 'Gamificación',
+    items: [
+      { href: '/admin/misiones', label: 'Misiones', icon: Target, permission: 'admin.shop.edit' },
+      { href: '/admin/logros', label: 'Logros', icon: Award, permission: 'admin.shop.edit' },
+      { href: '/admin/coleccionables', label: 'Coleccionables', icon: Gem, permission: 'admin.shop.edit' },
+      { href: '/admin/titulos', label: 'Títulos', icon: Gift, permission: 'admin.shop.edit' },
+      { href: '/admin/niveles', label: 'Niveles', icon: Layers, permission: 'admin.shop.edit' },
     ],
   },
   {
@@ -59,13 +85,13 @@ const allMenuItems: MenuSection[] = [
       { href: '/admin/tienda', label: 'Tienda', icon: Store, permission: 'admin.shop.view' },
       { href: '/admin/items', label: 'Ítems', icon: ShoppingBag, permission: 'admin.shop.view' },
       { href: '/admin/promociones', label: 'Promociones', icon: Tag, permission: 'admin.shop.edit' },
-      { href: '/admin/logros', label: 'Logros', icon: Trophy, permission: 'admin.shop.edit' },
     ],
   },
   {
     title: 'Comunicación',
     items: [
       { href: '/admin/anuncios', label: 'Anuncios', icon: Bell, permission: 'admin.notifications.send' },
+      { href: '/admin/soporte', label: 'Soporte', icon: HeadphonesIcon, permission: 'admin.reports.view' },
     ],
   },
   {
@@ -79,6 +105,7 @@ const allMenuItems: MenuSection[] = [
     title: 'Sistema',
     items: [
       { href: '/admin/configuracion', label: 'Configuración', icon: Settings, permission: 'admin.settings.view' },
+      { href: '/admin/audit-logs', label: 'Auditoría', icon: History, permission: 'admin.logs.view' },
       { href: '/admin/logs', label: 'Logs', icon: ScrollText, permission: 'admin.logs.view' },
     ],
   },
