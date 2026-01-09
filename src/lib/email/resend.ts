@@ -20,8 +20,8 @@ export const resend = {
   }
 };
 
-// Email por defecto (cambia cuando tengas dominio verificado)
-export const FROM_EMAIL = 'Apocaliptics <onboarding@resend.dev>';
+// Email por defecto (dominio verificado en Resend)
+export const FROM_EMAIL = 'Apocaliptics <noreply@apocaliptyx.com>';
 
 // Tipos de email
 export type EmailType = 
