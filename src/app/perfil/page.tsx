@@ -319,10 +319,10 @@ export default function PerfilPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-800 pb-4 overflow-x-auto">
+        <div className="flex gap-2 mb-6 border-b border-gray-800 pb-4 overflow-x-auto scrollbar-hide -mx-4 px-4">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base ${
               activeTab === "overview"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -332,34 +332,40 @@ export default function PerfilPage() {
           </button>
           <button
             onClick={() => setActiveTab("inventory")}
-            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-2 ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base ${
               activeTab === "inventory"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
             }`}
           >
             <Package className="w-4 h-4" />
-            Inventario ({inventory.length})
+            <span className="hidden sm:inline">Inventario</span>
+            <span className="sm:hidden">Items</span>
+            <span className="text-xs">({inventory.length})</span>
           </button>
           <button
             onClick={() => setActiveTab("predictions")}
-            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base ${
               activeTab === "predictions"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
             }`}
           >
-            Mis Predicciones ({predictions.length})
+            <span className="hidden sm:inline">Mis Predicciones</span>
+            <span className="sm:hidden">Predicciones</span>
+            <span className="text-xs ml-1">({predictions.length})</span>
           </button>
           <button
             onClick={() => setActiveTab("scenarios")}
-            className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm sm:text-base ${
               activeTab === "scenarios"
                 ? "bg-purple-500 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
             }`}
           >
-            Mis Escenarios ({scenarios.length})
+            <span className="hidden sm:inline">Mis Escenarios</span>
+            <span className="sm:hidden">Escenarios</span>
+            <span className="text-xs ml-1">({scenarios.length})</span>
           </button>
         </div>
 

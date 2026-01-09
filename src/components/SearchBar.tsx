@@ -154,7 +154,7 @@ export function SearchBar({
             onChange={(e) => setLocalQuery(e.target.value)}
             onFocus={() => setIsOpen(true)}
             onKeyDown={handleKeyDown}
-            className="pl-9 pr-8 w-48 lg:w-64 bg-muted border-border focus-visible:ring-purple-500 focus-visible:border-purple-500"
+            className="pl-9 pr-8 w-40 sm:w-48 md:w-56 lg:w-64 bg-muted border-border focus-visible:ring-purple-500 focus-visible:border-purple-500"
           />
           {localQuery && (
             <button
@@ -169,7 +169,7 @@ export function SearchBar({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden min-w-[300px]"
+            className="absolute top-full left-0 mt-2 bg-card border border-border rounded-lg shadow-xl z-50 overflow-hidden w-[280px] sm:w-[320px] md:min-w-[300px]"
           >
             {/* Resultados rápidos */}
             {localQuery.length >= 2 && (

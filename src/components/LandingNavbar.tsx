@@ -27,13 +27,13 @@ export function LandingNavbar() {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 safe-area-top ${
           scrolled
             ? "bg-gray-950/80 backdrop-blur-xl border-b border-zinc-800/50 shadow-lg shadow-purple-500/5"
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 safe-area-left safe-area-right">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
             <Link
