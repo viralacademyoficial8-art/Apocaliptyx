@@ -49,7 +49,8 @@ export function LanguageSelector({
         <DropdownMenuContent
           align="start"
           sideOffset={8}
-          className="bg-card border-border min-w-[200px] max-h-[300px] overflow-y-auto"
+          collisionPadding={16}
+          className="bg-card border-border w-[220px] max-h-[50vh] overflow-y-auto z-[100]"
         >
           <AnimatePresence>
             {languages.map((lang, index) => (
@@ -62,7 +63,7 @@ export function LanguageSelector({
                 <DropdownMenuItem
                   onClick={() => setLanguage(lang.code)}
                   className={cn(
-                    'flex items-center justify-between gap-3 cursor-pointer py-2.5',
+                    'flex items-center justify-between gap-3 cursor-pointer py-3 min-h-[44px]',
                     language === lang.code && 'bg-purple-500/10',
                   )}
                 >
@@ -91,7 +92,7 @@ export function LanguageSelector({
           variant="ghost"
           size={variant === 'minimal' ? 'icon' : 'sm'}
           className={cn(
-            'gap-1.5 sm:gap-2 hover:bg-muted transition-colors min-w-fit whitespace-nowrap px-2 sm:px-3',
+            'gap-1.5 sm:gap-2 hover:bg-muted transition-colors min-w-fit whitespace-nowrap px-2.5 sm:px-3 h-9 sm:h-10 touch-target-sm',
             className,
           )}
         >
@@ -120,7 +121,8 @@ export function LanguageSelector({
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="bg-card border-border min-w-[200px] sm:min-w-[220px] max-h-[70vh] overflow-y-auto"
+        collisionPadding={16}
+        className="bg-card border-border w-[200px] sm:min-w-[220px] max-h-[60vh] sm:max-h-[70vh] overflow-y-auto z-[100]"
       >
         <AnimatePresence>
           {languages.map((lang, index) => (
@@ -133,7 +135,7 @@ export function LanguageSelector({
               <DropdownMenuItem
                 onClick={() => setLanguage(lang.code)}
                 className={cn(
-                  'flex items-center justify-between gap-3 cursor-pointer py-2 sm:py-2.5',
+                  'flex items-center justify-between gap-3 cursor-pointer py-2.5 sm:py-2.5 min-h-[44px] sm:min-h-[40px]',
                   language === lang.code && 'bg-purple-500/10',
                 )}
               >
