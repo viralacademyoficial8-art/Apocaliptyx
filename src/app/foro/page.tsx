@@ -2428,6 +2428,32 @@ function PostCard({
         </div>
       )}
 
+      {/* Images */}
+      {post.media && post.media.length > 0 && (
+        <div className={`mb-4 grid gap-2 ${
+          post.media.length === 1 ? 'grid-cols-1' :
+          post.media.length === 2 ? 'grid-cols-2' :
+          post.media.length === 3 ? 'grid-cols-2' :
+          'grid-cols-2'
+        }`}>
+          {post.media.slice(0, 4).map((mediaItem: any, index: number) => (
+            <div
+              key={mediaItem.id || index}
+              className={`rounded-xl overflow-hidden ${
+                post.media.length === 3 && index === 0 ? 'col-span-2' : ''
+              }`}
+            >
+              <img
+                src={mediaItem.url}
+                alt={`Imagen ${index + 1}`}
+                className="w-full h-auto max-h-80 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => window.open(mediaItem.url, '_blank')}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Poll */}
       {post.poll && (
         <PollDisplay poll={post.poll} postId={post.id} currentUserId={currentUserId} dateLocale={dateLocale} />
