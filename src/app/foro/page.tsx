@@ -691,8 +691,12 @@ function ForoContent() {
           toast.success(t('forum.thread.created'));
           resetCreateModal();
           loadPosts();
+        } else {
+          console.error('Thread creation failed:', result.error);
+          toast.error(result.error || t('forum.thread.createError'));
         }
       } catch (error) {
+        console.error('Thread creation exception:', error);
         toast.error(t('forum.thread.createError'));
       } finally {
         setCreating(false);
