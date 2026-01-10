@@ -20,6 +20,9 @@ interface CommentRow {
   author_id: string;
   content: string;
   created_at: string;
+  parent_id?: string | null;
+  reply_to_username?: string | null;
+  replies_count?: number;
   author?: CommentUser;
 }
 
@@ -61,6 +64,9 @@ export async function GET(
       } : null,
       content: comment.content,
       createdAt: comment.created_at,
+      parentId: comment.parent_id || null,
+      replyToUsername: comment.reply_to_username || null,
+      repliesCount: comment.replies_count || 0,
     })) || [];
 
     return NextResponse.json({ comments: formattedComments });
@@ -103,7 +109,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { content } = body;
+    const { content, parentId, replyToUsername } = body;
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json({ error: 'El comentario es requerido' }, { status: 400 });
@@ -113,19 +119,34 @@ export async function POST(
       return NextResponse.json({ error: 'El comentario es demasiado largo (máx 500 caracteres)' }, { status: 400 });
     }
 
-    // Create comment
+    // Create comment with optional parent for replies
+    const commentData: any = {
+      post_id: postId,
+      author_id: session.user.id,
+      content: content.trim(),
+    };
+
+    // If this is a reply to another comment
+    if (parentId) {
+      commentData.parent_id = parentId;
+      if (replyToUsername) {
+        commentData.reply_to_username = replyToUsername;
+      }
+    }
+
     const { data: comment, error } = await supabase()
       .from('community_post_comments')
-      .insert({
-        post_id: postId,
-        author_id: session.user.id,
-        content: content.trim(),
-      })
+      .insert(commentData)
       .select(`
         *,
         author:users(id, username, display_name, avatar_url, level)
       `)
       .single();
+
+    // If this is a reply, increment replies_count on parent comment
+    if (parentId && !error) {
+      await supabase().rpc('increment_replies_count', { comment_id: parentId });
+    }
 
     if (error) throw error;
 
@@ -158,6 +179,9 @@ export async function POST(
         } : null,
         content: (comment as any).content,
         createdAt: (comment as any).created_at,
+        parentId: (comment as any).parent_id || null,
+        replyToUsername: (comment as any).reply_to_username || null,
+        repliesCount: 0,
       },
     });
   } catch (error) {
