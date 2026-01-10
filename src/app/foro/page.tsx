@@ -635,7 +635,7 @@ function ForoContent() {
   // Crear post
   const handleCreatePost = async () => {
     // DEBUG - usando toast para que sea visible
-    toast.info(`DEBUG: mode=${createMode}, imgs=${selectedImages.length}`);
+    toast(`DEBUG: mode=${createMode}, imgs=${selectedImages.length}`);
 
     if (!user?.id) {
       router.push('/login');
@@ -713,12 +713,8 @@ function ForoContent() {
       // Upload images first if any
       const uploadedImageUrls: string[] = [];
 
-      // DEBUG: mostrar cuantas imagenes se van a subir
       if (selectedImages.length > 0) {
-        toast.info(`Subiendo ${selectedImages.length} imagen(es)...`);
-      }
-
-      if (selectedImages.length > 0) {
+        toast(`Subiendo ${selectedImages.length} imagen(es)...`);
         for (const imageFile of selectedImages) {
           const formData = new FormData();
           formData.append('file', imageFile);
