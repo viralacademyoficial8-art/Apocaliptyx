@@ -364,7 +364,7 @@
       "voteRecorded": "Vote enregistré!",
       "voteError": "Erreur lors du vote",
       "pollEnded": "Sondage terminé",
-      "endsIn": "Se termine {{time}}"
+      "endsIn": "Se termine dans"
     },
     "thread": {
       "titleOptional": "Titre du fil (optionnel)",

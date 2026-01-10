@@ -1406,18 +1406,15 @@ class ForumService {
     if (posts.length === 0) return posts;
 
     const postIds = posts.map(p => p.id);
-    console.log('[ForumService] enrichPostsWithUserState - postIds:', postIds);
 
     // Get polls for all posts (visible to everyone)
-    const { data: pollsData, error: pollsError } = await getSupabase()
+    const { data: pollsData } = await getSupabase()
       .from('forum_polls')
       .select(`
         *,
         options:forum_poll_options(*)
       `)
       .in('post_id', postIds);
-
-    console.log('[ForumService] pollsData:', pollsData, 'error:', pollsError);
 
     type PollRow = ForumPoll & { options?: ForumPollOption[]; post_id?: string };
     const pollMap = new Map<string, ForumPoll>();
@@ -1453,16 +1450,12 @@ class ForumService {
       }
     }
 
-    console.log('[ForumService] pollMap size:', pollMap.size, 'keys:', Array.from(pollMap.keys()));
-
     // If no user, just add polls and return
     if (!userId) {
-      const result = posts.map(post => ({
+      return posts.map(post => ({
         ...post,
         poll: pollMap.get(post.id),
       }));
-      console.log('[ForumService] posts with polls (no user):', result.filter(p => p.poll).length);
-      return result;
     }
 
     // Get user reactions
@@ -1502,22 +1495,18 @@ class ForumService {
     const bookmarkSet = new Set(((bookmarks || []) as BookmarkRow[]).map(b => b.post_id).filter(Boolean) as string[]);
     const repostSet = new Set(((reposts || []) as RepostRow[]).map(r => r.original_post_id).filter(Boolean) as string[]);
 
-    const result = posts.map(post => ({
+    return posts.map(post => ({
       ...post,
       poll: pollMap.get(post.id),
       user_reactions: reactionMap.get(post.id) || [],
       user_bookmarked: bookmarkSet.has(post.id),
       user_reposted: repostSet.has(post.id),
     }));
-    console.log('[ForumService] posts with polls (with user):', result.filter(p => p.poll).length);
-    return result;
   }
 
   // ==================== POLLS ====================
 
   async createPostWithPoll(userId: string, input: CreatePostInput): Promise<ForumPost | null> {
-    console.log('[ForumService] createPostWithPoll called with poll:', input.poll);
-
     // First create the post
     const { data: postRaw, error: postError } = await getSupabase()
       .from('forum_posts')
@@ -1537,10 +1526,9 @@ class ForumService {
 
     const post = postRaw as ForumPost | null;
     if (postError || !post) {
-      console.error('[ForumService] Error creating post:', postError);
+      console.error('Error creating post:', postError);
       return null;
     }
-    console.log('[ForumService] Post created with id:', post.id);
 
     // If there's a poll, create it
     if (input.poll) {
@@ -1559,10 +1547,8 @@ class ForumService {
         .single();
 
       if (pollError) {
-        console.error('[ForumService] Error creating poll:', pollError);
+        console.error('Error creating poll:', pollError);
         // Still return the post, but log the error
-      } else {
-        console.log('[ForumService] Poll created:', pollRaw);
       }
 
       const poll = pollRaw as { id?: string } | null;
@@ -1577,9 +1563,7 @@ class ForumService {
 
         const { error: optionsError } = await getSupabase().from('forum_poll_options').insert(options as never[]);
         if (optionsError) {
-          console.error('[ForumService] Error creating poll options:', optionsError);
-        } else {
-          console.log('[ForumService] Poll options created:', options.length);
+          console.error('Error creating poll options:', optionsError);
         }
       }
     }

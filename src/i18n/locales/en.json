@@ -623,7 +623,7 @@
       "voteRecorded": "Vote recorded!",
       "voteError": "Error voting",
       "pollEnded": "Poll ended",
-      "endsIn": "Ends {{time}}"
+      "endsIn": "Ends in"
     },
     "thread": {
       "titleOptional": "Thread title (optional)",
