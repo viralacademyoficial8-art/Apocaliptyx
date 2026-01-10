@@ -1403,9 +1403,60 @@ class ForumService {
   }
 
   private async enrichPostsWithUserState(posts: ForumPost[], userId: string | null): Promise<ForumPost[]> {
-    if (!userId || posts.length === 0) return posts;
+    if (posts.length === 0) return posts;
 
     const postIds = posts.map(p => p.id);
+
+    // Get polls for all posts (visible to everyone)
+    const { data: pollsData } = await getSupabase()
+      .from('forum_polls')
+      .select(`
+        *,
+        options:forum_poll_options(*)
+      `)
+      .in('post_id', postIds);
+
+    type PollRow = ForumPoll & { options?: ForumPollOption[]; post_id?: string };
+    const pollMap = new Map<string, ForumPoll>();
+
+    if (pollsData) {
+      for (const pollRaw of pollsData as PollRow[]) {
+        if (pollRaw.post_id) {
+          const totalVotes = (pollRaw.options || []).reduce((sum, opt) => sum + (opt.votes_count || 0), 0);
+
+          // Check if user has voted (if logged in)
+          let hasVoted = false;
+          let userVotes: string[] = [];
+
+          if (userId && pollRaw.id) {
+            const { data: votes } = await getSupabase()
+              .from('forum_poll_votes')
+              .select('option_id')
+              .eq('poll_id', pollRaw.id)
+              .eq('user_id', userId);
+
+            hasVoted = (votes || []).length > 0;
+            userVotes = (votes || []).map((v: { option_id?: string }) => v.option_id).filter(Boolean) as string[];
+          }
+
+          pollMap.set(pollRaw.post_id, {
+            ...pollRaw,
+            options: pollRaw.options || [],
+            total_votes: totalVotes,
+            has_voted: hasVoted,
+            user_votes: userVotes,
+          });
+        }
+      }
+    }
+
+    // If no user, just add polls and return
+    if (!userId) {
+      return posts.map(post => ({
+        ...post,
+        poll: pollMap.get(post.id),
+      }));
+    }
 
     // Get user reactions
     const { data: reactions } = await getSupabase()
@@ -1446,6 +1497,7 @@ class ForumService {
 
     return posts.map(post => ({
       ...post,
+      poll: pollMap.get(post.id),
       user_reactions: reactionMap.get(post.id) || [],
       user_bookmarked: bookmarkSet.has(post.id),
       user_reposted: repostSet.has(post.id),
@@ -1903,9 +1955,9 @@ class ForumService {
 
   async getPostsBySorting(
     sortType: 'hot' | 'rising' | 'controversial',
-    options?: { limit?: number; offset?: number; category?: string }
+    options?: { limit?: number; offset?: number; category?: string; userId?: string }
   ): Promise<ForumPost[]> {
-    const { limit = 20, offset = 0, category } = options || {};
+    const { limit = 20, offset = 0, category, userId } = options || {};
 
     let query = getSupabase()
       .from('forum_posts')
@@ -1942,7 +1994,8 @@ class ForumService {
       return [];
     }
 
-    return data || [];
+    // Enrich posts with polls and user state
+    return this.enrichPostsWithUserState(data || [], userId || null);
   }
 
   // ==================== GIF SEARCH (GIPHY/TENOR) ====================

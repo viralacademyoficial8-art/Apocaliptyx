@@ -329,6 +329,7 @@ function ForoContent() {
         data = await forumService.getPostsBySorting(filter, {
           category: selectedCategory !== 'all' ? selectedCategory : undefined,
           limit: 50,
+          userId: user?.id,
         });
       } else {
         data = await forumService.getPostsWithUserState(user?.id || null, {
