@@ -1494,8 +1494,13 @@ class ForumService {
         .select('*')
         .single();
 
+      if (pollError) {
+        console.error('Error creating poll:', pollError);
+        // Still return the post, but log the error
+      }
+
       const poll = pollRaw as { id?: string } | null;
-      if (!pollError && poll?.id) {
+      if (poll?.id) {
         // Create poll options
         const options = input.poll.options.map((opt, idx) => ({
           poll_id: poll.id,
@@ -1504,7 +1509,10 @@ class ForumService {
           votes_count: 0,
         }));
 
-        await getSupabase().from('forum_poll_options').insert(options as never[]);
+        const { error: optionsError } = await getSupabase().from('forum_poll_options').insert(options as never[]);
+        if (optionsError) {
+          console.error('Error creating poll options:', optionsError);
+        }
       }
     }
 
