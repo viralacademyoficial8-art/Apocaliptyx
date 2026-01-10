@@ -339,6 +339,12 @@ function ForoContent() {
           limit: 50,
         });
       }
+      // Debug: Log posts with polls
+      const postsWithPolls = data.filter(p => p.poll);
+      console.log('[loadPosts] Total posts:', data.length, 'Posts with polls:', postsWithPolls.length);
+      if (postsWithPolls.length > 0) {
+        console.log('[loadPosts] First poll:', postsWithPolls[0].poll);
+      }
       setPosts(data);
     } catch (error) {
       console.error('Error loading posts:', error);
@@ -2285,6 +2291,11 @@ function PostCard({
   const { t } = useTranslation();
   const [showReactions, setShowReactions] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+
+  // Debug: Log poll data for each post
+  if (post.poll) {
+    console.log('[PostCard] Post has poll:', post.id, post.poll);
+  }
   const isAuthor = currentUserId === post.author_id;
 
   // Calculate total reactions
