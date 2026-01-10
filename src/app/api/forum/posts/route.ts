@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       .from('forum_posts')
       .select(`
         *,
-        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+        author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url),
         category:forum_categories(id, name, slug, icon)
       `)
       .eq('status', 'published');
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       })
       .select(`
         *,
-        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level)
+        author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url)
       `)
       .single();
 
