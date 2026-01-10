@@ -75,9 +75,49 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
-    const posts = postsRaw as PostRow[] | null;
+    const posts = (postsRaw || []) as PostRow[];
 
-    return NextResponse.json({ posts: posts || [] });
+    // Load polls for posts
+    let pollsCount = 0;
+    if (posts.length > 0) {
+      const postIds = posts.map(p => p.id);
+
+      const { data: pollsData, error: pollsError } = await supabase()
+        .from('forum_polls')
+        .select(`
+          *,
+          options:forum_poll_options(*)
+        `)
+        .in('post_id', postIds);
+
+      if (pollsError) {
+        console.error('Error loading polls:', pollsError);
+      }
+
+      if (pollsData && pollsData.length > 0) {
+        pollsCount = pollsData.length;
+        const pollMap = new Map();
+        for (const poll of pollsData) {
+          const totalVotes = (poll.options || []).reduce((sum: number, opt: { votes_count?: number }) => sum + (opt.votes_count || 0), 0);
+          pollMap.set(poll.post_id, {
+            ...poll,
+            total_votes: totalVotes,
+            has_voted: false,
+            user_votes: [],
+          });
+        }
+
+        // Add polls to posts
+        for (const post of posts) {
+          const poll = pollMap.get(post.id);
+          if (poll) {
+            (post as PostRow & { poll?: unknown }).poll = poll;
+          }
+        }
+      }
+    }
+
+    return NextResponse.json({ posts, _debug: { pollsLoaded: pollsCount, postsCount: posts.length } });
   } catch (error) {
     console.error('Error fetching posts:', error);
     return NextResponse.json(
