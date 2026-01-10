@@ -119,69 +119,37 @@ export async function POST(
       return NextResponse.json({ error: 'El comentario es demasiado largo (máx 500 caracteres)' }, { status: 400 });
     }
 
-    // Create comment with optional parent for replies
-    const commentData: any = {
-      post_id: postId,
-      author_id: session.user.id,
-      content: content.trim(),
-    };
-
-    // If this is a reply to another comment
-    if (parentId) {
-      commentData.parent_id = parentId;
-      if (replyToUsername) {
-        commentData.reply_to_username = replyToUsername;
-      }
-    }
-
-    const { data: comment, error } = await supabase()
-      .from('community_post_comments')
-      .insert(commentData)
-      .select(`
-        *,
-        author:users(id, username, display_name, avatar_url, level)
-      `)
-      .single();
-
-    // If this is a reply, increment replies_count on parent comment
-    if (parentId && !error) {
-      await supabase().rpc('increment_replies_count', { comment_id: parentId });
-    }
+    // Use RPC function to create comment (bypasses any interceptors)
+    const { data: commentResult, error } = await supabase().rpc('create_community_comment', {
+      p_post_id: postId,
+      p_author_id: session.user.id,
+      p_content: content.trim(),
+      p_parent_id: parentId || null,
+      p_reply_to_username: replyToUsername || null,
+    });
 
     if (error) throw error;
 
-    // Increment comments count on post
-    const { data: post } = await supabase()
-      .from('community_posts')
-      .select('comments_count')
-      .eq('id', postId)
-      .single();
-
-    if (post) {
-      await supabase()
-        .from('community_posts')
-        .update({ comments_count: ((post as any).comments_count || 0) + 1 })
-        .eq('id', postId);
-    }
+    const comment = commentResult as any;
 
     return NextResponse.json({
       success: true,
       comment: {
-        id: (comment as any).id,
-        postId: (comment as any).post_id,
-        authorId: (comment as any).author_id,
-        author: (comment as any).author ? {
-          id: (comment as any).author.id,
-          username: (comment as any).author.username,
-          displayName: (comment as any).author.display_name,
-          avatarUrl: (comment as any).author.avatar_url,
-          level: (comment as any).author.level,
+        id: comment.id,
+        postId: comment.post_id,
+        authorId: comment.author_id,
+        author: comment.author ? {
+          id: comment.author.id,
+          username: comment.author.username,
+          displayName: comment.author.display_name,
+          avatarUrl: comment.author.avatar_url,
+          level: comment.author.level,
         } : null,
-        content: (comment as any).content,
-        createdAt: (comment as any).created_at,
-        parentId: (comment as any).parent_id || null,
-        replyToUsername: (comment as any).reply_to_username || null,
-        repliesCount: 0,
+        content: comment.content,
+        createdAt: comment.created_at,
+        parentId: comment.parent_id || null,
+        replyToUsername: comment.reply_to_username || null,
+        repliesCount: comment.replies_count || 0,
       },
     });
   } catch (error) {
