@@ -342,7 +342,7 @@ class ForumService {
       .from('forum_posts')
       .select(`
         *,
-        author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
         category:forum_categories(id, name, slug, icon)
       `)
       .eq('status', 'published');
@@ -388,7 +388,7 @@ class ForumService {
       .from('forum_posts')
       .select(`
         *,
-        author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
         category:forum_categories(id, name, slug, icon)
       `)
       .eq('id', postId)
@@ -426,7 +426,7 @@ class ForumService {
       } as never)
       .select(`
         *,
-        author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level)
+        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level)
       `)
       .single();
 
@@ -569,7 +569,7 @@ class ForumService {
       .from('forum_comments')
       .select(`
         *,
-        author:profiles!forum_comments_author_id_fkey(id, username, display_name, avatar_url, level)
+        author:users!forum_comments_author_id_fkey(id, username, display_name, avatar_url, level)
       `)
       .eq('post_id', postId)
       .eq('status', 'published')
@@ -596,7 +596,7 @@ class ForumService {
       } as never)
       .select(`
         *,
-        author:profiles!forum_comments_author_id_fkey(id, username, display_name, avatar_url, level)
+        author:users!forum_comments_author_id_fkey(id, username, display_name, avatar_url, level)
       `)
       .single();
 
@@ -1007,7 +1007,7 @@ class ForumService {
       .select(`
         post:forum_posts(
           *,
-          author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+          author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
           category:forum_categories(id, name, slug, icon)
         )
       `)
@@ -1219,7 +1219,7 @@ class ForumService {
         .from('forum_posts')
         .select(`
           *,
-          author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+          author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
           category:forum_categories(id, name, slug, icon)
         `)
         .in('author_id', followingIds)
@@ -1911,7 +1911,7 @@ class ForumService {
       .from('forum_posts')
       .select(`
         *,
-        author:profiles!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
+        author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
         category:forum_categories(id, name, slug, icon)
       `)
       .eq('status', 'published');
