@@ -97,30 +97,47 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, category_id, tags } = body;
+    const { title, content, category_id, tags, gif_url, gif_width, gif_height, image_urls } = body;
 
-    if (!content) {
+    // Content is optional if there are images or gif
+    if (!content && !gif_url && (!image_urls || image_urls.length === 0)) {
       return NextResponse.json(
         { error: 'El contenido es requerido' },
         { status: 400 }
       );
     }
 
+    // Build post data
+    const postData: Record<string, unknown> = {
+      title: title || '',
+      content: content || '',
+      author_id: session.user.id,
+      category_id: category_id || null,
+      tags: tags || [],
+      status: 'published',
+      is_pinned: false,
+      is_locked: false,
+      views_count: 0,
+      likes_count: 0,
+      comments_count: 0,
+    };
+
+    // Add GIF if provided
+    if (gif_url) {
+      postData.gif_url = gif_url;
+      postData.gif_width = gif_width || null;
+      postData.gif_height = gif_height || null;
+    }
+
+    // Add media flags if images
+    if (image_urls && image_urls.length > 0) {
+      postData.has_media = true;
+      postData.media_count = image_urls.length;
+    }
+
     const { data: post, error } = await supabase()
       .from('forum_posts')
-      .insert({
-        title: title || '',
-        content,
-        author_id: session.user.id,
-        category_id: category_id || null,
-        tags: tags || [],
-        status: 'published',
-        is_pinned: false,
-        is_locked: false,
-        views_count: 0,
-        likes_count: 0,
-        comments_count: 0,
-      })
+      .insert(postData)
       .select(`
         *,
         author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level)
@@ -133,6 +150,25 @@ export async function POST(request: NextRequest) {
         { error: error.message || 'Error al crear post' },
         { status: 400 }
       );
+    }
+
+    // Save image URLs to forum_post_media table
+    if (image_urls && image_urls.length > 0 && post) {
+      const mediaRecords = image_urls.map((url: string, index: number) => ({
+        post_id: (post as any).id,
+        media_type: 'image',
+        url: url,
+        sort_order: index,
+      }));
+
+      const { error: mediaError } = await supabase()
+        .from('forum_post_media')
+        .insert(mediaRecords);
+
+      if (mediaError) {
+        console.error('Error saving media records:', mediaError);
+        // Don't fail the whole request, just log the error
+      }
     }
 
     return NextResponse.json({

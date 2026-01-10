@@ -700,13 +700,38 @@ function ForoContent() {
     }
 
     // Regular post
-    if (!newPostContent.trim() && !selectedGif) {
+    if (!newPostContent.trim() && !selectedGif && selectedImages.length === 0) {
       toast.error(t('forum.actions.writeToPublish'));
       return;
     }
 
     setCreating(true);
     try {
+      // Upload images first if any
+      const uploadedImageUrls: string[] = [];
+
+      if (selectedImages.length > 0) {
+        for (const imageFile of selectedImages) {
+          const formData = new FormData();
+          formData.append('file', imageFile);
+
+          const uploadResponse = await fetch('/api/forum/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const uploadData = await uploadResponse.json();
+
+          if (uploadResponse.ok && uploadData.url) {
+            uploadedImageUrls.push(uploadData.url);
+          } else {
+            toast.error(uploadData.error || 'Error al subir imagen');
+            setCreating(false);
+            return;
+          }
+        }
+      }
+
       const response = await fetch('/api/forum/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -717,6 +742,7 @@ function ForoContent() {
           gif_url: selectedGif?.url,
           gif_width: selectedGif?.width,
           gif_height: selectedGif?.height,
+          image_urls: uploadedImageUrls.length > 0 ? uploadedImageUrls : undefined,
         }),
       });
 
