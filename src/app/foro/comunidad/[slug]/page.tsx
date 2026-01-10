@@ -237,7 +237,16 @@ export default function CommunityPage() {
 
   // Create post
   const handleCreatePost = async () => {
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim()) {
+      toast.error('Escribe algo para publicar');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error('Debes iniciar sesión para publicar');
+      return;
+    }
+
     if (!isMember) {
       toast.error('Debes ser miembro para publicar');
       return;
@@ -255,6 +264,11 @@ export default function CommunityPage() {
       });
 
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al crear publicación');
+      }
+
       if (data.error) throw new Error(data.error);
 
       setPosts([data.post, ...posts]);

@@ -141,7 +141,20 @@ export function PostCard({
 
   // Submit comment or reply
   const handleSubmitComment = async () => {
-    if (!newComment.trim() || !isAuthenticated) return;
+    if (!newComment.trim()) {
+      toast.error('Escribe un comentario');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error('Debes iniciar sesión para comentar');
+      return;
+    }
+
+    if (!isMember) {
+      toast.error('Debes ser miembro de la comunidad para comentar');
+      return;
+    }
 
     setSubmittingComment(true);
     try {
