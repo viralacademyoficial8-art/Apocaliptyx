@@ -78,10 +78,11 @@ export async function GET(request: NextRequest) {
     const posts = (postsRaw || []) as PostRow[];
 
     // Load polls for posts
+    let pollsCount = 0;
     if (posts.length > 0) {
       const postIds = posts.map(p => p.id);
 
-      const { data: pollsData } = await supabase()
+      const { data: pollsData, error: pollsError } = await supabase()
         .from('forum_polls')
         .select(`
           *,
@@ -89,7 +90,12 @@ export async function GET(request: NextRequest) {
         `)
         .in('post_id', postIds);
 
+      if (pollsError) {
+        console.error('Error loading polls:', pollsError);
+      }
+
       if (pollsData && pollsData.length > 0) {
+        pollsCount = pollsData.length;
         const pollMap = new Map();
         for (const poll of pollsData) {
           const totalVotes = (poll.options || []).reduce((sum: number, opt: { votes_count?: number }) => sum + (opt.votes_count || 0), 0);
@@ -111,7 +117,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ posts });
+    return NextResponse.json({ posts, _debug: { pollsLoaded: pollsCount, postsCount: posts.length } });
   } catch (error) {
     console.error('Error fetching posts:', error);
     return NextResponse.json(
