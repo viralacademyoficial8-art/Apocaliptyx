@@ -343,7 +343,8 @@ class ForumService {
       .select(`
         *,
         author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
-        category:forum_categories(id, name, slug, icon)
+        category:forum_categories(id, name, slug, icon),
+        thread:forum_threads(id, title, total_posts, user_id)
       `)
       .eq('status', 'published');
 
@@ -1964,7 +1965,8 @@ class ForumService {
       .select(`
         *,
         author:users!forum_posts_author_id_fkey(id, username, display_name, avatar_url, level),
-        category:forum_categories(id, name, slug, icon)
+        category:forum_categories(id, name, slug, icon),
+        thread:forum_threads(id, title, total_posts, user_id)
       `)
       .eq('status', 'published');
 

@@ -2310,9 +2310,18 @@ function PostCard({
     <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
       {/* Thread indicator */}
       {post.thread_id && (
-        <div className="flex items-center gap-2 text-blue-400 text-sm mb-3">
-          <ListPlus className="w-4 h-4" />
-          <span>{t('forum.posts.thread')} {post.thread_position}/{post.thread?.total_posts || '?'}</span>
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-2 mb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-blue-400">
+              <ListPlus className="w-4 h-4" />
+              <span className="font-medium">{t('forum.posts.thread')}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="bg-blue-500/20 px-2 py-0.5 rounded-full text-blue-300 text-xs font-medium">
+                {post.thread_position}/{post.thread?.total_posts || '?'}
+              </span>
+            </div>
+          </div>
         </div>
       )}
 
