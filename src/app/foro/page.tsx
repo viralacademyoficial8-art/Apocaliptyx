@@ -700,6 +700,7 @@ function ForoContent() {
     }
 
     // Regular post
+    console.log('DEBUG: selectedImages =', selectedImages, 'length =', selectedImages.length);
     if (!newPostContent.trim() && !selectedGif && selectedImages.length === 0) {
       toast.error(t('forum.actions.writeToPublish'));
       return;
@@ -709,6 +710,7 @@ function ForoContent() {
     try {
       // Upload images first if any
       const uploadedImageUrls: string[] = [];
+      console.log('DEBUG: About to upload images, count:', selectedImages.length);
 
       if (selectedImages.length > 0) {
         for (const imageFile of selectedImages) {
