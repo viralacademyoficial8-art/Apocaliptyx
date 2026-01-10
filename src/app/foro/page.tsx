@@ -634,6 +634,8 @@ function ForoContent() {
 
   // Crear post
   const handleCreatePost = async () => {
+    console.log('DEBUG handleCreatePost called, createMode:', createMode, 'selectedImages:', selectedImages.length);
+
     if (!user?.id) {
       router.push('/login');
       return;
