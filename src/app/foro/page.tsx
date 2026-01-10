@@ -83,41 +83,6 @@ const BADGE_STYLES: Record<BadgeType, { icon: string; color: string; bg: string 
   apocaliptyx: { icon: '⚡', color: 'text-pink-400', bg: 'bg-pink-500/20' },
 };
 
-// Debug utility - accessible from browser console as window.debugPolls()
-if (typeof window !== 'undefined') {
-  (window as unknown as { debugPolls: () => Promise<void> }).debugPolls = async () => {
-    console.log('[Debug] Testing poll loading...');
-    const { getSupabaseClient } = await import('@/lib/supabase/client');
-    const supabase = getSupabaseClient();
-
-    // Get all polls
-    const { data: polls, error: pollsError } = await supabase
-      .from('forum_polls')
-      .select('*, options:forum_poll_options(*)');
-
-    console.log('[Debug] Polls from DB:', polls);
-    if (pollsError) console.error('[Debug] Polls error:', pollsError);
-
-    // Get all posts
-    const { data: posts, error: postsError } = await supabase
-      .from('forum_posts')
-      .select('id, content')
-      .eq('status', 'published')
-      .limit(10);
-
-    console.log('[Debug] Recent posts:', posts);
-    if (postsError) console.error('[Debug] Posts error:', postsError);
-
-    // Check if poll post_ids match post ids
-    if (polls && posts) {
-      const postIds = new Set(posts.map((p: { id: string }) => p.id));
-      const pollsWithMatchingPosts = polls.filter((p: { post_id: string }) => postIds.has(p.post_id));
-      console.log('[Debug] Polls with matching posts:', pollsWithMatchingPosts.length, 'of', polls.length);
-    }
-  };
-  console.log('[Foro] Debug utility loaded. Call window.debugPolls() to test poll loading.');
-}
-
 // Loading fallback component
 function ForoLoadingFallback() {
   return (
@@ -373,12 +338,6 @@ function ForoContent() {
           tag: selectedTag || undefined,
           limit: 50,
         });
-      }
-      // Debug: Log posts with polls
-      const postsWithPolls = data.filter(p => p.poll);
-      console.log('[loadPosts] Total posts:', data.length, 'Posts with polls:', postsWithPolls.length);
-      if (postsWithPolls.length > 0) {
-        console.log('[loadPosts] First poll:', postsWithPolls[0].poll);
       }
       setPosts(data);
     } catch (error) {
@@ -2326,11 +2285,6 @@ function PostCard({
   const { t } = useTranslation();
   const [showReactions, setShowReactions] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
-
-  // Debug: Log poll data for each post
-  if (post.poll) {
-    console.log('[PostCard] Post has poll:', post.id, post.poll);
-  }
   const isAuthor = currentUserId === post.author_id;
 
   // Calculate total reactions

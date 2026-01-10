@@ -364,7 +364,7 @@
       "voteRecorded": "Stimme registriert!",
       "voteError": "Fehler beim Abstimmen",
       "pollEnded": "Umfrage beendet",
-      "endsIn": "Endet {{time}}"
+      "endsIn": "Endet in"
     },
     "thread": {
       "titleOptional": "Thread-Titel (optional)",

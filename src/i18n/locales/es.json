@@ -622,7 +622,7 @@
       "voteRecorded": "¡Voto registrado!",
       "voteError": "Error al votar",
       "pollEnded": "Encuesta finalizada",
-      "endsIn": "Termina {{time}}"
+      "endsIn": "Termina en"
     },
     "thread": {
       "titleOptional": "Título del hilo (opcional)",
