@@ -1059,7 +1059,7 @@ class ChatService {
       .order('created_at', { ascending: false })
       .limit(50);
 
-    return data || [];
+    return (data as unknown as Message[]) || [];
   }
 
   // ============================================
