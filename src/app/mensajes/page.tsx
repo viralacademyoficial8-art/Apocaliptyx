@@ -1306,7 +1306,7 @@ function MensajesContent() {
 
                   {/* Bottom Sheet Menu */}
                   {showChatMenu && (
-                    <div className="fixed inset-0 z-[9999]">
+                    <div className="fixed inset-0 z-[9999] flex flex-col justify-end">
                       {/* Backdrop with blur */}
                       <div
                         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
@@ -1314,7 +1314,7 @@ function MensajesContent() {
                       />
 
                       {/* Bottom Sheet Container */}
-                      <div className="absolute bottom-0 left-0 right-0 animate-slide-up">
+                      <div className="relative animate-slide-up">
                         {/* Gradient top border */}
                         <div className="h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
