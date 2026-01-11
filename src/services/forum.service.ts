@@ -987,27 +987,27 @@ class ForumService {
     const existing = existingRaw as { id?: string } | null;
 
     if (existing) {
+      // Delete bookmark - trigger will decrement count automatically
       await getSupabase().from('forum_bookmarks').delete().eq('id', existing.id!);
+      // Get updated count from DB (after trigger has run)
       const { data: postRaw } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
         .eq('id', postId)
         .single();
       const post = postRaw as { bookmarks_count?: number } | null;
-      const newCount = Math.max(0, (post?.bookmarks_count || 1) - 1);
-      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount } as never).eq('id', postId);
-      return { bookmarked: false, count: newCount };
+      return { bookmarked: false, count: post?.bookmarks_count || 0 };
     } else {
+      // Insert bookmark - trigger will increment count automatically
       await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId } as never);
+      // Get updated count from DB (after trigger has run)
       const { data: postRaw } = await getSupabase()
         .from('forum_posts')
         .select('bookmarks_count')
         .eq('id', postId)
         .single();
       const post = postRaw as { bookmarks_count?: number } | null;
-      const newCount = (post?.bookmarks_count || 0) + 1;
-      await getSupabase().from('forum_posts').update({ bookmarks_count: newCount } as never).eq('id', postId);
-      return { bookmarked: true, count: newCount };
+      return { bookmarked: true, count: post?.bookmarks_count || 0 };
     }
   }
 
