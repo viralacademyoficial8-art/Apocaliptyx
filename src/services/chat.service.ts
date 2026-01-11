@@ -915,7 +915,7 @@ class ChatService {
             .single();
 
           if (data) {
-            onNewMessage(data);
+            onNewMessage(data as unknown as Message);
           }
         }
       )
