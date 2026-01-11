@@ -1536,69 +1536,110 @@ function MensajesContent() {
       {/* MODAL CREAR GRUPO */}
       {/* ============================================ */}
       {showCreateGroup && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md">
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-400" />
-                Crear grupo
-              </h2>
-              <button onClick={() => setShowCreateGroup(false)} className="p-2 hover:bg-gray-800 rounded-lg">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          {/* Decorative background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-600/20 rounded-full blur-[100px]" />
+            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-600/20 rounded-full blur-[100px]" />
+          </div>
 
-            <div className="p-4 space-y-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Nombre del grupo *</label>
-                <input
-                  type="text"
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                  placeholder="Ej: Profetas del Apocalipsis"
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  maxLength={50}
-                />
+          {/* Modal container with gradient border */}
+          <div className="relative w-full max-w-md">
+            <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-75" />
+            <div className="relative bg-[#0d0d14] rounded-2xl overflow-hidden">
+              {/* Header */}
+              <div className="p-5 border-b border-gray-800/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                    <Users className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                      Crear grupo
+                    </h2>
+                    <p className="text-xs text-gray-500">Crea un espacio para tu comunidad</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowCreateGroup(false)}
+                  className="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 hover:rotate-90"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Descripción (opcional)</label>
-                <textarea
-                  value={groupDescription}
-                  onChange={(e) => setGroupDescription(e.target.value)}
-                  placeholder="¿De qué trata este grupo?"
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                  rows={3}
-                  maxLength={200}
-                />
+              {/* Form */}
+              <div className="p-5 space-y-5">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Nombre del grupo <span className="text-pink-500">*</span>
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm" />
+                    <input
+                      type="text"
+                      value={groupName}
+                      onChange={(e) => setGroupName(e.target.value)}
+                      placeholder="Ej: Profetas del Apocalipsis"
+                      className="relative w-full px-4 py-3 bg-gray-800/80 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
+                      maxLength={50}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 text-right">{groupName.length}/50</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Descripción <span className="text-gray-500">(opcional)</span>
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm" />
+                    <textarea
+                      value={groupDescription}
+                      onChange={(e) => setGroupDescription(e.target.value)}
+                      placeholder="¿De qué trata este grupo?"
+                      className="relative w-full px-4 py-3 bg-gray-800/80 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300 resize-none"
+                      rows={3}
+                      maxLength={200}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 text-right">{groupDescription.length}/200</p>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                  <span className="text-xl">💡</span>
+                  <p className="text-xs text-gray-400">
+                    Después de crear el grupo podrás agregar miembros y personalizar la configuración desde el menú de opciones.
+                  </p>
+                </div>
               </div>
 
-              <p className="text-xs text-gray-500">
-                Después de crear el grupo podrás agregar miembros desde el menú de opciones.
-              </p>
-            </div>
-
-            <div className="p-4 border-t border-gray-800 flex gap-3">
-              <button
-                onClick={() => setShowCreateGroup(false)}
-                className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreateGroup}
-                disabled={!groupName.trim() || creatingGroup}
-                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {creatingGroup ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Creando...
-                  </>
-                ) : (
-                  'Crear grupo'
-                )}
-              </button>
+              {/* Actions */}
+              <div className="p-5 border-t border-gray-800/50 flex gap-3">
+                <button
+                  onClick={() => setShowCreateGroup(false)}
+                  className="flex-1 px-4 py-3 bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700/50 rounded-xl transition-all duration-300 font-medium text-gray-300 hover:text-white"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateGroup}
+                  disabled={!groupName.trim() || creatingGroup}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {creatingGroup ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Creando...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      Crear grupo
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
