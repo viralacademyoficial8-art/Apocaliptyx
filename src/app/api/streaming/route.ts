@@ -44,6 +44,11 @@ export async function GET(request: NextRequest) {
     const session = await auth();
     const user = session?.user;
 
+    // Get today's date range (UTC)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayISO = today.toISOString();
+
     let query = supabase
       .from('live_streams')
       .select(`
@@ -66,7 +71,7 @@ export async function GET(request: NextRequest) {
       if (followingIds.length > 0) {
         query = query.in('user_id', followingIds);
       } else {
-        return NextResponse.json({ streams: [] });
+        return NextResponse.json({ streams: [], stats: { liveNow: 0, totalViewers: 0, peakViewersToday: 0, streamsToday: 0 } });
       }
     }
 
@@ -83,6 +88,25 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     const streams = streamsRaw as StreamRow[] | null;
+
+    // Calculate real-time stats from database
+    // Get live streams count and viewers
+    const { data: liveStreamsData } = await supabase
+      .from('live_streams')
+      .select('viewers_count')
+      .eq('status', 'live');
+
+    const liveNow = liveStreamsData?.length || 0;
+    const totalViewers = liveStreamsData?.reduce((sum, s) => sum + (s.viewers_count || 0), 0) || 0;
+
+    // Get today's streams stats
+    const { data: todayStreamsData } = await supabase
+      .from('live_streams')
+      .select('peak_viewers, started_at')
+      .gte('started_at', todayISO);
+
+    const streamsToday = todayStreamsData?.length || 0;
+    const peakViewersToday = todayStreamsData?.reduce((max, s) => Math.max(max, s.peak_viewers || 0), 0) || 0;
 
     const formattedStreams = streams?.map(stream => ({
       id: stream.id,
@@ -105,7 +129,15 @@ export async function GET(request: NextRequest) {
       endedAt: stream.ended_at,
     })) || [];
 
-    return NextResponse.json({ streams: formattedStreams });
+    return NextResponse.json({
+      streams: formattedStreams,
+      stats: {
+        liveNow,
+        totalViewers,
+        peakViewersToday,
+        streamsToday,
+      }
+    });
   } catch (error) {
     console.error('Error fetching streams:', error);
     return NextResponse.json(

@@ -48,6 +48,14 @@ export default function StreamingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingStream, setIsStartingStream] = useState(false);
 
+  // Stats from database (real-time)
+  const [stats, setStats] = useState({
+    liveNow: 0,
+    totalViewers: 0,
+    peakViewersToday: 0,
+    streamsToday: 0,
+  });
+
   // Modal state
   const [showStartModal, setShowStartModal] = useState(false);
   const [streamTitle, setStreamTitle] = useState('');
@@ -56,6 +64,15 @@ export default function StreamingPage() {
 
   useEffect(() => {
     loadStreams();
+  }, [filter]);
+
+  // Auto-refresh stats every 10 seconds for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadStreams();
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
   }, [filter]);
 
   const loadStreams = async () => {
@@ -71,6 +88,11 @@ export default function StreamingPage() {
       if (data.error) throw new Error(data.error);
 
       setStreams(data.streams || []);
+
+      // Update stats from server
+      if (data.stats) {
+        setStats(data.stats);
+      }
     } catch (error) {
       console.error('Error loading streams:', error);
       toast.error(t('common.error'));
@@ -134,11 +156,6 @@ export default function StreamingPage() {
     }
     return true;
   });
-
-  const liveCount = streams.filter((s) => s.status === 'live').length;
-  const totalViewers = streams
-    .filter((s) => s.status === 'live')
-    .reduce((sum, s) => sum + s.viewersCount, 0);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-20">
@@ -317,39 +334,35 @@ export default function StreamingPage() {
           )}
         </div>
 
-        {/* Stats */}
+        {/* Stats - Real-time from database */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-red-400 mb-1">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               <span className="text-sm">{t('streaming.liveNow')}</span>
             </div>
-            <p className="text-2xl font-bold">{liveCount}</p>
+            <p className="text-2xl font-bold">{stats.liveNow}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-gray-400 mb-1">
               <Users className="w-4 h-4" />
               <span className="text-sm">{t('streaming.viewers')}</span>
             </div>
-            <p className="text-2xl font-bold">{totalViewers.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{stats.totalViewers.toLocaleString()}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-gray-400 mb-1">
               <TrendingUp className="w-4 h-4" />
               <span className="text-sm">{t('streaming.mostWatchedToday')}</span>
             </div>
-            <p className="text-2xl font-bold">
-              {streams.length > 0
-                ? Math.max(...streams.map((s) => s.peakViewers || 0)).toLocaleString()
-                : 0}
-            </p>
+            <p className="text-2xl font-bold">{stats.peakViewersToday.toLocaleString()}</p>
           </div>
           <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
             <div className="flex items-center gap-2 text-gray-400 mb-1">
               <Clock className="w-4 h-4" />
               <span className="text-sm">{t('streaming.streamsToday')}</span>
             </div>
-            <p className="text-2xl font-bold">{streams.length}</p>
+            <p className="text-2xl font-bold">{stats.streamsToday}</p>
           </div>
         </div>
 
