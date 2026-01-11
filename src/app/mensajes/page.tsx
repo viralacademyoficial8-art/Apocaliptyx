@@ -1314,7 +1314,7 @@ function MensajesContent() {
                       />
 
                       {/* Bottom Sheet Container */}
-                      <div className="relative animate-slide-up">
+                      <div className="relative animate-bottom-sheet">
                         {/* Gradient top border */}
                         <div className="h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
