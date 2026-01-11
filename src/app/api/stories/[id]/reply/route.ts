@@ -6,7 +6,14 @@ export const dynamic = 'force-dynamic';
 
 const supabase = () => getSupabaseAdmin();
 
-interface StoryData {
+interface StoryUserData {
+  id: string;
+  username?: string;
+  display_name?: string;
+  avatar_url?: string;
+}
+
+interface StoryDataRaw {
   id: string;
   user_id: string;
   content?: string;
@@ -22,12 +29,7 @@ interface StoryData {
     image: string | null;
     siteName: string | null;
   };
-  user?: {
-    id: string;
-    username?: string;
-    display_name?: string;
-    avatar_url?: string;
-  };
+  user?: StoryUserData | StoryUserData[];
 }
 
 interface ConversationData {
@@ -75,15 +77,17 @@ export async function POST(
       return NextResponse.json({ error: 'Story no encontrado' }, { status: 404 });
     }
 
-    const story = storyRaw as StoryData;
+    const storyData = storyRaw as StoryDataRaw;
+    // Extract user from array if needed (Supabase joins return arrays)
+    const storyUser = Array.isArray(storyData.user) ? storyData.user[0] : storyData.user;
 
     // Check if expired
-    if (new Date(story.expires_at) < new Date()) {
+    if (new Date(storyData.expires_at) < new Date()) {
       return NextResponse.json({ error: 'Story expirado' }, { status: 410 });
     }
 
     // Can't reply to own story
-    if (story.user_id === user.id) {
+    if (storyData.user_id === user.id) {
       return NextResponse.json(
         { error: 'No puedes responder a tu propio story' },
         { status: 400 }
@@ -108,15 +112,15 @@ export async function POST(
       .from('conversations')
       .select('*')
       .eq('type', 'direct')
-      .or(`participant_1.eq.${user.id},participant_1.eq.${story.user_id}`)
-      .or(`participant_2.eq.${user.id},participant_2.eq.${story.user_id}`);
+      .or(`participant_1.eq.${user.id},participant_1.eq.${storyData.user_id}`)
+      .or(`participant_2.eq.${user.id},participant_2.eq.${storyData.user_id}`);
 
     let conversation: ConversationData | null = null;
 
     if (existingConvs) {
       conversation = existingConvs.find((conv: ConversationData) =>
-        (conv.participant_1 === user.id && conv.participant_2 === story.user_id) ||
-        (conv.participant_1 === story.user_id && conv.participant_2 === user.id)
+        (conv.participant_1 === user.id && conv.participant_2 === storyData.user_id) ||
+        (conv.participant_1 === storyData.user_id && conv.participant_2 === user.id)
       ) || null;
     }
 
@@ -127,7 +131,7 @@ export async function POST(
         .insert({
           type: 'direct',
           participant_1: user.id,
-          participant_2: story.user_id,
+          participant_2: storyData.user_id,
         })
         .select()
         .single();
@@ -145,18 +149,18 @@ export async function POST(
 
     // Create story preview for the message
     const storyPreview = {
-      storyId: story.id,
-      storyOwnerId: story.user_id,
-      storyOwnerUsername: story.user?.username,
-      storyOwnerDisplayName: story.user?.display_name,
-      storyOwnerAvatarUrl: story.user?.avatar_url,
-      content: story.content,
-      mediaUrl: story.media_url,
-      mediaType: story.media_type,
-      backgroundColor: story.background_color,
-      linkUrl: story.link_url,
-      linkPreview: story.link_preview,
-      expiresAt: story.expires_at,
+      storyId: storyData.id,
+      storyOwnerId: storyData.user_id,
+      storyOwnerUsername: storyUser?.username,
+      storyOwnerDisplayName: storyUser?.display_name,
+      storyOwnerAvatarUrl: storyUser?.avatar_url,
+      content: storyData.content,
+      mediaUrl: storyData.media_url,
+      mediaType: storyData.media_type,
+      backgroundColor: storyData.background_color,
+      linkUrl: storyData.link_url,
+      linkPreview: storyData.link_preview,
+      expiresAt: storyData.expires_at,
     };
 
     // Send message with story reference
@@ -194,7 +198,7 @@ export async function POST(
     await supabase()
       .from('notifications')
       .insert({
-        user_id: story.user_id,
+        user_id: storyData.user_id,
         type: 'story_reply',
         title: 'Respuesta a tu story',
         message: `${replier?.display_name || replier?.username || 'Alguien'} respondió a tu story`,
