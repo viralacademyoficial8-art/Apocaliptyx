@@ -1023,12 +1023,12 @@ function MensajesContent() {
       {/* SIDEBAR - Fixed Left Panel */}
       {/* ============================================ */}
       <aside className={`
-        fixed md:relative inset-y-0 left-0 z-30
-        w-full md:w-80 lg:w-96
-        bg-[#0d0d14]/95 md:bg-[#0d0d14]/80
+        fixed md:static inset-y-0 left-0 z-30
+        w-full md:w-80 lg:w-96 md:flex-shrink-0
+        bg-[#0d0d14] md:bg-[#0d0d14]/90
         backdrop-blur-xl
         border-r border-gray-800/50
-        flex flex-col
+        flex flex-col h-screen
         transition-transform duration-300 ease-out
         ${selectedConversation ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}
       `}>
@@ -1233,7 +1233,7 @@ function MensajesContent() {
       {/* ============================================ */}
       {/* MAIN CHAT AREA */}
       {/* ============================================ */}
-      <main className="flex-1 flex flex-col relative z-10 md:ml-80 lg:ml-96 h-screen">
+      <main className="flex-1 flex flex-col relative z-10 h-screen">
         {selectedConversation ? (
           <>
             {/* Chat Header */}
