@@ -135,60 +135,67 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
           const hasStories = user.storiesCount > 0;
 
           return (
-            <button
+            <div
               key={user.userId}
-              onClick={() => {
-                if (isOwn && !hasStories) {
-                  onCreateStory();
-                } else if (hasStories) {
-                  onViewStories(user);
-                } else {
-                  // Can't view others' empty stories
-                }
-              }}
               className="flex flex-col items-center gap-2 min-w-[72px] group"
             >
               {/* Avatar with ring */}
               <div className="relative">
-                {/* Gradient ring for unviewed stories */}
-                <div
-                  className={cn(
-                    'w-[68px] h-[68px] rounded-full p-[3px]',
-                    hasStories && user.hasUnviewed
-                      ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600'
-                      : hasStories
-                      ? 'bg-gray-500'
-                      : 'bg-transparent'
-                  )}
+                {/* Clickable avatar area - view stories */}
+                <button
+                  onClick={() => {
+                    if (hasStories) {
+                      onViewStories(user);
+                    } else if (isOwn) {
+                      onCreateStory();
+                    }
+                  }}
+                  className="block"
                 >
-                  <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
-                    <div className="w-full h-full rounded-full overflow-hidden bg-gray-800">
-                      {user.avatarUrl ? (
-                        <img
-                          src={user.avatarUrl}
-                          alt={user.displayName || user.username}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-xl font-bold text-gray-400">
-                          {(user.displayName || user.username || '?')[0].toUpperCase()}
-                        </div>
-                      )}
+                  {/* Gradient ring for unviewed stories */}
+                  <div
+                    className={cn(
+                      'w-[68px] h-[68px] rounded-full p-[3px]',
+                      hasStories && user.hasUnviewed
+                        ? 'bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600'
+                        : hasStories
+                        ? 'bg-gray-500'
+                        : 'bg-transparent'
+                    )}
+                  >
+                    <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-gray-800">
+                        {user.avatarUrl ? (
+                          <img
+                            src={user.avatarUrl}
+                            alt={user.displayName || user.username}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xl font-bold text-gray-400">
+                            {(user.displayName || user.username || '?')[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </button>
 
-                {/* Add button for own story */}
+                {/* Add button for own story - ALWAYS creates new story */}
                 {isOwn && (
-                  <div
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCreateStory();
+                    }}
                     className={cn(
                       'absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center',
                       'bg-blue-500 border-2 border-gray-900',
-                      'group-hover:bg-blue-400 transition-colors'
+                      'hover:bg-blue-400 transition-colors cursor-pointer z-10'
                     )}
                   >
                     <Plus className="w-4 h-4 text-white" />
-                  </div>
+                  </button>
                 )}
               </div>
 
@@ -202,7 +209,7 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
               >
                 {isOwn ? 'Tu historia' : user.displayName || user.username || 'Usuario'}
               </span>
-            </button>
+            </div>
           );
         })}
 
