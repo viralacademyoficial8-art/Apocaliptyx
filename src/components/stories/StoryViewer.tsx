@@ -98,6 +98,25 @@ export function StoryViewer({
     }
   }, []);
 
+  // Navigation functions - defined before useEffect that uses them
+  const goToNextStory = useCallback(() => {
+    if (currentStoryIndex < userStories.stories.length - 1) {
+      setCurrentStoryIndex(prev => prev + 1);
+    } else if (onNext) {
+      onNext();
+    } else {
+      onClose();
+    }
+  }, [currentStoryIndex, userStories.stories.length, onNext, onClose]);
+
+  const goToPreviousStory = useCallback(() => {
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex(prev => prev - 1);
+    } else if (onPrevious) {
+      onPrevious();
+    }
+  }, [currentStoryIndex, onPrevious]);
+
   // Start progress timer
   useEffect(() => {
     if (!currentStory || isPaused) return;
@@ -130,25 +149,7 @@ export function StoryViewer({
         clearInterval(progressInterval.current);
       }
     };
-  }, [currentStoryIndex, isPaused, currentStory, isOwnStory, markAsViewed, loadViewers]);
-
-  const goToNextStory = useCallback(() => {
-    if (currentStoryIndex < userStories.stories.length - 1) {
-      setCurrentStoryIndex(prev => prev + 1);
-    } else if (onNext) {
-      onNext();
-    } else {
-      onClose();
-    }
-  }, [currentStoryIndex, userStories.stories.length, onNext, onClose]);
-
-  const goToPreviousStory = useCallback(() => {
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex(prev => prev - 1);
-    } else if (onPrevious) {
-      onPrevious();
-    }
-  }, [currentStoryIndex, onPrevious]);
+  }, [currentStoryIndex, isPaused, currentStory, isOwnStory, markAsViewed, loadViewers, goToNextStory]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -409,7 +410,7 @@ export function StoryViewer({
                     )}
                     style={{ color: currentStory.textColor || '#ffffff' }}
                   >
-                    "{currentStory.content}"
+                    &ldquo;{currentStory.content}&rdquo;
                   </p>
                 )}
                 {/* Tap to open indicator */}
