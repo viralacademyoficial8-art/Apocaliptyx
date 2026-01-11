@@ -1,10 +1,18 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Eye, Heart, Send, Pause, Play, MoreHorizontal, Trash2 } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Eye, Heart, Send, Pause, Play, MoreHorizontal, Trash2, Globe, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+
+interface LinkPreviewData {
+  url: string;
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  siteName: string | null;
+}
 
 interface Story {
   id: string;
@@ -17,6 +25,8 @@ interface Story {
   viewsCount?: number;
   createdAt: string;
   isViewed: boolean;
+  linkUrl?: string;
+  linkPreview?: LinkPreviewData;
 }
 
 interface UserStories {
@@ -344,7 +354,72 @@ export function StoryViewer({
           className="w-full h-full flex items-center justify-center"
           style={{ backgroundColor: currentStory.backgroundColor || '#1a1a2e' }}
         >
-          {currentStory.mediaUrl ? (
+          {/* Link Preview Story */}
+          {currentStory.linkPreview ? (
+            <a
+              href={currentStory.linkUrl || currentStory.linkPreview.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-full flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Link Image */}
+              {currentStory.linkPreview.image ? (
+                <div className="flex-1 relative">
+                  <img
+                    src={currentStory.linkPreview.image}
+                    alt={currentStory.linkPreview.title || 'Preview'}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <Globe className="w-24 h-24 text-gray-600" />
+                </div>
+              )}
+
+              {/* Link Info */}
+              <div className="absolute bottom-20 left-0 right-0 p-6">
+                {currentStory.linkPreview.siteName && (
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe className="w-4 h-4 text-purple-400" />
+                    <span className="text-sm text-purple-400 font-medium uppercase tracking-wide">
+                      {currentStory.linkPreview.siteName}
+                    </span>
+                  </div>
+                )}
+                {currentStory.linkPreview.title && (
+                  <h3 className="text-white font-bold text-xl line-clamp-2 mb-2">
+                    {currentStory.linkPreview.title}
+                  </h3>
+                )}
+                {currentStory.linkPreview.description && (
+                  <p className="text-gray-300 text-sm line-clamp-2 mb-3">
+                    {currentStory.linkPreview.description}
+                  </p>
+                )}
+                {/* User's comment */}
+                {currentStory.content && (
+                  <p
+                    className={cn(
+                      'text-white mt-3 text-lg',
+                      currentStory.fontStyle === 'bold' && 'font-bold',
+                      currentStory.fontStyle === 'italic' && 'italic'
+                    )}
+                    style={{ color: currentStory.textColor || '#ffffff' }}
+                  >
+                    "{currentStory.content}"
+                  </p>
+                )}
+                {/* Tap to open indicator */}
+                <div className="flex items-center gap-2 mt-4 text-gray-400 text-sm">
+                  <ExternalLink className="w-4 h-4" />
+                  <span>Toca para abrir el enlace</span>
+                </div>
+              </div>
+            </a>
+          ) : currentStory.mediaUrl ? (
             currentStory.mediaType === 'video' ? (
               <video
                 src={currentStory.mediaUrl}
