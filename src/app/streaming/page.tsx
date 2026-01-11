@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Radio, Search, TrendingUp, Users, Clock } from 'lucide-react';
+import { Radio, Search, TrendingUp, Users, Clock, X, Sparkles, Video, Mic } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { LiveStreamCard } from '@/components/streaming/LiveStreamCard';
@@ -29,6 +29,15 @@ interface LiveStream {
   startedAt?: string;
 }
 
+const STREAM_CATEGORIES = [
+  { id: 'predicciones', name: 'Predicciones', emoji: '🔮' },
+  { id: 'analisis', name: 'Análisis', emoji: '📊' },
+  { id: 'debate', name: 'Debate', emoji: '💬' },
+  { id: 'noticias', name: 'Noticias', emoji: '📰' },
+  { id: 'estrategia', name: 'Estrategia', emoji: '🎯' },
+  { id: 'entretenimiento', name: 'Entretenimiento', emoji: '🎮' },
+];
+
 export default function StreamingPage() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -38,6 +47,12 @@ export default function StreamingPage() {
   const [filter, setFilter] = useState<'live' | 'all' | 'following'>('live');
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingStream, setIsStartingStream] = useState(false);
+
+  // Modal state
+  const [showStartModal, setShowStartModal] = useState(false);
+  const [streamTitle, setStreamTitle] = useState('');
+  const [streamDescription, setStreamDescription] = useState('');
+  const [streamCategory, setStreamCategory] = useState('');
 
   useEffect(() => {
     loadStreams();
@@ -65,26 +80,28 @@ export default function StreamingPage() {
   };
 
   const handleStartStream = async () => {
-    if (!user) {
-      toast.error(t('streaming.chat.loginRequired'));
+    if (!streamTitle.trim()) {
+      toast.error('Por favor ingresa un título para tu stream');
       return;
     }
-
-    const title = prompt(t('streaming.streamTitle'));
-    if (!title) return;
 
     setIsStartingStream(true);
     try {
       const response = await fetch('/api/streaming', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({
+          title: streamTitle,
+          description: streamDescription,
+          category: streamCategory,
+        }),
       });
       const data = await response.json();
 
       if (data.error) throw new Error(data.error);
 
       toast.success(t('streaming.connecting'));
+      setShowStartModal(false);
 
       // Redirect to the live stream page as host
       router.push(`/streaming/live/${data.stream.id}?host=true`);
@@ -93,6 +110,17 @@ export default function StreamingPage() {
       toast.error(error instanceof Error ? error.message : t('common.error'));
       setIsStartingStream(false);
     }
+  };
+
+  const openStartModal = () => {
+    if (!user) {
+      toast.error(t('streaming.chat.loginRequired'));
+      return;
+    }
+    setStreamTitle('');
+    setStreamDescription('');
+    setStreamCategory('');
+    setShowStartModal(true);
   };
 
   const filteredStreams = streams.filter((stream) => {
@@ -114,6 +142,157 @@ export default function StreamingPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-20">
+      {/* Start Stream Modal */}
+      {showStartModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => !isStartingStream && setShowStartModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative w-full max-w-lg">
+            {/* Glow effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 animate-pulse" />
+
+            <div className="relative bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+              {/* Header with gradient */}
+              <div className="relative bg-gradient-to-r from-red-600/20 via-purple-600/20 to-pink-600/20 px-6 py-5 border-b border-gray-800">
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+                <div className="relative flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center">
+                      <Radio className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">Iniciar Transmisión</h2>
+                      <p className="text-sm text-gray-400">Comparte con tu audiencia en vivo</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => !isStartingStream && setShowStartModal(false)}
+                    className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+                    disabled={isStartingStream}
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 space-y-5">
+                {/* Title input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Título del stream *
+                  </label>
+                  <div className="relative">
+                    <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
+                    <input
+                      type="text"
+                      value={streamTitle}
+                      onChange={(e) => setStreamTitle(e.target.value)}
+                      placeholder="Ej: Predicciones para el fin de semana 🔥"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                      disabled={isStartingStream}
+                      maxLength={100}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">{streamTitle.length}/100 caracteres</p>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Descripción (opcional)
+                  </label>
+                  <textarea
+                    value={streamDescription}
+                    onChange={(e) => setStreamDescription(e.target.value)}
+                    placeholder="Cuéntale a tu audiencia de qué tratará tu stream..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+                    disabled={isStartingStream}
+                    maxLength={500}
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Categoría
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {STREAM_CATEGORIES.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setStreamCategory(streamCategory === cat.id ? '' : cat.id)}
+                        className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                          streamCategory === cat.id
+                            ? 'bg-red-600/20 border-red-500 text-red-400'
+                            : 'bg-gray-800/50 border-gray-700 text-gray-400 hover:border-gray-600'
+                        }`}
+                        disabled={isStartingStream}
+                      >
+                        <span className="mr-1">{cat.emoji}</span>
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-purple-300 mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Tips para un buen stream
+                  </h4>
+                  <ul className="text-xs text-gray-400 space-y-1">
+                    <li className="flex items-center gap-2">
+                      <Video className="w-3 h-3 text-purple-400" />
+                      Asegúrate de tener buena iluminación
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Mic className="w-3 h-3 text-purple-400" />
+                      Usa audífonos para evitar eco
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-800 flex items-center justify-between">
+                <button
+                  onClick={() => setShowStartModal(false)}
+                  className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                  disabled={isStartingStream}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleStartStream}
+                  disabled={isStartingStream || !streamTitle.trim()}
+                  className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 rounded-xl font-semibold flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isStartingStream ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Iniciando...
+                    </>
+                  ) : (
+                    <>
+                      <Radio className="w-4 h-4" />
+                      Ir en Vivo
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -128,8 +307,8 @@ export default function StreamingPage() {
           </div>
           {user && (
             <Button
-              className="bg-red-600 hover:bg-red-700"
-              onClick={handleStartStream}
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 border-0"
+              onClick={openStartModal}
               disabled={isStartingStream}
             >
               <Radio className={`w-4 h-4 mr-2 ${isStartingStream ? 'animate-pulse' : ''}`} />
