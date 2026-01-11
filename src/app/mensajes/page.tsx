@@ -1,7 +1,6 @@
 'use client';
 
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
@@ -1334,127 +1333,148 @@ function MensajesContent() {
                   >
                     <MoreVertical className="w-5 h-5" />
                   </button>
-
-                  {/* Bottom Sheet Menu - rendered via Portal */}
-                  {showChatMenu && typeof document !== 'undefined' && createPortal(
-                    <>
-                      {/* Backdrop with blur */}
-                      <div
-                        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-                        style={{ zIndex: 99998, pointerEvents: 'auto' }}
-                        onClick={() => { console.log('Backdrop clicked'); setShowChatMenu(false); }}
-                      />
-
-                      {/* Bottom Sheet Container - fixed to bottom */}
-                      <div
-                        style={{
-                          position: 'fixed',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          zIndex: 99999,
-                          pointerEvents: 'auto'
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {/* Gradient top border */}
-                        <div className="h-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
-
-                        {/* Sheet content */}
-                        <div className="bg-[#0d0d14] rounded-t-2xl pt-2 pb-4 px-3 max-h-[60vh] overflow-y-auto safe-area-bottom" style={{ pointerEvents: 'auto' }}>
-                          {/* Handle indicator */}
-                          <div className="flex justify-center mb-2">
-                            <div className="w-8 h-1 bg-gray-600 rounded-full" />
-                          </div>
-
-                          {/* Title */}
-                          <div className="text-center mb-3 px-2">
-                            <h3 className="text-sm font-semibold text-white">Opciones del chat</h3>
-                            <p className="text-[10px] text-gray-500 mt-0.5">
-                              {selectedConversation.type === 'group' ? selectedConversation.group_name : selectedConversation.other_user?.display_name}
-                            </p>
-                          </div>
-
-                          {/* Options Grid for main actions */}
-                          <div className="grid grid-cols-4 gap-2 px-2 mb-3">
-                            <button type="button" onClick={() => { console.log('Favorito clicked'); handleToggleFavorite(); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
-                              <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
-                                {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
-                              </div>
-                              <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_favorite ? 'Quitar' : 'Favorito'}</span>
-                            </button>
-
-                            <button type="button" onClick={() => { console.log('Silenciar clicked'); handleToggleMute(); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
-                              <div className={`p-2 rounded-lg ${selectedConversation.is_muted ? 'bg-green-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
-                                {selectedConversation.is_muted ? <Bell className="w-4 h-4 text-green-400" /> : <BellOff className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
-                              </div>
-                              <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_muted ? 'Activar' : 'Silenciar'}</span>
-                            </button>
-
-                            <button type="button" onClick={() => { console.log('Archivar clicked'); handleToggleArchive(); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
-                              <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
-                                <Archive className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
-                              </div>
-                              <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
-                            </button>
-
-                            <button type="button" onClick={() => { console.log('Buscar clicked'); setShowSearchInChat(true); setShowChatMenu(false); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
-                              <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
-                                <Search className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
-                              </div>
-                              <span className="text-[10px] text-gray-400 text-center leading-tight">Buscar</span>
-                            </button>
-                          </div>
-
-                          {/* Group-specific options */}
-                          {selectedConversation.type === 'group' && (
-                            <>
-                              <div className="mx-2 mb-2">
-                                <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 px-1">Opciones de grupo</p>
-                                <div className="space-y-0.5">
-                                  <button onClick={() => { loadFollowingUsers(); setShowAddMembers(true); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all group">
-                                    <div className="p-1.5 rounded-md bg-purple-500/20">
-                                      <UserPlus className="w-3.5 h-3.5 text-purple-400" />
-                                    </div>
-                                    <span className="text-xs text-gray-300 group-hover:text-white">Agregar miembros</span>
-                                  </button>
-                                  <button onClick={() => { handleGetInviteLink(); setShowChatMenu(false); }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all group">
-                                    <div className="p-1.5 rounded-md bg-blue-500/20">
-                                      <Link2 className="w-3.5 h-3.5 text-blue-400" />
-                                    </div>
-                                    <span className="text-xs text-gray-300 group-hover:text-white">Enlace de invitación</span>
-                                  </button>
-                                </div>
-                              </div>
-
-                              <div className="mx-2 pt-2 border-t border-gray-800/50">
-                                <button onClick={handleLeaveGroup} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 transition-all group">
-                                  <div className="p-1.5 rounded-md bg-red-500/20">
-                                    <LogOut className="w-3.5 h-3.5 text-red-400" />
-                                  </div>
-                                  <span className="text-xs text-red-400 group-hover:text-red-300">Salir del grupo</span>
-                                </button>
-                              </div>
-                            </>
-                          )}
-
-                          {/* Cancel button */}
-                          <div className="mx-2 mt-3">
-                            <button
-                              onClick={() => setShowChatMenu(false)}
-                              className="w-full py-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 text-gray-300 hover:text-white text-sm font-medium transition-all"
-                            >
-                              Cancelar
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </>,
-                    document.body
-                  )}
                 </div>
               </div>
             </header>
+
+            {/* Bottom Sheet Menu - rendered directly without Portal */}
+            {showChatMenu && selectedConversation && (
+              <>
+                {/* Backdrop with blur */}
+                <div
+                  className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+                  style={{ zIndex: 99998 }}
+                  onClick={() => setShowChatMenu(false)}
+                />
+
+                {/* Bottom Sheet Container - fixed to bottom */}
+                <div
+                  className="fixed bottom-0 left-0 right-0"
+                  style={{ zIndex: 99999 }}
+                >
+                  {/* Gradient top border */}
+                  <div className="h-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
+
+                  {/* Sheet content */}
+                  <div className="bg-[#0d0d14] rounded-t-2xl pt-2 pb-4 px-3 max-h-[60vh] overflow-y-auto">
+                    {/* Handle indicator */}
+                    <div className="flex justify-center mb-2">
+                      <div className="w-8 h-1 bg-gray-600 rounded-full" />
+                    </div>
+
+                    {/* Title */}
+                    <div className="text-center mb-3 px-2">
+                      <h3 className="text-sm font-semibold text-white">Opciones del chat</h3>
+                      <p className="text-[10px] text-gray-500 mt-0.5">
+                        {selectedConversation.type === 'group' ? selectedConversation.group_name : selectedConversation.other_user?.display_name}
+                      </p>
+                    </div>
+
+                    {/* Options Grid for main actions */}
+                    <div className="grid grid-cols-4 gap-2 px-2 mb-3">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); handleToggleFavorite(); }}
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                      >
+                        <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
+                          {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
+                        </div>
+                        <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_favorite ? 'Quitar' : 'Favorito'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); handleToggleMute(); }}
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                      >
+                        <div className={`p-2 rounded-lg ${selectedConversation.is_muted ? 'bg-green-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
+                          {selectedConversation.is_muted ? <Bell className="w-4 h-4 text-green-400" /> : <BellOff className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
+                        </div>
+                        <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_muted ? 'Activar' : 'Silenciar'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); handleToggleArchive(); }}
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                      >
+                        <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
+                          <Archive className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                        </div>
+                        <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setShowSearchInChat(true); setShowChatMenu(false); }}
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                      >
+                        <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
+                          <Search className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                        </div>
+                        <span className="text-[10px] text-gray-400 text-center leading-tight">Buscar</span>
+                      </button>
+                    </div>
+
+                    {/* Group-specific options */}
+                    {selectedConversation.type === 'group' && (
+                      <>
+                        <div className="mx-2 mb-2">
+                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 px-1">Opciones de grupo</p>
+                          <div className="space-y-0.5">
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); loadFollowingUsers(); setShowAddMembers(true); setShowChatMenu(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all group"
+                            >
+                              <div className="p-1.5 rounded-md bg-purple-500/20">
+                                <UserPlus className="w-3.5 h-3.5 text-purple-400" />
+                              </div>
+                              <span className="text-xs text-gray-300 group-hover:text-white">Agregar miembros</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); handleGetInviteLink(); setShowChatMenu(false); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all group"
+                            >
+                              <div className="p-1.5 rounded-md bg-blue-500/20">
+                                <Link2 className="w-3.5 h-3.5 text-blue-400" />
+                              </div>
+                              <span className="text-xs text-gray-300 group-hover:text-white">Enlace de invitación</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mx-2 pt-2 border-t border-gray-800/50">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleLeaveGroup(); }}
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 transition-all group"
+                          >
+                            <div className="p-1.5 rounded-md bg-red-500/20">
+                              <LogOut className="w-3.5 h-3.5 text-red-400" />
+                            </div>
+                            <span className="text-xs text-red-400 group-hover:text-red-300">Salir del grupo</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Cancel button */}
+                    <div className="mx-2 mt-3">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setShowChatMenu(false); }}
+                        className="w-full py-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 text-gray-300 hover:text-white text-sm font-medium transition-all"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Search in chat */}
             {showSearchInChat && (
