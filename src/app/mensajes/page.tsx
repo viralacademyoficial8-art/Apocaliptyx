@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
@@ -1304,12 +1305,13 @@ function MensajesContent() {
                     <MoreVertical className="w-5 h-5" />
                   </button>
 
-                  {/* Bottom Sheet Menu */}
-                  {showChatMenu && (
+                  {/* Bottom Sheet Menu - rendered via Portal */}
+                  {showChatMenu && typeof document !== 'undefined' && createPortal(
                     <>
                       {/* Backdrop with blur */}
                       <div
-                        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998]"
+                        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+                        style={{ zIndex: 99998 }}
                         onClick={() => setShowChatMenu(false)}
                       />
 
@@ -1320,7 +1322,7 @@ function MensajesContent() {
                           bottom: 0,
                           left: 0,
                           right: 0,
-                          zIndex: 9999
+                          zIndex: 99999
                         }}
                       >
                         {/* Gradient top border */}
@@ -1415,7 +1417,8 @@ function MensajesContent() {
                           </div>
                         </div>
                       </div>
-                    </>
+                    </>,
+                    document.body
                   )}
                 </div>
               </div>
