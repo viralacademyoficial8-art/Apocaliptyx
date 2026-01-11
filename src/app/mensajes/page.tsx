@@ -1305,33 +1305,59 @@ function MensajesContent() {
                   </button>
 
                   {showChatMenu && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-gray-800/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-xl z-50 overflow-hidden">
-                      <button onClick={handleToggleFavorite} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">
-                        {selectedConversation.is_favorite ? <><StarOff className="w-4 h-4" /><span>Quitar de favoritos</span></> : <><Star className="w-4 h-4" /><span>Agregar a favoritos</span></>}
-                      </button>
-                      <button onClick={handleToggleMute} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">
-                        {selectedConversation.is_muted ? <><Bell className="w-4 h-4" /><span>Activar notificaciones</span></> : <><BellOff className="w-4 h-4" /><span>Silenciar</span></>}
-                      </button>
-                      <button onClick={handleToggleArchive} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">
-                        <Archive className="w-4 h-4" /><span>{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
-                      </button>
-                      <button onClick={() => { setShowSearchInChat(true); setShowChatMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">
-                        <Search className="w-4 h-4" /><span>Buscar en el chat</span>
-                      </button>
-                      {selectedConversation.type === 'group' && (
-                        <>
-                          <div className="border-t border-gray-700/50" />
-                          <button onClick={() => { loadFollowingUsers(); setShowAddMembers(true); setShowChatMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">
-                            <UserPlus className="w-4 h-4" /><span>Agregar miembros</span>
-                          </button>
-                          <button onClick={() => { handleGetInviteLink(); setShowChatMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">
-                            <Link2 className="w-4 h-4" /><span>Enlace de invitación</span>
-                          </button>
-                          <button onClick={handleLeaveGroup} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-600/20 text-red-400 transition-colors border-t border-gray-700/50">
-                            <LogOut className="w-4 h-4" /><span>Salir del grupo</span>
-                          </button>
-                        </>
-                      )}
+                    <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden z-50">
+                      {/* Gradient border */}
+                      <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500/50 via-pink-500/50 to-purple-500/50 rounded-2xl" />
+                      <div className="relative bg-[#0d0d14]/95 backdrop-blur-xl rounded-2xl py-2">
+                        <button onClick={handleToggleFavorite} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
+                          <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-gray-800/80 group-hover:bg-purple-500/20'} transition-colors`}>
+                            {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
+                          </div>
+                          <span className="text-sm text-gray-300 group-hover:text-white">{selectedConversation.is_favorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}</span>
+                        </button>
+                        <button onClick={handleToggleMute} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
+                          <div className={`p-2 rounded-lg ${selectedConversation.is_muted ? 'bg-green-500/20' : 'bg-gray-800/80 group-hover:bg-purple-500/20'} transition-colors`}>
+                            {selectedConversation.is_muted ? <Bell className="w-4 h-4 text-green-400" /> : <BellOff className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
+                          </div>
+                          <span className="text-sm text-gray-300 group-hover:text-white">{selectedConversation.is_muted ? 'Activar notificaciones' : 'Silenciar'}</span>
+                        </button>
+                        <button onClick={handleToggleArchive} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
+                          <div className="p-2 rounded-lg bg-gray-800/80 group-hover:bg-purple-500/20 transition-colors">
+                            <Archive className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                          </div>
+                          <span className="text-sm text-gray-300 group-hover:text-white">{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
+                        </button>
+                        <button onClick={() => { setShowSearchInChat(true); setShowChatMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
+                          <div className="p-2 rounded-lg bg-gray-800/80 group-hover:bg-purple-500/20 transition-colors">
+                            <Search className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                          </div>
+                          <span className="text-sm text-gray-300 group-hover:text-white">Buscar en el chat</span>
+                        </button>
+                        {selectedConversation.type === 'group' && (
+                          <>
+                            <div className="my-2 mx-4 border-t border-gray-700/50" />
+                            <button onClick={() => { loadFollowingUsers(); setShowAddMembers(true); setShowChatMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
+                              <div className="p-2 rounded-lg bg-gray-800/80 group-hover:bg-purple-500/20 transition-colors">
+                                <UserPlus className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                              </div>
+                              <span className="text-sm text-gray-300 group-hover:text-white">Agregar miembros</span>
+                            </button>
+                            <button onClick={() => { handleGetInviteLink(); setShowChatMenu(false); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
+                              <div className="p-2 rounded-lg bg-gray-800/80 group-hover:bg-purple-500/20 transition-colors">
+                                <Link2 className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                              </div>
+                              <span className="text-sm text-gray-300 group-hover:text-white">Enlace de invitación</span>
+                            </button>
+                            <div className="my-2 mx-4 border-t border-gray-700/50" />
+                            <button onClick={handleLeaveGroup} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 transition-all duration-200 group">
+                              <div className="p-2 rounded-lg bg-red-500/10 group-hover:bg-red-500/20 transition-colors">
+                                <LogOut className="w-4 h-4 text-red-400" />
+                              </div>
+                              <span className="text-sm text-red-400 group-hover:text-red-300">Salir del grupo</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
