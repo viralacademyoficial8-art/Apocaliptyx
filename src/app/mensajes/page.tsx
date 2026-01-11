@@ -792,7 +792,7 @@ function MensajesContent() {
           )}
 
           {/* Story Reply Preview (Instagram/Facebook style) */}
-          {(message.story_preview || message.story_id) && !message.is_deleted && (
+          {(message.story_preview || message.story_id || message.content?.includes('Respondió a una historia:')) && !message.is_deleted && (
             <div className="px-3 pt-2 pb-1">
               <div className={`flex items-start gap-2.5 p-2.5 rounded-xl ${isOwn ? 'bg-purple-900/30' : 'bg-gray-800/50'}`}>
                 {/* Story thumbnail - Instagram style */}
@@ -1119,57 +1119,74 @@ function MensajesContent() {
                           </span>
                         </div>
                         {/* Story reply preview - Instagram style */}
-                        {(conv.last_message?.story_preview || conv.last_message?.story_id) ? (
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-xs ${conv.unread_count ? 'text-gray-300' : 'text-gray-500'}`}>
-                                Respondió a tu historia
-                              </p>
-                              <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
-                                {conv.last_message.content}
-                              </p>
-                            </div>
-                            {/* Story thumbnail - Instagram style */}
-                            {conv.last_message.story_preview && (
-                              <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-gray-600/50 bg-gray-800">
-                                {conv.last_message.story_preview.mediaUrl ? (
-                                  <img
-                                    src={conv.last_message.story_preview.mediaUrl}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : conv.last_message.story_preview.linkPreview?.image ? (
-                                  <img
-                                    src={conv.last_message.story_preview.linkPreview.image}
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                  />
+                        {(() => {
+                          // Check for story reply: story_preview, story_id, or legacy content pattern
+                          const isStoryReply = conv.last_message?.story_preview ||
+                            conv.last_message?.story_id ||
+                            conv.last_message?.content?.includes('Respondió a una historia:');
+
+                          // Extract actual message content for legacy format
+                          const getActualContent = () => {
+                            if (!conv.last_message?.content) return '';
+                            const legacyMatch = conv.last_message.content.match(/Respondió a una historia:\s*(.+)/);
+                            return legacyMatch ? legacyMatch[1] : conv.last_message.content;
+                          };
+
+                          if (isStoryReply) {
+                            return (
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-xs ${conv.unread_count ? 'text-gray-300' : 'text-gray-500'}`}>
+                                    Respondió a tu historia
+                                  </p>
+                                  <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
+                                    {getActualContent()}
+                                  </p>
+                                </div>
+                                {/* Story thumbnail - Instagram style */}
+                                {conv.last_message?.story_preview ? (
+                                  <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-gray-600/50 bg-gray-800">
+                                    {conv.last_message.story_preview.mediaUrl ? (
+                                      <img
+                                        src={conv.last_message.story_preview.mediaUrl}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : conv.last_message.story_preview.linkPreview?.image ? (
+                                      <img
+                                        src={conv.last_message.story_preview.linkPreview.image}
+                                        alt=""
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div
+                                        className="w-full h-full flex items-center justify-center"
+                                        style={{ backgroundColor: conv.last_message.story_preview.backgroundColor || '#6b21a8' }}
+                                      >
+                                        <span className="text-white text-[8px] text-center px-0.5 line-clamp-2">
+                                          {conv.last_message.story_preview.content?.slice(0, 20) || 'Aa'}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
                                 ) : (
-                                  <div
-                                    className="w-full h-full flex items-center justify-center"
-                                    style={{ backgroundColor: conv.last_message.story_preview.backgroundColor || '#6b21a8' }}
-                                  >
-                                    <span className="text-white text-[8px] text-center px-0.5 line-clamp-2">
-                                      {conv.last_message.story_preview.content?.slice(0, 20) || 'Aa'}
-                                    </span>
+                                  /* Fallback thumbnail for legacy messages */
+                                  <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-gray-600/50 bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                                    <span className="text-white text-lg">📷</span>
                                   </div>
                                 )}
                               </div>
-                            )}
-                            {/* Fallback thumbnail for legacy messages without story_preview */}
-                            {!conv.last_message.story_preview && (
-                              <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-gray-600/50 bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                                <span className="text-white text-lg">📷</span>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
-                            {conv.last_message?.file_url
-                              ? '📎 Archivo adjunto'
-                              : conv.last_message?.content || 'Sin mensajes'}
-                          </p>
-                        )}
+                            );
+                          }
+
+                          return (
+                            <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
+                              {conv.last_message?.file_url
+                                ? '📎 Archivo adjunto'
+                                : conv.last_message?.content || 'Sin mensajes'}
+                            </p>
+                          );
+                        })()}
                       </div>
                     </button>
                   ))
