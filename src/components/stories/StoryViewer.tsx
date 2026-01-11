@@ -68,8 +68,13 @@ export function StoryViewer({
   const [showViewers, setShowViewers] = useState(false);
   const [viewers, setViewers] = useState<{ userId: string; username?: string; displayName?: string; avatarUrl?: string; viewedAt: string }[]>([]);
   const [showMenu, setShowMenu] = useState(false);
+  const [replyText, setReplyText] = useState('');
+  const [isSendingReply, setIsSendingReply] = useState(false);
+  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const touchStartX = useRef<number>(0);
+  const replyInputRef = useRef<HTMLInputElement>(null);
 
   const currentStory = userStories.stories[currentStoryIndex];
   const isOwnStory = currentUserId === userStories.userId;
@@ -240,6 +245,66 @@ export function StoryViewer({
     }
   };
 
+  // Send reply message
+  const sendReply = async () => {
+    if (!replyText.trim() || isSendingReply) return;
+
+    setIsSendingReply(true);
+    try {
+      const response = await fetch(`/api/stories/${currentStory.id}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: replyText.trim() }),
+      });
+
+      if (response.ok) {
+        setReplyText('');
+        // Could show a toast/notification here
+      }
+    } catch (error) {
+      console.error('Error sending reply:', error);
+    } finally {
+      setIsSendingReply(false);
+    }
+  };
+
+  // Handle like with animation
+  const handleLike = async () => {
+    setShowLikeAnimation(true);
+    setIsLiked(true);
+
+    // Send the like/reaction
+    await sendReaction('❤️');
+
+    // Hide animation after a delay
+    setTimeout(() => {
+      setShowLikeAnimation(false);
+    }, 1000);
+  };
+
+  // Handle double tap to like
+  const lastTapRef = useRef<number>(0);
+  const handleDoubleTap = (e: React.MouseEvent | React.TouchEvent) => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      // Double tap detected
+      handleLike();
+      e.stopPropagation();
+    }
+    lastTapRef.current = now;
+  };
+
+  // Pause timer when typing
+  const handleInputFocus = () => {
+    setIsPaused(true);
+  };
+
+  const handleInputBlur = () => {
+    if (!replyText.trim()) {
+      setIsPaused(false);
+    }
+  };
+
   if (!currentStory) {
     return null;
   }
@@ -352,9 +417,19 @@ export function StoryViewer({
 
         {/* Story content */}
         <div
-          className="w-full h-full flex items-center justify-center"
+          className="w-full h-full flex items-center justify-center relative"
           style={{ backgroundColor: currentStory.backgroundColor || '#1a1a2e' }}
+          onClick={handleDoubleTap}
         >
+          {/* Like animation overlay */}
+          {showLikeAnimation && (
+            <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
+              <Heart
+                className="w-24 h-24 text-red-500 fill-red-500 animate-ping"
+                style={{ animationDuration: '0.5s' }}
+              />
+            </div>
+          )}
           {/* Link Preview Story */}
           {currentStory.linkPreview ? (
             <a
@@ -452,7 +527,7 @@ export function StoryViewer({
         </div>
 
         {/* Bottom actions */}
-        <div className="absolute bottom-0 left-0 right-0 z-20 p-4">
+        <div className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-black/60 to-transparent pt-12">
           {isOwnStory ? (
             // Show viewers for own story
             <button
@@ -466,26 +541,64 @@ export function StoryViewer({
               <span>{currentStory.viewsCount || 0} vistas</span>
             </button>
           ) : (
-            // Show reaction button for others' stories
+            // Instagram-style reply input and actions
             <div className="flex items-center gap-3">
+              {/* Reply input field */}
+              <div className="flex-1 relative">
+                <input
+                  ref={replyInputRef}
+                  type="text"
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  onKeyDown={(e) => {
+                    e.stopPropagation();
+                    if (e.key === 'Enter' && replyText.trim()) {
+                      sendReply();
+                    }
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  placeholder={`Responde a ${userStories.displayName || userStories.username}...`}
+                  className="w-full bg-transparent border border-white/30 rounded-full px-4 py-2.5 text-white placeholder-white/50 focus:outline-none focus:border-white/60 text-sm"
+                />
+                {replyText.trim() && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sendReply();
+                    }}
+                    disabled={isSendingReply}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-400 font-semibold text-sm hover:text-blue-300 disabled:opacity-50"
+                  >
+                    Enviar
+                  </button>
+                )}
+              </div>
+
+              {/* Heart/Like button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike();
+                }}
+                className={cn(
+                  'p-2 transition-all duration-200',
+                  isLiked ? 'text-red-500 scale-110' : 'text-white hover:text-red-400'
+                )}
+              >
+                <Heart className={cn('w-7 h-7', isLiked && 'fill-red-500')} />
+              </button>
+
+              {/* Share/Send button */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowReactions(prev => !prev);
                 }}
-                className="flex-1 flex items-center gap-2 bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-3 text-white/80"
+                className="p-2 text-white hover:text-gray-300 transition-colors"
               >
-                <Send className="w-5 h-5" />
-                <span>Enviar mensaje</span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  sendReaction('❤️');
-                }}
-                className="p-3 bg-gray-800/80 backdrop-blur-sm rounded-full text-white/80 hover:text-red-400 transition-colors"
-              >
-                <Heart className="w-5 h-5" />
+                <Send className="w-7 h-7" />
               </button>
             </div>
           )}
