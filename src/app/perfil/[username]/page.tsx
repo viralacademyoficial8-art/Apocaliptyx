@@ -108,11 +108,18 @@ export default function PublicProfilePage() {
 
     setChatLoading(true);
     try {
-      const conversation = await chatService.getOrCreateConversation(currentUser.id, profile.id);
-      if (conversation) {
-        router.push(`/mensajes?conv=${conversation.id}`);
+      const response = await fetch('/api/chat/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: profile.id }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.conversation) {
+        router.push(`/mensajes?conv=${data.conversation.id}`);
       } else {
-        toast.error('Error al iniciar la conversación');
+        toast.error(data.error || 'Error al iniciar la conversación');
       }
     } catch (error) {
       toast.error('Error al iniciar la conversación');
