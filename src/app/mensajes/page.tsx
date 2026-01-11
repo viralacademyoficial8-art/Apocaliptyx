@@ -1314,12 +1314,20 @@ function MensajesContent() {
                       />
 
                       {/* Bottom Sheet Container - fixed to bottom */}
-                      <div className="fixed bottom-0 left-0 right-0 z-[9999] animate-bottom-sheet">
+                      <div
+                        style={{
+                          position: 'fixed',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          zIndex: 9999
+                        }}
+                      >
                         {/* Gradient top border */}
                         <div className="h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
                         {/* Sheet content */}
-                        <div className="bg-[#0d0d14] rounded-t-3xl pt-3 pb-8 px-2 max-h-[70vh] overflow-y-auto">
+                        <div className="bg-[#0d0d14] rounded-t-3xl pt-3 pb-8 px-2 max-h-[70vh] overflow-y-auto safe-area-bottom">
                           {/* Handle indicator */}
                           <div className="flex justify-center mb-4">
                             <div className="w-12 h-1.5 bg-gray-600 rounded-full" />
