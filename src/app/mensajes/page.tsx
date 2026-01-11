@@ -1375,28 +1375,28 @@ function MensajesContent() {
 
                           {/* Options Grid for main actions */}
                           <div className="grid grid-cols-4 gap-2 px-2 mb-3">
-                            <button onClick={handleToggleFavorite} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
+                            <button type="button" onClick={() => { console.log('Favorito clicked'); handleToggleFavorite(); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
                               <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
                                 {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
                               </div>
                               <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_favorite ? 'Quitar' : 'Favorito'}</span>
                             </button>
 
-                            <button onClick={handleToggleMute} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
+                            <button type="button" onClick={() => { console.log('Silenciar clicked'); handleToggleMute(); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
                               <div className={`p-2 rounded-lg ${selectedConversation.is_muted ? 'bg-green-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
                                 {selectedConversation.is_muted ? <Bell className="w-4 h-4 text-green-400" /> : <BellOff className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
                               </div>
                               <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_muted ? 'Activar' : 'Silenciar'}</span>
                             </button>
 
-                            <button onClick={handleToggleArchive} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
+                            <button type="button" onClick={() => { console.log('Archivar clicked'); handleToggleArchive(); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
                               <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
                                 <Archive className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
                               </div>
                               <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
                             </button>
 
-                            <button onClick={() => { setShowSearchInChat(true); setShowChatMenu(false); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
+                            <button type="button" onClick={() => { console.log('Buscar clicked'); setShowSearchInChat(true); setShowChatMenu(false); }} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group">
                               <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
                                 <Search className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
                               </div>
