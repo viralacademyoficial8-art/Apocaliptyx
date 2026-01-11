@@ -580,8 +580,7 @@ class ChatService {
       .select(`
         id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
         file_url, file_type, file_name, reply_to_id, story_id, story_preview,
-        sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url),
-        reply_to:messages!messages_reply_to_id_fkey(id, content, sender_id, sender:users!messages_sender_id_fkey(username, display_name))
+        sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
       `)
       .eq('conversation_id', conversationId)
       .order('created_at', { ascending: true })
