@@ -47,6 +47,23 @@ export function LiveStreamCard({ stream, onWatch }: LiveStreamCardProps) {
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
   };
 
+  const getTimeAgo = (dateStr?: string) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / (1000 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    if (days > 0) return `hace ${days}d`;
+    if (hours > 0) return `hace ${hours}h`;
+    if (minutes > 0) return `hace ${minutes}m`;
+    return 'ahora';
+  };
+
+  const isEnded = stream.status === 'ended';
+
   return (
     <Link
       href={isLive ? `/streaming/live/${stream.id}` : `/streaming/${stream.id}`}
@@ -73,7 +90,7 @@ export function LiveStreamCard({ stream, onWatch }: LiveStreamCardProps) {
             </div>
           )}
 
-          {/* Live Badge */}
+          {/* Status Badge */}
           {isLive && (
             <div className="absolute top-3 left-3 flex items-center gap-2">
               <span className="flex items-center gap-1 bg-red-600 px-2 py-1 rounded text-xs font-bold animate-pulse">
@@ -83,6 +100,18 @@ export function LiveStreamCard({ stream, onWatch }: LiveStreamCardProps) {
               {getStreamDuration() && (
                 <span className="bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs">
                   {getStreamDuration()}
+                </span>
+              )}
+            </div>
+          )}
+          {isEnded && (
+            <div className="absolute top-3 left-3 flex items-center gap-2">
+              <span className="flex items-center gap-1 bg-gray-600 px-2 py-1 rounded text-xs font-medium">
+                TERMINADO
+              </span>
+              {getTimeAgo(stream.startedAt) && (
+                <span className="bg-black/70 backdrop-blur-sm px-2 py-1 rounded text-xs">
+                  {getTimeAgo(stream.startedAt)}
                 </span>
               )}
             </div>

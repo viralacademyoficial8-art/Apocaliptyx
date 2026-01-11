@@ -54,11 +54,10 @@ export async function GET(request: NextRequest) {
       .select(`
         *,
         user:users(id, username, display_name, avatar_url)
-      `)
-      .order('viewers_count', { ascending: false });
+      `);
 
     if (filter === 'live') {
-      query = query.eq('status', 'live');
+      query = query.eq('status', 'live').order('viewers_count', { ascending: false });
     } else if (filter === 'following' && user) {
       // Get followed users
       const { data: followingRaw } = await supabase
@@ -74,6 +73,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ streams: [], stats: { liveNow: 0, totalViewers: 0, peakViewersToday: 0, streamsToday: 0 } });
       }
     }
+    // For 'all' filter, we don't add status filter - will sort manually
 
     if (category) {
       query = query.eq('category', category);
@@ -83,11 +83,30 @@ export async function GET(request: NextRequest) {
       query = query.or(`title.ilike.%${search}%,tags.cs.{${search}}`);
     }
 
-    const { data: streamsRaw, error } = await query.limit(50);
+    const { data: streamsRaw, error } = await query.limit(100);
 
     if (error) throw error;
 
-    const streams = streamsRaw as StreamRow[] | null;
+    let streams = streamsRaw as StreamRow[] | null;
+
+    // Sort streams: Live first (by viewers), then ended (by most recent)
+    if (streams && filter !== 'live') {
+      streams = streams.sort((a, b) => {
+        // Live streams always come first
+        if (a.status === 'live' && b.status !== 'live') return -1;
+        if (a.status !== 'live' && b.status === 'live') return 1;
+
+        // If both are live, sort by viewers_count descending
+        if (a.status === 'live' && b.status === 'live') {
+          return (b.viewers_count || 0) - (a.viewers_count || 0);
+        }
+
+        // If both are ended, sort by ended_at descending (most recent first)
+        const aEnded = a.ended_at ? new Date(a.ended_at).getTime() : 0;
+        const bEnded = b.ended_at ? new Date(b.ended_at).getTime() : 0;
+        return bEnded - aEnded;
+      });
+    }
 
     // Calculate real-time stats from database
     // Get live streams count and viewers
