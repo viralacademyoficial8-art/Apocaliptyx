@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Radio, Search, TrendingUp, Users, Clock, X, Sparkles, Video, Mic } from 'lucide-react';
+import { Radio, Search, TrendingUp, Users, Clock, X, Sparkles, Video, Mic, Flame, Crown, Eye, Star, Folder, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { LiveStreamCard } from '@/components/streaming/LiveStreamCard';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/lib/stores';
 import { useTranslation } from '@/hooks/useTranslation';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 interface LiveStream {
   id: string;
@@ -27,6 +29,28 @@ interface LiveStream {
   category?: string;
   tags: string[];
   startedAt?: string;
+}
+
+interface SidebarStream {
+  id: string;
+  title: string;
+  status: string;
+  viewersCount: number;
+  peakViewers: number;
+  category?: string;
+  userId: string;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  followersCount: number;
+  fameScore: number;
+  endedAt?: string;
+}
+
+interface SidebarCategory {
+  name: string;
+  totalStreams: number;
+  liveStreams: number;
 }
 
 const STREAM_CATEGORIES = [
@@ -56,6 +80,20 @@ export default function StreamingPage() {
     streamsToday: 0,
   });
 
+  // Sidebar data from database
+  const [sidebar, setSidebar] = useState<{
+    live: SidebarStream[];
+    ended: SidebarStream[];
+    categories: SidebarCategory[];
+  }>({
+    live: [],
+    ended: [],
+    categories: [],
+  });
+
+  // Selected category filter
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   // Modal state
   const [showStartModal, setShowStartModal] = useState(false);
   const [streamTitle, setStreamTitle] = useState('');
@@ -64,7 +102,7 @@ export default function StreamingPage() {
 
   useEffect(() => {
     loadStreams();
-  }, [filter]);
+  }, [filter, selectedCategory]);
 
   // Auto-refresh stats every 10 seconds for real-time updates
   useEffect(() => {
@@ -81,6 +119,7 @@ export default function StreamingPage() {
       const params = new URLSearchParams();
       params.set('filter', filter);
       if (searchQuery) params.set('search', searchQuery);
+      if (selectedCategory) params.set('category', selectedCategory);
 
       const response = await fetch(`/api/streaming?${params.toString()}`);
       const data = await response.json();
@@ -92,6 +131,11 @@ export default function StreamingPage() {
       // Update stats from server
       if (data.stats) {
         setStats(data.stats);
+      }
+
+      // Update sidebar from server
+      if (data.sidebar) {
+        setSidebar(data.sidebar);
       }
     } catch (error) {
       console.error('Error loading streams:', error);
@@ -366,49 +410,70 @@ export default function StreamingPage() {
           </div>
         </div>
 
-        {/* Search & Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={`${t('common.search')}...`}
-              className="pl-10 bg-gray-800 border-gray-700"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={filter === 'live' ? 'default' : 'outline'}
-              onClick={() => setFilter('live')}
-              className={`text-sm ${filter === 'live' ? 'bg-red-600' : 'border-gray-700'}`}
-              size="sm"
-            >
-              <span className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse" />
-              {t('streaming.live')}
-            </Button>
-            <Button
-              variant={filter === 'all' ? 'default' : 'outline'}
-              onClick={() => setFilter('all')}
-              className={`text-sm ${filter === 'all' ? 'bg-purple-600' : 'border-gray-700'}`}
-              size="sm"
-            >
-              {t('streaming.all')}
-            </Button>
-            <Button
-              variant={filter === 'following' ? 'default' : 'outline'}
-              onClick={() => setFilter('following')}
-              className={`text-sm ${filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}`}
-              size="sm"
-            >
-              <Users className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">{t('streaming.following')}</span>
-              <span className="sm:hidden">Seguidos</span>
-            </Button>
-          </div>
-        </div>
+        {/* Main Content with Sidebar */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left: Main Content */}
+          <div className="flex-1 min-w-0">
+            {/* Search & Filters */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={`${t('common.search')}...`}
+                  className="pl-10 bg-gray-800 border-gray-700"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={filter === 'live' ? 'default' : 'outline'}
+                  onClick={() => setFilter('live')}
+                  className={`text-sm ${filter === 'live' ? 'bg-red-600' : 'border-gray-700'}`}
+                  size="sm"
+                >
+                  <span className="w-2 h-2 bg-red-500 rounded-full mr-2 animate-pulse" />
+                  {t('streaming.live')}
+                </Button>
+                <Button
+                  variant={filter === 'all' ? 'default' : 'outline'}
+                  onClick={() => setFilter('all')}
+                  className={`text-sm ${filter === 'all' ? 'bg-purple-600' : 'border-gray-700'}`}
+                  size="sm"
+                >
+                  {t('streaming.all')}
+                </Button>
+                <Button
+                  variant={filter === 'following' ? 'default' : 'outline'}
+                  onClick={() => setFilter('following')}
+                  className={`text-sm ${filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}`}
+                  size="sm"
+                >
+                  <Users className="w-4 h-4 mr-1" />
+                  <span className="hidden sm:inline">{t('streaming.following')}</span>
+                  <span className="sm:hidden">Seguidos</span>
+                </Button>
+              </div>
+            </div>
 
-        {/* Streams Grid */}
+            {/* Category Filter Badge */}
+            {selectedCategory && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-sm text-gray-400">Filtrando por:</span>
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-600/20 border border-purple-500/30 rounded-full text-sm text-purple-300">
+                  <Folder className="w-3 h-3" />
+                  {selectedCategory}
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className="ml-1 hover:text-white"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              </div>
+            )}
+
+            {/* Streams Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
@@ -461,6 +526,174 @@ export default function StreamingPage() {
             )}
           </div>
         )}
+          </div>
+
+          {/* Right: Sidebar */}
+          <div className="lg:w-80 xl:w-96 space-y-6">
+            {/* Live Now Section */}
+            <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-red-600/20 to-pink-600/20">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-red-400" />
+                  En Vivo Ahora
+                  <span className="ml-auto text-xs bg-red-600 px-2 py-0.5 rounded-full">
+                    {sidebar.live.length}
+                  </span>
+                </h3>
+              </div>
+              <div className="divide-y divide-gray-700/50">
+                {sidebar.live.length > 0 ? (
+                  sidebar.live.slice(0, 5).map((stream, index) => (
+                    <Link
+                      key={stream.id}
+                      href={`/streaming/live/${stream.id}`}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-700/30 transition-colors"
+                    >
+                      <div className="relative">
+                        {index === 0 && (
+                          <Crown className="absolute -top-1 -right-1 w-3 h-3 text-yellow-400" />
+                        )}
+                        <Avatar className="w-10 h-10 border-2 border-red-500">
+                          <AvatarImage src={stream.avatarUrl} />
+                          <AvatarFallback>{stream.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{stream.displayName || stream.username}</p>
+                        <p className="text-xs text-gray-400 truncate">{stream.title}</p>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                          <span className="flex items-center gap-1 text-red-400">
+                            <Eye className="w-3 h-3" />
+                            {stream.viewersCount}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {stream.followersCount}
+                          </span>
+                          <span className="flex items-center gap-1 text-yellow-400">
+                            <Star className="w-3 h-3" />
+                            {stream.fameScore}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-500" />
+                    </Link>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-gray-500 text-sm">
+                    No hay streams en vivo
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recently Ended Section */}
+            <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-gray-600/20 to-gray-500/20">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  Terminados Recientes
+                </h3>
+              </div>
+              <div className="divide-y divide-gray-700/50">
+                {sidebar.ended.length > 0 ? (
+                  sidebar.ended.slice(0, 5).map((stream) => (
+                    <Link
+                      key={stream.id}
+                      href={`/streaming/${stream.id}`}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-700/30 transition-colors opacity-75 hover:opacity-100"
+                    >
+                      <Avatar className="w-10 h-10 border border-gray-600">
+                        <AvatarImage src={stream.avatarUrl} />
+                        <AvatarFallback>{stream.username?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{stream.displayName || stream.username}</p>
+                        <p className="text-xs text-gray-400 truncate">{stream.title}</p>
+                        <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Eye className="w-3 h-3" />
+                            {stream.peakViewers} pico
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {stream.followersCount}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-gray-500 text-sm">
+                    No hay streams terminados
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Categories Section */}
+            <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-purple-600/20 to-blue-600/20">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Folder className="w-4 h-4 text-purple-400" />
+                  Categorías
+                </h3>
+              </div>
+              <div className="p-3 space-y-2">
+                {sidebar.categories.length > 0 ? (
+                  sidebar.categories.map((cat) => {
+                    const categoryInfo = STREAM_CATEGORIES.find(
+                      c => c.id === cat.name || c.name.toLowerCase() === cat.name.toLowerCase()
+                    );
+                    return (
+                      <button
+                        key={cat.name}
+                        onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
+                        className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors ${
+                          selectedCategory === cat.name
+                            ? 'bg-purple-600/30 border border-purple-500/50'
+                            : 'hover:bg-gray-700/50'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2 text-sm">
+                          <span>{categoryInfo?.emoji || '📁'}</span>
+                          {categoryInfo?.name || cat.name}
+                        </span>
+                        <span className="flex items-center gap-2 text-xs">
+                          {cat.liveStreams > 0 && (
+                            <span className="flex items-center gap-1 text-red-400">
+                              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                              {cat.liveStreams}
+                            </span>
+                          )}
+                          <span className="text-gray-500">{cat.totalStreams} total</span>
+                        </span>
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="text-center text-gray-500 text-sm py-2">
+                    No hay categorías
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Fame Legend */}
+            <div className="bg-gradient-to-r from-yellow-600/10 to-orange-600/10 border border-yellow-500/20 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-yellow-300 mb-2 flex items-center gap-2">
+                <Star className="w-4 h-4" />
+                Puntuación de Fama
+              </h4>
+              <p className="text-xs text-gray-400">
+                La fama se calcula: <span className="text-yellow-300">(Viewers × 2) + Seguidores</span>
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Los streamers con más fama aparecen primero
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
