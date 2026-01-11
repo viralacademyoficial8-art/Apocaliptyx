@@ -614,6 +614,7 @@ class ChatService {
         reactionsMap.set(r.message_id, existing);
       });
 
+      // Add reactions to messages
       data?.forEach(m => {
         (m as unknown as Message).reactions = reactionsMap.get(m.id) || [];
       });
