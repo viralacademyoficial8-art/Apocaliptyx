@@ -1306,15 +1306,15 @@ function MensajesContent() {
 
                   {/* Bottom Sheet Menu */}
                   {showChatMenu && (
-                    <div className="fixed inset-0 z-[9999] flex flex-col justify-end">
+                    <>
                       {/* Backdrop with blur */}
                       <div
-                        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998]"
                         onClick={() => setShowChatMenu(false)}
                       />
 
-                      {/* Bottom Sheet Container */}
-                      <div className="relative animate-bottom-sheet">
+                      {/* Bottom Sheet Container - fixed to bottom */}
+                      <div className="fixed bottom-0 left-0 right-0 z-[9999] animate-bottom-sheet">
                         {/* Gradient top border */}
                         <div className="h-[2px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
@@ -1407,7 +1407,7 @@ function MensajesContent() {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
