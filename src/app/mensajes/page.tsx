@@ -772,78 +772,51 @@ function MensajesContent() {
           </div>
         )}
 
-        {/* Story Reply Preview - OUTSIDE main message container */}
+        {/* Story Reply Preview - Instagram Style (Compact & Square) */}
         {(message.story_preview || message.story_id || message.content?.includes('Respondió a una historia:')) && !message.is_deleted && (
-          <div className="max-w-[220px] mb-2">
-            {/* Compact Card */}
-            <div className="rounded-xl overflow-hidden border border-gray-700/50 bg-gray-800/90">
-              {/* Compact header */}
-              <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-900/50 border-b border-gray-700/30">
-                {/* Small avatar with gradient ring */}
-                <div className="w-5 h-5 rounded-full p-[1px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex-shrink-0">
-                  <div className="w-full h-full rounded-full bg-gray-900 overflow-hidden">
-                    {message.story_preview?.storyOwnerAvatarUrl ? (
-                      <img src={message.story_preview.storyOwnerAvatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[7px] font-bold text-white">
-                        {(message.story_preview?.storyOwnerDisplayName || message.story_preview?.storyOwnerUsername || '?')[0].toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[9px] text-gray-400 leading-tight">
-                    {isOwn ? 'Respondiste a la historia' : 'Respondió a tu historia'}
-                  </p>
-                  <p className="text-[10px] font-medium text-white truncate">
-                    @{message.story_preview?.storyOwnerUsername || 'usuario'}
-                  </p>
-                </div>
-              </div>
+          <div className="mb-1">
+            {/* Mini header */}
+            <p className="text-[10px] text-gray-500 mb-1">
+              {isOwn ? 'Respondiste a la historia' : 'Respondió a la historia de'}{' '}
+              <span className="text-gray-400">@{message.story_preview?.storyOwnerUsername || 'usuario'}</span>
+            </p>
 
-              {/* Compact story preview - shorter height */}
-              <div className="relative h-[100px]">
-                {message.story_preview?.mediaUrl ? (
-                  <>
-                    <img src={message.story_preview.mediaUrl} alt="Story" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    {message.story_preview.content && (
-                      <p className="absolute bottom-1.5 left-2 right-2 text-[10px] text-white line-clamp-2 drop-shadow">
+            {/* Square story card - like Instagram */}
+            <div className="w-[140px] h-[180px] rounded-lg overflow-hidden border border-gray-700/60 bg-gray-800">
+              {message.story_preview?.mediaUrl ? (
+                <div className="relative w-full h-full">
+                  <img src={message.story_preview.mediaUrl} alt="Story" className="w-full h-full object-cover" />
+                  {message.story_preview.content && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <p className="absolute bottom-2 left-2 right-2 text-[10px] text-white line-clamp-2">
                         {message.story_preview.content}
                       </p>
-                    )}
-                  </>
-                ) : message.story_preview?.linkPreview?.image ? (
-                  <>
-                    <img src={message.story_preview.linkPreview.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-1.5 left-2 right-2">
-                      <p className="text-[8px] text-purple-300 uppercase">{message.story_preview.linkPreview.siteName || 'Link'}</p>
-                      <p className="text-[10px] text-white font-medium line-clamp-1">{message.story_preview.linkPreview.title}</p>
-                    </div>
-                  </>
-                ) : message.story_preview?.content ? (
-                  <div
-                    className="w-full h-full flex items-center justify-center p-2"
-                    style={{ background: message.story_preview.backgroundColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
-                  >
-                    <p className="text-xs text-white text-center font-medium line-clamp-3 drop-shadow">
-                      {message.story_preview.content}
-                    </p>
+                    </>
+                  )}
+                </div>
+              ) : message.story_preview?.linkPreview?.image ? (
+                <div className="relative w-full h-full">
+                  <img src={message.story_preview.linkPreview.image} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-[10px] text-white font-medium line-clamp-2">{message.story_preview.linkPreview.title}</p>
                   </div>
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 flex items-center justify-center">
-                    <span className="text-xl">📷</span>
-                  </div>
-                )}
-
-                {/* Expired badge */}
-                {message.story_preview?.expiresAt && new Date(message.story_preview.expiresAt) < new Date() && (
-                  <div className="absolute top-1 right-1 px-1 py-0.5 bg-black/60 rounded text-[7px] text-gray-300">
-                    Expirada
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : message.story_preview?.content ? (
+                <div
+                  className="w-full h-full flex items-center justify-center p-3"
+                  style={{ background: message.story_preview.backgroundColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                >
+                  <p className="text-sm text-white text-center font-medium line-clamp-5">
+                    {message.story_preview.content}
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 flex items-center justify-center">
+                  <span className="text-3xl">📷</span>
+                </div>
+              )}
             </div>
           </div>
         )}
