@@ -66,27 +66,23 @@ export async function GET(request: NextRequest) {
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false });
 
-    if (userId) {
-      // Get specific user's stories
-      query = query.eq('user_id', userId);
-    } else if (user) {
-      // Get stories from followed users + own stories
+    // Get followed users for prioritization
+    let followingIds: string[] = [];
+    if (user) {
       const { data: followingRaw } = await supabase()
         .from('user_follows')
         .select('following_id')
         .eq('follower_id', user.id);
 
       const following = followingRaw as UserFollow[] | null;
-      const followingIds = following?.map(f => f.following_id) || [];
-
-      if (includeOwn) {
-        followingIds.push(user.id);
-      }
-
-      if (followingIds.length > 0) {
-        query = query.in('user_id', followingIds);
-      }
+      followingIds = following?.map(f => f.following_id) || [];
     }
+
+    if (userId) {
+      // Get specific user's stories
+      query = query.eq('user_id', userId);
+    }
+    // Note: We now show ALL active stories, but prioritize followed users in sorting
 
     const { data: storiesRaw, error } = await query.limit(50);
 
@@ -139,7 +135,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Convert to array and sort (own stories first, then by hasUnviewed, then by latest)
+    // Convert to array and sort (own stories first, then followed with unviewed, then others)
     const groupedStories = Array.from(userStoriesMap.values())
       .sort((a, b) => {
         // Current user's stories first
@@ -147,6 +143,16 @@ export async function GET(request: NextRequest) {
           if (a.user.id === user.id) return -1;
           if (b.user.id === user.id) return 1;
         }
+
+        // Check if users are followed
+        const aIsFollowed = followingIds.includes(a.user.id);
+        const bIsFollowed = followingIds.includes(b.user.id);
+
+        // Followed users before non-followed
+        if (aIsFollowed !== bIsFollowed) {
+          return aIsFollowed ? -1 : 1;
+        }
+
         // Then unviewed stories
         if (a.hasUnviewed !== b.hasUnviewed) {
           return a.hasUnviewed ? -1 : 1;
