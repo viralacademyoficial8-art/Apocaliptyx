@@ -29,7 +29,12 @@ interface StreamRow {
   tags?: string[];
   started_at?: string;
   ended_at?: string;
-  user?: StreamUser;
+  user?: StreamUser & { followers_count?: number };
+}
+
+interface FollowerCount {
+  following_id: string;
+  count: number;
 }
 
 // GET /api/streaming - Get live streams
@@ -142,6 +147,106 @@ export async function GET(request: NextRequest) {
     const streamsToday = todayStreamsData?.length || 0;
     const peakViewersToday = todayStreamsData?.reduce((max, s) => Math.max(max, s.peak_viewers || 0), 0) || 0;
 
+    // === SIDEBAR DATA ===
+
+    // Get all live streams for sidebar (with user data)
+    const { data: liveStreamsForSidebar } = await supabase
+      .from('live_streams')
+      .select(`
+        id, title, status, viewers_count, category, user_id,
+        user:users(id, username, display_name, avatar_url)
+      `)
+      .eq('status', 'live')
+      .order('viewers_count', { ascending: false })
+      .limit(10);
+
+    // Get recently ended streams for sidebar
+    const { data: endedStreamsForSidebar } = await supabase
+      .from('live_streams')
+      .select(`
+        id, title, status, viewers_count, peak_viewers, category, user_id, ended_at,
+        user:users(id, username, display_name, avatar_url)
+      `)
+      .eq('status', 'ended')
+      .order('ended_at', { ascending: false })
+      .limit(5);
+
+    // Get followers count for streamers to calculate "fame"
+    const streamerIds = [
+      ...(liveStreamsForSidebar?.map(s => s.user_id) || []),
+      ...(endedStreamsForSidebar?.map(s => s.user_id) || [])
+    ].filter((id, index, self) => self.indexOf(id) === index);
+
+    // Get follower counts for these users
+    const followerCounts: Record<string, number> = {};
+    if (streamerIds.length > 0) {
+      const { data: followersData } = await supabase
+        .from('follows')
+        .select('following_id')
+        .in('following_id', streamerIds);
+
+      if (followersData) {
+        followersData.forEach((f: { following_id: string }) => {
+          followerCounts[f.following_id] = (followerCounts[f.following_id] || 0) + 1;
+        });
+      }
+    }
+
+    // Calculate fame score and format sidebar data
+    const formatSidebarStream = (s: StreamRow & { user?: StreamUser }) => ({
+      id: s.id,
+      title: s.title,
+      status: s.status,
+      viewersCount: s.viewers_count || 0,
+      peakViewers: s.peak_viewers || 0,
+      category: s.category,
+      userId: s.user_id,
+      username: s.user?.username,
+      displayName: s.user?.display_name,
+      avatarUrl: s.user?.avatar_url,
+      followersCount: followerCounts[s.user_id] || 0,
+      // Fame score = viewers * 2 + followers (weighted towards live engagement)
+      fameScore: ((s.viewers_count || 0) * 2) + (followerCounts[s.user_id] || 0),
+      endedAt: s.ended_at,
+    });
+
+    // Sort live streams by fame score
+    const sidebarLive = (liveStreamsForSidebar as StreamRow[] || [])
+      .map(formatSidebarStream)
+      .sort((a, b) => b.fameScore - a.fameScore);
+
+    // Sort ended streams by fame score
+    const sidebarEnded = (endedStreamsForSidebar as StreamRow[] || [])
+      .map(formatSidebarStream)
+      .sort((a, b) => b.fameScore - a.fameScore);
+
+    // Get categories with counts
+    const { data: categoriesData } = await supabase
+      .from('live_streams')
+      .select('category, status')
+      .not('category', 'is', null);
+
+    const categoryStats: Record<string, { total: number; live: number }> = {};
+    (categoriesData || []).forEach((s: { category: string | null; status: string }) => {
+      if (s.category) {
+        if (!categoryStats[s.category]) {
+          categoryStats[s.category] = { total: 0, live: 0 };
+        }
+        categoryStats[s.category].total++;
+        if (s.status === 'live') {
+          categoryStats[s.category].live++;
+        }
+      }
+    });
+
+    const sidebarCategories = Object.entries(categoryStats)
+      .map(([name, stats]) => ({
+        name,
+        totalStreams: stats.total,
+        liveStreams: stats.live,
+      }))
+      .sort((a, b) => b.liveStreams - a.liveStreams || b.totalStreams - a.totalStreams);
+
     const formattedStreams = streams?.map(stream => ({
       id: stream.id,
       userId: stream.user_id,
@@ -170,6 +275,11 @@ export async function GET(request: NextRequest) {
         totalViewers,
         peakViewersToday,
         streamsToday,
+      },
+      sidebar: {
+        live: sidebarLive,
+        ended: sidebarEnded,
+        categories: sidebarCategories,
       }
     });
   } catch (error) {
