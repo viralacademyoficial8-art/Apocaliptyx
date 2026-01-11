@@ -793,25 +793,34 @@ function MensajesContent() {
 
           {/* Story Reply Preview (Instagram/Facebook style) */}
           {message.story_preview && !message.is_deleted && (
-            <div className={`mx-2 mt-2 mb-1 rounded-lg overflow-hidden ${isOwn ? 'bg-purple-700/40' : 'bg-gray-700/60'}`}>
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10">
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  {message.story_preview.storyOwnerAvatarUrl ? (
-                    <img
-                      src={message.story_preview.storyOwnerAvatarUrl}
-                      alt=""
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold">
-                      {(message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername || '?')[0].toUpperCase()}
+            <div className={`mx-2 mt-2 mb-1 rounded-xl overflow-hidden border ${isOwn ? 'bg-purple-700/30 border-purple-500/30' : 'bg-gray-700/50 border-gray-600/30'}`}>
+              <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/10">
+                {/* Avatar with Instagram-style gradient ring */}
+                <div className="relative flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
+                    <div className="w-full h-full rounded-full bg-gray-900 p-[1px]">
+                      {message.story_preview.storyOwnerAvatarUrl ? (
+                        <img
+                          src={message.story_preview.storyOwnerAvatarUrl}
+                          alt=""
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold text-white">
+                          {(message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername || '?')[0].toUpperCase()}
+                        </div>
+                      )}
                     </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">
-                      Respondió a la historia de {message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername}
-                    </p>
                   </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                    <span className="inline-block w-3 h-3">📷</span>
+                    Respondió a la historia
+                  </p>
+                  <p className="text-xs font-medium truncate">
+                    {message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername}
+                  </p>
                 </div>
               </div>
 
@@ -1113,7 +1122,11 @@ function MensajesContent() {
                           </span>
                         </div>
                         <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
-                          {conv.last_message?.file_url ? '📎 Archivo adjunto' : conv.last_message?.content || 'Sin mensajes'}
+                          {conv.last_message?.story_preview
+                            ? `📷 Respondió a una historia: ${conv.last_message.content}`
+                            : conv.last_message?.file_url
+                            ? '📎 Archivo adjunto'
+                            : conv.last_message?.content || 'Sin mensajes'}
                         </p>
                       </div>
                     </button>
