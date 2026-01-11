@@ -1,0 +1,211 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { ExternalLink, Globe, Loader2 } from 'lucide-react';
+
+interface LinkPreviewData {
+  url: string;
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  siteName: string | null;
+  favicon: string | null;
+}
+
+interface LinkPreviewProps {
+  url: string;
+  className?: string;
+}
+
+// Cache for previews to avoid re-fetching
+const previewCache = new Map<string, LinkPreviewData | null>();
+
+export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
+  const [preview, setPreview] = useState<LinkPreviewData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    const fetchPreview = async () => {
+      // Check cache first
+      if (previewCache.has(url)) {
+        const cached = previewCache.get(url);
+        setPreview(cached || null);
+        setLoading(false);
+        setError(!cached);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await fetch('/api/link-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch preview');
+        }
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          previewCache.set(url, data.data);
+          setPreview(data.data);
+        } else {
+          previewCache.set(url, null);
+          setError(true);
+        }
+      } catch (err) {
+        previewCache.set(url, null);
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPreview();
+  }, [url]);
+
+  if (loading) {
+    return (
+      <div className={`flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 ${className}`}>
+        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+        <span className="text-sm text-gray-400">Cargando vista previa...</span>
+      </div>
+    );
+  }
+
+  if (error || !preview) {
+    // Show simple link fallback
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors ${className}`}
+      >
+        <Globe className="w-4 h-4 text-gray-400" />
+        <span className="text-sm text-purple-400 hover:underline truncate">{url}</span>
+        <ExternalLink className="w-3 h-3 text-gray-500 flex-shrink-0" />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`block overflow-hidden rounded-xl border border-gray-700 bg-gray-800/50 hover:bg-gray-800/80 transition-all hover:border-gray-600 ${className}`}
+    >
+      {/* Image */}
+      {preview.image && !imageError && (
+        <div className="relative w-full h-48 bg-gray-900">
+          <Image
+            src={preview.image}
+            alt={preview.title || 'Link preview'}
+            fill
+            className="object-cover"
+            onError={() => setImageError(true)}
+            unoptimized
+          />
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="p-4">
+        {/* Site info */}
+        <div className="flex items-center gap-2 mb-2">
+          {preview.favicon && !imageError && (
+            <Image
+              src={preview.favicon}
+              alt=""
+              width={16}
+              height={16}
+              className="rounded"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+              unoptimized
+            />
+          )}
+          <span className="text-xs text-gray-400 uppercase tracking-wide">
+            {preview.siteName || new URL(url).hostname}
+          </span>
+        </div>
+
+        {/* Title */}
+        {preview.title && (
+          <h3 className="font-semibold text-white line-clamp-2 mb-1">
+            {preview.title}
+          </h3>
+        )}
+
+        {/* Description */}
+        {preview.description && (
+          <p className="text-sm text-gray-400 line-clamp-2">
+            {preview.description}
+          </p>
+        )}
+
+        {/* URL */}
+        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
+          <ExternalLink className="w-3 h-3" />
+          <span className="truncate">{new URL(url).hostname}</span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+// Helper function to extract URLs from text
+export function extractUrls(text: string): string[] {
+  const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
+  const matches = text.match(urlRegex) || [];
+  // Remove duplicates and clean up trailing punctuation
+  return [...new Set(matches.map(url => url.replace(/[.,;:!?)]+$/, '')))];
+}
+
+// Component to render text with link previews
+export function TextWithLinkPreviews({
+  text,
+  className = '',
+  maxPreviews = 3
+}: {
+  text: string;
+  className?: string;
+  maxPreviews?: number;
+}) {
+  const urls = extractUrls(text).slice(0, maxPreviews);
+
+  if (urls.length === 0) {
+    return <p className={className}>{text}</p>;
+  }
+
+  // Replace URLs in text with styled links
+  let processedText = text;
+  urls.forEach(url => {
+    processedText = processedText.replace(
+      url,
+      `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline break-all">${url}</a>`
+    );
+  });
+
+  return (
+    <div className="space-y-3">
+      <p
+        className={className}
+        dangerouslySetInnerHTML={{ __html: processedText }}
+      />
+      {/* Link previews */}
+      <div className="space-y-2">
+        {urls.map((url, index) => (
+          <LinkPreview key={`${url}-${index}`} url={url} />
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -22,6 +22,7 @@ import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { TextWithLinkPreviews } from '@/components/LinkPreview';
 
 interface PostAuthor {
   id: string;
@@ -334,9 +335,13 @@ export function PostCard({
             </span>
           </div>
 
-          <p className="mt-2 text-gray-200 whitespace-pre-wrap break-words">
-            {post.content}
-          </p>
+          <div className="mt-2">
+            <TextWithLinkPreviews
+              text={post.content}
+              className="text-gray-200 whitespace-pre-wrap break-words"
+              maxPreviews={2}
+            />
+          </div>
 
           {post.imageUrl && (
             <img
