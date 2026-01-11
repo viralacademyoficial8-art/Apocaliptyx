@@ -338,6 +338,6 @@
   }
 }
 
-.animate-slide-up {
+.animate-bottom-sheet {
   animation: bottom-sheet-up 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
