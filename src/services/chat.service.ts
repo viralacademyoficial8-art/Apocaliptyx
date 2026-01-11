@@ -665,7 +665,7 @@ class ChatService {
     // Enviar notificaciones (excepto a usuarios que silenciaron el chat)
     await this.sendMessageNotifications(conversationId, senderId, content, options?.file);
 
-    return data;
+    return data as unknown as Message;
   }
 
   async sendSystemMessage(conversationId: string, content: string): Promise<void> {
