@@ -75,8 +75,8 @@ const EMOJI_LIST = [
 // Filtros disponibles
 const FILTERS: { key: ChatFilter; label: string; icon: React.ReactNode }[] = [
   { key: 'all', label: 'Todos', icon: <MessageCircle className="w-4 h-4" /> },
-  { key: 'unread', label: 'No leídos', icon: <Hash className="w-4 h-4" /> },
-  { key: 'favorites', label: 'Favoritos', icon: <Star className="w-4 h-4" /> },
+  { key: 'unread', label: 'No leídos', icon: <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span></span> },
+  { key: 'favorites', label: 'Favoritos', icon: <Star className="w-4 h-4 text-yellow-400" /> },
   { key: 'groups', label: 'Grupos', icon: <Users className="w-4 h-4" /> },
   { key: 'archived', label: 'Archivados', icon: <Archive className="w-4 h-4" /> },
 ];
@@ -1071,22 +1071,22 @@ function MensajesContent() {
             />
           </div>
 
-          {/* Filter pills */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {/* Filter pills - Improved UX */}
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide snap-x snap-mandatory">
             {FILTERS.filter(f => f.key !== 'archived').map(filter => (
               <button
                 key={filter.key}
                 onClick={() => setActiveFilter(filter.key)}
                 className={`
-                  flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300
+                  flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 snap-start
                   ${activeFilter === filter.key
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25'
-                    : 'bg-gray-800/60 text-gray-400 hover:bg-gray-700/60 hover:text-white border border-gray-700/50'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-[1.02]'
+                    : 'bg-gray-800/80 text-gray-400 hover:bg-gray-700/80 hover:text-white border border-gray-700/50 hover:border-purple-500/30'
                   }
                 `}
               >
-                {filter.icon}
-                {filter.label}
+                <span className="text-base">{filter.icon}</span>
+                <span>{filter.label}</span>
               </button>
             ))}
           </div>
