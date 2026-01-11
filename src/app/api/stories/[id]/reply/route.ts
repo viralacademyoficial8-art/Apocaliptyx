@@ -175,7 +175,8 @@ export async function POST(
         story_preview: storyPreview,
       })
       .select(`
-        *,
+        id, conversation_id, sender_id, content, is_read, is_deleted, created_at,
+        file_url, file_type, file_name, reply_to_id, story_id, story_preview,
         sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
       `)
       .single();

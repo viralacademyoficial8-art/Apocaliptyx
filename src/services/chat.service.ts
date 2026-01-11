@@ -305,10 +305,10 @@ class ChatService {
           })) || [];
         }
 
-        // Último mensaje
+        // Último mensaje (incluir story fields explícitamente)
         const { data: lastMessages } = await supabase
           .from('messages')
-          .select('*')
+          .select('id, conversation_id, sender_id, content, is_read, is_deleted, created_at, file_url, file_type, file_name, reply_to_id, story_id, story_preview')
           .eq('conversation_id', conv.id)
           .order('created_at', { ascending: false })
           .limit(1);
@@ -578,7 +578,8 @@ class ChatService {
     const { data, error } = await supabase
       .from('messages')
       .select(`
-        *,
+        id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
+        file_url, file_type, file_name, reply_to_id, story_id, story_preview,
         sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url),
         reply_to:messages!messages_reply_to_id_fkey(id, content, sender_id, sender:users!messages_sender_id_fkey(username, display_name))
       `)
@@ -643,7 +644,8 @@ class ChatService {
         reply_to_id: options?.replyToId || null,
       })
       .select(`
-        *,
+        id, conversation_id, sender_id, content, is_read, is_deleted, created_at,
+        file_url, file_type, file_name, reply_to_id, story_id, story_preview,
         sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
       `)
       .single();
@@ -904,7 +906,8 @@ class ChatService {
           const { data } = await supabase
             .from('messages')
             .select(`
-              *,
+              id, conversation_id, sender_id, content, is_read, is_deleted, created_at,
+              file_url, file_type, file_name, reply_to_id, story_id, story_preview,
               sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
             `)
             .eq('id', payload.new.id)
@@ -1046,7 +1049,8 @@ class ChatService {
     const { data } = await supabase
       .from('messages')
       .select(`
-        *,
+        id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
+        file_url, file_type, file_name, reply_to_id, story_id, story_preview,
         sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
       `)
       .eq('conversation_id', conversationId)
@@ -1517,7 +1521,8 @@ class ChatService {
       .from('pinned_messages')
       .select(`
         message:messages(
-          *,
+          id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
+          file_url, file_type, file_name, reply_to_id, story_id, story_preview,
           sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
         )
       `)
@@ -1554,7 +1559,8 @@ class ChatService {
       .from('saved_messages')
       .select(`
         message:messages(
-          *,
+          id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
+          file_url, file_type, file_name, reply_to_id, story_id, story_preview,
           sender:users!messages_sender_id_fkey(id, username, display_name, avatar_url)
         )
       `)
