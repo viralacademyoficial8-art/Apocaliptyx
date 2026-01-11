@@ -615,11 +615,11 @@ class ChatService {
       });
 
       data?.forEach(m => {
-        (m as Message).reactions = reactionsMap.get(m.id) || [];
+        (m as unknown as Message).reactions = reactionsMap.get(m.id) || [];
       });
     }
 
-    return (data as Message[]) || [];
+    return (data as unknown as Message[]) || [];
   }
 
   async sendMessage(
