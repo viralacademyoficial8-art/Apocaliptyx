@@ -772,51 +772,114 @@ function MensajesContent() {
           </div>
         )}
 
-        {/* Story Reply Preview - Instagram Style (Compact & Square) */}
+        {/* Story Reply Preview - Modern Social Media Style */}
         {(message.story_preview || message.story_id || message.content?.includes('Respondió a una historia:')) && !message.is_deleted && (
-          <div className="mb-1">
-            {/* Mini header */}
-            <p className="text-[10px] text-gray-500 mb-1">
-              {isOwn ? 'Respondiste a la historia' : 'Respondió a la historia de'}{' '}
-              <span className="text-gray-400">@{message.story_preview?.storyOwnerUsername || 'usuario'}</span>
-            </p>
+          <div className={`mb-2 ${isOwn ? 'flex justify-end' : ''}`}>
+            {/* Story Card Container */}
+            <div className="group relative">
+              {/* Gradient border effect */}
+              <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-300 blur-[1px]" />
 
-            {/* Square story card - like Instagram */}
-            <div className="w-[140px] h-[180px] rounded-lg overflow-hidden border border-gray-700/60 bg-gray-800">
-              {message.story_preview?.mediaUrl ? (
-                <div className="relative w-full h-full">
-                  <img src={message.story_preview.mediaUrl} alt="Story" className="w-full h-full object-cover" />
-                  {message.story_preview.content && (
-                    <>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <p className="absolute bottom-2 left-2 right-2 text-[10px] text-white line-clamp-2">
-                        {message.story_preview.content}
-                      </p>
-                    </>
-                  )}
-                </div>
-              ) : message.story_preview?.linkPreview?.image ? (
-                <div className="relative w-full h-full">
-                  <img src={message.story_preview.linkPreview.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <p className="text-[10px] text-white font-medium line-clamp-2">{message.story_preview.linkPreview.title}</p>
+              <div className="relative bg-gray-900 rounded-2xl p-3 max-w-[280px]">
+                {/* Header with avatar and username */}
+                <div className="flex items-center gap-2 mb-2">
+                  {/* Mini avatar with gradient ring */}
+                  <div className="relative">
+                    <div className="absolute -inset-[2px] bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-full" />
+                    <div className="relative w-6 h-6 rounded-full bg-gray-900 p-[2px]">
+                      {message.story_preview?.storyOwnerAvatarUrl ? (
+                        <img
+                          src={message.story_preview.storyOwnerAvatarUrl}
+                          alt=""
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                          <span className="text-[8px] text-white font-bold">
+                            {message.story_preview?.storyOwnerUsername?.charAt(0).toUpperCase() || 'U'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-gray-400">
+                      {isOwn ? 'Respondiste a la historia de' : 'Respondió a tu historia'}
+                    </p>
+                    <p className="text-xs text-white font-medium truncate">
+                      @{message.story_preview?.storyOwnerUsername || 'usuario'}
+                    </p>
                   </div>
                 </div>
-              ) : message.story_preview?.content ? (
-                <div
-                  className="w-full h-full flex items-center justify-center p-3"
-                  style={{ background: message.story_preview.backgroundColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
-                >
-                  <p className="text-sm text-white text-center font-medium line-clamp-5">
-                    {message.story_preview.content}
-                  </p>
+
+                {/* Story Content Preview */}
+                <div className="relative rounded-xl overflow-hidden aspect-[9/16] max-h-[200px] bg-gray-800">
+                  {message.story_preview?.mediaUrl ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={message.story_preview.mediaUrl}
+                        alt="Story"
+                        className="w-full h-full object-cover"
+                      />
+                      {message.story_preview.content && (
+                        <>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                          <p className="absolute bottom-3 left-3 right-3 text-xs text-white font-medium line-clamp-2 drop-shadow-lg">
+                            {message.story_preview.content}
+                          </p>
+                        </>
+                      )}
+                      {/* Play button for videos */}
+                      {message.story_preview.mediaType?.includes('video') && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-white border-b-8 border-b-transparent ml-1" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : message.story_preview?.linkPreview?.image ? (
+                    <div className="relative w-full h-full">
+                      <img
+                        src={message.story_preview.linkPreview.image}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Link2 className="w-3 h-3 text-blue-400" />
+                          <span className="text-[10px] text-blue-400 truncate">
+                            {message.story_preview.linkPreview.siteName || 'Link'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-white font-medium line-clamp-2">
+                          {message.story_preview.linkPreview.title}
+                        </p>
+                      </div>
+                    </div>
+                  ) : message.story_preview?.content ? (
+                    <div
+                      className="w-full h-full flex items-center justify-center p-4 min-h-[150px]"
+                      style={{
+                        background: message.story_preview.backgroundColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                      }}
+                    >
+                      <p className="text-sm text-white text-center font-medium line-clamp-6 drop-shadow-lg">
+                        {message.story_preview.content}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full min-h-[150px] bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 flex items-center justify-center">
+                      <div className="text-center">
+                        <span className="text-4xl mb-2 block">📷</span>
+                        <span className="text-xs text-white/80">Historia</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 flex items-center justify-center">
-                  <span className="text-3xl">📷</span>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         )}
