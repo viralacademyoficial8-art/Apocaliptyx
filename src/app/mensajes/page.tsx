@@ -885,19 +885,21 @@ function MensajesContent() {
         )}
 
         <div className={`
-          max-w-[75%] rounded-2xl overflow-hidden
+          max-w-[75%] rounded-2xl overflow-hidden transition-all duration-200
           ${message.is_deleted
-            ? 'bg-gray-800/50 border border-gray-700'
-            : isOwn ? 'bg-purple-600 rounded-br-md' : 'bg-gray-800 rounded-bl-md'
+            ? 'bg-gray-800/30 border border-gray-700/50 backdrop-blur-sm'
+            : isOwn
+              ? 'bg-gradient-to-br from-purple-600 to-purple-700 rounded-br-md shadow-lg shadow-purple-500/20'
+              : 'bg-gray-800/80 backdrop-blur-sm border border-gray-700/30 rounded-bl-md'
           }
         `}>
           {/* Mensaje de respuesta */}
           {message.reply_to && !message.is_deleted && (
-            <div className={`px-3 py-2 border-l-2 ${isOwn ? 'border-purple-300 bg-purple-700/50' : 'border-gray-500 bg-gray-700/50'}`}>
-              <p className="text-xs opacity-70">
+            <div className={`px-3 py-2 border-l-2 ${isOwn ? 'border-pink-400 bg-purple-700/60' : 'border-purple-400 bg-gray-700/60'}`}>
+              <p className="text-xs opacity-80 font-medium">
                 Respondiendo a {message.reply_to.sender?.display_name || 'Usuario'}
               </p>
-              <p className="text-xs truncate opacity-80">
+              <p className="text-xs truncate opacity-70">
                 {message.reply_to.content}
               </p>
             </div>
@@ -905,8 +907,8 @@ function MensajesContent() {
 
           {/* Mensaje eliminado */}
           {message.is_deleted ? (
-            <p className="text-sm text-gray-500 italic px-4 py-2">
-              🗑️ Este mensaje fue eliminado
+            <p className="text-sm text-gray-500 italic px-4 py-3 flex items-center gap-2">
+              <Trash2 className="w-4 h-4" /> Este mensaje fue eliminado
             </p>
           ) : (
             <>
@@ -1007,61 +1009,71 @@ function MensajesContent() {
   // ============================================
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-[#0a0a0f] text-white">
       <Navbar />
 
       {userId && <PresenceTracker userId={userId} />}
 
-      <div className="container mx-auto px-0 sm:px-4 py-0 sm:py-6">
-        <div className="bg-gray-900 border border-gray-800 rounded-none sm:rounded-xl overflow-hidden h-[calc(100vh-4rem)] sm:h-[calc(100vh-8rem)]">
+      {/* Background decorations */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-600/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-0 sm:px-4 py-0 sm:py-4 relative z-10">
+        <div className="backdrop-blur-xl bg-gray-900/80 border border-gray-800/50 rounded-none sm:rounded-2xl overflow-hidden h-[calc(100vh-4rem)] sm:h-[calc(100vh-6rem)] shadow-2xl shadow-purple-500/5">
           <div className="flex h-full">
 
             {/* ============================================ */}
-            {/* LISTA DE CONVERSACIONES */}
+            {/* LISTA DE CONVERSACIONES - Modern Design */}
             {/* ============================================ */}
             <div className={`
-              w-full md:w-80 lg:w-96 border-r border-gray-800 flex flex-col
+              w-full md:w-80 lg:w-96 border-r border-gray-800/50 flex flex-col bg-gray-900/50
               ${selectedConversation ? 'hidden md:flex' : 'flex'}
             `}>
-              {/* Header con filtros */}
-              <div className="p-4 border-b border-gray-800">
+              {/* Header con filtros - Glassmorphism */}
+              <div className="p-4 border-b border-gray-800/50 backdrop-blur-sm bg-gray-900/30">
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-xl font-bold flex items-center gap-2">
-                    <MessageCircle className="w-6 h-6 text-purple-400" />
-                    Mensajes
+                    <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                      <MessageCircle className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                      Mensajes
+                    </span>
                   </h1>
                   <button
                     onClick={() => setShowCreateGroup(true)}
-                    className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+                    className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-transparent hover:border-purple-500/30"
                     title="Crear grupo"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
                   </button>
                 </div>
 
-                {/* Barra de búsqueda */}
-                <div className="relative mb-3">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                {/* Barra de búsqueda - Modern */}
+                <div className="relative mb-3 group">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar conversaciones..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-800/50 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
                   />
                 </div>
 
-                {/* Filtros */}
-                <div className="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+                {/* Filtros - Pill style */}
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
                   {FILTERS.map(filter => (
                     <button
                       key={filter.key}
                       onClick={() => setActiveFilter(filter.key)}
                       className={`
-                        flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors
+                        flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300
                         ${activeFilter === filter.key
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25 scale-105'
+                          : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700/50 hover:text-white border border-gray-700/50'
                         }
                       `}
                     >
@@ -1073,11 +1085,13 @@ function MensajesContent() {
               </div>
 
               {/* Lista de conversaciones */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
                 {filteredConversations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                    <MessageCircle className="w-12 h-12 text-gray-700 mb-4" />
-                    <p className="text-gray-400">
+                  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-4">
+                      <MessageCircle className="w-10 h-10 text-purple-400" />
+                    </div>
+                    <p className="text-gray-300 font-medium">
                       {activeFilter === 'all' ? 'No tienes conversaciones' :
                        activeFilter === 'unread' ? 'No hay mensajes sin leer' :
                        activeFilter === 'favorites' ? 'No tienes favoritos' :
@@ -1085,7 +1099,7 @@ function MensajesContent() {
                        'No hay chats archivados'}
                     </p>
                     {activeFilter === 'all' && (
-                      <p className="text-gray-500 text-sm mt-1">
+                      <p className="text-gray-500 text-sm mt-2">
                         Ve al perfil de alguien para enviar un mensaje
                       </p>
                     )}
@@ -1096,34 +1110,42 @@ function MensajesContent() {
                       key={conv.id}
                       onClick={() => handleSelectConversation(conv)}
                       className={`
-                        w-full p-4 flex items-center gap-3 hover:bg-gray-800/50 transition-colors border-b border-gray-800/50
-                        ${selectedConversation?.id === conv.id ? 'bg-purple-500/10' : ''}
+                        w-full p-4 flex items-center gap-3 transition-all duration-200 border-b border-gray-800/30
+                        ${selectedConversation?.id === conv.id
+                          ? 'bg-gradient-to-r from-purple-500/15 to-pink-500/10 border-l-2 border-l-purple-500'
+                          : 'hover:bg-white/5 border-l-2 border-l-transparent'
+                        }
                       `}
                     >
+                      {/* Avatar con anillo de gradiente */}
                       <div className="relative flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
-                          {getConversationAvatar(conv) ? (
-                            <img src={getConversationAvatar(conv)} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-lg font-bold">
-                              {conv.type === 'group' ? (
-                                <Users className="w-6 h-6" />
-                              ) : (
-                                getConversationName(conv)[0].toUpperCase()
-                              )}
-                            </span>
-                          )}
+                        <div className={`absolute -inset-1 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 opacity-0 transition-opacity duration-300 ${conv.unread_count ? 'opacity-100' : 'group-hover:opacity-50'}`} />
+                        <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 p-[2px]">
+                          <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
+                            {getConversationAvatar(conv) ? (
+                              <img src={getConversationAvatar(conv)} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-lg font-bold text-white">
+                                {conv.type === 'group' ? (
+                                  <Users className="w-5 h-5" />
+                                ) : (
+                                  getConversationName(conv)[0].toUpperCase()
+                                )}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        {/* Indicadores */}
+                        {/* Online indicator */}
                         {conv.type === 'direct' && conv.other_user?.id && (
                           <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
                             <OnlineStatus userId={conv.other_user.id} size="sm" />
                           </div>
                         )}
 
+                        {/* Unread badge */}
                         {conv.unread_count && conv.unread_count > 0 && (
-                          <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full text-xs flex items-center justify-center font-bold">
+                          <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full text-xs flex items-center justify-center font-bold shadow-lg shadow-purple-500/50 animate-pulse">
                             {conv.unread_count > 9 ? '9+' : conv.unread_count}
                           </span>
                         )}
@@ -1227,10 +1249,10 @@ function MensajesContent() {
             `}>
               {selectedConversation ? (
                 <>
-                  {/* Header del chat */}
-                  <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                  {/* Header del chat - Modern Glassmorphism */}
+                  <div className="p-4 border-b border-gray-800/50 backdrop-blur-lg bg-gray-900/50 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <button onClick={handleBack} className="md:hidden p-2 hover:bg-gray-800 rounded-lg">
+                      <button onClick={handleBack} className="md:hidden p-2 hover:bg-white/10 rounded-xl transition-all duration-200">
                         <ArrowLeft className="w-5 h-5" />
                       </button>
 
@@ -1239,21 +1261,25 @@ function MensajesContent() {
                           ? `/perfil/${selectedConversation.other_user?.username}`
                           : '#'
                         }
-                        className="flex items-center gap-3 hover:opacity-80"
+                        className="flex items-center gap-3 group"
                       >
+                        {/* Avatar with gradient ring */}
                         <div className="relative">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
-                            {getConversationAvatar(selectedConversation) ? (
-                              <img src={getConversationAvatar(selectedConversation)} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              selectedConversation.type === 'group' ? (
-                                <Users className="w-5 h-5" />
+                          <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 opacity-75 group-hover:opacity-100 transition-opacity blur-sm" />
+                          <div className="relative w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 p-[2px]">
+                            <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
+                              {getConversationAvatar(selectedConversation) ? (
+                                <img src={getConversationAvatar(selectedConversation)} alt="" className="w-full h-full object-cover" />
                               ) : (
-                                <span className="font-bold">
-                                  {getConversationName(selectedConversation)[0].toUpperCase()}
-                                </span>
-                              )
-                            )}
+                                selectedConversation.type === 'group' ? (
+                                  <Users className="w-5 h-5 text-white" />
+                                ) : (
+                                  <span className="font-bold text-white">
+                                    {getConversationName(selectedConversation)[0].toUpperCase()}
+                                  </span>
+                                )
+                              )}
+                            </div>
                           </div>
                           {selectedConversation.type === 'direct' && selectedConversation.other_user?.id && (
                             <div className="absolute -bottom-0.5 -right-0.5 border-2 border-gray-900 rounded-full">
@@ -1263,9 +1289,9 @@ function MensajesContent() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-semibold">{getConversationName(selectedConversation)}</p>
+                            <p className="font-semibold text-white group-hover:text-purple-300 transition-colors">{getConversationName(selectedConversation)}</p>
                             {selectedConversation.type === 'group' && (
-                              <span className="text-xs text-gray-400">
+                              <span className="text-xs text-gray-400 px-2 py-0.5 rounded-full bg-gray-800/50">
                                 {selectedConversation.members?.length || 0} miembros
                               </span>
                             )}
@@ -1513,28 +1539,28 @@ function MensajesContent() {
                     </div>
                   )}
 
-                  {/* Input de mensaje */}
-                  <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-800">
-                    <div className="flex items-center gap-2">
+                  {/* Input de mensaje - Modern Design */}
+                  <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-800/50 backdrop-blur-lg bg-gray-900/30">
+                    <div className="flex items-center gap-3">
                       {/* Botón de emoji */}
                       <div className="relative" ref={emojiPickerRef}>
                         <button
                           type="button"
                           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                          className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors"
+                          className="p-2.5 text-gray-400 hover:text-purple-400 hover:bg-white/5 rounded-xl transition-all duration-200"
                         >
-                          <Smile className="w-6 h-6" />
+                          <Smile className="w-5 h-5" />
                         </button>
 
                         {showEmojiPicker && (
-                          <div className="absolute bottom-12 left-0 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-3 z-50">
-                            <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
+                          <div className="absolute bottom-14 left-0 w-80 backdrop-blur-xl bg-gray-900/95 border border-gray-700/50 rounded-2xl shadow-2xl shadow-purple-500/10 p-4 z-50">
+                            <div className="grid grid-cols-8 gap-2 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
                               {EMOJI_LIST.map((emoji, i) => (
                                 <button
                                   key={i}
                                   type="button"
                                   onClick={() => handleEmojiSelect(emoji)}
-                                  className="w-8 h-8 flex items-center justify-center text-xl hover:bg-gray-700 rounded"
+                                  className="w-9 h-9 flex items-center justify-center text-xl hover:bg-white/10 rounded-lg transition-all duration-200 hover:scale-110"
                                 >
                                   {emoji}
                                 </button>
@@ -1548,9 +1574,9 @@ function MensajesContent() {
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors"
+                        className="p-2.5 text-gray-400 hover:text-purple-400 hover:bg-white/5 rounded-xl transition-all duration-200"
                       >
-                        <Paperclip className="w-6 h-6" />
+                        <Paperclip className="w-5 h-5" />
                       </button>
                       <input
                         ref={fileInputRef}
@@ -1560,25 +1586,27 @@ function MensajesContent() {
                         className="hidden"
                       />
 
-                      {/* Input de texto */}
-                      <input
-                        ref={inputRef}
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => {
-                          setNewMessage(e.target.value);
-                          handleTyping();
-                        }}
-                        placeholder="Escribe un mensaje..."
-                        className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        disabled={sending || uploading}
-                      />
+                      {/* Input de texto - Modern */}
+                      <div className="flex-1 relative">
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          value={newMessage}
+                          onChange={(e) => {
+                            setNewMessage(e.target.value);
+                            handleTyping();
+                          }}
+                          placeholder="Escribe un mensaje..."
+                          className="w-full px-5 py-3 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
+                          disabled={sending || uploading}
+                        />
+                      </div>
 
-                      {/* Botón enviar */}
+                      {/* Botón enviar - Gradient */}
                       <button
                         type="submit"
                         disabled={(!newMessage.trim() && !selectedFile) || sending || uploading}
-                        className="p-3 bg-purple-600 hover:bg-purple-700 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="p-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105 active:scale-95"
                       >
                         {sending || uploading ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
