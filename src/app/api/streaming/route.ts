@@ -58,8 +58,17 @@ export async function GET(request: NextRequest) {
 
     if (filter === 'live') {
       query = query.eq('status', 'live').order('viewers_count', { ascending: false });
-    } else if (filter === 'following' && user) {
-      // Get followed users
+    } else if (filter === 'following') {
+      // User must be logged in to see following streams
+      if (!user) {
+        return NextResponse.json({
+          streams: [],
+          stats: { liveNow: 0, totalViewers: 0, peakViewersToday: 0, streamsToday: 0 },
+          message: 'not_logged_in'
+        });
+      }
+
+      // Get followed users from database
       const { data: followingRaw } = await supabase
         .from('follows')
         .select('following_id')
@@ -67,10 +76,16 @@ export async function GET(request: NextRequest) {
 
       const following = followingRaw as UserFollow[] | null;
       const followingIds = following?.map(f => f.following_id) || [];
+
       if (followingIds.length > 0) {
+        // Filter streams by followed users (both live and ended)
         query = query.in('user_id', followingIds);
       } else {
-        return NextResponse.json({ streams: [], stats: { liveNow: 0, totalViewers: 0, peakViewersToday: 0, streamsToday: 0 } });
+        return NextResponse.json({
+          streams: [],
+          stats: { liveNow: 0, totalViewers: 0, peakViewersToday: 0, streamsToday: 0 },
+          message: 'no_following'
+        });
       }
     }
     // For 'all' filter, we don't add status filter - will sort manually

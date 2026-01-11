@@ -424,19 +424,40 @@ export default function StreamingPage() {
         ) : (
           <div className="text-center py-16 text-gray-400">
             <Radio className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg">
-              {filter === 'live'
-                ? t('streaming.noLiveStreams')
-                : t('streaming.noLiveStreams')}
-            </p>
-            {filter === 'live' && (
-              <Button
-                variant="link"
-                onClick={() => setFilter('all')}
-                className="text-purple-400 mt-2"
-              >
-                {t('streaming.viewAllStreams')}
-              </Button>
+            {filter === 'following' && !user ? (
+              <>
+                <p className="text-lg mb-2">Inicia sesión para ver streams</p>
+                <p className="text-sm">Debes iniciar sesión para ver streams de usuarios que sigues</p>
+              </>
+            ) : filter === 'following' ? (
+              <>
+                <p className="text-lg mb-2">No hay streams de usuarios que sigues</p>
+                <p className="text-sm mb-4">Sigue a más usuarios para ver sus transmisiones aquí</p>
+                <Button
+                  variant="link"
+                  onClick={() => setFilter('all')}
+                  className="text-purple-400"
+                >
+                  Ver todos los streams
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-lg">
+                  {filter === 'live'
+                    ? t('streaming.noLiveStreams')
+                    : 'No hay streams disponibles'}
+                </p>
+                {filter === 'live' && (
+                  <Button
+                    variant="link"
+                    onClick={() => setFilter('all')}
+                    className="text-purple-400 mt-2"
+                  >
+                    {t('streaming.viewAllStreams')}
+                  </Button>
+                )}
+              </>
             )}
           </div>
         )}
