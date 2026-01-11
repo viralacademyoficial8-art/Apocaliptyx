@@ -1341,8 +1341,8 @@ function MensajesContent() {
                       {/* Backdrop with blur */}
                       <div
                         className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-                        style={{ zIndex: 99998 }}
-                        onClick={() => setShowChatMenu(false)}
+                        style={{ zIndex: 99998, pointerEvents: 'auto' }}
+                        onClick={() => { console.log('Backdrop clicked'); setShowChatMenu(false); }}
                       />
 
                       {/* Bottom Sheet Container - fixed to bottom */}
@@ -1352,14 +1352,16 @@ function MensajesContent() {
                           bottom: 0,
                           left: 0,
                           right: 0,
-                          zIndex: 99999
+                          zIndex: 99999,
+                          pointerEvents: 'auto'
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         {/* Gradient top border */}
                         <div className="h-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
                         {/* Sheet content */}
-                        <div className="bg-[#0d0d14] rounded-t-2xl pt-2 pb-4 px-3 max-h-[60vh] overflow-y-auto safe-area-bottom">
+                        <div className="bg-[#0d0d14] rounded-t-2xl pt-2 pb-4 px-3 max-h-[60vh] overflow-y-auto safe-area-bottom" style={{ pointerEvents: 'auto' }}>
                           {/* Handle indicator */}
                           <div className="flex justify-center mb-2">
                             <div className="w-8 h-1 bg-gray-600 rounded-full" />
