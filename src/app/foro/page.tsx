@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { TextWithLinkPreviews } from '@/components/LinkPreview';
 import {
   MessageSquarePlus,
   TrendingUp,
@@ -2524,7 +2525,13 @@ function PostCard({
       )}
 
       {/* Content */}
-      <p className="text-gray-200 mb-4 whitespace-pre-wrap">{post.content}</p>
+      <div className="mb-4">
+        <TextWithLinkPreviews
+          text={post.content}
+          className="text-gray-200 whitespace-pre-wrap"
+          maxPreviews={2}
+        />
+      </div>
 
       {/* GIF */}
       {post.gif_url && (
