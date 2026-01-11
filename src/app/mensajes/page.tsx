@@ -1071,21 +1071,21 @@ function MensajesContent() {
             />
           </div>
 
-          {/* Filter pills - Improved UX */}
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide snap-x snap-mandatory">
+          {/* Filter pills - Grid Layout for better visibility */}
+          <div className="grid grid-cols-2 gap-2">
             {FILTERS.filter(f => f.key !== 'archived').map(filter => (
               <button
                 key={filter.key}
                 onClick={() => setActiveFilter(filter.key)}
                 className={`
-                  flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 snap-start
+                  flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
                   ${activeFilter === filter.key
-                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-[1.02]'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
                     : 'bg-gray-800/80 text-gray-400 hover:bg-gray-700/80 hover:text-white border border-gray-700/50 hover:border-purple-500/30'
                   }
                 `}
               >
-                <span className="text-base">{filter.icon}</span>
+                <span className="flex items-center justify-center">{filter.icon}</span>
                 <span>{filter.label}</span>
               </button>
             ))}
