@@ -27,6 +27,14 @@ interface StoryRow {
   created_at: string;
   is_highlight: boolean;
   highlight_name?: string;
+  link_url?: string;
+  link_preview?: {
+    url: string;
+    title: string | null;
+    description: string | null;
+    image: string | null;
+    siteName: string | null;
+  };
   user?: StoryUser;
 }
 
@@ -165,6 +173,8 @@ export async function GET(request: NextRequest) {
           expiresAt: s.expires_at,
           createdAt: s.created_at,
           isViewed: viewedStoryIds.includes(s.id),
+          linkUrl: s.link_url,
+          linkPreview: s.link_preview,
         })),
       }));
 
@@ -218,6 +228,8 @@ export async function POST(request: NextRequest) {
     let backgroundColor: string = '#1a1a2e';
     let textColor: string = '#ffffff';
     let fontStyle: string = 'normal';
+    let linkUrl: string | undefined;
+    let linkPreview: any | undefined;
 
     if (contentType.includes('multipart/form-data')) {
       // Handle file upload
@@ -229,11 +241,14 @@ export async function POST(request: NextRequest) {
       fontStyle = formData.get('fontStyle') as string || 'normal';
 
       if (file) {
-        // Determine media type
+        // Only allow images (no videos)
         if (file.type.startsWith('image/')) {
           mediaType = file.type.includes('gif') ? 'gif' : 'image';
-        } else if (file.type.startsWith('video/')) {
-          mediaType = 'video';
+        } else {
+          return NextResponse.json(
+            { error: 'Solo se permiten imágenes' },
+            { status: 400 }
+          );
         }
 
         // Upload to storage
@@ -251,33 +266,52 @@ export async function POST(request: NextRequest) {
         mediaUrl = publicUrl;
       }
     } else {
-      // Handle JSON body (text-only story)
+      // Handle JSON body (text-only story or link story)
       const body = await request.json();
       content = body.content;
       backgroundColor = body.backgroundColor || '#1a1a2e';
       textColor = body.textColor || '#ffffff';
       fontStyle = body.fontStyle || 'normal';
+      linkUrl = body.linkUrl;
+      linkPreview = body.linkPreview;
+
+      // If there's a link preview with an image, use it as media
+      if (linkPreview?.image) {
+        mediaUrl = linkPreview.image;
+        mediaType = 'link_preview';
+      }
     }
 
-    if (!content && !mediaUrl) {
+    if (!content && !mediaUrl && !linkUrl) {
       return NextResponse.json(
-        { error: 'Se requiere contenido o media' },
+        { error: 'Se requiere contenido, imagen o link' },
         { status: 400 }
       );
+    }
+
+    // Create story data
+    const storyData: any = {
+      user_id: user.id,
+      content,
+      media_url: mediaUrl,
+      media_type: mediaType,
+      background_color: backgroundColor,
+      text_color: textColor,
+      font_style: fontStyle,
+    };
+
+    // Add link fields if present
+    if (linkUrl) {
+      storyData.link_url = linkUrl;
+    }
+    if (linkPreview) {
+      storyData.link_preview = linkPreview;
     }
 
     // Create story
     const { data: story, error: createError } = await supabase()
       .from('forum_stories')
-      .insert({
-        user_id: user.id,
-        content,
-        media_url: mediaUrl,
-        media_type: mediaType,
-        background_color: backgroundColor,
-        text_color: textColor,
-        font_style: fontStyle,
-      } as never)
+      .insert(storyData as never)
       .select()
       .single();
 
