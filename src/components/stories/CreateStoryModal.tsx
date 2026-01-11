@@ -1,12 +1,21 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { X, Image, Type, Palette, Upload, Loader2 } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { X, Image, Type, Palette, Upload, Loader2, Link as LinkIcon, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LinkPreview, extractUrls } from '@/components/LinkPreview';
 
 interface CreateStoryModalProps {
   onClose: () => void;
   onSuccess?: () => void;
+}
+
+interface LinkPreviewData {
+  url: string;
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  siteName: string | null;
 }
 
 const BACKGROUND_COLORS = [
@@ -29,8 +38,11 @@ const FONT_STYLES = [
 ];
 
 export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) {
-  const [mode, setMode] = useState<'text' | 'media'>('text');
+  const [mode, setMode] = useState<'text' | 'media' | 'link'>('text');
   const [content, setContent] = useState('');
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkPreview, setLinkPreview] = useState<LinkPreviewData | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
   const [backgroundColor, setBackgroundColor] = useState(BACKGROUND_COLORS[0]);
   const [textColor, setTextColor] = useState(TEXT_COLORS[0]);
   const [fontStyle, setFontStyle] = useState('normal');
@@ -40,24 +52,66 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-        alert('Solo se permiten imágenes y videos');
+  // Fetch link preview when URL changes
+  useEffect(() => {
+    const fetchPreview = async () => {
+      if (!linkUrl) {
+        setLinkPreview(null);
         return;
       }
 
-      // Validate file size (50MB max)
-      if (file.size > 50 * 1024 * 1024) {
-        alert('El archivo es demasiado grande. Máximo 50MB.');
+      // Extract URL from text
+      const urls = extractUrls(linkUrl);
+      if (urls.length === 0) {
+        setLinkPreview(null);
+        return;
+      }
+
+      setLoadingPreview(true);
+      try {
+        const response = await fetch('/api/link-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: urls[0] }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            setLinkPreview(data.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching preview:', error);
+      } finally {
+        setLoadingPreview(false);
+      }
+    };
+
+    const debounce = setTimeout(fetchPreview, 500);
+    return () => clearTimeout(debounce);
+  }, [linkUrl]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Only allow images (no videos)
+      if (!file.type.startsWith('image/')) {
+        alert('Solo se permiten imágenes');
+        return;
+      }
+
+      // Validate file size (10MB max for images)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('La imagen es demasiado grande. Máximo 10MB.');
         return;
       }
 
       setMediaFile(file);
       setMediaPreview(URL.createObjectURL(file));
       setMode('media');
+      setLinkUrl('');
+      setLinkPreview(null);
     }
   };
 
@@ -70,9 +124,15 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
     }
   };
 
+  const removeLink = () => {
+    setLinkUrl('');
+    setLinkPreview(null);
+    setMode('text');
+  };
+
   const handleSubmit = async () => {
-    if (!content && !mediaFile) {
-      alert('Agrega texto o una imagen/video');
+    if (!content && !mediaFile && !linkPreview) {
+      alert('Agrega texto, una imagen o un link');
       return;
     }
 
@@ -102,6 +162,8 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
             backgroundColor,
             textColor,
             fontStyle,
+            linkUrl: linkPreview?.url || null,
+            linkPreview: linkPreview || null,
           }),
         });
       }
@@ -148,19 +210,11 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
           >
             {mediaPreview ? (
               <>
-                {mediaFile?.type.startsWith('video/') ? (
-                  <video
-                    src={mediaPreview}
-                    className="w-full h-full object-contain"
-                    controls
-                  />
-                ) : (
-                  <img
-                    src={mediaPreview}
-                    alt="Preview"
-                    className="w-full h-full object-contain"
-                  />
-                )}
+                <img
+                  src={mediaPreview}
+                  alt="Preview"
+                  className="w-full h-full object-contain"
+                />
                 <button
                   onClick={removeMedia}
                   className="absolute top-2 right-2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70"
@@ -168,6 +222,52 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                   <X className="w-4 h-4" />
                 </button>
               </>
+            ) : linkPreview ? (
+              <div className="w-full h-full flex flex-col">
+                {/* Link preview in story */}
+                {linkPreview.image && (
+                  <div className="flex-1 relative">
+                    <img
+                      src={linkPreview.image}
+                      alt={linkPreview.title || 'Preview'}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  </div>
+                )}
+                <div className={cn(
+                  'absolute bottom-0 left-0 right-0 p-4',
+                  !linkPreview.image && 'top-0 flex flex-col items-center justify-center'
+                )}>
+                  {linkPreview.siteName && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <Globe className="w-4 h-4 text-gray-300" />
+                      <span className="text-sm text-gray-300">{linkPreview.siteName}</span>
+                    </div>
+                  )}
+                  {linkPreview.title && (
+                    <h3 className="text-white font-bold text-lg line-clamp-2 mb-1">
+                      {linkPreview.title}
+                    </h3>
+                  )}
+                  {linkPreview.description && !linkPreview.image && (
+                    <p className="text-gray-300 text-sm line-clamp-3">
+                      {linkPreview.description}
+                    </p>
+                  )}
+                  {content && (
+                    <p className={cn('text-white mt-2', currentFontClass)} style={{ color: textColor }}>
+                      {content}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={removeLink}
+                  className="absolute top-2 right-2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
             ) : content ? (
               <div className={cn('px-6 text-center', currentFontClass)} style={{ color: textColor }}>
                 <p className="text-2xl leading-relaxed break-words">{content}</p>
@@ -180,23 +280,59 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
 
         {/* Text input */}
         <div className="p-4 border-t border-gray-800">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Escribe tu story..."
-            className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
-            rows={2}
-            maxLength={500}
-          />
-          <p className="text-gray-500 text-xs text-right mt-1">{content.length}/500</p>
+          {mode === 'link' ? (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <LinkIcon className="w-4 h-4 text-gray-400" />
+                <input
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="Pega un link de YouTube, Twitter, etc..."
+                  className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              {loadingPreview && (
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Cargando vista previa...
+                </div>
+              )}
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Añade un comentario (opcional)..."
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                rows={2}
+                maxLength={200}
+              />
+              <p className="text-gray-500 text-xs text-right">{content.length}/200</p>
+            </div>
+          ) : (
+            <>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Escribe tu story..."
+                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                rows={2}
+                maxLength={500}
+              />
+              <p className="text-gray-500 text-xs text-right mt-1">{content.length}/500</p>
+            </>
+          )}
         </div>
 
         {/* Tools */}
         <div className="p-4 border-t border-gray-800">
-          <div className="flex items-center gap-4 mb-4">
-            {/* Mode toggle */}
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            {/* Mode toggles */}
             <button
-              onClick={() => setMode('text')}
+              onClick={() => {
+                setMode('text');
+                setLinkUrl('');
+                setLinkPreview(null);
+                removeMedia();
+              }}
               className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
                 mode === 'text' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
@@ -213,12 +349,25 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
               )}
             >
               <Image className="w-4 h-4" />
-              Media
+              Imagen
+            </button>
+            <button
+              onClick={() => {
+                setMode('link');
+                removeMedia();
+              }}
+              className={cn(
+                'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
+                mode === 'link' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+              )}
+            >
+              <LinkIcon className="w-4 h-4" />
+              Link
             </button>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,video/*"
+              accept="image/*"
               onChange={handleFileSelect}
               className="hidden"
             />
@@ -303,10 +452,10 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
         <div className="p-4 border-t border-gray-800">
           <button
             onClick={handleSubmit}
-            disabled={isUploading || (!content && !mediaFile)}
+            disabled={isUploading || (!content && !mediaFile && !linkPreview)}
             className={cn(
               'w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors',
-              isUploading || (!content && !mediaFile)
+              isUploading || (!content && !mediaFile && !linkPreview)
                 ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
                 : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500'
             )}
