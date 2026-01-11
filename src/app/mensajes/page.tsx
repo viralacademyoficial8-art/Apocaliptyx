@@ -1306,16 +1306,16 @@ function MensajesContent() {
 
                   {showChatMenu && (
                     <>
-                      {/* Backdrop overlay */}
+                      {/* Full screen backdrop - completely covers messages */}
                       <div
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+                        className="fixed inset-0 bg-[#0a0a0f]/98 z-[9998]"
                         onClick={() => setShowChatMenu(false)}
                       />
-                      {/* Menu */}
-                      <div className="fixed right-4 top-16 w-72 z-[9999]">
+                      {/* Menu container */}
+                      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 z-[9999]">
                         {/* Gradient border */}
-                        <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500/50 via-pink-500/50 to-purple-500/50 rounded-2xl" />
-                        <div className="relative bg-[#0d0d14] backdrop-blur-xl rounded-2xl py-2 shadow-2xl shadow-black/50 max-h-[80vh] overflow-y-auto">
+                        <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-75" />
+                        <div className="relative bg-[#0d0d14] rounded-2xl py-3 shadow-2xl shadow-purple-500/20 max-h-[80vh] overflow-y-auto">
                         <button onClick={handleToggleFavorite} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-all duration-200 group">
                           <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-gray-800/80 group-hover:bg-purple-500/20'} transition-colors`}>
                             {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
