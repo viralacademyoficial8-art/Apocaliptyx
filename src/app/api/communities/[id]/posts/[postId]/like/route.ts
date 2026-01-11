@@ -12,7 +12,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string; postId: string }> }
 ) {
   try {
-    const { postId } = await params;
+    const { id: communityId, postId } = await params;
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -30,6 +30,27 @@ export async function POST(
     if (existingLike) {
       return NextResponse.json({ error: 'Ya has dado like a esta publicación' }, { status: 400 });
     }
+
+    // Get post info for notification
+    const { data: postData } = await supabase()
+      .from('community_posts')
+      .select('author_id, content, community_id')
+      .eq('id', postId)
+      .single();
+
+    // Get community name
+    const { data: community } = await supabase()
+      .from('communities')
+      .select('name')
+      .eq('id', communityId)
+      .single();
+
+    // Get liker username
+    const { data: liker } = await supabase()
+      .from('users')
+      .select('username, display_name')
+      .eq('id', session.user.id)
+      .single();
 
     // Add like
     const { error } = await supabase()
@@ -57,6 +78,24 @@ export async function POST(
           .update({ likes_count: ((post as any).likes_count || 0) + 1 })
           .eq('id', postId);
       }
+    }
+
+    // Create notification for post author (if not self-like)
+    if (postData && (postData as any).author_id !== session.user.id) {
+      const likerName = (liker as any)?.display_name || (liker as any)?.username || 'Alguien';
+      const communityName = (community as any)?.name || 'la comunidad';
+      const contentPreview = (postData as any).content?.substring(0, 50) + ((postData as any).content?.length > 50 ? '...' : '');
+
+      await supabase()
+        .from('notifications')
+        .insert({
+          user_id: (postData as any).author_id,
+          type: 'community_like',
+          title: '❤️ Nuevo like en tu publicación',
+          message: `${likerName} le dio like a tu publicación en ${communityName}: "${contentPreview}"`,
+          link_url: `/foro/comunidad/${communityId}`,
+          is_read: false,
+        });
     }
 
     return NextResponse.json({ success: true, message: 'Like agregado' });
