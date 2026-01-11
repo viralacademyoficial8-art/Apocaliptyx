@@ -768,9 +768,20 @@ function ForoContent() {
   };
 
   // Abrir modal de comentarios
-  const openComments = (postId: string) => {
+  const openComments = async (postId: string) => {
     setSelectedPostId(postId);
     loadComments(postId);
+
+    // Incrementar contador de vistas
+    await forumService.incrementViewCount(postId);
+    // Actualizar el contador local
+    setPosts(prev =>
+      prev.map(p =>
+        p.id === postId
+          ? { ...p, views_count: (p.views_count || 0) + 1 }
+          : p
+      )
+    );
   };
 
   // Crear comentario
@@ -2551,7 +2562,7 @@ function PostCard({
         {/* Bookmark */}
         <button
           onClick={() => onBookmark(post.id)}
-          className={`transition-colors ${
+          className={`flex items-center gap-1 transition-colors ${
             post.user_bookmarked
               ? 'text-yellow-400'
               : 'text-gray-400 hover:text-yellow-400'
@@ -2561,6 +2572,9 @@ function PostCard({
             <BookMarked className="w-5 h-5" />
           ) : (
             <Bookmark className="w-5 h-5" />
+          )}
+          {(post.bookmarks_count || 0) > 0 && (
+            <span className="text-sm">{post.bookmarks_count}</span>
           )}
         </button>
 
