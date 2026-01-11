@@ -355,12 +355,18 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
             </button>
             <button
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 setMode('link');
-                removeMedia();
+                setMediaFile(null);
+                setMediaPreview(null);
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = '';
+                }
               }}
               className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
+                'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors cursor-pointer select-none',
                 mode === 'link' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
               )}
             >
