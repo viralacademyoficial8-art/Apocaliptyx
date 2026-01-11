@@ -319,6 +319,26 @@ function ForoContent() {
   const [communitiesLoading, setCommunitiesLoading] = useState(false);
   const [communitySearch, setCommunitySearch] = useState('');
 
+  // Lives/Streams state
+  const [streams, setStreams] = useState<{
+    id: string;
+    userId: string;
+    username?: string;
+    displayName?: string;
+    avatarUrl?: string;
+    title?: string;
+    viewersCount: number;
+    category?: string;
+    startedAt?: string;
+  }[]>([]);
+  const [streamsLoading, setStreamsLoading] = useState(false);
+  const [liveStats, setLiveStats] = useState({
+    liveNow: 0,
+    totalViewers: 0,
+    mostWatchedToday: 0,
+    streamsToday: 0,
+  });
+
   // Cargar posts
   const loadPosts = useCallback(async () => {
     setLoading(true);
@@ -436,6 +456,35 @@ function ForoContent() {
       toast.error(t('forum.reels.publishError'));
     }
   };
+
+  // Cargar streams/lives
+  const loadStreams = useCallback(async () => {
+    setStreamsLoading(true);
+    try {
+      const response = await fetch('/api/streaming?filter=live');
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      const liveStreams = data.streams || [];
+      setStreams(liveStreams);
+
+      // Calculate stats
+      const totalViewers = liveStreams.reduce((sum: number, s: { viewersCount?: number }) => sum + (s.viewersCount || 0), 0);
+      const mostWatched = liveStreams.length > 0 ? Math.max(...liveStreams.map((s: { viewersCount?: number }) => s.viewersCount || 0)) : 0;
+
+      setLiveStats({
+        liveNow: liveStreams.length,
+        totalViewers,
+        mostWatchedToday: mostWatched,
+        streamsToday: liveStreams.length, // Could be expanded to include ended streams
+      });
+    } catch (error) {
+      console.error('Error loading streams:', error);
+    } finally {
+      setStreamsLoading(false);
+    }
+  }, []);
 
   // Cargar comunidades
   const loadCommunities = useCallback(async () => {
@@ -594,6 +643,13 @@ function ForoContent() {
       loadCommunities();
     }
   }, [activeTab, loadCommunities]);
+
+  // Load streams when lives tab is active
+  useEffect(() => {
+    if (activeTab === 'lives') {
+      loadStreams();
+    }
+  }, [activeTab, loadStreams]);
 
   // Search mentions
   const searchMentions = useCallback(async (query: string) => {
@@ -1444,7 +1500,10 @@ function ForoContent() {
                 <p className="text-gray-400 mt-1">{t('forum.lives.subtitle')}</p>
               </div>
               {isLoggedIn && (
-                <Button className="bg-red-600 hover:bg-red-700">
+                <Button
+                  className="bg-red-600 hover:bg-red-700"
+                  onClick={() => router.push('/streaming')}
+                >
                   <Radio className="w-4 h-4 mr-2" />
                   {t('forum.lives.startStream')}
                 </Button>
@@ -1458,45 +1517,96 @@ function ForoContent() {
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   <span className="text-sm">{t('forum.lives.liveNow')}</span>
                 </div>
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{liveStats.liveNow}</p>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <Users className="w-4 h-4" />
                   <span className="text-sm">{t('forum.lives.viewers')}</span>
                 </div>
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{liveStats.totalViewers}</p>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <TrendingUp className="w-4 h-4" />
                   <span className="text-sm">{t('forum.lives.mostWatchedToday')}</span>
                 </div>
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{liveStats.mostWatchedToday}</p>
               </div>
               <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <Clock className="w-4 h-4" />
                   <span className="text-sm">{t('forum.lives.streamsToday')}</span>
                 </div>
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{liveStats.streamsToday}</p>
               </div>
             </div>
 
-            {/* Lives Grid Placeholder */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
-              <Radio className="w-16 h-16 text-red-400/50 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{t('forum.lives.noStreams')}</h3>
-              <p className="text-gray-400 mb-4">
-                {t('forum.lives.beFirst')}
-              </p>
-              {isLoggedIn && (
-                <Button className="bg-red-600 hover:bg-red-700">
-                  <Radio className="w-4 h-4 mr-2" />
-                  {t('forum.lives.startMyFirst')}
-                </Button>
-              )}
-            </div>
+            {/* Streams Grid or Empty State */}
+            {streamsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-red-500" />
+              </div>
+            ) : streams.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {streams.map((stream) => (
+                  <div
+                    key={stream.id}
+                    onClick={() => router.push(`/streaming/live/${stream.id}`)}
+                    className="bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:border-red-500/50 transition-all group"
+                  >
+                    {/* Thumbnail placeholder */}
+                    <div className="aspect-video bg-gray-900 relative">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Radio className="w-12 h-12 text-red-400/50 group-hover:text-red-400 transition-colors" />
+                      </div>
+                      {/* Live badge */}
+                      <div className="absolute top-2 left-2 bg-red-600 px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                        LIVE
+                      </div>
+                      {/* Viewers count */}
+                      <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-0.5 rounded text-xs flex items-center gap-1">
+                        <Users className="w-3 h-3" />
+                        {stream.viewersCount || 0}
+                      </div>
+                    </div>
+                    {/* Stream info */}
+                    <div className="p-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                          {(stream.displayName || stream.username || 'U')[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium truncate">{stream.title || 'Stream en vivo'}</h3>
+                          <p className="text-sm text-gray-400 truncate">{stream.displayName || stream.username}</p>
+                          {stream.category && (
+                            <span className="text-xs text-red-400">{stream.category}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+                <Radio className="w-16 h-16 text-red-400/50 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">{t('forum.lives.noStreams')}</h3>
+                <p className="text-gray-400 mb-4">
+                  {t('forum.lives.beFirst')}
+                </p>
+                {isLoggedIn && (
+                  <Button
+                    className="bg-red-600 hover:bg-red-700"
+                    onClick={() => router.push('/streaming')}
+                  >
+                    <Radio className="w-4 h-4 mr-2" />
+                    {t('forum.lives.startMyFirst')}
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         )}
 
