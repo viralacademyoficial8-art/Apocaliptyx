@@ -37,6 +37,19 @@ interface FollowerCount {
   count: number;
 }
 
+// Sidebar stream interface (partial data)
+interface SidebarStreamRow {
+  id: string;
+  title?: string;
+  status: string;
+  viewers_count?: number;
+  peak_viewers?: number;
+  category?: string;
+  user_id: string;
+  ended_at?: string;
+  user?: StreamUser;
+}
+
 // GET /api/streaming - Get live streams
 export async function GET(request: NextRequest) {
   try {
@@ -193,7 +206,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate fame score and format sidebar data
-    const formatSidebarStream = (s: StreamRow & { user?: StreamUser }) => ({
+    const formatSidebarStream = (s: SidebarStreamRow) => ({
       id: s.id,
       title: s.title,
       status: s.status,
@@ -211,12 +224,12 @@ export async function GET(request: NextRequest) {
     });
 
     // Sort live streams by fame score
-    const sidebarLive = (liveStreamsForSidebar as StreamRow[] || [])
+    const sidebarLive = ((liveStreamsForSidebar as unknown as SidebarStreamRow[]) || [])
       .map(formatSidebarStream)
       .sort((a, b) => b.fameScore - a.fameScore);
 
     // Sort ended streams by fame score
-    const sidebarEnded = (endedStreamsForSidebar as StreamRow[] || [])
+    const sidebarEnded = ((endedStreamsForSidebar as unknown as SidebarStreamRow[]) || [])
       .map(formatSidebarStream)
       .sort((a, b) => b.fameScore - a.fameScore);
 
