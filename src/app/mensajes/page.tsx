@@ -772,6 +772,82 @@ function MensajesContent() {
           </div>
         )}
 
+        {/* Story Reply Preview - OUTSIDE main message container */}
+        {(message.story_preview || message.story_id || message.content?.includes('Respondió a una historia:')) && !message.is_deleted && (
+          <div className="max-w-[220px] mb-2">
+            {/* Compact Card */}
+            <div className="rounded-xl overflow-hidden border border-gray-700/50 bg-gray-800/90">
+              {/* Compact header */}
+              <div className="flex items-center gap-2 px-2 py-1.5 bg-gray-900/50 border-b border-gray-700/30">
+                {/* Small avatar with gradient ring */}
+                <div className="w-5 h-5 rounded-full p-[1px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex-shrink-0">
+                  <div className="w-full h-full rounded-full bg-gray-900 overflow-hidden">
+                    {message.story_preview?.storyOwnerAvatarUrl ? (
+                      <img src={message.story_preview.storyOwnerAvatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[7px] font-bold text-white">
+                        {(message.story_preview?.storyOwnerDisplayName || message.story_preview?.storyOwnerUsername || '?')[0].toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[9px] text-gray-400 leading-tight">
+                    {isOwn ? 'Respondiste a la historia' : 'Respondió a tu historia'}
+                  </p>
+                  <p className="text-[10px] font-medium text-white truncate">
+                    @{message.story_preview?.storyOwnerUsername || 'usuario'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Compact story preview - shorter height */}
+              <div className="relative h-[100px]">
+                {message.story_preview?.mediaUrl ? (
+                  <>
+                    <img src={message.story_preview.mediaUrl} alt="Story" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    {message.story_preview.content && (
+                      <p className="absolute bottom-1.5 left-2 right-2 text-[10px] text-white line-clamp-2 drop-shadow">
+                        {message.story_preview.content}
+                      </p>
+                    )}
+                  </>
+                ) : message.story_preview?.linkPreview?.image ? (
+                  <>
+                    <img src={message.story_preview.linkPreview.image} alt="" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-1.5 left-2 right-2">
+                      <p className="text-[8px] text-purple-300 uppercase">{message.story_preview.linkPreview.siteName || 'Link'}</p>
+                      <p className="text-[10px] text-white font-medium line-clamp-1">{message.story_preview.linkPreview.title}</p>
+                    </div>
+                  </>
+                ) : message.story_preview?.content ? (
+                  <div
+                    className="w-full h-full flex items-center justify-center p-2"
+                    style={{ background: message.story_preview.backgroundColor || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+                  >
+                    <p className="text-xs text-white text-center font-medium line-clamp-3 drop-shadow">
+                      {message.story_preview.content}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 flex items-center justify-center">
+                    <span className="text-xl">📷</span>
+                  </div>
+                )}
+
+                {/* Expired badge */}
+                {message.story_preview?.expiresAt && new Date(message.story_preview.expiresAt) < new Date() && (
+                  <div className="absolute top-1 right-1 px-1 py-0.5 bg-black/60 rounded text-[7px] text-gray-300">
+                    Expirada
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={`
           max-w-[75%] rounded-2xl overflow-hidden
           ${message.is_deleted
@@ -788,137 +864,6 @@ function MensajesContent() {
               <p className="text-xs truncate opacity-80">
                 {message.reply_to.content}
               </p>
-            </div>
-          )}
-
-          {/* Story Reply Preview - Modern Design */}
-          {(message.story_preview || message.story_id || message.content?.includes('Respondió a una historia:')) && !message.is_deleted && (
-            <div className={`max-w-[260px] ${isOwn ? 'ml-auto' : 'mr-auto'}`}>
-              {/* Glassmorphism Card Container */}
-              <div className="relative group">
-                {/* Gradient border effect */}
-                <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-[20px] opacity-75 group-hover:opacity-100 transition-opacity duration-300 blur-[1px]" />
-
-                {/* Main Card */}
-                <div className="relative rounded-[20px] overflow-hidden bg-gray-900/95 backdrop-blur-xl">
-                  {/* Header with user info */}
-                  <div className="px-3 py-2.5 bg-gradient-to-r from-gray-800/80 to-gray-900/80 border-b border-white/5">
-                    <div className="flex items-center gap-2.5">
-                      {/* Avatar with animated gradient ring */}
-                      <div className="relative">
-                        <div className="w-8 h-8 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-rose-500 to-purple-600 animate-pulse">
-                          <div className="w-full h-full rounded-full bg-gray-900 p-[1px]">
-                            <div className="w-full h-full rounded-full overflow-hidden">
-                              {message.story_preview?.storyOwnerAvatarUrl ? (
-                                <img src={message.story_preview.storyOwnerAvatarUrl} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[11px] font-bold text-white">
-                                  {(message.story_preview?.storyOwnerDisplayName || message.story_preview?.storyOwnerUsername || '?')[0].toUpperCase()}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        {/* Story ring indicator */}
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full border-2 border-gray-900" />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[11px] text-gray-400 leading-tight">
-                          {isOwn ? 'Respondiste a la historia' : 'Respondió a tu historia'}
-                        </p>
-                        <p className="text-xs font-semibold text-white truncate">
-                          @{message.story_preview?.storyOwnerUsername || 'usuario'}
-                        </p>
-                      </div>
-
-                      {/* Expired indicator */}
-                      {message.story_preview?.expiresAt && new Date(message.story_preview.expiresAt) < new Date() && (
-                        <div className="px-2 py-0.5 bg-gray-700/80 rounded-full">
-                          <span className="text-[9px] text-gray-400">Expirada</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Story Content */}
-                  <div className="relative">
-                    {message.story_preview?.mediaUrl ? (
-                      <div className="relative aspect-[9/16] max-h-[220px] w-full">
-                        <img
-                          src={message.story_preview.mediaUrl}
-                          alt="Story"
-                          className="w-full h-full object-cover"
-                        />
-                        {/* Cinematic gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
-                        {/* Story text overlay */}
-                        {message.story_preview.content && (
-                          <div className="absolute bottom-3 left-3 right-3">
-                            <p className="text-sm text-white font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] line-clamp-3">
-                              {message.story_preview.content}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : message.story_preview?.linkPreview?.image ? (
-                      <div className="relative aspect-[9/16] max-h-[220px] w-full">
-                        <img
-                          src={message.story_preview.linkPreview.image}
-                          alt="Link preview"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <div className="w-4 h-4 rounded bg-white/20 flex items-center justify-center">
-                              <span className="text-[10px]">🔗</span>
-                            </div>
-                            <span className="text-[10px] text-purple-300 uppercase tracking-wider font-medium">
-                              {message.story_preview.linkPreview.siteName || 'Link'}
-                            </span>
-                          </div>
-                          <p className="text-sm text-white font-semibold line-clamp-2 drop-shadow-lg">
-                            {message.story_preview.linkPreview.title}
-                          </p>
-                        </div>
-                      </div>
-                    ) : message.story_preview?.content ? (
-                      /* Text-only story with vibrant gradient */
-                      <div
-                        className="aspect-[9/16] max-h-[220px] w-full flex items-center justify-center p-5 relative overflow-hidden"
-                        style={{
-                          background: message.story_preview.backgroundColor
-                            ? message.story_preview.backgroundColor
-                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
-                        }}
-                      >
-                        {/* Decorative circles */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
-                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full blur-xl translate-y-1/2 -translate-x-1/2" />
-
-                        <p className="text-base text-white text-center font-semibold leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)] line-clamp-6 relative z-10">
-                          {message.story_preview.content}
-                        </p>
-                      </div>
-                    ) : (
-                      /* Fallback - Modern gradient */
-                      <div className="aspect-[9/16] max-h-[180px] w-full relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-fuchsia-500 to-orange-400" />
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.2),transparent_50%)]" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="w-14 h-14 mx-auto mb-2 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                              <span className="text-3xl">📷</span>
-                            </div>
-                            <p className="text-sm text-white/90 font-medium">Historia</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
