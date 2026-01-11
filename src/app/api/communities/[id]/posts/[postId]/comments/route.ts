@@ -119,6 +119,27 @@ export async function POST(
       return NextResponse.json({ error: 'El comentario es demasiado largo (máx 500 caracteres)' }, { status: 400 });
     }
 
+    // Get post info for notification
+    const { data: postData } = await supabase()
+      .from('community_posts')
+      .select('author_id, content')
+      .eq('id', postId)
+      .single();
+
+    // Get community name
+    const { data: community } = await supabase()
+      .from('communities')
+      .select('name')
+      .eq('id', communityId)
+      .single();
+
+    // Get commenter username
+    const { data: commenter } = await supabase()
+      .from('users')
+      .select('username, display_name')
+      .eq('id', session.user.id)
+      .single();
+
     // Create comment with optional parent for replies
     const commentData: any = {
       post_id: postId,
@@ -162,6 +183,50 @@ export async function POST(
         .from('community_posts')
         .update({ comments_count: ((post as any).comments_count || 0) + 1 })
         .eq('id', postId);
+    }
+
+    // Create notification for post author (if not self-comment)
+    if (postData && (postData as any).author_id !== session.user.id) {
+      const commenterName = (commenter as any)?.display_name || (commenter as any)?.username || 'Alguien';
+      const communityName = (community as any)?.name || 'la comunidad';
+      const commentPreview = content.trim().substring(0, 50) + (content.trim().length > 50 ? '...' : '');
+
+      await supabase()
+        .from('notifications')
+        .insert({
+          user_id: (postData as any).author_id,
+          type: 'community_comment',
+          title: '💬 Nuevo comentario en tu publicación',
+          message: `${commenterName} comentó en tu publicación en ${communityName}: "${commentPreview}"`,
+          link_url: `/foro/comunidad/${communityId}`,
+          is_read: false,
+        });
+    }
+
+    // If this is a reply, also notify the person being replied to
+    if (replyToUsername && replyToUsername !== (commenter as any)?.username) {
+      const { data: replyToUser } = await supabase()
+        .from('users')
+        .select('id')
+        .eq('username', replyToUsername)
+        .single();
+
+      if (replyToUser && (replyToUser as any).id !== session.user.id) {
+        const commenterName = (commenter as any)?.display_name || (commenter as any)?.username || 'Alguien';
+        const communityName = (community as any)?.name || 'la comunidad';
+        const commentPreview = content.trim().substring(0, 50) + (content.trim().length > 50 ? '...' : '');
+
+        await supabase()
+          .from('notifications')
+          .insert({
+            user_id: (replyToUser as any).id,
+            type: 'community_reply',
+            title: '↩️ Nueva respuesta a tu comentario',
+            message: `${commenterName} te respondió en ${communityName}: "${commentPreview}"`,
+            link_url: `/foro/comunidad/${communityId}`,
+            is_read: false,
+          });
+      }
     }
 
     return NextResponse.json({
