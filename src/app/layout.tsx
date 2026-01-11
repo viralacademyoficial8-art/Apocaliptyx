@@ -6,6 +6,7 @@ import { PWAProvider } from '@/components/pwa';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import CookieConsent from '@/components/CookieConsent';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: 'Apocaliptics - Predice el Futuro',
@@ -48,6 +49,29 @@ export default function RootLayout({
             <PWAProvider>
               {children}
               <CookieConsent />
+              <Toaster
+                position="bottom-center"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: '#1f2937',
+                    color: '#fff',
+                    border: '1px solid #374151',
+                  },
+                  success: {
+                    iconTheme: {
+                      primary: '#10b981',
+                      secondary: '#fff',
+                    },
+                  },
+                  error: {
+                    iconTheme: {
+                      primary: '#ef4444',
+                      secondary: '#fff',
+                    },
+                  },
+                }}
+              />
             </PWAProvider>
           </LanguageProvider>
         </SessionProvider>

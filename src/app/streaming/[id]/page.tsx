@@ -268,9 +268,20 @@ export default function StreamDetailPage() {
               <Button
                 variant="outline"
                 className="w-full border-gray-700"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success('Enlace copiado');
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    toast.success('Enlace copiado al portapapeles');
+                  } catch (err) {
+                    // Fallback for browsers that don't support clipboard API
+                    const textArea = document.createElement('textarea');
+                    textArea.value = window.location.href;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    toast.success('Enlace copiado al portapapeles');
+                  }
                 }}
               >
                 <Share2 className="w-4 h-4 mr-2" />
