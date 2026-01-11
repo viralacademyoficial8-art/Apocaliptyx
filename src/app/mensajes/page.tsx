@@ -430,37 +430,67 @@ function MensajesContent() {
   };
 
   const handleToggleFavorite = async () => {
-    if (!selectedConversation || !userId) return;
+    if (!selectedConversation || !userId) {
+      toast.error('Error: No hay conversación seleccionada');
+      return;
+    }
 
-    const success = await chatService.toggleFavorite(selectedConversation.id, userId);
-    if (success) {
-      setSelectedConversation(prev => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
-      toast.success(selectedConversation.is_favorite ? 'Eliminado de favoritos' : 'Agregado a favoritos');
-      loadConversations();
+    try {
+      const success = await chatService.toggleFavorite(selectedConversation.id, userId);
+      if (success) {
+        setSelectedConversation(prev => prev ? { ...prev, is_favorite: !prev.is_favorite } : null);
+        toast.success(selectedConversation.is_favorite ? 'Eliminado de favoritos' : 'Agregado a favoritos');
+        loadConversations();
+      } else {
+        toast.error('Error al actualizar favorito');
+      }
+    } catch (error) {
+      console.error('Error en toggleFavorite:', error);
+      toast.error('Error al actualizar favorito');
     }
     setShowChatMenu(false);
   };
 
   const handleToggleMute = async () => {
-    if (!selectedConversation || !userId) return;
+    if (!selectedConversation || !userId) {
+      toast.error('Error: No hay conversación seleccionada');
+      return;
+    }
 
-    const success = await chatService.toggleMute(selectedConversation.id, userId);
-    if (success) {
-      setSelectedConversation(prev => prev ? { ...prev, is_muted: !prev.is_muted } : null);
-      toast.success(selectedConversation.is_muted ? 'Notificaciones activadas' : 'Notificaciones silenciadas');
-      loadConversations();
+    try {
+      const success = await chatService.toggleMute(selectedConversation.id, userId);
+      if (success) {
+        setSelectedConversation(prev => prev ? { ...prev, is_muted: !prev.is_muted } : null);
+        toast.success(selectedConversation.is_muted ? 'Notificaciones activadas' : 'Notificaciones silenciadas');
+        loadConversations();
+      } else {
+        toast.error('Error al silenciar chat');
+      }
+    } catch (error) {
+      console.error('Error en toggleMute:', error);
+      toast.error('Error al silenciar chat');
     }
     setShowChatMenu(false);
   };
 
   const handleToggleArchive = async () => {
-    if (!selectedConversation || !userId) return;
+    if (!selectedConversation || !userId) {
+      toast.error('Error: No hay conversación seleccionada');
+      return;
+    }
 
-    const success = await chatService.toggleArchive(selectedConversation.id, userId);
-    if (success) {
-      toast.success(selectedConversation.is_archived ? 'Chat desarchivado' : 'Chat archivado');
-      setSelectedConversation(null);
-      loadConversations();
+    try {
+      const success = await chatService.toggleArchive(selectedConversation.id, userId);
+      if (success) {
+        toast.success(selectedConversation.is_archived ? 'Chat desarchivado' : 'Chat archivado');
+        setSelectedConversation(null);
+        loadConversations();
+      } else {
+        toast.error('Error al archivar chat');
+      }
+    } catch (error) {
+      console.error('Error en toggleArchive:', error);
+      toast.error('Error al archivar chat');
     }
     setShowChatMenu(false);
   };

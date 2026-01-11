@@ -504,69 +504,102 @@ class ChatService {
   // ============================================
 
   async toggleFavorite(conversationId: string, userId: string): Promise<boolean> {
-    // Verificar si existe preferencia
-    const { data: existing } = await supabase
-      .from('conversation_preferences')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .eq('user_id', userId)
-      .single();
+    try {
+      // Verificar si existe preferencia
+      const { data: existing, error: selectError } = await supabase
+        .from('conversation_preferences')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    if (existing) {
-      const { error } = await supabase
-        .from('conversation_preferences')
-        .update({ is_favorite: !existing.is_favorite })
-        .eq('id', existing.id);
-      return !error;
-    } else {
-      const { error } = await supabase
-        .from('conversation_preferences')
-        .insert({ conversation_id: conversationId, user_id: userId, is_favorite: true });
-      return !error;
+      if (selectError) {
+        console.error('Error checking existing preference:', selectError);
+      }
+
+      if (existing) {
+        const { error } = await supabase
+          .from('conversation_preferences')
+          .update({ is_favorite: !existing.is_favorite, updated_at: new Date().toISOString() })
+          .eq('id', existing.id);
+        if (error) console.error('Error updating favorite:', error);
+        return !error;
+      } else {
+        const { error } = await supabase
+          .from('conversation_preferences')
+          .insert({ conversation_id: conversationId, user_id: userId, is_favorite: true });
+        if (error) console.error('Error inserting favorite:', error);
+        return !error;
+      }
+    } catch (err) {
+      console.error('toggleFavorite exception:', err);
+      return false;
     }
   }
 
   async toggleArchive(conversationId: string, userId: string): Promise<boolean> {
-    const { data: existing } = await supabase
-      .from('conversation_preferences')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data: existing, error: selectError } = await supabase
+        .from('conversation_preferences')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    if (existing) {
-      const { error } = await supabase
-        .from('conversation_preferences')
-        .update({ is_archived: !existing.is_archived })
-        .eq('id', existing.id);
-      return !error;
-    } else {
-      const { error } = await supabase
-        .from('conversation_preferences')
-        .insert({ conversation_id: conversationId, user_id: userId, is_archived: true });
-      return !error;
+      if (selectError) {
+        console.error('Error checking existing preference:', selectError);
+      }
+
+      if (existing) {
+        const { error } = await supabase
+          .from('conversation_preferences')
+          .update({ is_archived: !existing.is_archived, updated_at: new Date().toISOString() })
+          .eq('id', existing.id);
+        if (error) console.error('Error updating archive:', error);
+        return !error;
+      } else {
+        const { error } = await supabase
+          .from('conversation_preferences')
+          .insert({ conversation_id: conversationId, user_id: userId, is_archived: true });
+        if (error) console.error('Error inserting archive:', error);
+        return !error;
+      }
+    } catch (err) {
+      console.error('toggleArchive exception:', err);
+      return false;
     }
   }
 
   async toggleMute(conversationId: string, userId: string): Promise<boolean> {
-    const { data: existing } = await supabase
-      .from('conversation_preferences')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .eq('user_id', userId)
-      .single();
+    try {
+      const { data: existing, error: selectError } = await supabase
+        .from('conversation_preferences')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    if (existing) {
-      const { error } = await supabase
-        .from('conversation_preferences')
-        .update({ is_muted: !existing.is_muted })
-        .eq('id', existing.id);
-      return !error;
-    } else {
-      const { error } = await supabase
-        .from('conversation_preferences')
-        .insert({ conversation_id: conversationId, user_id: userId, is_muted: true });
-      return !error;
+      if (selectError) {
+        console.error('Error checking existing preference:', selectError);
+      }
+
+      if (existing) {
+        const { error } = await supabase
+          .from('conversation_preferences')
+          .update({ is_muted: !existing.is_muted, updated_at: new Date().toISOString() })
+          .eq('id', existing.id);
+        if (error) console.error('Error updating mute:', error);
+        return !error;
+      } else {
+        const { error } = await supabase
+          .from('conversation_preferences')
+          .insert({ conversation_id: conversationId, user_id: userId, is_muted: true });
+        if (error) console.error('Error inserting mute:', error);
+        return !error;
+      }
+    } catch (err) {
+      console.error('toggleMute exception:', err);
+      return false;
     }
   }
 
