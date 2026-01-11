@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { X, Image, Type, Palette, Upload, Loader2, Link as LinkIcon, Globe } from 'lucide-react';
+import { X, Image as ImageIcon, Type, Palette, Upload, Loader2, Link as LinkIcon, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LinkPreview, extractUrls } from '@/components/LinkPreview';
 
@@ -327,6 +327,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             {/* Mode toggles */}
             <button
+              type="button"
               onClick={() => {
                 setMode('text');
                 setLinkUrl('');
@@ -342,16 +343,18 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
               Texto
             </button>
             <button
+              type="button"
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
                 mode === 'media' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
               )}
             >
-              <Image className="w-4 h-4" />
+              <ImageIcon className="w-4 h-4" />
               Imagen
             </button>
             <button
+              type="button"
               onClick={() => {
                 setMode('link');
                 removeMedia();
