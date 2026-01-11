@@ -409,6 +409,25 @@ class ForumService {
     return data;
   }
 
+  async incrementViewCount(postId: string): Promise<void> {
+    try {
+      const { data } = await getSupabase()
+        .from('forum_posts')
+        .select('views_count')
+        .eq('id', postId)
+        .single();
+
+      if (data) {
+        await getSupabase()
+          .from('forum_posts')
+          .update({ views_count: ((data as { views_count?: number }).views_count || 0) + 1 } as never)
+          .eq('id', postId);
+      }
+    } catch (error) {
+      console.error('Error incrementing view count:', error);
+    }
+  }
+
   async createPost(userId: string, input: CreatePostInput): Promise<ForumPost | null> {
     const { data, error } = await getSupabase()
       .from('forum_posts')
