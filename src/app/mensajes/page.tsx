@@ -1329,7 +1329,7 @@ function MensajesContent() {
                           <div className="text-center mb-4 px-4">
                             <h3 className="text-lg font-semibold text-white">Opciones del chat</h3>
                             <p className="text-xs text-gray-500 mt-1">
-                              {selectedConversation.type === 'group' ? selectedConversation.name : selectedConversation.other_user?.display_name}
+                              {selectedConversation.type === 'group' ? selectedConversation.group_name : selectedConversation.other_user?.display_name}
                             </p>
                           </div>
 
