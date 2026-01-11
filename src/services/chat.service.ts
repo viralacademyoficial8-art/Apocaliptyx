@@ -124,6 +124,30 @@ export interface Message {
   sender?: UserInfo;
   // Reacciones
   reactions?: MessageReaction[];
+  // Story reply (Instagram/Facebook style)
+  story_id?: string;
+  story_preview?: StoryPreview;
+}
+
+export interface StoryPreview {
+  storyId: string;
+  storyOwnerId: string;
+  storyOwnerUsername?: string;
+  storyOwnerDisplayName?: string;
+  storyOwnerAvatarUrl?: string;
+  content?: string;
+  mediaUrl?: string;
+  mediaType?: string;
+  backgroundColor?: string;
+  linkUrl?: string;
+  linkPreview?: {
+    url: string;
+    title: string | null;
+    description: string | null;
+    image: string | null;
+    siteName: string | null;
+  };
+  expiresAt: string;
 }
 
 export interface MessageReaction {

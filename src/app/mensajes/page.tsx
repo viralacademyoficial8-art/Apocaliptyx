@@ -12,7 +12,8 @@ import {
   TypingUser,
   MessageReaction,
   GroupInvitation,
-  UserInfo
+  UserInfo,
+  StoryPreview
 } from '@/services/chat.service';
 import { OnlineStatus, PresenceTracker } from '@/components/OnlineStatus';
 import { formatDistanceToNow } from 'date-fns';
@@ -787,6 +788,88 @@ function MensajesContent() {
               <p className="text-xs truncate opacity-80">
                 {message.reply_to.content}
               </p>
+            </div>
+          )}
+
+          {/* Story Reply Preview (Instagram/Facebook style) */}
+          {message.story_preview && !message.is_deleted && (
+            <div className={`mx-2 mt-2 mb-1 rounded-lg overflow-hidden ${isOwn ? 'bg-purple-700/40' : 'bg-gray-700/60'}`}>
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {message.story_preview.storyOwnerAvatarUrl ? (
+                    <img
+                      src={message.story_preview.storyOwnerAvatarUrl}
+                      alt=""
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold">
+                      {(message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername || '?')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium truncate">
+                      Respondió a la historia de {message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Story content preview */}
+              <div className="relative">
+                {message.story_preview.mediaUrl ? (
+                  <div className="relative h-32 w-full">
+                    <img
+                      src={message.story_preview.mediaUrl}
+                      alt="Story"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {message.story_preview.content && (
+                      <p className="absolute bottom-2 left-3 right-3 text-xs text-white line-clamp-2">
+                        {message.story_preview.content}
+                      </p>
+                    )}
+                  </div>
+                ) : message.story_preview.linkPreview?.image ? (
+                  <div className="relative h-32 w-full">
+                    <img
+                      src={message.story_preview.linkPreview.image}
+                      alt="Link preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                    <div className="absolute bottom-2 left-3 right-3">
+                      <p className="text-[10px] text-purple-300 uppercase tracking-wide">
+                        {message.story_preview.linkPreview.siteName || new URL(message.story_preview.linkUrl || '').hostname}
+                      </p>
+                      <p className="text-xs text-white line-clamp-1 font-medium">
+                        {message.story_preview.linkPreview.title}
+                      </p>
+                    </div>
+                  </div>
+                ) : message.story_preview.content ? (
+                  <div
+                    className="h-24 w-full flex items-center justify-center px-4"
+                    style={{ backgroundColor: message.story_preview.backgroundColor || '#1a1a2e' }}
+                  >
+                    <p className="text-sm text-white text-center line-clamp-3">
+                      &ldquo;{message.story_preview.content}&rdquo;
+                    </p>
+                  </div>
+                ) : (
+                  <div className="h-20 w-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                    <span className="text-white text-xs opacity-70">Historia</span>
+                  </div>
+                )}
+
+                {/* Story expired indicator */}
+                {new Date(message.story_preview.expiresAt) < new Date() && (
+                  <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">
+                    Expirada
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

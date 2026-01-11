@@ -72,6 +72,7 @@ export function StoryViewer({
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [showLikeAnimation, setShowLikeAnimation] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [showReplySent, setShowReplySent] = useState(false);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const touchStartX = useRef<number>(0);
   const replyInputRef = useRef<HTMLInputElement>(null);
@@ -259,7 +260,11 @@ export function StoryViewer({
 
       if (response.ok) {
         setReplyText('');
-        // Could show a toast/notification here
+        // Show success notification
+        setShowReplySent(true);
+        setTimeout(() => setShowReplySent(false), 2500);
+        // Resume timer
+        setIsPaused(false);
       }
     } catch (error) {
       console.error('Error sending reply:', error);
@@ -600,6 +605,16 @@ export function StoryViewer({
               >
                 <Send className="w-7 h-7" />
               </button>
+            </div>
+          )}
+
+          {/* Reply sent notification */}
+          {showReplySent && (
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-green-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 animate-fade-in">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Mensaje enviado
             </div>
           )}
 
