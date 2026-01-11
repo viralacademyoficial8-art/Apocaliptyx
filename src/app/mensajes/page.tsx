@@ -1305,7 +1305,7 @@ function MensajesContent() {
                   </button>
 
                   {showChatMenu && (
-                    <div className="fixed right-4 top-16 w-56 z-[9999]">
+                    <div className="fixed right-4 top-16 w-72 z-[9999]">
                       {/* Gradient border */}
                       <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500/50 via-pink-500/50 to-purple-500/50 rounded-2xl" />
                       <div className="relative bg-[#0d0d14] backdrop-blur-xl rounded-2xl py-2 shadow-2xl shadow-black/50 max-h-[80vh] overflow-y-auto">
