@@ -26,6 +26,7 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { LinkPreview, extractUrls } from "@/components/LinkPreview";
 
 interface ForumPostCardProps {
   post: ForumPost;
@@ -177,6 +178,13 @@ export function ForumPostCard({ post, onOpenComments }: ForumPostCardProps) {
           className="text-foreground whitespace-pre-wrap break-words"
           dangerouslySetInnerHTML={{ __html: processContent(post.content) }}
         />
+
+        {/* Link Previews */}
+        {extractUrls(post.content).slice(0, 2).map((url, index) => (
+          <div key={`${url}-${index}`} className="mt-3">
+            <LinkPreview url={url} />
+          </div>
+        ))}
 
         {post.tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
