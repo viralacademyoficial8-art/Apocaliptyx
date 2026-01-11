@@ -793,91 +793,74 @@ function MensajesContent() {
 
           {/* Story Reply Preview (Instagram/Facebook style) */}
           {message.story_preview && !message.is_deleted && (
-            <div className={`mx-2 mt-2 mb-1 rounded-xl overflow-hidden border ${isOwn ? 'bg-purple-700/30 border-purple-500/30' : 'bg-gray-700/50 border-gray-600/30'}`}>
-              <div className="flex items-center gap-2.5 px-3 py-2.5 border-b border-white/10">
-                {/* Avatar with Instagram-style gradient ring */}
+            <div className="px-3 pt-2 pb-1">
+              <div className={`flex items-start gap-2.5 p-2.5 rounded-xl ${isOwn ? 'bg-purple-900/30' : 'bg-gray-800/50'}`}>
+                {/* Story thumbnail - Instagram style */}
                 <div className="relative flex-shrink-0">
-                  <div className="w-8 h-8 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
-                    <div className="w-full h-full rounded-full bg-gray-900 p-[1px]">
-                      {message.story_preview.storyOwnerAvatarUrl ? (
-                        <img
-                          src={message.story_preview.storyOwnerAvatarUrl}
-                          alt=""
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold text-white">
-                          {(message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername || '?')[0].toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] text-gray-400 flex items-center gap-1">
-                    <span className="inline-block w-3 h-3">📷</span>
-                    Respondió a la historia
-                  </p>
-                  <p className="text-xs font-medium truncate">
-                    {message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername}
-                  </p>
-                </div>
-              </div>
-
-              {/* Story content preview */}
-              <div className="relative">
-                {message.story_preview.mediaUrl ? (
-                  <div className="relative h-32 w-full">
-                    <img
-                      src={message.story_preview.mediaUrl}
-                      alt="Story"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    {message.story_preview.content && (
-                      <p className="absolute bottom-2 left-3 right-3 text-xs text-white line-clamp-2">
-                        {message.story_preview.content}
-                      </p>
+                  <div className="w-14 h-14 rounded-lg overflow-hidden border-2 border-purple-500/50">
+                    {message.story_preview.mediaUrl ? (
+                      <img
+                        src={message.story_preview.mediaUrl}
+                        alt="Story"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : message.story_preview.linkPreview?.image ? (
+                      <img
+                        src={message.story_preview.linkPreview.image}
+                        alt="Link preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center"
+                        style={{ backgroundColor: message.story_preview.backgroundColor || '#6b21a8' }}
+                      >
+                        <span className="text-white text-[10px] text-center px-1 line-clamp-2">
+                          {message.story_preview.content?.slice(0, 30) || 'Aa'}
+                        </span>
+                      </div>
                     )}
                   </div>
-                ) : message.story_preview.linkPreview?.image ? (
-                  <div className="relative h-32 w-full">
-                    <img
-                      src={message.story_preview.linkPreview.image}
-                      alt="Link preview"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <div className="absolute bottom-2 left-3 right-3">
-                      <p className="text-[10px] text-purple-300 uppercase tracking-wide">
-                        {message.story_preview.linkPreview.siteName || new URL(message.story_preview.linkUrl || '').hostname}
-                      </p>
-                      <p className="text-xs text-white line-clamp-1 font-medium">
-                        {message.story_preview.linkPreview.title}
-                      </p>
+                  {/* Story expired badge */}
+                  {new Date(message.story_preview.expiresAt) < new Date() && (
+                    <div className="absolute -bottom-1 -right-1 bg-gray-700 text-gray-300 text-[8px] px-1.5 py-0.5 rounded-full border border-gray-600">
+                      Expirada
                     </div>
+                  )}
+                </div>
+
+                {/* Story info */}
+                <div className="flex-1 min-w-0 py-0.5">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    {/* Mini avatar with gradient ring */}
+                    <div className="w-5 h-5 rounded-full p-[1.5px] bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 flex-shrink-0">
+                      <div className="w-full h-full rounded-full bg-gray-900 overflow-hidden">
+                        {message.story_preview.storyOwnerAvatarUrl ? (
+                          <img
+                            src={message.story_preview.storyOwnerAvatarUrl}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[8px] font-bold text-white">
+                            {(message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername || '?')[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-xs font-medium text-white truncate">
+                      {message.story_preview.storyOwnerDisplayName || message.story_preview.storyOwnerUsername}
+                    </span>
                   </div>
-                ) : message.story_preview.content ? (
-                  <div
-                    className="h-24 w-full flex items-center justify-center px-4"
-                    style={{ backgroundColor: message.story_preview.backgroundColor || '#1a1a2e' }}
-                  >
-                    <p className="text-sm text-white text-center line-clamp-3">
+                  <p className="text-[11px] text-gray-400">
+                    {isOwn ? 'Respondiste a su historia' : 'Respondió a tu historia'}
+                  </p>
+                  {message.story_preview.content && !message.story_preview.mediaUrl && (
+                    <p className="text-xs text-gray-300 mt-1 line-clamp-1 italic">
                       &ldquo;{message.story_preview.content}&rdquo;
                     </p>
-                  </div>
-                ) : (
-                  <div className="h-20 w-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                    <span className="text-white text-xs opacity-70">Historia</span>
-                  </div>
-                )}
-
-                {/* Story expired indicator */}
-                {new Date(message.story_preview.expiresAt) < new Date() && (
-                  <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">
-                    Expirada
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -1121,13 +1104,50 @@ function MensajesContent() {
                             {conv.last_message && formatDistanceToNow(new Date(conv.last_message.created_at), { addSuffix: false, locale: es })}
                           </span>
                         </div>
-                        <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
-                          {conv.last_message?.story_preview
-                            ? `📷 Respondió a una historia: ${conv.last_message.content}`
-                            : conv.last_message?.file_url
-                            ? '📎 Archivo adjunto'
-                            : conv.last_message?.content || 'Sin mensajes'}
-                        </p>
+                        {/* Story reply preview - Instagram style */}
+                        {conv.last_message?.story_preview ? (
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs ${conv.unread_count ? 'text-gray-300' : 'text-gray-500'}`}>
+                                Respondió a tu historia
+                              </p>
+                              <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
+                                {conv.last_message.content}
+                              </p>
+                            </div>
+                            {/* Story thumbnail - Instagram style */}
+                            <div className="flex-shrink-0 w-10 h-10 rounded-lg overflow-hidden border border-gray-600/50 bg-gray-800">
+                              {conv.last_message.story_preview.mediaUrl ? (
+                                <img
+                                  src={conv.last_message.story_preview.mediaUrl}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : conv.last_message.story_preview.linkPreview?.image ? (
+                                <img
+                                  src={conv.last_message.story_preview.linkPreview.image}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div
+                                  className="w-full h-full flex items-center justify-center"
+                                  style={{ backgroundColor: conv.last_message.story_preview.backgroundColor || '#6b21a8' }}
+                                >
+                                  <span className="text-white text-[8px] text-center px-0.5 line-clamp-2">
+                                    {conv.last_message.story_preview.content?.slice(0, 20) || 'Aa'}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className={`text-sm truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
+                            {conv.last_message?.file_url
+                              ? '📎 Archivo adjunto'
+                              : conv.last_message?.content || 'Sin mensajes'}
+                          </p>
+                        )}
                       </div>
                     </button>
                   ))
