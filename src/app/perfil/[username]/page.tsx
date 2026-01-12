@@ -88,7 +88,15 @@ export default function PublicProfilePage() {
   const [predictions, setPredictions] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
-  
+
+  // Estados para modales de seguidores/siguiendo
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [followersList, setFollowersList] = useState<any[]>([]);
+  const [followingList, setFollowingList] = useState<any[]>([]);
+  const [loadingFollowers, setLoadingFollowers] = useState(false);
+  const [loadingFollowing, setLoadingFollowing] = useState(false);
+
   // Estados para menú de opciones
   const [isBlocked, setIsBlocked] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -151,6 +159,46 @@ export default function PublicProfilePage() {
     } else {
       handleCopyLink();
     }
+  };
+
+  // Cargar lista de seguidores
+  const loadFollowers = async () => {
+    if (!profile?.id) return;
+    setLoadingFollowers(true);
+    try {
+      const followers = await publicProfileService.getFollowers(profile.id);
+      setFollowersList(followers);
+    } catch (error) {
+      console.error('Error loading followers:', error);
+    } finally {
+      setLoadingFollowers(false);
+    }
+  };
+
+  // Cargar lista de siguiendo
+  const loadFollowing = async () => {
+    if (!profile?.id) return;
+    setLoadingFollowing(true);
+    try {
+      const following = await publicProfileService.getFollowing(profile.id);
+      setFollowingList(following);
+    } catch (error) {
+      console.error('Error loading following:', error);
+    } finally {
+      setLoadingFollowing(false);
+    }
+  };
+
+  // Abrir modal de seguidores
+  const handleOpenFollowers = () => {
+    setShowFollowersModal(true);
+    loadFollowers();
+  };
+
+  // Abrir modal de siguiendo
+  const handleOpenFollowing = () => {
+    setShowFollowingModal(true);
+    loadFollowing();
   };
 
   // Verificar estados de bloqueo y silencio
@@ -640,15 +688,21 @@ export default function PublicProfilePage() {
 
             {/* Stats row */}
             <div className="flex flex-wrap gap-6 mt-6">
-              <div className="text-center">
+              <button
+                onClick={handleOpenFollowers}
+                className="text-center hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-colors"
+              >
                 <span className="text-xl font-bold">{profile.followers_count}</span>
                 <span className="text-gray-400 text-sm ml-1">seguidores</span>
-              </div>
-              <div className="text-center">
+              </button>
+              <button
+                onClick={handleOpenFollowing}
+                className="text-center hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-colors"
+              >
                 <span className="text-xl font-bold">{profile.following_count}</span>
                 <span className="text-gray-400 text-sm ml-1">siguiendo</span>
-              </div>
-              <div className="text-center">
+              </button>
+              <div className="text-center px-3 py-2">
                 <span className="text-xl font-bold">#{profile.rank || '-'}</span>
                 <span className="text-gray-400 text-sm ml-1">ranking</span>
               </div>
@@ -952,6 +1006,110 @@ export default function PublicProfilePage() {
                 )}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Seguidores */}
+      <Dialog open={showFollowersModal} onOpenChange={setShowFollowersModal}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Users className="w-5 h-5 text-purple-400" />
+              Seguidores de @{profile?.username}
+            </h2>
+            <p className="text-sm text-gray-400 mt-1">{profile?.followers_count} seguidores</p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+            {loadingFollowers ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+              </div>
+            ) : followersList.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>Aún no tiene seguidores</p>
+              </div>
+            ) : (
+              followersList.map((follower) => (
+                <Link
+                  key={follower.id}
+                  href={`/perfil/${follower.username}`}
+                  onClick={() => setShowFollowersModal(false)}
+                  className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
+                    {follower.avatar_url ? (
+                      <img src={follower.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-5 h-5 text-white" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-white truncate flex items-center gap-1">
+                      {follower.display_name || follower.username}
+                      {follower.is_verified && <CheckCircle className="w-4 h-4 text-blue-400" />}
+                      {follower.is_premium && <Crown className="w-4 h-4 text-yellow-400" />}
+                    </p>
+                    <p className="text-sm text-gray-400 truncate">@{follower.username}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">Nivel {follower.level}</span>
+                </Link>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de Siguiendo */}
+      <Dialog open={showFollowingModal} onOpenChange={setShowFollowingModal}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Users className="w-5 h-5 text-purple-400" />
+              @{profile?.username} sigue a
+            </h2>
+            <p className="text-sm text-gray-400 mt-1">{profile?.following_count} siguiendo</p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+            {loadingFollowing ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+              </div>
+            ) : followingList.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>No sigue a nadie todavía</p>
+              </div>
+            ) : (
+              followingList.map((following) => (
+                <Link
+                  key={following.id}
+                  href={`/perfil/${following.username}`}
+                  onClick={() => setShowFollowingModal(false)}
+                  className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
+                    {following.avatar_url ? (
+                      <img src={following.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-5 h-5 text-white" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-white truncate flex items-center gap-1">
+                      {following.display_name || following.username}
+                      {following.is_verified && <CheckCircle className="w-4 h-4 text-blue-400" />}
+                      {following.is_premium && <Crown className="w-4 h-4 text-yellow-400" />}
+                    </p>
+                    <p className="text-sm text-gray-400 truncate">@{following.username}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">Nivel {following.level}</span>
+                </Link>
+              ))
+            )}
           </div>
         </DialogContent>
       </Dialog>
