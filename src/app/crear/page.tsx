@@ -235,44 +235,82 @@ export default function CrearPage() {
                 {similarScenarios.map((scenario) => (
                   <div
                     key={scenario.id}
-                    className="flex items-center justify-between p-3 bg-zinc-900/50 rounded-lg"
+                    className={`p-3 rounded-lg cursor-pointer transition-all ${
+                      isDuplicate
+                        ? 'bg-zinc-900/50 hover:bg-zinc-800/70 border border-transparent hover:border-purple-500/50'
+                        : 'bg-zinc-900/50'
+                    }`}
+                    onClick={() => isDuplicate && handleGoToExistingScenario(scenario.id)}
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-100 truncate">
-                        {scenario.title}
-                      </p>
-                      <p className="text-xs text-zinc-400 truncate mt-0.5">
-                        {scenario.description?.slice(0, 80)}...
-                      </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-zinc-100 truncate">
+                          {scenario.title}
+                        </p>
+                        <p className="text-xs text-zinc-400 truncate mt-0.5">
+                          {scenario.description?.slice(0, 60)}...
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-3">
+                        <span className={`text-xs font-bold px-2 py-1 rounded ${
+                          scenario.similarity >= 70
+                            ? 'bg-red-500/20 text-red-400'
+                            : scenario.similarity > 60
+                              ? 'bg-amber-500/20 text-amber-400'
+                              : 'bg-zinc-700 text-zinc-300'
+                        }`}>
+                          {scenario.similarity}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 ml-3">
-                      <span className={`text-xs font-bold px-2 py-1 rounded ${
-                        scenario.similarity > 80
-                          ? 'bg-red-500/20 text-red-400'
-                          : scenario.similarity > 60
-                            ? 'bg-amber-500/20 text-amber-400'
-                            : 'bg-zinc-700 text-zinc-300'
-                      }`}>
-                        {scenario.similarity}%
-                      </span>
-                    </div>
+                    {/* Info de robo */}
+                    {isDuplicate && (
+                      <div className="mt-2 pt-2 border-t border-zinc-700/50 flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                          <span>👑</span>
+                          <span>Holder: <span className="text-purple-400">@{scenario.holder_username || 'creador'}</span></span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs">
+                          <span className="text-yellow-400 font-bold">⚡ {scenario.current_price || 11} AP</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
               {isDuplicate && similarScenarios.length > 0 && (
-                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                  <p className="text-xs text-green-300 mb-3">
+                <div className="mt-4 p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/40 rounded-xl">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">⚡</span>
+                    <h4 className="text-sm font-bold text-white">¡Roba este escenario!</h4>
+                  </div>
+                  <p className="text-xs text-purple-200/80 mb-3">
                     {t('create.duplicates.participateInstead')}
                   </p>
+                  <div className="bg-zinc-900/50 rounded-lg p-3 mb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-zinc-400">Holder actual</p>
+                        <p className="text-sm font-medium text-purple-400">@{similarScenarios[0]?.holder_username || 'creador'}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-zinc-400">Precio para robar</p>
+                        <p className="text-lg font-bold text-yellow-400">{similarScenarios[0]?.current_price || 11} AP</p>
+                      </div>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={() => handleGoToExistingScenario(similarScenarios[0].id)}
-                    className="w-full px-4 py-2.5 text-sm bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-black font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 text-sm bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                    {t('create.duplicates.goToScenario')}
+                    <span>⚡</span>
+                    Robar por {similarScenarios[0]?.current_price || 11} AP
                   </button>
+                  <p className="text-[10px] text-zinc-500 text-center mt-2">
+                    Haz clic para ir al escenario y comprarlo
+                  </p>
                 </div>
               )}
 

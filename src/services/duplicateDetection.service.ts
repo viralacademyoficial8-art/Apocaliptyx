@@ -14,6 +14,8 @@ export interface SimilarScenario {
   similarity: number;
   status: string;
   created_at: string;
+  current_price?: number;
+  holder_username?: string;
 }
 
 export interface DuplicateCheckResult {
@@ -130,7 +132,10 @@ class DuplicateDetectionService {
     // 2. Buscar escenarios similares por título
     let similarQuery = supabase
       .from('scenarios')
-      .select('id, title, description, status, created_at')
+      .select(`
+        id, title, description, status, created_at, current_price,
+        holder:users!scenarios_current_holder_id_fkey(username)
+      `)
       .neq('status', 'CANCELLED');
     
     if (excludeId) {
@@ -170,6 +175,12 @@ class DuplicateDetectionService {
 
       // Solo incluir si la similitud es > 50%
       if (similarityPercent > 50) {
+        // Extraer username del holder (puede venir como array o objeto)
+        const holderData = scenario.holder as any;
+        const holderUsername = Array.isArray(holderData)
+          ? holderData[0]?.username
+          : holderData?.username;
+
         similarScenarios.push({
           id: scenario.id,
           title: scenario.title,
@@ -177,6 +188,8 @@ class DuplicateDetectionService {
           similarity: similarityPercent,
           status: scenario.status,
           created_at: scenario.created_at,
+          current_price: scenario.current_price || 11, // Precio por defecto
+          holder_username: holderUsername || 'creador',
         });
       }
     }
@@ -187,9 +200,9 @@ class DuplicateDetectionService {
     // Tomar los top 5
     const topSimilar = similarScenarios.slice(0, 5);
 
-    // Considerar duplicado si hay alguno con similitud > 70%
+    // Considerar duplicado si hay alguno con similitud >= 70%
     // Umbral reducido para ser más estrictos y forzar compra de escenarios existentes
-    const isDuplicate = topSimilar.some(s => s.similarity > 70);
+    const isDuplicate = topSimilar.some(s => s.similarity >= 70);
 
     return {
       isDuplicate,
