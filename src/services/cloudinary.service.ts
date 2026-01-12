@@ -43,39 +43,49 @@ class CloudinaryService {
     const defaultOptions = {
       folder: 'apocaliptyx/reels',
       resource_type: 'video' as const,
-      // Eager transformations for optimized playback
-      eager: [
-        // Optimized video for web playback
-        {
-          streaming_profile: 'auto',
-          format: 'mp4',
-        },
-        // Generate thumbnail at 0 seconds
-        {
-          format: 'jpg',
-          transformation: [
-            { width: 720, height: 1280, crop: 'fill', gravity: 'auto' },
-            { start_offset: '0' },
-          ],
-        },
-      ],
+      // Eager transformations run in background for faster response
       eager_async: true,
-      // Auto quality and format for best performance
-      transformation: [
-        { quality: 'auto' },
-        { fetch_format: 'auto' },
-      ],
     };
 
     const uploadOptions = { ...defaultOptions, ...options };
 
     try {
-      // If file is a Buffer, convert to base64 data URI
-      const fileToUpload = Buffer.isBuffer(file)
-        ? `data:video/mp4;base64,${file.toString('base64')}`
-        : file;
+      // Use upload_stream for Buffer (more efficient for large files)
+      if (Buffer.isBuffer(file)) {
+        return new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            uploadOptions,
+            (error, result) => {
+              if (error) {
+                console.error('Cloudinary upload stream error:', error);
+                reject(new Error(`Failed to upload video: ${error.message}`));
+                return;
+              }
+              if (!result) {
+                reject(new Error('No result from Cloudinary'));
+                return;
+              }
+              resolve({
+                public_id: result.public_id,
+                secure_url: result.secure_url,
+                url: result.url,
+                format: result.format,
+                resource_type: result.resource_type,
+                duration: result.duration,
+                width: result.width,
+                height: result.height,
+                bytes: result.bytes,
+                thumbnail_url: this.generateThumbnailUrl(result.public_id),
+                playback_url: this.generatePlaybackUrl(result.public_id),
+              });
+            }
+          );
+          uploadStream.end(file);
+        });
+      }
 
-      const result = await cloudinary.uploader.upload(fileToUpload, uploadOptions);
+      // For URL strings, use regular upload
+      const result = await cloudinary.uploader.upload(file, uploadOptions);
 
       return {
         public_id: result.public_id,
