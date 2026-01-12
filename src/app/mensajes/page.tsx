@@ -1661,7 +1661,7 @@ function MensajesContent() {
               Selecciona una conversación de la lista o ve al perfil de un usuario para empezar a chatear
             </p>
             <Link
-              href="/"
+              href="/leaderboard"
               className="mt-6 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-xl text-sm font-medium transition-all duration-300 hover:scale-105"
             >
               Explorar perfiles
