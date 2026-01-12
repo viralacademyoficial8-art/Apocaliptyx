@@ -178,10 +178,13 @@ export function ProfileHeader({
                 <span className="text-gray-400">AP Coins</span>
               </div>
             )}
-            <div className="flex items-center gap-1">
+            <Link
+              href="/leaderboard"
+              className="flex items-center gap-1 hover:bg-purple-500/20 px-2 py-1 rounded-lg transition-colors cursor-pointer"
+            >
               <span className="text-purple-400 font-bold">#{profile.stats.rank}</span>
               <span className="text-gray-400">ranking</span>
-            </div>
+            </Link>
           </div>
 
           <div className="mt-6 max-w-md">
