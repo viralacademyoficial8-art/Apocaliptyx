@@ -8,6 +8,7 @@ import { scenariosService } from '@/services';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuthStore } from '@/lib/stores';
 import { formatDate } from '@/lib/utils';
+import { getSupabase } from '@/lib/supabase/client';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
   Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight
@@ -32,6 +33,13 @@ interface ScenarioData {
   is_featured: boolean;
   is_hot: boolean;
   created_at: string;
+}
+
+// Tipo para stats del usuario
+interface UserStats {
+  apCoins: number;
+  scenariosWon: number;
+  scenariosCreated: number;
 }
 
 // Category keys for translations
@@ -71,12 +79,58 @@ export default function ExplorarPage() {
   const [filteredScenarios, setFilteredScenarios] = useState<ScenarioData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userStats, setUserStats] = useState<UserStats>({
+    apCoins: 0,
+    scenariosWon: 0,
+    scenariosCreated: 0,
+  });
 
   // Filtros
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
+
+  // Cargar stats del usuario desde Supabase
+  useEffect(() => {
+    async function loadUserStats() {
+      if (!isAuthenticated || !user?.id) return;
+
+      const supabase = getSupabase();
+
+      try {
+        // Obtener AP Coins del usuario
+        const { data: userData } = await supabase
+          .from('users')
+          .select('ap_coins')
+          .eq('id', user.id)
+          .single();
+
+        // Contar escenarios creados por el usuario
+        const { count: scenariosCreated } = await supabase
+          .from('scenarios')
+          .select('*', { count: 'exact', head: true })
+          .eq('creator_id', user.id);
+
+        // Contar predicciones ganadas (status = 'WON')
+        const { count: scenariosWon } = await supabase
+          .from('predictions')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('status', 'WON');
+
+        setUserStats({
+          apCoins: userData?.ap_coins || 0,
+          scenariosWon: scenariosWon || 0,
+          scenariosCreated: scenariosCreated || 0,
+        });
+      } catch (err) {
+        console.error('Error loading user stats:', err);
+      }
+    }
+
+    loadUserStats();
+  }, [isAuthenticated, user?.id]);
 
   // Cargar escenarios de Supabase
   useEffect(() => {
@@ -168,7 +222,7 @@ export default function ExplorarPage() {
                 </p>
               </section>
 
-              {/* Stats Cards */}
+              {/* Stats Cards - Datos reales de Supabase */}
               <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StaggerItem>
                   <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
@@ -176,7 +230,7 @@ export default function ExplorarPage() {
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.apCoins')}</p>
                       <p className="text-xl font-bold">
-                        {user.apCoins?.toLocaleString() || '0'}
+                        {userStats.apCoins.toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -187,7 +241,7 @@ export default function ExplorarPage() {
                     <Trophy className="w-6 h-6 text-yellow-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.scenariosWon')}</p>
-                      <p className="text-xl font-bold">{user.scenariosWon || 0}</p>
+                      <p className="text-xl font-bold">{userStats.scenariosWon}</p>
                     </div>
                   </div>
                 </StaggerItem>
@@ -197,7 +251,7 @@ export default function ExplorarPage() {
                     <ShoppingBag className="w-6 h-6 text-emerald-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.scenariosCreated')}</p>
-                      <p className="text-xl font-bold">{user.scenariosCreated || 0}</p>
+                      <p className="text-xl font-bold">{userStats.scenariosCreated}</p>
                     </div>
                   </div>
                 </StaggerItem>
