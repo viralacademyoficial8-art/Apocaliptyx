@@ -15,7 +15,8 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { data: user, error } = await getSupabaseAdmin()
+    const supabase = getSupabaseAdmin();
+    const { data: user, error } = await supabase
       .from('users')
       .select(`
         id,
@@ -33,7 +34,12 @@ export async function GET() {
       .eq('email', session.user.email)
       .single();
 
-    if (error || !user) {
+    if (error) {
+      console.error('Supabase error in /api/me:', error);
+      return NextResponse.json({ error: 'Error de base de datos' }, { status: 500 });
+    }
+
+    if (!user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
@@ -51,7 +57,10 @@ export async function GET() {
       isPremium: user.is_premium,
     });
   } catch (error) {
-    console.error('Error fetching user:', error);
-    return NextResponse.json({ error: 'Error interno' }, { status: 500 });
+    console.error('Error in /api/me:', error);
+    return NextResponse.json({
+      error: 'Error interno',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
