@@ -18,7 +18,7 @@ interface CreateReelModalProps {
     videoFile: File;
     caption: string;
     tags: string[];
-  }) => void;
+  }) => Promise<void>;
 }
 
 export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
@@ -28,6 +28,7 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
   const [caption, setCaption] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,24 +52,30 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
     setTags(tags.filter((t) => t !== tagToRemove));
   };
 
-  const handleSubmit = () => {
-    if (!videoFile) return;
+  const handleSubmit = async () => {
+    if (!videoFile || isUploading) return;
 
-    onCreateReel({
-      videoFile,
-      caption,
-      tags,
-    });
+    setIsUploading(true);
+    try {
+      await onCreateReel({
+        videoFile,
+        caption,
+        tags,
+      });
 
-    // Reset form
-    setVideoFile(null);
-    setVideoPreview(null);
-    setCaption('');
-    setTags([]);
-    setIsOpen(false);
+      // Reset form only on success
+      setVideoFile(null);
+      setVideoPreview(null);
+      setCaption('');
+      setTags([]);
+      setIsOpen(false);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleClose = () => {
+    if (isUploading) return; // No cerrar mientras se sube
     if (videoPreview) {
       URL.revokeObjectURL(videoPreview);
     }
@@ -200,11 +207,20 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
           {/* Submit */}
           <Button
             onClick={handleSubmit}
-            disabled={!videoFile}
+            disabled={!videoFile || isUploading}
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
           >
-            <Send className="w-4 h-4 mr-2" />
-            Publicar Reel
+            {isUploading ? (
+              <>
+                <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Subiendo video...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4 mr-2" />
+                Publicar Reel
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>

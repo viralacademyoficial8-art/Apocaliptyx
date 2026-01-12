@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { cloudinaryService } from '@/services/cloudinary.service';
 
+// Configuración de ruta para Next.js 14 App Router
+export const maxDuration = 60; // 60 segundos de timeout para uploads de video
+export const dynamic = 'force-dynamic';
+
 interface UserFollow {
   following_id: string;
 }
@@ -134,19 +138,41 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = createServerSupabaseClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    if (authError) {
+      console.error('Auth error:', authError);
+      return NextResponse.json({ error: 'Error de autenticación' }, { status: 401 });
     }
 
-    const formData = await request.formData();
+    if (!user) {
+      return NextResponse.json({ error: 'Debes iniciar sesión para publicar reels' }, { status: 401 });
+    }
+
+    let formData: FormData;
+    try {
+      formData = await request.formData();
+    } catch (formError) {
+      console.error('FormData error:', formError);
+      return NextResponse.json({
+        error: 'Error al procesar el archivo. El video puede ser demasiado grande (máx 100MB)'
+      }, { status: 400 });
+    }
+
     const videoFile = formData.get('video') as File;
     const caption = formData.get('caption') as string;
     const tags = JSON.parse(formData.get('tags') as string || '[]');
 
     if (!videoFile) {
       return NextResponse.json({ error: 'Video requerido' }, { status: 400 });
+    }
+
+    // Verificar tamaño del archivo (máx 100MB)
+    const maxSize = 100 * 1024 * 1024; // 100MB
+    if (videoFile.size > maxSize) {
+      return NextResponse.json({
+        error: 'El video es demasiado grande. Máximo permitido: 100MB'
+      }, { status: 400 });
     }
 
     let videoUrl: string;
@@ -157,39 +183,58 @@ export async function POST(request: NextRequest) {
 
     // Check if Cloudinary is configured
     if (cloudinaryService.isConfigured()) {
-      // Upload to Cloudinary
-      const arrayBuffer = await videoFile.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      try {
+        // Upload to Cloudinary
+        const arrayBuffer = await videoFile.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-      const uploadResult = await cloudinaryService.uploadVideo(buffer, {
-        folder: `apocaliptyx/reels/${user.id}`,
-        public_id: `reel-${Date.now()}`,
-      });
+        const uploadResult = await cloudinaryService.uploadVideo(buffer, {
+          folder: `apocaliptyx/reels/${user.id}`,
+          public_id: `reel-${Date.now()}`,
+        });
 
-      videoUrl = uploadResult.secure_url;
-      thumbnailUrl = uploadResult.thumbnail_url;
-      duration = uploadResult.duration;
-      width = uploadResult.width;
-      height = uploadResult.height;
+        videoUrl = uploadResult.secure_url;
+        thumbnailUrl = uploadResult.thumbnail_url;
+        duration = uploadResult.duration;
+        width = uploadResult.width;
+        height = uploadResult.height;
 
-      console.log('Video uploaded to Cloudinary:', uploadResult.public_id);
+        console.log('Video uploaded to Cloudinary:', uploadResult.public_id);
+      } catch (cloudinaryError) {
+        console.error('Cloudinary upload error:', cloudinaryError);
+        return NextResponse.json({
+          error: 'Error al subir video a Cloudinary. Intenta de nuevo.'
+        }, { status: 500 });
+      }
     } else {
       // Fallback to Supabase Storage if Cloudinary is not configured
       console.log('Cloudinary not configured, using Supabase Storage');
 
-      const fileName = `${user.id}/${Date.now()}-${videoFile.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('reels')
-        .upload(fileName, videoFile);
+      try {
+        const fileName = `${user.id}/${Date.now()}-${videoFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('reels')
+          .upload(fileName, videoFile);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Supabase storage error:', uploadError);
+          return NextResponse.json({
+            error: 'Error al subir video. Verifica que el bucket de storage existe.'
+          }, { status: 500 });
+        }
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('reels')
-        .getPublicUrl(fileName);
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('reels')
+          .getPublicUrl(fileName);
 
-      videoUrl = publicUrl;
+        videoUrl = publicUrl;
+      } catch (storageError) {
+        console.error('Storage error:', storageError);
+        return NextResponse.json({
+          error: 'Error de almacenamiento. Contacta al administrador.'
+        }, { status: 500 });
+      }
     }
 
     // Create reel record
@@ -209,7 +254,12 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (createError) throw createError;
+    if (createError) {
+      console.error('Database insert error:', createError);
+      return NextResponse.json({
+        error: 'Error al guardar el reel en la base de datos'
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,
@@ -219,7 +269,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating reel:', error);
     return NextResponse.json(
-      { error: 'Error al crear reel' },
+      { error: 'Error inesperado al crear reel. Intenta de nuevo.' },
       { status: 500 }
     );
   }
