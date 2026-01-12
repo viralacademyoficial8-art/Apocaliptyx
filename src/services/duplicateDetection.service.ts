@@ -130,12 +130,10 @@ class DuplicateDetectionService {
     }
 
     // 2. Buscar escenarios similares por título
+    // Query simplificada sin joins para evitar errores de foreign key
     let similarQuery = supabase
       .from('scenarios')
-      .select(`
-        id, title, description, status, created_at, current_price,
-        holder:users!scenarios_current_holder_id_fkey(username)
-      `)
+      .select('id, title, description, status, created_at, current_price, current_holder_id')
       .neq('status', 'CANCELLED');
     
     if (excludeId) {
@@ -175,12 +173,6 @@ class DuplicateDetectionService {
 
       // Solo incluir si la similitud es > 50%
       if (similarityPercent > 50) {
-        // Extraer username del holder (puede venir como array o objeto)
-        const holderData = scenario.holder as any;
-        const holderUsername = Array.isArray(holderData)
-          ? holderData[0]?.username
-          : holderData?.username;
-
         similarScenarios.push({
           id: scenario.id,
           title: scenario.title,
@@ -189,7 +181,7 @@ class DuplicateDetectionService {
           status: scenario.status,
           created_at: scenario.created_at,
           current_price: scenario.current_price || 11, // Precio por defecto
-          holder_username: holderUsername || 'creador',
+          holder_username: scenario.current_holder_id ? 'holder' : 'creador',
         });
       }
     }
