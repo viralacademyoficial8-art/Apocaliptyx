@@ -196,7 +196,7 @@ class DuplicateDetectionService {
         // Obtener el username del holder real
         const holderUsername = scenario.current_holder_id
           ? holderMap[scenario.current_holder_id] || 'holder'
-          : null;
+          : undefined;
 
         similarScenarios.push({
           id: scenario.id,
