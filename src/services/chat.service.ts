@@ -665,7 +665,13 @@ class ChatService {
     // Enviar notificaciones (excepto a usuarios que silenciaron el chat)
     await this.sendMessageNotifications(conversationId, senderId, content, options?.file);
 
-    return data;
+    // Transform sender from array to object (Supabase returns arrays for joins)
+    const transformedData = {
+      ...data,
+      sender: Array.isArray(data.sender) ? data.sender[0] : data.sender,
+    } as Message;
+
+    return transformedData;
   }
 
   async sendSystemMessage(conversationId: string, content: string): Promise<void> {
