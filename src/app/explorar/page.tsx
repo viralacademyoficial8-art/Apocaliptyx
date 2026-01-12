@@ -8,7 +8,7 @@ import { scenariosService } from '@/services';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuthStore } from '@/lib/stores';
 import { formatDate } from '@/lib/utils';
-import { getSupabase } from '@/lib/supabase/client';
+import { getSupabaseClient } from '@/lib/supabase/client';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
   Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight
@@ -96,7 +96,7 @@ export default function ExplorarPage() {
     async function loadUserStats() {
       if (!isAuthenticated || !user?.id) return;
 
-      const supabase = getSupabase();
+      const supabase = getSupabaseClient();
 
       try {
         // Obtener AP Coins del usuario
