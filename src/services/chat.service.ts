@@ -697,7 +697,13 @@ class ChatService {
     // Enviar notificaciones (excepto a usuarios que silenciaron el chat)
     await this.sendMessageNotifications(conversationId, senderId, content, options?.file);
 
-    return data as unknown as Message;
+    // Transform sender from array to object (Supabase returns arrays for joins)
+    const transformedData = {
+      ...data,
+      sender: Array.isArray(data.sender) ? data.sender[0] : data.sender,
+    } as Message;
+
+    return transformedData;
   }
 
   async sendSystemMessage(conversationId: string, content: string): Promise<void> {
@@ -947,7 +953,12 @@ class ChatService {
             .single();
 
           if (data) {
-            onNewMessage(data as unknown as Message);
+            // Transform sender from array to object (Supabase returns arrays for joins)
+            const transformedData = {
+              ...data,
+              sender: Array.isArray(data.sender) ? data.sender[0] : data.sender,
+            } as Message;
+            onNewMessage(transformedData);
           }
         }
       )
@@ -1091,7 +1102,11 @@ class ChatService {
       .order('created_at', { ascending: false })
       .limit(50);
 
-    return (data as unknown as Message[]) || [];
+    // Transform sender from array to object for each message (Supabase returns arrays for joins)
+    return (data || []).map(msg => ({
+      ...msg,
+      sender: Array.isArray(msg.sender) ? msg.sender[0] : msg.sender,
+    })) as Message[];
   }
 
   // ============================================
