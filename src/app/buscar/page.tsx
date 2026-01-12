@@ -6,15 +6,18 @@ import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { LandingNavbar } from '@/components/LandingNavbar';
 import { createClient } from '@supabase/supabase-js';
-import { 
-  Search, 
-  Loader2, 
+import {
+  Search,
+  Loader2,
   Filter,
   X,
   Flame,
   Users,
   Clock,
-  TrendingUp
+  TrendingUp,
+  User,
+  Trophy,
+  Target
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -38,6 +41,19 @@ interface Scenario {
   is_featured: boolean;
   is_hot: boolean;
   created_at: string;
+}
+
+interface UserProfile {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  level: number;
+  ap_coins: number;
+  is_verified: boolean;
+  total_predictions: number;
+  correct_predictions: number;
 }
 
 const CATEGORIES = [
@@ -67,11 +83,13 @@ function SearchContent() {
   
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'escenarios' | 'profetas'>('escenarios');
 
   // Cargar búsquedas recientes del localStorage
   useEffect(() => {
@@ -89,45 +107,65 @@ function SearchContent() {
     localStorage.setItem('recentSearches', JSON.stringify(updated));
   };
 
-  // Buscar escenarios
-  const searchScenarios = useCallback(async (searchQuery: string) => {
+  // Buscar escenarios y usuarios
+  const searchAll = useCallback(async (searchQuery: string) => {
     setLoading(true);
     try {
-      let queryBuilder = supabase
+      // Buscar escenarios
+      let scenarioQuery = supabase
         .from('scenarios')
         .select('*')
         .eq('status', 'ACTIVE');
 
       // Filtrar por búsqueda
       if (searchQuery.trim()) {
-        queryBuilder = queryBuilder.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+        scenarioQuery = scenarioQuery.or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
       }
 
       // Filtrar por categoría
       if (selectedCategory !== 'Todos') {
-        queryBuilder = queryBuilder.eq('category', selectedCategory);
+        scenarioQuery = scenarioQuery.eq('category', selectedCategory);
       }
 
-      // Ordenar
+      // Ordenar escenarios
       switch (sortBy) {
         case 'popular':
-          queryBuilder = queryBuilder.order('participant_count', { ascending: false });
+          scenarioQuery = scenarioQuery.order('participant_count', { ascending: false });
           break;
         case 'pool':
-          queryBuilder = queryBuilder.order('total_pool', { ascending: false });
+          scenarioQuery = scenarioQuery.order('total_pool', { ascending: false });
           break;
         case 'ending':
-          queryBuilder = queryBuilder.order('resolution_date', { ascending: true });
+          scenarioQuery = scenarioQuery.order('resolution_date', { ascending: true });
           break;
         case 'recent':
         default:
-          queryBuilder = queryBuilder.order('created_at', { ascending: false });
+          scenarioQuery = scenarioQuery.order('created_at', { ascending: false });
       }
 
-      const { data, error } = await queryBuilder.limit(50);
+      // Buscar usuarios
+      let userQuery = supabase
+        .from('users')
+        .select('id, username, display_name, avatar_url, bio, level, ap_coins, is_verified, total_predictions, correct_predictions')
+        .eq('is_banned', false);
 
-      if (error) throw error;
-      setScenarios(data || []);
+      if (searchQuery.trim()) {
+        userQuery = userQuery.or(`username.ilike.%${searchQuery}%,display_name.ilike.%${searchQuery}%`);
+      }
+
+      userQuery = userQuery.order('level', { ascending: false }).limit(50);
+
+      // Ejecutar ambas búsquedas en paralelo
+      const [scenariosResult, usersResult] = await Promise.all([
+        scenarioQuery.limit(50),
+        userQuery
+      ]);
+
+      if (scenariosResult.error) throw scenariosResult.error;
+      if (usersResult.error) throw usersResult.error;
+
+      setScenarios(scenariosResult.data || []);
+      setUsers(usersResult.data || []);
 
       if (searchQuery.trim()) {
         saveRecentSearch(searchQuery);
@@ -143,8 +181,8 @@ function SearchContent() {
   useEffect(() => {
     const urlQuery = searchParams.get('q') || '';
     setQuery(urlQuery);
-    searchScenarios(urlQuery);
-  }, [searchParams, searchScenarios]);
+    searchAll(urlQuery);
+  }, [searchParams, searchAll]);
 
   // Manejar búsqueda
   const handleSearch = (e?: React.FormEvent) => {
@@ -168,11 +206,11 @@ function SearchContent() {
           <div className="flex items-center gap-3 mb-2">
             <Search className="w-8 h-8 text-purple-500" />
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
-              Buscar Escenarios
+              Buscar
             </h1>
           </div>
           <p className="text-muted-foreground">
-            Encuentra predicciones sobre cualquier tema
+            Encuentra escenarios y profetas
           </p>
         </div>
 
@@ -182,7 +220,7 @@ function SearchContent() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Buscar escenarios..."
+              placeholder="Buscar escenarios, profetas..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-12 pr-24 py-6 text-lg bg-card border-border focus-visible:ring-purple-500"
@@ -294,7 +332,7 @@ function SearchContent() {
 
               {/* Aplicar filtros */}
               <Button
-                onClick={() => searchScenarios(query)}
+                onClick={() => searchAll(query)}
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 Aplicar filtros
@@ -303,11 +341,46 @@ function SearchContent() {
           )}
         </div>
 
+        {/* Pestañas de resultados */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('escenarios')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'escenarios'
+                ? 'bg-purple-500 text-white'
+                : 'bg-card border border-border text-muted-foreground hover:border-gray-600'
+            }`}
+          >
+            <Search className="w-4 h-4" />
+            Escenarios
+            <span className="text-xs bg-black/20 px-2 py-0.5 rounded-full">
+              {scenarios.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('profetas')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'profetas'
+                ? 'bg-purple-500 text-white'
+                : 'bg-card border border-border text-muted-foreground hover:border-gray-600'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            Profetas
+            <span className="text-xs bg-black/20 px-2 py-0.5 rounded-full">
+              {users.length}
+            </span>
+          </button>
+        </div>
+
         {/* Resultados */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-muted-foreground">
-              {scenarios.length} resultado{scenarios.length !== 1 ? 's' : ''} encontrado{scenarios.length !== 1 ? 's' : ''}
+              {activeTab === 'escenarios'
+                ? `${scenarios.length} escenario${scenarios.length !== 1 ? 's' : ''} encontrado${scenarios.length !== 1 ? 's' : ''}`
+                : `${users.length} profeta${users.length !== 1 ? 's' : ''} encontrado${users.length !== 1 ? 's' : ''}`
+              }
             </p>
           </div>
 
@@ -316,20 +389,38 @@ function SearchContent() {
               <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
               <span className="ml-3 text-muted-foreground">Buscando...</span>
             </div>
-          ) : scenarios.length === 0 ? (
-            <div className="text-center py-20">
-              <Search className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No se encontraron resultados</h3>
-              <p className="text-muted-foreground">
-                {query ? 'Intenta con otros términos de búsqueda' : 'Busca escenarios por título o descripción'}
-              </p>
-            </div>
+          ) : activeTab === 'escenarios' ? (
+            scenarios.length === 0 ? (
+              <div className="text-center py-20">
+                <Search className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No se encontraron escenarios</h3>
+                <p className="text-muted-foreground">
+                  {query ? 'Intenta con otros términos de búsqueda' : 'Busca escenarios por título o descripción'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {scenarios.map((scenario) => (
+                  <ScenarioCard key={scenario.id} scenario={scenario} />
+                ))}
+              </div>
+            )
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {scenarios.map((scenario) => (
-                <ScenarioCard key={scenario.id} scenario={scenario} />
-              ))}
-            </div>
+            users.length === 0 ? (
+              <div className="text-center py-20">
+                <User className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No se encontraron profetas</h3>
+                <p className="text-muted-foreground">
+                  {query ? 'Intenta con otros términos de búsqueda' : 'Busca profetas por nombre de usuario'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {users.map((user) => (
+                  <UserCard key={user.id} user={user} />
+                ))}
+              </div>
+            )
           )}
         </div>
       </main>
@@ -415,6 +506,84 @@ function ScenarioCard({ scenario }: { scenario: Scenario }) {
             {daysLeft > 0 ? `${daysLeft}d` : 'Cerrado'}
           </span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Componente de tarjeta de usuario (profeta)
+function UserCard({ user }: { user: UserProfile }) {
+  const router = useRouter();
+  const accuracy = user.total_predictions > 0
+    ? Math.round((user.correct_predictions / user.total_predictions) * 100)
+    : 0;
+
+  return (
+    <div
+      onClick={() => router.push(`/perfil/${user.username}`)}
+      className="rounded-xl border border-border bg-card p-5 hover:border-purple-500/50 hover:bg-card/80 transition-all cursor-pointer group"
+    >
+      {/* Header con avatar y verificación */}
+      <div className="flex items-center gap-4 mb-4">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          {user.avatar_url ? (
+            <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-white text-xl font-bold">
+              {user.username[0].toUpperCase()}
+            </span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground group-hover:text-purple-300 transition-colors truncate">
+              {user.display_name || user.username}
+            </h3>
+            {user.is_verified && (
+              <span className="text-blue-400 flex-shrink-0">✓</span>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">@{user.username}</p>
+        </div>
+      </div>
+
+      {/* Bio */}
+      {user.bio && (
+        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+          {user.bio}
+        </p>
+      )}
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-1 text-purple-400">
+            <Trophy className="w-4 h-4" />
+            <span className="font-semibold">{user.level}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">Nivel</p>
+        </div>
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-1 text-green-400">
+            <Target className="w-4 h-4" />
+            <span className="font-semibold">{accuracy}%</span>
+          </div>
+          <p className="text-xs text-muted-foreground">Precisión</p>
+        </div>
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-1 text-yellow-400">
+            <Flame className="w-4 h-4" />
+            <span className="font-semibold">{user.ap_coins.toLocaleString()}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">AP</p>
+        </div>
+      </div>
+
+      {/* Predicciones */}
+      <div className="mt-3 text-center">
+        <span className="text-xs text-muted-foreground">
+          {user.total_predictions} predicciones · {user.correct_predictions} correctas
+        </span>
       </div>
     </div>
   );

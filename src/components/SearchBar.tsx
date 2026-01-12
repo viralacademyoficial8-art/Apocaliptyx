@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, X, Clock, TrendingUp, Loader2 } from 'lucide-react';
+import { Search, X, Clock, TrendingUp, Loader2, User } from 'lucide-react';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +24,15 @@ interface QuickResult {
   category: string;
 }
 
+interface UserResult {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  level: number;
+  is_verified: boolean;
+}
+
 export function SearchBar({
   variant = 'navbar',
   autoFocus = false,
@@ -37,6 +46,7 @@ export function SearchBar({
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [quickResults, setQuickResults] = useState<QuickResult[]>([]);
+  const [userResults, setUserResults] = useState<UserResult[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   // Trending searches (estos podrían venir de la DB también)
@@ -77,20 +87,31 @@ export function SearchBar({
   useEffect(() => {
     if (!localQuery.trim() || localQuery.length < 2) {
       setQuickResults([]);
+      setUserResults([]);
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const { data } = await supabase
-          .from('scenarios')
-          .select('id, title, category')
-          .eq('status', 'ACTIVE')
-          .or(`title.ilike.%${localQuery}%,description.ilike.%${localQuery}%`)
-          .limit(5);
+        // Buscar escenarios y usuarios en paralelo
+        const [scenariosResponse, usersResponse] = await Promise.all([
+          supabase
+            .from('scenarios')
+            .select('id, title, category')
+            .eq('status', 'ACTIVE')
+            .or(`title.ilike.%${localQuery}%,description.ilike.%${localQuery}%`)
+            .limit(5),
+          supabase
+            .from('users')
+            .select('id, username, display_name, avatar_url, level, is_verified')
+            .eq('is_banned', false)
+            .or(`username.ilike.%${localQuery}%,display_name.ilike.%${localQuery}%`)
+            .limit(5)
+        ]);
 
-        setQuickResults(data || []);
+        setQuickResults(scenariosResponse.data || []);
+        setUserResults(usersResponse.data || []);
       } catch (error) {
         console.error('Quick search error:', error);
       } finally {
@@ -140,6 +161,11 @@ export function SearchBar({
     router.push(`/escenario/${scenarioId}`);
   };
 
+  const handleUserClick = (username: string) => {
+    setIsOpen(false);
+    router.push(`/perfil/${username}`);
+  };
+
   // 🌐 Variante NAVBAR
   if (variant === 'navbar') {
     return (
@@ -149,7 +175,7 @@ export function SearchBar({
           <Input
             ref={inputRef}
             type="text"
-            placeholder="Buscar escenarios..."
+            placeholder="Buscar escenarios, profetas..."
             value={localQuery}
             onChange={(e) => setLocalQuery(e.target.value)}
             onFocus={() => setIsOpen(true)}
@@ -173,33 +199,78 @@ export function SearchBar({
           >
             {/* Resultados rápidos */}
             {localQuery.length >= 2 && (
-              <div className="p-3 border-b border-border">
+              <div className="border-b border-border">
                 {isSearching ? (
                   <div className="flex items-center justify-center py-4">
                     <Loader2 className="w-5 h-5 animate-spin text-purple-500" />
                   </div>
-                ) : quickResults.length > 0 ? (
+                ) : (quickResults.length > 0 || userResults.length > 0) ? (
                   <div className="space-y-1">
-                    <span className="text-xs font-medium text-muted-foreground">Resultados</span>
-                    {quickResults.map((result) => (
-                      <button
-                        key={result.id}
-                        onClick={() => handleResultClick(result.id)}
-                        className="w-full text-left px-2 py-2 text-sm rounded hover:bg-muted transition-colors"
-                      >
-                        <div className="font-medium line-clamp-1">{result.title}</div>
-                        <div className="text-xs text-muted-foreground">{result.category}</div>
-                      </button>
-                    ))}
+                    {/* Usuarios (Profetas) */}
+                    {userResults.length > 0 && (
+                      <div className="p-3 border-b border-border">
+                        <span className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2">
+                          <User className="w-3 h-3" />
+                          Profetas
+                        </span>
+                        {userResults.map((user) => (
+                          <button
+                            key={user.id}
+                            onClick={() => handleUserClick(user.username)}
+                            className="w-full text-left px-2 py-2 text-sm rounded hover:bg-muted transition-colors flex items-center gap-3"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                              {user.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-white text-xs font-bold">
+                                  {user.username[0].toUpperCase()}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium line-clamp-1 flex items-center gap-1">
+                                {user.display_name || user.username}
+                                {user.is_verified && (
+                                  <span className="text-blue-400 text-xs">✓</span>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground">@{user.username} · Nivel {user.level}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Escenarios */}
+                    {quickResults.length > 0 && (
+                      <div className="p-3">
+                        <span className="text-xs font-medium text-muted-foreground flex items-center gap-1 mb-2">
+                          <Search className="w-3 h-3" />
+                          Escenarios
+                        </span>
+                        {quickResults.map((result) => (
+                          <button
+                            key={result.id}
+                            onClick={() => handleResultClick(result.id)}
+                            className="w-full text-left px-2 py-2 text-sm rounded hover:bg-muted transition-colors"
+                          >
+                            <div className="font-medium line-clamp-1">{result.title}</div>
+                            <div className="text-xs text-muted-foreground">{result.category}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
                     <button
                       onClick={() => handleSearch()}
-                      className="w-full text-center text-sm text-purple-400 hover:text-purple-300 py-2"
+                      className="w-full text-center text-sm text-purple-400 hover:text-purple-300 py-2 border-t border-border"
                     >
                       Ver todos los resultados →
                     </button>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground text-center py-2">
+                  <p className="text-sm text-muted-foreground text-center py-4">
                     No se encontraron resultados
                   </p>
                 )}
