@@ -11,7 +11,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import {
   X,
   Home,
-  LayoutDashboard,
   ShoppingBag,
   Trophy,
   MessageCircle,
@@ -60,8 +59,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   const navItems = isAuthenticated
     ? [
-        { href: "/dashboard", label: t("nav.home"), icon: LayoutDashboard, gradient: "from-purple-500 to-indigo-500" },
-        { href: "/explorar", label: t("nav.scenarios"), icon: Home, gradient: "from-blue-500 to-cyan-500" },
+        { href: "/explorar", label: t("nav.scenarios"), icon: Home, gradient: "from-purple-500 to-indigo-500" },
         { href: "/misiones", label: "Misiones", icon: Target, gradient: "from-blue-500 to-teal-500" },
         { href: "/tienda", label: t("nav.shop"), icon: ShoppingBag, gradient: "from-pink-500 to-rose-500" },
         { href: "/leaderboard", label: t("nav.rankings"), icon: Trophy, gradient: "from-yellow-500 to-orange-500" },

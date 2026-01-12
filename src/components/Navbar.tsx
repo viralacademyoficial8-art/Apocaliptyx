@@ -78,7 +78,6 @@ export function Navbar() {
   }, [status, session, refreshBalance]);
 
   const navItems = [
-    { href: "/dashboard", label: t("nav.home") },
     { href: "/explorar", label: t("nav.scenarios") },
     { href: "/misiones", label: "Misiones" },
     { href: "/tienda", label: t("nav.shop") },
