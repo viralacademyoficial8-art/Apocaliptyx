@@ -168,6 +168,11 @@ model Scenario {
   // Imagen
   imageUrl        String?
 
+  // Detección de duplicados
+  contentHash      String?   @map("content_hash")
+  duplicateChecked Boolean   @default(false) @map("duplicate_checked")
+  duplicateOf      String?   @map("duplicate_of")
+
   // Relaciones
   creatorId       String
   creator         User           @relation("CreatedScenarios", fields: [creatorId], references: [id])
@@ -181,6 +186,7 @@ model Scenario {
   @@index([status])
   @@index([category])
   @@index([deadline])
+  @@index([contentHash])
 }
 
 enum Category {
