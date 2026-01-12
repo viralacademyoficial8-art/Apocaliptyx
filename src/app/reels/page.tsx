@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
 import { CreateReelModal } from '@/components/reels/CreateReelModal';
 import { useAuthStore } from '@/lib/stores';
+import { Navbar } from '@/components/Navbar';
 import toast from 'react-hot-toast';
 
 interface Reel {
@@ -148,7 +149,8 @@ export default function ReelsPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <Navbar />
+      <div className="max-w-6xl mx-auto px-4 py-8 pt-20">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
