@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { cloudinaryService } from '@/services/cloudinary.service';
 
 interface UserFollow {
   following_id: string;
@@ -148,26 +149,60 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Video requerido' }, { status: 400 });
     }
 
-    // Upload video to storage
-    const fileName = `${user.id}/${Date.now()}-${videoFile.name}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('reels')
-      .upload(fileName, videoFile);
+    let videoUrl: string;
+    let thumbnailUrl: string | undefined;
+    let duration: number | undefined;
+    let width: number | undefined;
+    let height: number | undefined;
 
-    if (uploadError) throw uploadError;
+    // Check if Cloudinary is configured
+    if (cloudinaryService.isConfigured()) {
+      // Upload to Cloudinary
+      const arrayBuffer = await videoFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('reels')
-      .getPublicUrl(fileName);
+      const uploadResult = await cloudinaryService.uploadVideo(buffer, {
+        folder: `apocaliptyx/reels/${user.id}`,
+        public_id: `reel-${Date.now()}`,
+      });
+
+      videoUrl = uploadResult.secure_url;
+      thumbnailUrl = uploadResult.thumbnail_url;
+      duration = uploadResult.duration;
+      width = uploadResult.width;
+      height = uploadResult.height;
+
+      console.log('Video uploaded to Cloudinary:', uploadResult.public_id);
+    } else {
+      // Fallback to Supabase Storage if Cloudinary is not configured
+      console.log('Cloudinary not configured, using Supabase Storage');
+
+      const fileName = `${user.id}/${Date.now()}-${videoFile.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('reels')
+        .upload(fileName, videoFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('reels')
+        .getPublicUrl(fileName);
+
+      videoUrl = publicUrl;
+    }
 
     // Create reel record
     const { data: reel, error: createError } = await supabase
       .from('user_reels')
       .insert({
         user_id: user.id,
-        video_url: publicUrl,
+        video_url: videoUrl,
+        thumbnail_url: thumbnailUrl,
         caption,
+        duration,
+        width,
+        height,
         tags,
         is_published: true,
       } as never)
