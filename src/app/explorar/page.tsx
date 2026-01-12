@@ -10,7 +10,7 @@ import { useAuthStore } from '@/lib/stores';
 import { formatDate } from '@/lib/utils';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag
+  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight
 } from 'lucide-react';
 import {
   FadeInView,
@@ -202,6 +202,53 @@ export default function ExplorarPage() {
                   </div>
                 </StaggerItem>
               </StaggerContainer>
+
+              {/* Featured Scenarios Section */}
+              {scenarios.filter(s => s.is_featured || s.is_hot).length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-purple-400" />
+                      {t('dashboard.featuredScenarios')}
+                    </h2>
+                    <button
+                      onClick={() => {
+                        setSelectedCategory('Todos');
+                        setSortBy('popular');
+                      }}
+                      className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                    >
+                      {t('dashboard.viewAll')} <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {scenarios
+                      .filter(s => s.is_featured || s.is_hot)
+                      .slice(0, 6)
+                      .map((scenario) => (
+                        <ScenarioCard key={scenario.id} scenario={scenario} />
+                      ))}
+                  </div>
+                </section>
+              )}
+
+              {/* CTA Buttons */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  onClick={() => router.push('/tienda')}
+                  className="p-5 rounded-xl bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 hover:border-purple-500/60 transition-all text-left"
+                >
+                  <h3 className="font-semibold text-white mb-1">{t('dashboard.goToShop')}</h3>
+                  <p className="text-sm text-zinc-400">{t('dashboard.shopDescription')}</p>
+                </button>
+                <button
+                  onClick={() => router.push('/leaderboard')}
+                  className="p-5 rounded-xl bg-gradient-to-r from-zinc-900/80 to-zinc-800/50 border border-zinc-700/50 hover:border-zinc-600 transition-all text-left"
+                >
+                  <h3 className="font-semibold text-white mb-1">{t('dashboard.viewLeaderboard')}</h3>
+                  <p className="text-sm text-zinc-400">{t('dashboard.leaderboardDescription')}</p>
+                </button>
+              </div>
             </div>
           </FadeInView>
         )}
