@@ -2,15 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { cloudinaryService } from '@/services/cloudinary.service';
 
-// Configuración para permitir archivos grandes (hasta 100MB para videos)
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// Aumentar el límite de tamaño para esta ruta
-export const maxDuration = 60; // 60 segundos de timeout
+// Configuración de ruta para Next.js 14 App Router
+export const maxDuration = 60; // 60 segundos de timeout para uploads de video
 export const dynamic = 'force-dynamic';
 
 interface UserFollow {
