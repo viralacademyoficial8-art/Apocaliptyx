@@ -120,7 +120,7 @@ export default function ExplorarPage() {
           .eq('status', 'WON');
 
         setUserStats({
-          apCoins: userData?.ap_coins || 0,
+          apCoins: (userData as { ap_coins: number } | null)?.ap_coins || 0,
           scenariosWon: scenariosWon || 0,
           scenariosCreated: scenariosCreated || 0,
         });
