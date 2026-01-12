@@ -490,7 +490,17 @@
       "warningPrefix": "Encontramos",
       "warningSuffix": "cenários similares. Considere participar deles em vez de criar um duplicado.",
       "similarity": "similaridade",
-      "by": "por"
+      "by": "por",
+      "possibleDuplicate": "Cenário possivelmente duplicado",
+      "similarFound": "Cenários similares encontrados",
+      "cannotCreate": "Não é possível criar este cenário",
+      "duplicateBlocked": "Este cenário já existe na plataforma. Cenários duplicados não são permitidos.",
+      "duplicateWarning": "Um cenário muito similar já existe na plataforma. Por favor, revise antes de continuar.",
+      "similarWarning": "Encontramos alguns cenários parecidos. Verifique se não é uma ideia repetida.",
+      "similar": "similar",
+      "participateInstead": "Boas notícias! Este cenário já existe. Participe dele e faça sua previsão.",
+      "goToScenario": "Ir ao cenário e participar",
+      "changeScenario": "Mudar meu cenário"
     },
     "submit": "Criar Cenário",
     "submitting": "Criando...",
@@ -503,7 +513,8 @@
       "futureDateRequired": "A data deve ser futura",
       "priceMin": "Preço mínimo é 10 AP",
       "priceMax": "Preço máximo é 10,000 AP",
-      "createFailed": "Erro ao criar o cenário"
+      "createFailed": "Erro ao criar o cenário",
+      "duplicateBlocked": "Cenários duplicados não são permitidos. Participe do cenário existente."
     },
     "success": "Cenário criado com sucesso!"
   }

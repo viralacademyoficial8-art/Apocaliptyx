@@ -10,7 +10,6 @@ import { duplicateDetectionService, SimilarScenario } from "@/services/duplicate
 import type { ScenarioCategory } from "@/types";
 import { toast } from "@/components/ui/toast";
 import { Loader2, AlertTriangle, X, ExternalLink, Search } from "lucide-react";
-import Link from "next/link";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CrearPage() {
@@ -40,7 +39,6 @@ export default function CrearPage() {
   const [similarScenarios, setSimilarScenarios] = useState<SimilarScenario[]>([]);
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(false);
-  const [forceCreate, setForceCreate] = useState(false);
 
   // Debounce para verificar duplicados mientras escribe
   useEffect(() => {
@@ -92,10 +90,10 @@ export default function CrearPage() {
       return;
     }
 
-    // Si es duplicado y no ha forzado la creación, mostrar warning
-    if (isDuplicate && !forceCreate) {
+    // Si es duplicado, no permitir creación
+    if (isDuplicate) {
       setShowDuplicateWarning(true);
-      toast.error(t('create.errors.duplicateWarning'));
+      toast.error(t('create.errors.duplicateBlocked'));
       return;
     }
 
@@ -137,7 +135,6 @@ export default function CrearPage() {
       setDueDate("");
       setSimilarScenarios([]);
       setShowDuplicateWarning(false);
-      setForceCreate(false);
 
       // Redirigir al escenario creado
       router.push(`/escenario/${newScenario.id}`);
@@ -150,10 +147,9 @@ export default function CrearPage() {
     }
   };
 
-  // Permitir crear de todas formas
-  const handleForceCreate = () => {
-    setForceCreate(true);
-    setShowDuplicateWarning(false);
+  // Redirigir al escenario existente para participar
+  const handleGoToExistingScenario = (scenarioId: string) => {
+    router.push(`/escenario/${scenarioId}`);
   };
 
   return (
@@ -195,41 +191,51 @@ export default function CrearPage() {
             )}
           </div>
 
-          {/* Alerta de escenarios similares */}
+          {/* Alerta de escenarios similares/duplicados */}
           {showDuplicateWarning && similarScenarios.length > 0 && (
-            <div className="rounded-xl border border-amber-500/50 bg-amber-500/10 p-4">
+            <div className={`rounded-xl border p-4 ${
+              isDuplicate
+                ? 'border-red-500/50 bg-red-500/10'
+                : 'border-amber-500/50 bg-amber-500/10'
+            }`}>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                  <AlertTriangle className={`w-5 h-5 flex-shrink-0 ${
+                    isDuplicate ? 'text-red-500' : 'text-amber-500'
+                  }`} />
                   <div>
-                    <h3 className="font-semibold text-amber-400">
+                    <h3 className={`font-semibold ${
+                      isDuplicate ? 'text-red-400' : 'text-amber-400'
+                    }`}>
                       {isDuplicate
-                        ? `⚠️ ${t('create.duplicates.possibleDuplicate')}`
+                        ? `🚫 ${t('create.duplicates.cannotCreate')}`
                         : t('create.duplicates.similarFound')}
                     </h3>
-                    <p className="text-xs text-amber-200/80 mt-1">
+                    <p className={`text-xs mt-1 ${
+                      isDuplicate ? 'text-red-200/80' : 'text-amber-200/80'
+                    }`}>
                       {isDuplicate
-                        ? t('create.duplicates.duplicateWarning')
+                        ? t('create.duplicates.duplicateBlocked')
                         : t('create.duplicates.similarWarning')}
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowDuplicateWarning(false)}
-                  className="text-zinc-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                {!isDuplicate && (
+                  <button
+                    type="button"
+                    onClick={() => setShowDuplicateWarning(false)}
+                    className="text-zinc-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
               <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
                 {similarScenarios.map((scenario) => (
-                  <Link
+                  <div
                     key={scenario.id}
-                    href={`/escenario/${scenario.id}`}
-                    target="_blank"
-                    className="flex items-center justify-between p-3 bg-zinc-900/50 rounded-lg hover:bg-zinc-800/50 transition-colors"
+                    className="flex items-center justify-between p-3 bg-zinc-900/50 rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-zinc-100 truncate">
@@ -241,29 +247,37 @@ export default function CrearPage() {
                     </div>
                     <div className="flex items-center gap-2 ml-3">
                       <span className={`text-xs font-bold px-2 py-1 rounded ${
-                        scenario.similarity > 80 
-                          ? 'bg-red-500/20 text-red-400' 
-                          : scenario.similarity > 60 
+                        scenario.similarity > 80
+                          ? 'bg-red-500/20 text-red-400'
+                          : scenario.similarity > 60
                             ? 'bg-amber-500/20 text-amber-400'
                             : 'bg-zinc-700 text-zinc-300'
                       }`}>
-                        {scenario.similarity}% {t('create.duplicates.similar')}
+                        {scenario.similarity}%
                       </span>
-                      <ExternalLink className="w-4 h-4 text-zinc-500" />
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
 
-              {isDuplicate && (
-                <div className="mt-3 flex gap-2">
+              {isDuplicate && similarScenarios.length > 0 && (
+                <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <p className="text-xs text-green-300 mb-3">
+                    {t('create.duplicates.participateInstead')}
+                  </p>
                   <button
                     type="button"
-                    onClick={handleForceCreate}
-                    className="flex-1 px-3 py-2 text-xs bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                    onClick={() => handleGoToExistingScenario(similarScenarios[0].id)}
+                    className="w-full px-4 py-2.5 text-sm bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-black font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
                   >
-                    {t('create.duplicates.createAnyway')}
+                    <ExternalLink className="w-4 h-4" />
+                    {t('create.duplicates.goToScenario')}
                   </button>
+                </div>
+              )}
+
+              {!isDuplicate && (
+                <div className="mt-3">
                   <button
                     type="button"
                     onClick={() => {
@@ -272,7 +286,7 @@ export default function CrearPage() {
                       setSimilarScenarios([]);
                       setShowDuplicateWarning(false);
                     }}
-                    className="flex-1 px-3 py-2 text-xs bg-amber-600 hover:bg-amber-500 text-black font-medium rounded-lg transition-colors"
+                    className="w-full px-3 py-2 text-xs bg-amber-600 hover:bg-amber-500 text-black font-medium rounded-lg transition-colors"
                   >
                     {t('create.duplicates.changeScenario')}
                   </button>
@@ -351,7 +365,7 @@ export default function CrearPage() {
           {/* Botón enviar */}
           <button
             type="submit"
-            disabled={isLoading || !title || !description || !dueDate || (isDuplicate && !forceCreate)}
+            disabled={isLoading || !title || !description || !dueDate || isDuplicate}
             className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-6 py-2 text-sm font-semibold text-black shadow-lg shadow-amber-500/30 transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (

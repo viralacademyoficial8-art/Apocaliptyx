@@ -478,15 +478,19 @@
     "duplicates": {
       "possibleDuplicate": "Escenario posiblemente duplicado",
       "similarFound": "Escenarios similares encontrados",
+      "cannotCreate": "No se puede crear este escenario",
+      "duplicateBlocked": "Este escenario ya existe en la plataforma. No está permitido crear escenarios duplicados.",
       "duplicateWarning": "Ya existe un escenario muy similar en la plataforma. Por favor, revisa antes de continuar.",
       "similarWarning": "Encontramos algunos escenarios parecidos. Verifica que no sea una idea repetida.",
       "similar": "similar",
-      "createAnyway": "Crear de todas formas",
+      "participateInstead": "¡Buenas noticias! Ya existe este escenario. Participa en él y haz tu predicción.",
+      "goToScenario": "Ir al escenario y participar",
       "changeScenario": "Cambiar mi escenario"
     },
     "errors": {
       "loginRequired": "Debes iniciar sesión para crear un escenario.",
       "allFieldsRequired": "Completa todos los campos para crear tu escenario.",
+      "duplicateBlocked": "No se permiten escenarios duplicados. Participa en el escenario existente.",
       "duplicateWarning": "Este escenario parece ser similar a uno existente. Revisa las sugerencias.",
       "createFailed": "Error al crear el escenario. Intenta de nuevo."
     }

@@ -490,7 +490,17 @@
       "warningPrefix": "Nous avons trouvé",
       "warningSuffix": "scénarios similaires. Envisagez d'y participer au lieu de créer un doublon.",
       "similarity": "similarité",
-      "by": "par"
+      "by": "par",
+      "possibleDuplicate": "Scénario possiblement dupliqué",
+      "similarFound": "Scénarios similaires trouvés",
+      "cannotCreate": "Impossible de créer ce scénario",
+      "duplicateBlocked": "Ce scénario existe déjà sur la plateforme. Les scénarios en double ne sont pas autorisés.",
+      "duplicateWarning": "Un scénario très similaire existe déjà sur la plateforme. Veuillez vérifier avant de continuer.",
+      "similarWarning": "Nous avons trouvé des scénarios similaires. Vérifiez qu'il ne s'agit pas d'une idée répétée.",
+      "similar": "similaire",
+      "participateInstead": "Bonne nouvelle ! Ce scénario existe déjà. Participez-y et faites votre prédiction.",
+      "goToScenario": "Aller au scénario et participer",
+      "changeScenario": "Modifier mon scénario"
     },
     "submit": "Créer le Scénario",
     "submitting": "Création...",
@@ -503,7 +513,8 @@
       "futureDateRequired": "La date doit être future",
       "priceMin": "Le prix minimum est 10 AP",
       "priceMax": "Le prix maximum est 10 000 AP",
-      "createFailed": "Erreur lors de la création du scénario"
+      "createFailed": "Erreur lors de la création du scénario",
+      "duplicateBlocked": "Les scénarios en double ne sont pas autorisés. Participez au scénario existant."
     },
     "success": "Scénario créé avec succès!"
   }
