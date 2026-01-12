@@ -268,7 +268,20 @@ export default function CrearPage() {
                       <div className="mt-2 pt-2 border-t border-zinc-700/50 flex items-center justify-between">
                         <div className="flex items-center gap-2 text-xs text-zinc-400">
                           <span>👑</span>
-                          <span>Holder: <span className="text-purple-400">@{scenario.holder_username || 'creador'}</span></span>
+                          <span>Holder: {scenario.holder_username ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/perfil/${scenario.holder_username}`);
+                              }}
+                              className="text-purple-400 hover:text-purple-300 hover:underline"
+                            >
+                              @{scenario.holder_username}
+                            </button>
+                          ) : (
+                            <span className="text-zinc-500">Dueño original</span>
+                          )}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs">
                           <span className="text-yellow-400 font-bold">⚡ {scenario.current_price || 11} AP</span>
@@ -292,7 +305,17 @@ export default function CrearPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-xs text-zinc-400">Holder actual</p>
-                        <p className="text-sm font-medium text-purple-400">@{similarScenarios[0]?.holder_username || 'creador'}</p>
+                        {similarScenarios[0]?.holder_username ? (
+                          <button
+                            type="button"
+                            onClick={() => router.push(`/perfil/${similarScenarios[0].holder_username}`)}
+                            className="text-sm font-medium text-purple-400 hover:text-purple-300 hover:underline"
+                          >
+                            @{similarScenarios[0].holder_username}
+                          </button>
+                        ) : (
+                          <p className="text-sm font-medium text-zinc-500">Dueño original</p>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-zinc-400">Precio para robar</p>
@@ -309,7 +332,7 @@ export default function CrearPage() {
                     Robar por {similarScenarios[0]?.current_price || 11} AP
                   </button>
                   <p className="text-[10px] text-zinc-500 text-center mt-2">
-                    Haz clic para ir al escenario y comprarlo
+                    Haz clic para ir al escenario y robarlo
                   </p>
                 </div>
               )}

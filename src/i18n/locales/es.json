@@ -479,18 +479,18 @@
       "possibleDuplicate": "Escenario posiblemente duplicado",
       "similarFound": "Escenarios similares encontrados",
       "cannotCreate": "No se puede crear este escenario",
-      "duplicateBlocked": "Este escenario ya existe en la plataforma. En lugar de crear uno nuevo, puedes comprarlo y convertirte en su dueño.",
+      "duplicateBlocked": "Este escenario ya existe en la plataforma. En lugar de crear uno nuevo, puedes robarlo y convertirte en su dueño.",
       "duplicateWarning": "Ya existe un escenario muy similar en la plataforma. Por favor, revisa antes de continuar.",
       "similarWarning": "Encontramos algunos escenarios parecidos. Verifica que no sea una idea repetida.",
       "similar": "similar",
-      "participateInstead": "¡Este escenario ya existe! Puedes comprarlo al holder actual y convertirte en el nuevo dueño. Así acumularás ganancias cuando otros participen.",
-      "goToScenario": "Comprar escenario existente",
+      "participateInstead": "¡Este escenario ya existe! Puedes robarlo al holder actual y convertirte en el nuevo dueño. Así acumularás ganancias cuando otros participen.",
+      "goToScenario": "Robar escenario existente",
       "changeScenario": "Cambiar mi escenario"
     },
     "errors": {
       "loginRequired": "Debes iniciar sesión para crear un escenario.",
       "allFieldsRequired": "Completa todos los campos para crear tu escenario.",
-      "duplicateBlocked": "No se permiten escenarios duplicados. Compra el escenario existente para convertirte en su dueño.",
+      "duplicateBlocked": "No se permiten escenarios duplicados. Roba el escenario existente para convertirte en su dueño.",
       "duplicateWarning": "Este escenario parece ser similar a uno existente. Revisa las sugerencias.",
       "createFailed": "Error al crear el escenario. Intenta de nuevo."
     }
