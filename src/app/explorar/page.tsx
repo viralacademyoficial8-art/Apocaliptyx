@@ -6,10 +6,17 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { scenariosService } from '@/services';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuthStore } from '@/lib/stores';
+import { formatDate } from '@/lib/utils';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, X
+  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag
 } from 'lucide-react';
+import {
+  FadeInView,
+  StaggerContainer,
+  StaggerItem,
+} from '@/components/animations';
 
 // Tipo para escenarios
 interface ScenarioData {
@@ -36,6 +43,7 @@ const CATEGORY_KEYS = [
 export default function ExplorarPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { user, isAuthenticated } = useAuthStore();
 
   // Translated categories and sort options
   const CATEGORIES = [
@@ -144,7 +152,60 @@ export default function ExplorarPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 space-y-8">
+        {/* User Stats Section - Only when authenticated */}
+        {isAuthenticated && user && (
+          <FadeInView direction="up" delay={0.05}>
+            <div className="space-y-6">
+              {/* Welcome Header */}
+              <section>
+                <p className="text-xs text-zinc-400">{t('dashboard.welcomeBack')}</p>
+                <h1 className="text-2xl font-bold text-zinc-50">
+                  {user.displayName || user.username}
+                </h1>
+                <p className="text-xs text-zinc-500 mt-1">
+                  {t('dashboard.memberSince')} {formatDate(user.createdAt)}
+                </p>
+              </section>
+
+              {/* Stats Cards */}
+              <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <StaggerItem>
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                    <Flame className="w-6 h-6 text-orange-400" />
+                    <div>
+                      <p className="text-xs text-zinc-400">{t('dashboard.apCoins')}</p>
+                      <p className="text-xl font-bold">
+                        {user.apCoins?.toLocaleString() || '0'}
+                      </p>
+                    </div>
+                  </div>
+                </StaggerItem>
+
+                <StaggerItem>
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                    <Trophy className="w-6 h-6 text-yellow-400" />
+                    <div>
+                      <p className="text-xs text-zinc-400">{t('dashboard.scenariosWon')}</p>
+                      <p className="text-xl font-bold">{user.scenariosWon || 0}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+
+                <StaggerItem>
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                    <ShoppingBag className="w-6 h-6 text-emerald-400" />
+                    <div>
+                      <p className="text-xs text-zinc-400">{t('dashboard.scenariosCreated')}</p>
+                      <p className="text-xl font-bold">{user.scenariosCreated || 0}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
+              </StaggerContainer>
+            </div>
+          </FadeInView>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">{t('explore.title')}</h1>
