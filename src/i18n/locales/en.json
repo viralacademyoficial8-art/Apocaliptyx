@@ -480,18 +480,18 @@
       "possibleDuplicate": "Possibly duplicate scenario",
       "similarFound": "Similar scenarios found",
       "cannotCreate": "Cannot create this scenario",
-      "duplicateBlocked": "This scenario already exists on the platform. Duplicate scenarios are not allowed.",
+      "duplicateBlocked": "This scenario already exists on the platform. Instead of creating a new one, you can buy it and become its owner.",
       "duplicateWarning": "A very similar scenario already exists on the platform. Please review before continuing.",
       "similarWarning": "We found some similar scenarios. Verify it's not a repeated idea.",
       "similar": "similar",
-      "participateInstead": "Good news! This scenario already exists. Participate in it and make your prediction.",
-      "goToScenario": "Go to scenario and participate",
+      "participateInstead": "This scenario already exists! You can buy it from the current holder and become the new owner. You'll earn profits when others participate.",
+      "goToScenario": "Buy existing scenario",
       "changeScenario": "Change my scenario"
     },
     "errors": {
       "loginRequired": "You must log in to create a scenario.",
       "allFieldsRequired": "Complete all fields to create your scenario.",
-      "duplicateBlocked": "Duplicate scenarios are not allowed. Participate in the existing scenario.",
+      "duplicateBlocked": "Duplicate scenarios are not allowed. Buy the existing scenario to become its owner.",
       "duplicateWarning": "This scenario seems similar to an existing one. Review the suggestions.",
       "createFailed": "Error creating scenario. Please try again."
     }
