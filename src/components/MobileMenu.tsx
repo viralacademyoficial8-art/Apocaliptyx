@@ -27,6 +27,7 @@ import {
   ChevronRight,
   Zap,
   Target,
+  Mail,
 } from "lucide-react";
 
 interface MobileMenuProps {
@@ -294,6 +295,17 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     <Settings className="w-4 h-4" />
                   </div>
                   <span className="font-medium">{t("nav.settings")}</span>
+                </Link>
+
+                <Link
+                  href="/mensajes"
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-zinc-400 hover:bg-blue-500/10 hover:text-blue-400 transition-all touch-target"
+                >
+                  <div className="p-2 rounded-lg bg-blue-500/20">
+                    <Mail className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="font-medium">Mensajes</span>
                 </Link>
 
                 {/* Language Selector */}

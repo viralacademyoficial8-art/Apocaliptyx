@@ -20,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, Mail } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 export function Navbar() {
@@ -284,6 +284,14 @@ export function Navbar() {
                         >
                           <Settings className="mr-2 h-4 w-4" />
                           {t("nav.settings")}
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => router.push("/mensajes")}
+                          className="cursor-pointer hover:bg-blue-500/10"
+                        >
+                          <Mail className="mr-2 h-4 w-4 text-blue-400" />
+                          Mensajes
                         </DropdownMenuItem>
 
                         {/* Separador - Social */}
