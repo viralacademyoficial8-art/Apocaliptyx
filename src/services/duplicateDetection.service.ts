@@ -151,6 +151,26 @@ class DuplicateDetectionService {
       };
     }
 
+    // Obtener los usernames de los holders
+    const holderIds = allScenarios
+      .map(s => s.current_holder_id)
+      .filter((id): id is string => !!id);
+
+    let holderMap: Record<string, string> = {};
+    if (holderIds.length > 0) {
+      const { data: holders } = await supabase
+        .from('users')
+        .select('id, username')
+        .in('id', holderIds);
+
+      if (holders) {
+        holderMap = holders.reduce((acc, h) => {
+          acc[h.id] = h.username;
+          return acc;
+        }, {} as Record<string, string>);
+      }
+    }
+
     // 3. Calcular similitud para cada escenario
     const similarScenarios: SimilarScenario[] = [];
 
@@ -173,6 +193,11 @@ class DuplicateDetectionService {
 
       // Solo incluir si la similitud es > 50%
       if (similarityPercent > 50) {
+        // Obtener el username del holder real
+        const holderUsername = scenario.current_holder_id
+          ? holderMap[scenario.current_holder_id] || 'holder'
+          : null;
+
         similarScenarios.push({
           id: scenario.id,
           title: scenario.title,
@@ -181,7 +206,7 @@ class DuplicateDetectionService {
           status: scenario.status,
           created_at: scenario.created_at,
           current_price: scenario.current_price || 11, // Precio por defecto
-          holder_username: scenario.current_holder_id ? 'holder' : 'creador',
+          holder_username: holderUsername,
         });
       }
     }
