@@ -479,15 +479,19 @@
     "duplicates": {
       "possibleDuplicate": "Possibly duplicate scenario",
       "similarFound": "Similar scenarios found",
+      "cannotCreate": "Cannot create this scenario",
+      "duplicateBlocked": "This scenario already exists on the platform. Duplicate scenarios are not allowed.",
       "duplicateWarning": "A very similar scenario already exists on the platform. Please review before continuing.",
       "similarWarning": "We found some similar scenarios. Verify it's not a repeated idea.",
       "similar": "similar",
-      "createAnyway": "Create anyway",
+      "participateInstead": "Good news! This scenario already exists. Participate in it and make your prediction.",
+      "goToScenario": "Go to scenario and participate",
       "changeScenario": "Change my scenario"
     },
     "errors": {
       "loginRequired": "You must log in to create a scenario.",
       "allFieldsRequired": "Complete all fields to create your scenario.",
+      "duplicateBlocked": "Duplicate scenarios are not allowed. Participate in the existing scenario.",
       "duplicateWarning": "This scenario seems similar to an existing one. Review the suggestions.",
       "createFailed": "Error creating scenario. Please try again."
     }

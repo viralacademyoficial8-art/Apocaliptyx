@@ -490,7 +490,17 @@
       "warningPrefix": "Wir haben",
       "warningSuffix": "ähnliche Szenarien gefunden. Erwäge, an diesen teilzunehmen, anstatt ein Duplikat zu erstellen.",
       "similarity": "Ähnlichkeit",
-      "by": "von"
+      "by": "von",
+      "possibleDuplicate": "Möglicherweise dupliziertes Szenario",
+      "similarFound": "Ähnliche Szenarien gefunden",
+      "cannotCreate": "Dieses Szenario kann nicht erstellt werden",
+      "duplicateBlocked": "Dieses Szenario existiert bereits auf der Plattform. Duplikate sind nicht erlaubt.",
+      "duplicateWarning": "Ein sehr ähnliches Szenario existiert bereits auf der Plattform. Bitte überprüfe vor dem Fortfahren.",
+      "similarWarning": "Wir haben ähnliche Szenarien gefunden. Überprüfe, ob es sich nicht um eine wiederholte Idee handelt.",
+      "similar": "ähnlich",
+      "participateInstead": "Gute Nachrichten! Dieses Szenario existiert bereits. Nimm daran teil und mache deine Vorhersage.",
+      "goToScenario": "Zum Szenario gehen und teilnehmen",
+      "changeScenario": "Mein Szenario ändern"
     },
     "submit": "Szenario Erstellen",
     "submitting": "Wird erstellt...",
@@ -503,7 +513,8 @@
       "futureDateRequired": "Das Datum muss in der Zukunft liegen",
       "priceMin": "Mindestpreis ist 10 AP",
       "priceMax": "Höchstpreis ist 10.000 AP",
-      "createFailed": "Fehler beim Erstellen des Szenarios"
+      "createFailed": "Fehler beim Erstellen des Szenarios",
+      "duplicateBlocked": "Doppelte Szenarien sind nicht erlaubt. Nimm am bestehenden Szenario teil."
     },
     "success": "Szenario erfolgreich erstellt!"
   }
