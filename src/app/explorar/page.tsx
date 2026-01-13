@@ -300,6 +300,9 @@ export default function ExplorarPage() {
                       onClick={() => {
                         setSelectedCategory('Todos');
                         setSortBy('popular');
+                        setTimeout(() => {
+                          document.getElementById('explorar-escenarios')?.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
                       }}
                       className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
                     >
@@ -339,7 +342,7 @@ export default function ExplorarPage() {
         )}
 
         {/* Header */}
-        <div className="mb-8">
+        <div id="explorar-escenarios" className="mb-8 scroll-mt-24">
           <h1 className="text-3xl font-bold mb-2">{t('explore.title')}</h1>
           <p className="text-gray-400">
             {t('explore.subtitle')}
