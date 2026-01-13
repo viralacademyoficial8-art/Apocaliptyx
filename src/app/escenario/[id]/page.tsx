@@ -333,9 +333,12 @@ export default function EscenarioPage() {
   const noPercent = 100 - yesPercent;
 
   // Calcular días restantes
-  const daysLeft = scenario 
+  const daysLeft = scenario
     ? Math.ceil((new Date(scenario.resolution_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : 0;
+
+  // Escenario vencido (no se puede votar, robar ni proteger)
+  const isExpired = daysLeft <= 0;
 
   // Compartir
   const handleShare = () => {
@@ -525,39 +528,48 @@ export default function EscenarioPage() {
 
           {/* Steal & Shield Buttons */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
-            {!isOwner && scenario.status === "ACTIVE" && (
-              <button
-                onClick={handleSteal}
-                disabled={!canSteal() || isStealing}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors"
-              >
-                {isStealing ? (
+            {isExpired ? (
+              <div className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl">
+                <Clock className="w-5 h-5 text-gray-400" />
+                <span className="text-gray-400 font-semibold">Escenario vencido - No se puede robar ni proteger</span>
+              </div>
+            ) : (
+              <>
+                {!isOwner && scenario.status === "ACTIVE" && (
+                  <button
+                    onClick={handleSteal}
+                    disabled={!canSteal() || isStealing}
+                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors"
+                  >
+                    {isStealing ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Robando...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5" />
+                        Robar por {currentPrice} AP
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {isOwner && (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Robando...
-                  </>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5" />
-                    Robar por {currentPrice} AP
+                    <div className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-green-500/20 border border-green-500/30 rounded-xl">
+                      <Shield className="w-5 h-5 text-green-400" />
+                      <span className="text-green-400 font-semibold">Este escenario es tuyo</span>
+                    </div>
+                    <button
+                      onClick={() => setShowShieldModal(true)}
+                      className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-colors"
+                    >
+                      <Shield className="w-5 h-5" />
+                      Proteger
+                    </button>
                   </>
                 )}
-              </button>
-            )}
-
-            {isOwner && (
-              <>
-                <div className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-green-500/20 border border-green-500/30 rounded-xl">
-                  <Shield className="w-5 h-5 text-green-400" />
-                  <span className="text-green-400 font-semibold">Este escenario es tuyo</span>
-                </div>
-                <button
-                  onClick={() => setShowShieldModal(true)}
-                  className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-colors"
-                >
-                  <Shield className="w-5 h-5" />
-                  Proteger
-                </button>
               </>
             )}
           </div>
@@ -596,6 +608,11 @@ export default function EscenarioPage() {
               <p className="text-gray-400 mt-3">
                 Tu opinión ha sido registrada
               </p>
+            </div>
+          ) : isExpired ? (
+            <div className="text-center py-8">
+              <Clock className="w-12 h-12 mx-auto mb-4 text-gray-500" />
+              <p className="text-gray-400">Este escenario ha vencido y ya no acepta opiniones</p>
             </div>
           ) : scenario.status !== "ACTIVE" ? (
             <div className="text-center py-8">
