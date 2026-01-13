@@ -27,22 +27,19 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id;
 
-    // Check if user already reposted this post (without quote)
-    if (!quoteContent) {
-      const { data: existingRepost } = await supabase()
-        .from('forum_reposts')
-        .select('id')
-        .eq('original_post_id', originalPostId)
-        .eq('user_id', userId)
-        .is('quote_content', null)
-        .single();
+    // Check if user already reposted this post (unique constraint on user_id + original_post_id)
+    const { data: existingRepost } = await supabase()
+      .from('forum_reposts')
+      .select('id, quote_content')
+      .eq('original_post_id', originalPostId)
+      .eq('user_id', userId)
+      .single();
 
-      if (existingRepost) {
-        return NextResponse.json(
-          { error: 'Ya compartiste esta publicación' },
-          { status: 400 }
-        );
-      }
+    if (existingRepost) {
+      return NextResponse.json(
+        { error: 'Ya compartiste esta publicación' },
+        { status: 400 }
+      );
     }
 
     // Create the repost
