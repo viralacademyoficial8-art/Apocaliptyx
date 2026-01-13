@@ -42,6 +42,7 @@ import {
   Bell,
   UserX,
   Share2,
+  Skull,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -71,7 +72,7 @@ const REPORT_REASONS = [
   { id: 'other', label: 'Otro motivo' },
 ];
 
-type TabType = 'general' | 'predictions' | 'scenarios' | 'activity';
+type TabType = 'general' | 'stolen' | 'scenarios' | 'activity';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -85,7 +86,7 @@ export default function PublicProfilePage() {
   const [followLoading, setFollowLoading] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('general');
-  const [predictions, setPredictions] = useState<any[]>([]);
+  const [stolenScenarios, setStolenScenarios] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
 
@@ -362,9 +363,30 @@ export default function PublicProfilePage() {
   const loadTabData = useCallback(async () => {
     if (!profile?.id) return;
 
-    if (activeTab === 'predictions' && predictions.length === 0) {
-      const data = await publicProfileService.getPredictions(profile.id);
-      setPredictions(data);
+    if (activeTab === 'stolen' && stolenScenarios.length === 0) {
+      // Obtener escenarios robados desde scenario_steal_history
+      const { data: steals } = await supabase
+        .from('scenario_steal_history')
+        .select(`
+          id,
+          stolen_at,
+          steal_price,
+          scenario:scenarios (
+            id,
+            title,
+            category,
+            total_pool,
+            participant_count,
+            status
+          ),
+          victim:users!scenario_steal_history_victim_id_fkey (
+            username
+          )
+        `)
+        .eq('thief_id', profile.id)
+        .order('stolen_at', { ascending: false });
+
+      setStolenScenarios(steals || []);
     }
     if (activeTab === 'scenarios' && scenarios.length === 0) {
       const data = await publicProfileService.getCreatedScenarios(profile.id);
@@ -374,7 +396,7 @@ export default function PublicProfilePage() {
       const data = await publicProfileService.getActivity(profile.id);
       setActivity(data);
     }
-  }, [profile?.id, activeTab, predictions.length, scenarios.length, activity.length]);
+  }, [profile?.id, activeTab, stolenScenarios.length, scenarios.length, activity.length]);
 
   useEffect(() => {
     loadProfile();
@@ -753,7 +775,7 @@ export default function PublicProfilePage() {
           <div className="flex overflow-x-auto px-4 sm:px-6">
             {[
               { id: 'general', label: 'General', icon: User },
-              { id: 'predictions', label: 'Predicciones', icon: Target },
+              { id: 'stolen', label: 'Escenarios Robados', icon: Skull },
               { id: 'scenarios', label: 'Escenarios', icon: Zap },
               { id: 'activity', label: 'Actividad', icon: Eye },
             ].map((tab) => {
@@ -830,35 +852,47 @@ export default function PublicProfilePage() {
             </div>
           )}
 
-          {activeTab === 'predictions' && (
+          {activeTab === 'stolen' && (
             <div className="space-y-4">
-              <h3 className="font-semibold mb-4">Historial de Predicciones</h3>
-              {predictions.length === 0 ? (
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Skull className="w-5 h-5 text-red-400" />
+                Escenarios Robados
+              </h3>
+              {stolenScenarios.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
-                  <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>No hay predicciones aún</p>
+                  <Skull className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No ha robado escenarios aún</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {predictions.map((pred) => (
-                    <div
-                      key={pred.id}
-                      className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 flex items-center justify-between"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {stolenScenarios.map((steal) => (
+                    <Link
+                      key={steal.id}
+                      href={`/escenario/${steal.scenario?.id}`}
+                      className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-red-500/50 transition-colors"
                     >
-                      <div>
-                        <p className="font-medium">{pred.scenario?.title || 'Escenario'}</p>
-                        <p className="text-sm text-gray-400">
-                          Predijo: {pred.prediction === 'YES' ? 'SÍ' : 'NO'} • {pred.amount} AP
-                        </p>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+                          {steal.scenario?.category || 'Sin categoría'}
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full flex items-center gap-1">
+                          <Skull className="w-3 h-3" />
+                          Robado
+                        </span>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-sm ${
-                        pred.status === 'WON' ? 'bg-green-500/20 text-green-400' :
-                        pred.status === 'LOST' ? 'bg-red-500/20 text-red-400' :
-                        'bg-yellow-500/20 text-yellow-400'
-                      }`}>
-                        {pred.status === 'WON' ? 'Ganada' : pred.status === 'LOST' ? 'Perdida' : 'Pendiente'}
-                      </span>
-                    </div>
+                      <h4 className="font-medium mt-2 line-clamp-2">{steal.scenario?.title || 'Escenario eliminado'}</h4>
+                      <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <Flame className="w-4 h-4 text-yellow-500" />
+                          {steal.scenario?.total_pool?.toLocaleString() || 0} AP
+                        </span>
+                        <span>{steal.scenario?.participant_count || 0} participantes</span>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-500">
+                        <p>Robado a @{steal.victim?.username || 'desconocido'} por {steal.steal_price} AP</p>
+                        <p>{formatDistanceToNow(new Date(steal.stolen_at), { addSuffix: true, locale: es })}</p>
+                      </div>
+                    </Link>
                   ))}
                 </div>
               )}
