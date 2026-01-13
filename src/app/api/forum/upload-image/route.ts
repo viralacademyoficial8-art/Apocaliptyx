@@ -8,19 +8,15 @@ const supabase = () => getSupabaseAdmin();
 
 // POST /api/forum/upload-image - Upload image to storage
 export async function POST(request: NextRequest) {
-  console.log('[upload-image] Starting image upload...');
   try {
     const session = await auth();
-    console.log('[upload-image] Session:', session?.user?.id ? 'authenticated' : 'not authenticated');
 
     if (!session?.user?.id) {
-      console.log('[upload-image] Unauthorized - no session');
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    console.log('[upload-image] File received:', file ? `${file.name} (${file.size} bytes)` : 'none');
 
     if (!file) {
       return NextResponse.json(
@@ -54,7 +50,6 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Try uploading to forum-images bucket
-    console.log('[upload-image] Attempting upload to forum-images bucket...');
     let uploadResult = await supabase().storage
       .from('forum-images')
       .upload(fileName, buffer, {
@@ -65,9 +60,6 @@ export async function POST(request: NextRequest) {
 
     // If forum-images doesn't exist, try posts bucket
     if (uploadResult.error) {
-      console.error('[upload-image] Upload to forum-images failed:', uploadResult.error);
-
-      console.log('[upload-image] Attempting upload to posts bucket...');
       uploadResult = await supabase().storage
         .from('posts')
         .upload(fileName, buffer, {
@@ -77,7 +69,6 @@ export async function POST(request: NextRequest) {
         });
 
       if (uploadResult.error) {
-        console.error('[upload-image] Upload to posts failed:', uploadResult.error);
         return NextResponse.json(
           { error: `Error al subir: ${uploadResult.error.message}` },
           { status: 400 }
@@ -89,7 +80,6 @@ export async function POST(request: NextRequest) {
         .from('posts')
         .getPublicUrl(fileName);
 
-      console.log('[upload-image] Success (posts bucket):', publicUrl);
       return NextResponse.json({
         success: true,
         url: publicUrl,
@@ -101,13 +91,11 @@ export async function POST(request: NextRequest) {
       .from('forum-images')
       .getPublicUrl(fileName);
 
-    console.log('[upload-image] Success (forum-images bucket):', publicUrl);
     return NextResponse.json({
       success: true,
       url: publicUrl,
     });
   } catch (error) {
-    console.error('Error uploading image:', error);
     return NextResponse.json(
       { error: 'Error al subir la imagen' },
       { status: 500 }
