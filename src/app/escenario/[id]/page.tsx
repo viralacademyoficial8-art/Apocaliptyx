@@ -166,7 +166,7 @@ export default function EscenarioPage() {
         }
         setUserPrediction(result.data);
       } else {
-        toast.error(result.error || "Error al registrar la predicción");
+        toast.error(result.error || "Error al registrar tu voto");
       }
     } catch (err) {
       console.error("Error voting:", err);
@@ -577,7 +577,7 @@ export default function EscenarioPage() {
 
         {/* Voting section */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-bold mb-6">Haz tu predicción</h2>
+          <h2 className="text-xl font-bold mb-6">¿Qué opinas?</h2>
           
           {userPrediction ? (
             <div className="text-center py-8">
@@ -594,7 +594,7 @@ export default function EscenarioPage() {
                 Votaste: {userPrediction.prediction === "YES" ? "SÍ" : "NO"}
               </div>
               <p className="text-gray-400 mt-3">
-                Tu predicción ha sido registrada
+                Tu voto ha sido registrado
               </p>
             </div>
           ) : scenario.status !== "ACTIVE" ? (
