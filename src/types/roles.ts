@@ -22,6 +22,31 @@ export type Permission =
   | 'admin.shop.edit'           // Editar items de tienda
   | 'admin.shop.create'         // Crear items de tienda
   | 'admin.shop.delete'         // Eliminar items de tienda
+  // Permisos por módulo
+  | 'admin.missions.create'     // Crear misiones
+  | 'admin.missions.edit'       // Editar misiones
+  | 'admin.missions.delete'     // Eliminar misiones
+  | 'admin.titles.create'       // Crear títulos
+  | 'admin.titles.edit'         // Editar títulos
+  | 'admin.titles.delete'       // Eliminar títulos
+  | 'admin.achievements.create' // Crear logros
+  | 'admin.achievements.edit'   // Editar logros
+  | 'admin.achievements.delete' // Eliminar logros
+  | 'admin.collectibles.create' // Crear coleccionables
+  | 'admin.collectibles.edit'   // Editar coleccionables
+  | 'admin.collectibles.delete' // Eliminar coleccionables
+  | 'admin.communities.edit'    // Editar comunidades
+  | 'admin.communities.delete'  // Eliminar comunidades
+  | 'admin.content.edit'        // Editar contenido
+  | 'admin.content.delete'      // Eliminar contenido
+  | 'admin.chat.delete'         // Eliminar chats
+  | 'admin.forum.create'        // Crear categorías foro
+  | 'admin.ranks.create'        // Crear rangos
+  | 'admin.ranks.edit'          // Editar rangos
+  | 'admin.ranks.delete'        // Eliminar rangos
+  | 'admin.tournaments.create'  // Crear torneos
+  | 'admin.tournaments.edit'    // Editar torneos
+  | 'admin.tournaments.delete'  // Eliminar torneos
   | 'admin.notifications.send'  // Enviar notificaciones masivas
   | 'admin.settings.view'       // Ver configuración
   | 'admin.settings.edit'       // Editar configuración
@@ -98,6 +123,30 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'admin.shop.edit',
     'admin.shop.create',
     'admin.shop.delete',
+    'admin.missions.create',
+    'admin.missions.edit',
+    'admin.missions.delete',
+    'admin.titles.create',
+    'admin.titles.edit',
+    'admin.titles.delete',
+    'admin.achievements.create',
+    'admin.achievements.edit',
+    'admin.achievements.delete',
+    'admin.collectibles.create',
+    'admin.collectibles.edit',
+    'admin.collectibles.delete',
+    'admin.communities.edit',
+    'admin.communities.delete',
+    'admin.content.edit',
+    'admin.content.delete',
+    'admin.chat.delete',
+    'admin.forum.create',
+    'admin.ranks.create',
+    'admin.ranks.edit',
+    'admin.ranks.delete',
+    'admin.tournaments.create',
+    'admin.tournaments.edit',
+    'admin.tournaments.delete',
     'admin.promos.view',
     'admin.promos.create',
     'admin.promos.edit',
@@ -133,6 +182,30 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'admin.shop.edit',
     'admin.shop.create',
     'admin.shop.delete',
+    'admin.missions.create',
+    'admin.missions.edit',
+    'admin.missions.delete',
+    'admin.titles.create',
+    'admin.titles.edit',
+    'admin.titles.delete',
+    'admin.achievements.create',
+    'admin.achievements.edit',
+    'admin.achievements.delete',
+    'admin.collectibles.create',
+    'admin.collectibles.edit',
+    'admin.collectibles.delete',
+    'admin.communities.edit',
+    'admin.communities.delete',
+    'admin.content.edit',
+    'admin.content.delete',
+    'admin.chat.delete',
+    'admin.forum.create',
+    'admin.ranks.create',
+    'admin.ranks.edit',
+    'admin.ranks.delete',
+    'admin.tournaments.create',
+    'admin.tournaments.edit',
+    'admin.tournaments.delete',
     'admin.promos.view',
     'admin.promos.create',
     'admin.promos.edit',
