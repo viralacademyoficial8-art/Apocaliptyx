@@ -207,7 +207,9 @@
       "daysLeft": "{{days}} días",
       "hoursLeft": "{{hours}} horas",
       "hot": "Hot",
-      "closed": "Cerrado"
+      "closed": "Cerrado",
+      "createdBy": "Creado por",
+      "ownedBy": "Robado por"
     },
     "detail": {
       "description": "Descripción",

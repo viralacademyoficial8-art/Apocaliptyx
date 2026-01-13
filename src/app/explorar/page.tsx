@@ -11,7 +11,7 @@ import { formatDate } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Skull
+  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Skull, User, Crown
 } from 'lucide-react';
 import {
   FadeInView,
@@ -33,6 +33,10 @@ interface ScenarioData {
   is_featured: boolean;
   is_hot: boolean;
   created_at: string;
+  creator_id: string;
+  current_holder_id?: string | null;
+  creator_username?: string;
+  holder_username?: string;
 }
 
 // Tipo para stats del usuario
@@ -518,13 +522,16 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
     (new Date(scenario.resolution_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   );
 
+  // Determinar si fue robado (holder diferente al creador)
+  const wasStolen = scenario.current_holder_id && scenario.current_holder_id !== scenario.creator_id;
+
   return (
     <div
       onClick={() => router.push(`/escenario/${scenario.id}`)}
       className="rounded-xl border border-gray-800 bg-gray-900/60 p-5 hover:border-purple-500/50 hover:bg-gray-900 transition-all cursor-pointer group"
     >
       {/* Category & badges */}
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
           {scenario.category}
         </span>
@@ -546,9 +553,37 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       </h3>
 
       {/* Description */}
-      <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+      <p className="text-gray-400 text-sm mb-3 line-clamp-2">
         {scenario.description}
       </p>
+
+      {/* Creator & Owner Tags */}
+      <div className="flex flex-wrap gap-2 mb-4 text-xs">
+        {scenario.creator_username && (
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/perfil/${scenario.creator_username}`);
+            }}
+          >
+            <User className="w-3 h-3" />
+            {t('scenarios.card.createdBy')} @{scenario.creator_username}
+          </span>
+        )}
+        {wasStolen && scenario.holder_username && (
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-400 rounded-full border border-red-500/20"
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/perfil/${scenario.holder_username}`);
+            }}
+          >
+            <Crown className="w-3 h-3" />
+            {t('scenarios.card.ownedBy')} @{scenario.holder_username}
+          </span>
+        )}
+      </div>
 
       {/* Progress bar */}
       <div className="mb-4">

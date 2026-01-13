@@ -118,7 +118,7 @@ class ScenariosService {
   }
 
   /**
-   * Obtener escenarios activos
+   * Obtener escenarios activos con usernames de creador y dueño
    */
   async getActive(limit?: number): Promise<ScenarioFromDB[]> {
     try {
@@ -139,7 +139,37 @@ class ScenariosService {
         return [];
       }
 
-      return data as ScenarioFromDB[];
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      // Obtener todos los IDs únicos de usuarios (creadores y holders)
+      const userIds = new Set<string>();
+      data.forEach((scenario) => {
+        if (scenario.creator_id) userIds.add(scenario.creator_id);
+        if (scenario.current_holder_id) userIds.add(scenario.current_holder_id);
+      });
+
+      // Obtener usernames en una sola consulta
+      const { data: usersData } = await supabase
+        .from("users")
+        .select("id, username")
+        .in("id", Array.from(userIds));
+
+      // Crear mapa de id -> username
+      const userMap = new Map<string, string>();
+      usersData?.forEach((user) => {
+        userMap.set(user.id, user.username);
+      });
+
+      // Agregar usernames a cada escenario
+      return data.map((scenario) => ({
+        ...scenario,
+        creator_username: userMap.get(scenario.creator_id) || undefined,
+        holder_username: scenario.current_holder_id
+          ? userMap.get(scenario.current_holder_id)
+          : userMap.get(scenario.creator_id) || undefined,
+      })) as ScenarioFromDB[];
     } catch (error) {
       console.error("Error in getActive scenarios:", error);
       return [];
