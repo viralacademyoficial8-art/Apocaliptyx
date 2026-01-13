@@ -494,6 +494,7 @@
     "errors": {
       "loginRequired": "You must log in to create a scenario.",
       "allFieldsRequired": "Complete all fields to create your scenario.",
+      "futureDateRequired": "The deadline must be after today.",
       "duplicateBlocked": "Duplicate scenarios are not allowed. Buy the existing scenario to become its owner.",
       "duplicateWarning": "This scenario seems similar to an existing one. Review the suggestions.",
       "createFailed": "Error creating scenario. Please try again."

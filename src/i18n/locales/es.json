@@ -493,6 +493,7 @@
     "errors": {
       "loginRequired": "Debes iniciar sesión para crear un escenario.",
       "allFieldsRequired": "Completa todos los campos para crear tu escenario.",
+      "futureDateRequired": "La fecha límite debe ser posterior a hoy.",
       "duplicateBlocked": "No se permiten escenarios duplicados. Roba el escenario existente para convertirte en su dueño.",
       "duplicateWarning": "Este escenario parece ser similar a uno existente. Revisa las sugerencias.",
       "createFailed": "Error al crear el escenario. Intenta de nuevo."

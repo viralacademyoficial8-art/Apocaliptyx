@@ -90,6 +90,15 @@ export default function CrearPage() {
       return;
     }
 
+    // Validar que la fecha sea posterior a hoy
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(dueDate);
+    if (selectedDate <= today) {
+      toast.error(t('create.errors.futureDateRequired') || 'La fecha límite debe ser posterior a hoy');
+      return;
+    }
+
     // Si es duplicado, no permitir creación
     if (isDuplicate) {
       setShowDuplicateWarning(true);
