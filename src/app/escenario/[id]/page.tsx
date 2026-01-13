@@ -11,7 +11,7 @@ import { createClient } from "@supabase/supabase-js";
 import {
   Loader2, ArrowLeft, Clock, Users, Flame,
   TrendingUp, TrendingDown, AlertCircle, Share2, Flag, X,
-  Shield, Crown, Zap, Coins, User
+  Shield, Crown, Zap, Coins, User, ThumbsUp, ThumbsDown
 } from "lucide-react";
 import { useScenarioStealing } from "@/hooks/useScenarioStealing";
 import { toast } from "@/components/ui/toast";
@@ -587,14 +587,14 @@ export default function EscenarioPage() {
                   : "bg-red-500/20 text-red-400"
               }`}>
                 {userPrediction.prediction === "YES" ? (
-                  <TrendingUp className="w-5 h-5" />
+                  <ThumbsUp className="w-5 h-5" />
                 ) : (
-                  <TrendingDown className="w-5 h-5" />
+                  <ThumbsDown className="w-5 h-5" />
                 )}
-                Votaste: {userPrediction.prediction === "YES" ? "SÍ" : "NO"}
+                Opinaste: {userPrediction.prediction === "YES" ? "Me gusta" : "No me gusta"}
               </div>
               <p className="text-gray-400 mt-3">
-                Tu voto ha sido registrado
+                Tu opinión ha sido registrada
               </p>
             </div>
           ) : scenario.status !== "ACTIVE" ? (
@@ -613,13 +613,13 @@ export default function EscenarioPage() {
                       : "border-gray-700 hover:border-green-500/50"
                   }`}
                 >
-                  <TrendingUp className={`w-8 h-8 mx-auto mb-2 ${
+                  <ThumbsUp className={`w-8 h-8 mx-auto mb-2 ${
                     selectedVote === "YES" ? "text-green-500" : "text-gray-500"
                   }`} />
-                  <p className="text-xl font-bold">SÍ</p>
-                  <p className="text-sm text-gray-400">{yesPercent}% cree que sí</p>
+                  <p className="text-xl font-bold">Me gusta</p>
+                  <p className="text-sm text-gray-400">{yesPercent}% opina igual</p>
                 </button>
-                
+
                 <button
                   onClick={() => setSelectedVote("NO")}
                   className={`p-6 rounded-xl border-2 transition-all ${
@@ -628,11 +628,11 @@ export default function EscenarioPage() {
                       : "border-gray-700 hover:border-red-500/50"
                   }`}
                 >
-                  <TrendingDown className={`w-8 h-8 mx-auto mb-2 ${
+                  <ThumbsDown className={`w-8 h-8 mx-auto mb-2 ${
                     selectedVote === "NO" ? "text-red-500" : "text-gray-500"
                   }`} />
-                  <p className="text-xl font-bold">NO</p>
-                  <p className="text-sm text-gray-400">{noPercent}% cree que no</p>
+                  <p className="text-xl font-bold">No me gusta</p>
+                  <p className="text-sm text-gray-400">{noPercent}% opina igual</p>
                 </button>
               </div>
 
@@ -648,7 +648,7 @@ export default function EscenarioPage() {
                     Procesando...
                   </>
                 ) : (
-                  `Votar ${selectedVote === "YES" ? "SÍ" : selectedVote === "NO" ? "NO" : ""}`
+                  "Opinar"
                 )}
               </button>
             </>
@@ -657,10 +657,10 @@ export default function EscenarioPage() {
 
         {/* Progress bar */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Distribución de votos</h2>
+          <h2 className="text-xl font-bold mb-4">Distribución de opiniones</h2>
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-green-400 font-medium">SÍ: {scenario.yes_pool} votos ({yesPercent}%)</span>
-            <span className="text-red-400 font-medium">NO: {scenario.no_pool} votos ({noPercent}%)</span>
+            <span className="text-green-400 font-medium">Me gusta: {scenario.yes_pool} ({yesPercent}%)</span>
+            <span className="text-red-400 font-medium">No me gusta: {scenario.no_pool} ({noPercent}%)</span>
           </div>
           <div className="h-4 bg-gray-800 rounded-full overflow-hidden flex">
             <div 
