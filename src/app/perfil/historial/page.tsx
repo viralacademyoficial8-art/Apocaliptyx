@@ -3,10 +3,14 @@
 import Link from 'next/link';
 import { ArrowLeft, History } from 'lucide-react';
 import { ProfileHistory } from '@/components/perfil';
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 
 export default function HistorialPage() {
   return (
     <div className="min-h-screen bg-gray-950">
+      <Navbar />
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <Link
@@ -25,6 +29,8 @@ export default function HistorialPage() {
 
         <ProfileHistory />
       </div>
+
+      <Footer />
     </div>
   );
 }
