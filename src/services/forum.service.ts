@@ -185,6 +185,8 @@ export interface ForumPost {
   gif_url?: string | null;
   gif_width?: number;
   gif_height?: number;
+  // Image fields
+  image_url?: string | null;
   // Scoring fields (Reddit-style)
   hot_score?: number;
   rising_score?: number;

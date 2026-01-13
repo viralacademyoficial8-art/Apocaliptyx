@@ -779,14 +779,21 @@ function ForoContent() {
       // Upload images if any
       let imageUrl: string | null = null;
       if (selectedImages.length > 0) {
+        console.log('Starting image upload for file:', selectedImages[0].name);
         toast.loading('Subiendo imagen...', { id: 'upload-image' });
         imageUrl = await uploadPostImage(selectedImages[0]);
         toast.dismiss('upload-image');
+        console.log('Upload result:', imageUrl ? 'Success - ' + imageUrl : 'Failed');
 
-        if (!imageUrl && !newPostContent.trim() && !selectedGif) {
-          toast.error('Error al subir la imagen');
-          setCreating(false);
-          return;
+        if (!imageUrl) {
+          if (!newPostContent.trim() && !selectedGif) {
+            toast.error('Error al subir la imagen');
+            setCreating(false);
+            return;
+          } else {
+            // Show warning but continue with text/gif
+            toast.error('No se pudo subir la imagen, publicando solo el texto');
+          }
         }
       }
 
@@ -1077,7 +1084,13 @@ function ForoContent() {
 
   // Upload image via API (server-side to bypass RLS)
   const uploadPostImage = async (file: File): Promise<string | null> => {
-    if (!user?.id) return null;
+    console.log('[uploadPostImage] Starting upload, user:', user?.id, 'file:', file.name);
+
+    if (!user?.id) {
+      console.error('[uploadPostImage] No user ID found');
+      toast.error('Debes iniciar sesión para subir imágenes');
+      return null;
+    }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
@@ -1094,23 +1107,27 @@ function ForoContent() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      console.log('[uploadPostImage] Sending request to API...');
 
       const response = await fetch('/api/forum/upload-image', {
         method: 'POST',
         body: formData,
       });
 
+      console.log('[uploadPostImage] Response status:', response.status);
       const data = await response.json();
+      console.log('[uploadPostImage] Response data:', data);
 
       if (!response.ok) {
-        console.error('Upload error:', data.error);
+        console.error('[uploadPostImage] Upload error:', data.error);
         toast.error(data.error || 'Error al subir la imagen');
         return null;
       }
 
+      console.log('[uploadPostImage] Upload successful, URL:', data.url);
       return data.url;
     } catch (error) {
-      console.error('Upload exception:', error);
+      console.error('[uploadPostImage] Upload exception:', error);
       toast.error('Error al subir la imagen');
       return null;
     }
@@ -2625,6 +2642,17 @@ function PostCard({
             src={post.gif_url}
             alt="GIF"
             className="max-h-80 w-auto"
+          />
+        </div>
+      )}
+
+      {/* Image */}
+      {post.image_url && (
+        <div className="mb-4 rounded-xl overflow-hidden">
+          <img
+            src={post.image_url}
+            alt="Imagen del post"
+            className="max-h-[500px] w-auto max-w-full object-contain"
           />
         </div>
       )}
