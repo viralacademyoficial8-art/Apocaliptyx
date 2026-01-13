@@ -1090,8 +1090,8 @@ class ForumService {
 
       const currentCount = (postData as { reposts_count?: number } | null)?.reposts_count || 0;
 
-      await getSupabase()
-        .from('forum_posts')
+      await (getSupabase()
+        .from('forum_posts') as any)
         .update({ reposts_count: currentCount + 1 })
         .eq('id', originalPostId);
 
