@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -117,7 +118,7 @@ export default function AdminMisionesPage() {
       .eq('id', mission.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadMissions();
     }
@@ -134,7 +135,7 @@ export default function AdminMisionesPage() {
       .eq('id', mission.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadMissions();
     }
@@ -219,7 +220,7 @@ export default function AdminMisionesPage() {
         .eq('id', editingMission.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadMissions();
@@ -230,7 +231,7 @@ export default function AdminMisionesPage() {
         .insert(missionData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadMissions();
@@ -303,7 +304,7 @@ export default function AdminMisionesPage() {
         </div>
 
         {/* New Button */}
-        <PermissionGate permission="admin.shop.create">
+        <PermissionGate permission="admin.missions.create">
           <Button onClick={openNewModal} className="bg-purple-600 hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Nueva Misión
@@ -403,7 +404,7 @@ export default function AdminMisionesPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                              <PermissionGate permission="admin.shop.edit">
+                              <PermissionGate permission="admin.missions.edit">
                                 <DropdownMenuItem onClick={() => openEditModal(mission)}>
                                   <Pencil className="w-4 h-4 mr-2" />
                                   Editar
@@ -413,7 +414,7 @@ export default function AdminMisionesPage() {
                                   {mission.is_active ? 'Desactivar' : 'Activar'}
                                 </DropdownMenuItem>
                               </PermissionGate>
-                              <PermissionGate permission="admin.shop.delete">
+                              <PermissionGate permission="admin.missions.delete">
                                 <div className="h-px bg-border my-1" />
                                 <DropdownMenuItem onClick={() => handleDelete(mission)} className="text-red-400">
                                   <Trash2 className="w-4 h-4 mr-2" />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -147,7 +148,7 @@ export default function AdminContenidoPage() {
       .update({ is_published: !reel.is_published, updated_at: new Date().toISOString() })
       .eq('id', reel.id);
 
-    if (error) alert('Error: ' + error.message);
+    if (error) toast.error('Error: ' + error.message);
     else loadData();
     setActionLoading(null);
   };
@@ -161,7 +162,7 @@ export default function AdminContenidoPage() {
       .delete()
       .eq('id', reel.id);
 
-    if (error) alert('Error: ' + error.message);
+    if (error) toast.error('Error: ' + error.message);
     else loadData();
     setActionLoading(null);
   };
@@ -174,7 +175,7 @@ export default function AdminContenidoPage() {
       .update({ is_published: !audio.is_published, updated_at: new Date().toISOString() })
       .eq('id', audio.id);
 
-    if (error) alert('Error: ' + error.message);
+    if (error) toast.error('Error: ' + error.message);
     else loadData();
     setActionLoading(null);
   };
@@ -188,7 +189,7 @@ export default function AdminContenidoPage() {
       .delete()
       .eq('id', audio.id);
 
-    if (error) alert('Error: ' + error.message);
+    if (error) toast.error('Error: ' + error.message);
     else loadData();
     setActionLoading(null);
   };
@@ -203,7 +204,7 @@ export default function AdminContenidoPage() {
       .update({ status: 'ended', ended_at: new Date().toISOString() })
       .eq('id', stream.id);
 
-    if (error) alert('Error: ' + error.message);
+    if (error) toast.error('Error: ' + error.message);
     else loadData();
     setActionLoading(null);
   };
@@ -217,7 +218,7 @@ export default function AdminContenidoPage() {
       .delete()
       .eq('id', stream.id);
 
-    if (error) alert('Error: ' + error.message);
+    if (error) toast.error('Error: ' + error.message);
     else loadData();
     setActionLoading(null);
   };
@@ -366,13 +367,13 @@ export default function AdminContenidoPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <PermissionGate permission="admin.shop.edit">
+                              <PermissionGate permission="admin.content.edit">
                                 <DropdownMenuItem onClick={() => handleToggleReelPublished(reel)}>
                                   {reel.is_published ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                                   {reel.is_published ? 'Ocultar' : 'Publicar'}
                                 </DropdownMenuItem>
                               </PermissionGate>
-                              <PermissionGate permission="admin.shop.delete">
+                              <PermissionGate permission="admin.content.delete">
                                 <DropdownMenuItem onClick={() => handleDeleteReel(reel)} className="text-red-400">
                                   <Trash2 className="w-4 h-4 mr-2" />
                                   Eliminar
@@ -423,13 +424,13 @@ export default function AdminContenidoPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <PermissionGate permission="admin.shop.edit">
+                          <PermissionGate permission="admin.content.edit">
                             <DropdownMenuItem onClick={() => handleToggleAudioPublished(audio)}>
                               {audio.is_published ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
                               {audio.is_published ? 'Ocultar' : 'Publicar'}
                             </DropdownMenuItem>
                           </PermissionGate>
-                          <PermissionGate permission="admin.shop.delete">
+                          <PermissionGate permission="admin.content.delete">
                             <DropdownMenuItem onClick={() => handleDeleteAudio(audio)} className="text-red-400">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Eliminar
@@ -486,14 +487,14 @@ export default function AdminContenidoPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           {stream.status === 'live' && (
-                            <PermissionGate permission="admin.shop.edit">
+                            <PermissionGate permission="admin.content.edit">
                               <DropdownMenuItem onClick={() => handleEndStream(stream)} className="text-yellow-400">
                                 <Radio className="w-4 h-4 mr-2" />
                                 Terminar Stream
                               </DropdownMenuItem>
                             </PermissionGate>
                           )}
-                          <PermissionGate permission="admin.shop.delete">
+                          <PermissionGate permission="admin.content.delete">
                             <DropdownMenuItem onClick={() => handleDeleteStream(stream)} className="text-red-400">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Eliminar

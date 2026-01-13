@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { createClient } from '@supabase/supabase-js';
 import { useAuthStore } from '@/lib/stores';
@@ -145,7 +146,7 @@ export default function AdminReportesPage() {
       setSelectedReport(null);
     } catch (error) {
       console.error('Error updating report:', error);
-      alert('Error al actualizar el reporte');
+      toast.error('Error al actualizar el reporte');
     } finally {
       setActionLoading(null);
     }
@@ -170,7 +171,7 @@ export default function AdminReportesPage() {
       await handleUpdateStatus(reportId, 'resolved');
     } catch (error) {
       console.error('Error deleting scenario:', error);
-      alert('Error al eliminar el escenario');
+      toast.error('Error al eliminar el escenario');
     } finally {
       setActionLoading(null);
     }

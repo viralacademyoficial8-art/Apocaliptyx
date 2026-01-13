@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -90,7 +91,7 @@ export default function AdminRangosPage() {
       .eq('id', rank.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadRanks();
     }
@@ -161,7 +162,7 @@ export default function AdminRangosPage() {
         .eq('id', editingRank.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadRanks();
@@ -172,7 +173,7 @@ export default function AdminRangosPage() {
         .insert(rankData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadRanks();
@@ -219,7 +220,7 @@ export default function AdminRangosPage() {
         </div>
 
         {/* New Button */}
-        <PermissionGate permission="admin.shop.create">
+        <PermissionGate permission="admin.ranks.create">
           <Button onClick={openNewModal} className="bg-purple-600 hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Rango
@@ -293,13 +294,13 @@ export default function AdminRangosPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                              <PermissionGate permission="admin.shop.edit">
+                              <PermissionGate permission="admin.ranks.edit">
                                 <DropdownMenuItem onClick={() => openEditModal(rank)}>
                                   <Pencil className="w-4 h-4 mr-2" />
                                   Editar
                                 </DropdownMenuItem>
                               </PermissionGate>
-                              <PermissionGate permission="admin.shop.delete">
+                              <PermissionGate permission="admin.ranks.delete">
                                 <div className="h-px bg-border my-1" />
                                 <DropdownMenuItem onClick={() => handleDelete(rank)} className="text-red-400">
                                   <Trash2 className="w-4 h-4 mr-2" />

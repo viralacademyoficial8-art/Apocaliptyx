@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -114,7 +115,7 @@ export default function AdminAnunciosPage() {
       .eq('id', announcement.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadAnnouncements();
     }
@@ -129,7 +130,7 @@ export default function AdminAnunciosPage() {
       .eq('id', announcement.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadAnnouncements();
     }
@@ -144,7 +145,7 @@ export default function AdminAnunciosPage() {
       .eq('id', announcement.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadAnnouncements();
     }
@@ -161,7 +162,7 @@ export default function AdminAnunciosPage() {
       .eq('id', announcement.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadAnnouncements();
     }
@@ -228,7 +229,7 @@ export default function AdminAnunciosPage() {
         .eq('id', editingAnnouncement.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadAnnouncements();
@@ -239,7 +240,7 @@ export default function AdminAnunciosPage() {
         .insert(announcementData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadAnnouncements();

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -103,7 +104,7 @@ export default function AdminComunidadesPage() {
       .eq('id', community.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadCommunities();
     }
@@ -118,7 +119,7 @@ export default function AdminComunidadesPage() {
       .eq('id', community.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadCommunities();
     }
@@ -135,7 +136,7 @@ export default function AdminComunidadesPage() {
       .eq('id', community.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadCommunities();
     }
@@ -177,7 +178,7 @@ export default function AdminComunidadesPage() {
       .eq('id', editingCommunity.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       setShowModal(false);
       loadCommunities();
@@ -326,7 +327,7 @@ export default function AdminComunidadesPage() {
                               <Eye className="w-4 h-4 mr-2" />
                               Ver Comunidad
                             </DropdownMenuItem>
-                            <PermissionGate permission="admin.shop.edit">
+                            <PermissionGate permission="admin.communities.edit">
                               <DropdownMenuItem onClick={() => openEditModal(community)}>
                                 <Pencil className="w-4 h-4 mr-2" />
                                 Editar
@@ -349,7 +350,7 @@ export default function AdminComunidadesPage() {
                                 )}
                               </DropdownMenuItem>
                             </PermissionGate>
-                            <PermissionGate permission="admin.shop.delete">
+                            <PermissionGate permission="admin.communities.delete">
                               <div className="h-px bg-border my-1" />
                               <DropdownMenuItem onClick={() => handleDelete(community)} className="text-red-400">
                                 <Trash2 className="w-4 h-4 mr-2" />

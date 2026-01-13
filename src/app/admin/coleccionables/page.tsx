@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -119,7 +120,7 @@ export default function AdminColeccionablesPage() {
       .eq('id', collectible.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadCollectibles();
     }
@@ -136,7 +137,7 @@ export default function AdminColeccionablesPage() {
       .eq('id', collectible.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadCollectibles();
     }
@@ -215,7 +216,7 @@ export default function AdminColeccionablesPage() {
         .eq('id', editingCollectible.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadCollectibles();
@@ -226,7 +227,7 @@ export default function AdminColeccionablesPage() {
         .insert(collectibleData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadCollectibles();
@@ -287,7 +288,7 @@ export default function AdminColeccionablesPage() {
         </div>
 
         {/* New Button */}
-        <PermissionGate permission="admin.shop.create">
+        <PermissionGate permission="admin.collectibles.create">
           <Button onClick={openNewModal} className="bg-purple-600 hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Coleccionable
@@ -379,7 +380,7 @@ export default function AdminColeccionablesPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                              <PermissionGate permission="admin.shop.edit">
+                              <PermissionGate permission="admin.collectibles.edit">
                                 <DropdownMenuItem onClick={() => openEditModal(collectible)}>
                                   <Pencil className="w-4 h-4 mr-2" />
                                   Editar
@@ -389,7 +390,7 @@ export default function AdminColeccionablesPage() {
                                   {collectible.is_active ? 'Desactivar' : 'Activar'}
                                 </DropdownMenuItem>
                               </PermissionGate>
-                              <PermissionGate permission="admin.shop.delete">
+                              <PermissionGate permission="admin.collectibles.delete">
                                 <div className="h-px bg-border my-1" />
                                 <DropdownMenuItem onClick={() => handleDelete(collectible)} className="text-red-400">
                                   <Trash2 className="w-4 h-4 mr-2" />
