@@ -1066,8 +1066,8 @@ class ForumService {
       }
 
       // Create the repost
-      const { data: newRepost, error: insertError } = await getSupabase()
-        .from('forum_reposts')
+      const { data: newRepost, error: insertError } = await (getSupabase()
+        .from('forum_reposts') as any)
         .insert({
           original_post_id: originalPostId,
           user_id: userId,
