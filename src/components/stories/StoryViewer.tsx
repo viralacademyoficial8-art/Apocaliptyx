@@ -316,6 +316,34 @@ export function StoryViewer({
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+      {/* Navigation arrows OUTSIDE story container - visible on tablets and desktop */}
+      {/* Left arrow */}
+      {(currentStoryIndex > 0 || onPrevious) && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            goToPreviousStory();
+          }}
+          className="absolute left-4 md:left-8 lg:left-16 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110 z-50 backdrop-blur-md border border-white/20"
+          aria-label="Historia anterior"
+        >
+          <ChevronLeft className="w-6 h-6 md:w-8 md:h-8" />
+        </button>
+      )}
+      {/* Right arrow */}
+      {(currentStoryIndex < userStories.stories.length - 1 || onNext) && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            goToNextStory();
+          }}
+          className="absolute right-4 md:right-8 lg:right-16 top-1/2 -translate-y-1/2 p-3 md:p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all hover:scale-110 z-50 backdrop-blur-md border border-white/20"
+          aria-label="Historia siguiente"
+        >
+          <ChevronRight className="w-6 h-6 md:w-8 md:h-8" />
+        </button>
+      )}
+
       {/* Story container */}
       <div
         className="relative w-full max-w-[420px] h-full max-h-[90vh] bg-gray-900 rounded-lg overflow-hidden"
@@ -699,33 +727,6 @@ export function StoryViewer({
           </div>
         )}
 
-        {/* Navigation arrows - always visible */}
-        {/* Left arrow - show if there's a previous story or previous user */}
-        {(currentStoryIndex > 0 || onPrevious) && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              goToPreviousStory();
-            }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110 z-30 backdrop-blur-sm"
-            aria-label="Historia anterior"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-        )}
-        {/* Right arrow - show if there's a next story or next user */}
-        {(currentStoryIndex < userStories.stories.length - 1 || onNext) && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              goToNextStory();
-            }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110 z-30 backdrop-blur-sm"
-            aria-label="Historia siguiente"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        )}
       </div>
     </div>
   );
