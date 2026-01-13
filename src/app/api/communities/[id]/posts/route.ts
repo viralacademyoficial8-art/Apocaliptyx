@@ -212,6 +212,50 @@ export async function POST(
         .eq('id', communityId);
     }
 
+    // Get community name and members for notifications
+    const { data: communityInfo } = await supabase()
+      .from('communities')
+      .select('name')
+      .eq('id', communityId)
+      .single();
+
+    // Get author info
+    const { data: authorInfo } = await supabase()
+      .from('users')
+      .select('username, display_name')
+      .eq('id', session.user.id)
+      .single();
+
+    // Get all community members except the author
+    const { data: members } = await supabase()
+      .from('community_members')
+      .select('user_id')
+      .eq('community_id', communityId)
+      .neq('user_id', session.user.id);
+
+    // Create notifications for all members
+    if (members && members.length > 0 && communityInfo && authorInfo) {
+      const authorName = (authorInfo as any).display_name || (authorInfo as any).username || 'Alguien';
+      const communityName = (communityInfo as any).name || 'la comunidad';
+      const contentPreview = content.trim().substring(0, 50) + (content.trim().length > 50 ? '...' : '');
+
+      const notifications = members.map((member: any) => ({
+        user_id: member.user_id,
+        type: 'community_post',
+        title: `📝 Nueva publicación en ${communityName}`,
+        message: `${authorName} publicó: "${contentPreview}"`,
+        link_url: `/foro/comunidad/${communityId}`,
+        is_read: false,
+      }));
+
+      // Insert notifications in batches to avoid issues
+      if (notifications.length > 0) {
+        await supabase()
+          .from('notifications')
+          .insert(notifications);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       post: {
