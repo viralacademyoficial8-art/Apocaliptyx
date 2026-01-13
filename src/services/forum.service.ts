@@ -952,62 +952,27 @@ class ForumService {
 
   async toggleBookmark(postId: string, userId: string): Promise<{ bookmarked: boolean; count: number }> {
     try {
-      const { data, error } = await (getSupabase().rpc as any)('toggle_bookmark', {
-        p_post_id: postId,
-        p_user_id: userId,
+      // Call API route to toggle bookmark (server-side to bypass RLS)
+      const response = await fetch('/api/forum/bookmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId }),
       });
 
-      if (error) {
-        console.error('Error toggling bookmark:', error);
-        return this.toggleBookmarkManual(postId, userId);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Error toggling bookmark:', data.error);
+        return { bookmarked: false, count: 0 };
       }
 
-      const rpcData = data as { bookmarked?: boolean; count?: number } | null;
       return {
-        bookmarked: rpcData?.bookmarked || false,
-        count: rpcData?.count || 0,
+        bookmarked: data.bookmarked,
+        count: data.count,
       };
     } catch (error) {
       console.error('Error in toggleBookmark:', error);
-      return this.toggleBookmarkManual(postId, userId);
-    }
-  }
-
-  private async toggleBookmarkManual(
-    postId: string,
-    userId: string
-  ): Promise<{ bookmarked: boolean; count: number }> {
-    const { data: existingRaw } = await getSupabase()
-      .from('forum_bookmarks')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_id', userId)
-      .single();
-
-    const existing = existingRaw as { id?: string } | null;
-
-    if (existing) {
-      // Delete bookmark - trigger will decrement count automatically
-      await getSupabase().from('forum_bookmarks').delete().eq('id', existing.id!);
-      // Get updated count from DB (after trigger has run)
-      const { data: postRaw } = await getSupabase()
-        .from('forum_posts')
-        .select('bookmarks_count')
-        .eq('id', postId)
-        .single();
-      const post = postRaw as { bookmarks_count?: number } | null;
-      return { bookmarked: false, count: post?.bookmarks_count || 0 };
-    } else {
-      // Insert bookmark - trigger will increment count automatically
-      await getSupabase().from('forum_bookmarks').insert({ post_id: postId, user_id: userId } as never);
-      // Get updated count from DB (after trigger has run)
-      const { data: postRaw } = await getSupabase()
-        .from('forum_posts')
-        .select('bookmarks_count')
-        .eq('id', postId)
-        .single();
-      const post = postRaw as { bookmarks_count?: number } | null;
-      return { bookmarked: true, count: post?.bookmarks_count || 0 };
+      return { bookmarked: false, count: 0 };
     }
   }
 
