@@ -231,10 +231,13 @@ export default function ExplorarPage() {
                 </p>
               </section>
 
-              {/* Stats Cards - Datos reales de Supabase */}
+              {/* Stats Cards - Datos reales de Supabase (Clickeables) */}
               <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StaggerItem>
-                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                  <div
+                    onClick={() => router.push('/tienda')}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-orange-500/50 hover:bg-zinc-900 transition-all"
+                  >
                     <Flame className="w-6 h-6 text-orange-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.apCoins')}</p>
@@ -246,7 +249,10 @@ export default function ExplorarPage() {
                 </StaggerItem>
 
                 <StaggerItem>
-                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                  <div
+                    onClick={() => router.push('/perfil/historial')}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-yellow-500/50 hover:bg-zinc-900 transition-all"
+                  >
                     <Trophy className="w-6 h-6 text-yellow-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.scenariosWon')}</p>
@@ -256,7 +262,10 @@ export default function ExplorarPage() {
                 </StaggerItem>
 
                 <StaggerItem>
-                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                  <div
+                    onClick={() => router.push(`/perfil/${user.username}`)}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 hover:bg-zinc-900 transition-all"
+                  >
                     <ShoppingBag className="w-6 h-6 text-emerald-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.scenariosCreated')}</p>
@@ -266,7 +275,10 @@ export default function ExplorarPage() {
                 </StaggerItem>
 
                 <StaggerItem>
-                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                  <div
+                    onClick={() => router.push('/perfil/historial')}
+                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-red-500/50 hover:bg-zinc-900 transition-all"
+                  >
                     <Skull className="w-6 h-6 text-red-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.scenariosStolen')}</p>
