@@ -1066,8 +1066,8 @@ class ForumService {
       }
 
       // Create the repost
-      const { data: newRepost, error: insertError } = await getSupabase()
-        .from('forum_reposts')
+      const { data: newRepost, error: insertError } = await (getSupabase()
+        .from('forum_reposts') as any)
         .insert({
           original_post_id: originalPostId,
           user_id: userId,
@@ -1090,8 +1090,8 @@ class ForumService {
 
       const currentCount = (postData as { reposts_count?: number } | null)?.reposts_count || 0;
 
-      await getSupabase()
-        .from('forum_posts')
+      await (getSupabase()
+        .from('forum_posts') as any)
         .update({ reposts_count: currentCount + 1 })
         .eq('id', originalPostId);
 
