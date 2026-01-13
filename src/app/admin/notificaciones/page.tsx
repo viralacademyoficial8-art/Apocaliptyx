@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -150,7 +151,7 @@ export default function AdminNotificacionesPage() {
       setTimeout(() => setSent(false), 5000);
     } catch (error) {
       console.error('Error sending notifications:', error);
-      alert('Error al enviar notificaciones');
+      toast.error('Error al enviar notificaciones');
     } finally {
       setSending(false);
     }

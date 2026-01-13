@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -158,7 +159,7 @@ export default function AdminForoPage() {
         .eq('id', editingCategory.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowCategoryModal(false);
         loadData();
@@ -169,7 +170,7 @@ export default function AdminForoPage() {
         .insert({ ...categoryForm, slug, sort_order: categories.length + 1 });
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowCategoryModal(false);
         loadData();
@@ -187,7 +188,7 @@ export default function AdminForoPage() {
       .eq('id', category.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadData();
     }
@@ -204,7 +205,7 @@ export default function AdminForoPage() {
       .eq('id', category.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadData();
     }
@@ -240,7 +241,7 @@ export default function AdminForoPage() {
       .eq('id', post.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadData();
     }
@@ -318,7 +319,7 @@ export default function AdminForoPage() {
             </div>
 
             {/* New Category Button */}
-            <PermissionGate permission="admin.shop.create">
+            <PermissionGate permission="admin.forum.create">
               <Button onClick={openNewCategoryModal} className="bg-purple-600 hover:bg-purple-700">
                 <Plus className="w-4 h-4 mr-2" />
                 Nueva Categoría

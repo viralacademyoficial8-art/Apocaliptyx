@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -164,7 +165,7 @@ export default function AdminChatPage() {
       .eq('id', messageId);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       if (selectedConversation) {
         await loadMessages(selectedConversation.id);
@@ -191,7 +192,7 @@ export default function AdminChatPage() {
       .eq('id', conversation.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadData();
     }
@@ -208,7 +209,7 @@ export default function AdminChatPage() {
       .eq('id', blockId);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadData();
     }
@@ -326,7 +327,7 @@ export default function AdminChatPage() {
                             <Eye className="w-4 h-4 mr-2" />
                             Ver Mensajes
                           </DropdownMenuItem>
-                          <PermissionGate permission="admin.shop.delete">
+                          <PermissionGate permission="admin.chat.delete">
                             <DropdownMenuItem onClick={() => handleDeleteConversation(conv)} className="text-red-400">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Eliminar
@@ -372,7 +373,7 @@ export default function AdminChatPage() {
                             <Eye className="w-4 h-4 mr-2" />
                             Ver Mensajes
                           </DropdownMenuItem>
-                          <PermissionGate permission="admin.shop.delete">
+                          <PermissionGate permission="admin.chat.delete">
                             <DropdownMenuItem onClick={() => handleDeleteConversation(group)} className="text-red-400">
                               <Trash2 className="w-4 h-4 mr-2" />
                               Eliminar Grupo
@@ -411,7 +412,7 @@ export default function AdminChatPage() {
                           </p>
                         </div>
                       </div>
-                      <PermissionGate permission="admin.shop.delete">
+                      <PermissionGate permission="admin.chat.delete">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -476,7 +477,7 @@ export default function AdminChatPage() {
                       </p>
                     </div>
                     {!msg.is_deleted && (
-                      <PermissionGate permission="admin.shop.delete">
+                      <PermissionGate permission="admin.chat.delete">
                         <Button
                           variant="ghost"
                           size="sm"

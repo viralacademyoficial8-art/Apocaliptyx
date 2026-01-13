@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -125,7 +126,7 @@ export default function AdminPromocionesPage() {
       .eq('id', promoCode.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadPromoCodes();
     }
@@ -142,7 +143,7 @@ export default function AdminPromocionesPage() {
       .eq('id', promoCode.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadPromoCodes();
     }
@@ -218,7 +219,7 @@ export default function AdminPromocionesPage() {
         .eq('id', editingCode.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadPromoCodes();
@@ -229,7 +230,7 @@ export default function AdminPromocionesPage() {
         .insert(promoData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadPromoCodes();

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -102,7 +103,7 @@ export default function AdminLogrosPage() {
       .eq('id', achievement.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadAchievements();
     }
@@ -119,7 +120,7 @@ export default function AdminLogrosPage() {
       .eq('id', achievement.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadAchievements();
     }
@@ -186,7 +187,7 @@ export default function AdminLogrosPage() {
         .eq('id', editingAchievement.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadAchievements();
@@ -197,7 +198,7 @@ export default function AdminLogrosPage() {
         .insert(achievementData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadAchievements();
@@ -258,7 +259,7 @@ export default function AdminLogrosPage() {
         </div>
 
         {/* New Button */}
-        <PermissionGate permission="admin.shop.create">
+        <PermissionGate permission="admin.achievements.create">
           <Button onClick={openNewModal} className="bg-purple-600 hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Logro
@@ -340,7 +341,7 @@ export default function AdminLogrosPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
-                            <PermissionGate permission="admin.shop.edit">
+                            <PermissionGate permission="admin.achievements.edit">
                               <DropdownMenuItem onClick={() => openEditModal(achievement)}>
                                 <Pencil className="w-4 h-4 mr-2" />
                                 Editar
@@ -350,7 +351,7 @@ export default function AdminLogrosPage() {
                                 {achievement.is_active ? 'Desactivar' : 'Activar'}
                               </DropdownMenuItem>
                             </PermissionGate>
-                            <PermissionGate permission="admin.shop.delete">
+                            <PermissionGate permission="admin.achievements.delete">
                               <div className="h-px bg-border my-1" />
                               <DropdownMenuItem onClick={() => handleDelete(achievement)} className="text-red-400">
                                 <Trash2 className="w-4 h-4 mr-2" />

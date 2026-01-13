@@ -116,7 +116,7 @@ export function ShopManagement() {
         <StatCard title="Items" value={stats.total} icon={ShoppingBag} />
         <StatCard title="Activos" value={stats.active} icon={Power} />
         <StatCard title="Ventas" value={stats.sales} icon={ShoppingBag} />
-        <StatCard title="Ingresos (mock)" value={stats.revenue} icon={ShoppingBag} />
+        <StatCard title="Ingresos" value={stats.revenue} icon={ShoppingBag} />
       </StatsGrid>
 
       <div className="flex justify-end">

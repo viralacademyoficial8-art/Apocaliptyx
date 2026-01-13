@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -154,7 +155,7 @@ export default function AdminTorneosPage() {
       .eq('id', tournament.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadTournaments();
     }
@@ -171,7 +172,7 @@ export default function AdminTorneosPage() {
       .eq('id', tournament.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadTournaments();
     }
@@ -254,7 +255,7 @@ export default function AdminTorneosPage() {
         .eq('id', editingTournament.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadTournaments();
@@ -265,7 +266,7 @@ export default function AdminTorneosPage() {
         .insert(tournamentData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadTournaments();
@@ -338,7 +339,7 @@ export default function AdminTorneosPage() {
         </div>
 
         {/* New Button */}
-        <PermissionGate permission="admin.shop.create">
+        <PermissionGate permission="admin.tournaments.create">
           <Button onClick={openNewModal} className="bg-purple-600 hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Torneo
@@ -431,7 +432,7 @@ export default function AdminTorneosPage() {
                               <Eye className="w-4 h-4 mr-2" />
                               Ver Participantes
                             </DropdownMenuItem>
-                            <PermissionGate permission="admin.shop.edit">
+                            <PermissionGate permission="admin.tournaments.edit">
                               <DropdownMenuItem onClick={() => openEditModal(tournament)}>
                                 <Pencil className="w-4 h-4 mr-2" />
                                 Editar
@@ -455,7 +456,7 @@ export default function AdminTorneosPage() {
                                 </DropdownMenuItem>
                               )}
                             </PermissionGate>
-                            <PermissionGate permission="admin.shop.delete">
+                            <PermissionGate permission="admin.tournaments.delete">
                               <div className="h-px bg-border my-1" />
                               <DropdownMenuItem onClick={() => handleDelete(tournament)} className="text-red-400">
                                 <Trash2 className="w-4 h-4 mr-2" />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -87,7 +88,7 @@ export default function AdminConfiguracionPage() {
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Error saving config:', error);
-      alert('Error al guardar configuración');
+      toast.error('Error al guardar configuración');
     } finally {
       setSaving(false);
     }

@@ -178,7 +178,7 @@ export function SystemConfig() {
           onClick={save}
           className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500"
         >
-          <Save className="w-4 h-4" /> Guardar cambios (mock)
+          <Save className="w-4 h-4" /> Guardar cambios
         </button>
       </div>
     </div>

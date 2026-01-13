@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
 import { createClient } from '@supabase/supabase-js';
@@ -101,7 +102,7 @@ export default function AdminTitulosPage() {
       .eq('id', title.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadTitles();
     }
@@ -118,7 +119,7 @@ export default function AdminTitulosPage() {
       .eq('id', title.id);
 
     if (error) {
-      alert('Error: ' + error.message);
+      toast.error('Error: ' + error.message);
     } else {
       loadTitles();
     }
@@ -191,7 +192,7 @@ export default function AdminTitulosPage() {
         .eq('id', editingTitle.id);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadTitles();
@@ -202,7 +203,7 @@ export default function AdminTitulosPage() {
         .insert(titleData);
 
       if (error) {
-        alert('Error: ' + error.message);
+        toast.error('Error: ' + error.message);
       } else {
         setShowModal(false);
         loadTitles();
@@ -263,7 +264,7 @@ export default function AdminTitulosPage() {
         </div>
 
         {/* New Button */}
-        <PermissionGate permission="admin.shop.create">
+        <PermissionGate permission="admin.titles.create">
           <Button onClick={openNewModal} className="bg-purple-600 hover:bg-purple-700">
             <Plus className="w-4 h-4 mr-2" />
             Nuevo Título
@@ -340,7 +341,7 @@ export default function AdminTitulosPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
-                              <PermissionGate permission="admin.shop.edit">
+                              <PermissionGate permission="admin.titles.edit">
                                 <DropdownMenuItem onClick={() => openEditModal(title)}>
                                   <Pencil className="w-4 h-4 mr-2" />
                                   Editar
@@ -350,7 +351,7 @@ export default function AdminTitulosPage() {
                                   {title.is_active ? 'Desactivar' : 'Activar'}
                                 </DropdownMenuItem>
                               </PermissionGate>
-                              <PermissionGate permission="admin.shop.delete">
+                              <PermissionGate permission="admin.titles.delete">
                                 <div className="h-px bg-border my-1" />
                                 <DropdownMenuItem onClick={() => handleDelete(title)} className="text-red-400">
                                   <Trash2 className="w-4 h-4 mr-2" />
