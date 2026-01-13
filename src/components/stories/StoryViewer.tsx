@@ -699,25 +699,29 @@ export function StoryViewer({
           </div>
         )}
 
-        {/* Navigation arrows (desktop) */}
-        {onPrevious && (
+        {/* Navigation arrows - always visible */}
+        {/* Left arrow - show if there's a previous story or previous user */}
+        {(currentStoryIndex > 0 || onPrevious) && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               goToPreviousStory();
             }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors hidden md:block"
+            className="absolute left-2 top-1/2 -translate-y-1/2 p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110 z-30 backdrop-blur-sm"
+            aria-label="Historia anterior"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
         )}
-        {onNext && (
+        {/* Right arrow - show if there's a next story or next user */}
+        {(currentStoryIndex < userStories.stories.length - 1 || onNext) && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               goToNextStory();
             }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors hidden md:block"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-black/60 hover:bg-black/80 rounded-full text-white transition-all hover:scale-110 z-30 backdrop-blur-sm"
+            aria-label="Historia siguiente"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
