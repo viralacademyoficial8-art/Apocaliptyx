@@ -797,21 +797,25 @@ function ForoContent() {
         }
       }
 
+      const postData = {
+        content: newPostContent,
+        tags: newPostTags,
+        category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
+        gif_url: selectedGif?.url,
+        gif_width: selectedGif?.width,
+        gif_height: selectedGif?.height,
+        image_url: imageUrl,
+      };
+      console.log('[handleCreatePost] Sending post data:', postData);
+
       const response = await fetch('/api/forum/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: newPostContent,
-          tags: newPostTags,
-          category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
-          gif_url: selectedGif?.url,
-          gif_width: selectedGif?.width,
-          gif_height: selectedGif?.height,
-          image_url: imageUrl,
-        }),
+        body: JSON.stringify(postData),
       });
 
       const data = await response.json();
+      console.log('[handleCreatePost] API response:', data);
 
       if (response.ok && data.success) {
         toast.success(t('forum.actions.postCreated'));
