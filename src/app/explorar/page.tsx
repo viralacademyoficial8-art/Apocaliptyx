@@ -11,7 +11,7 @@ import { formatDate } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight
+  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Skull
 } from 'lucide-react';
 import {
   FadeInView,
@@ -40,6 +40,7 @@ interface UserStats {
   apCoins: number;
   scenariosWon: number;
   scenariosCreated: number;
+  scenariosStolen: number;
 }
 
 // Category keys for translations
@@ -83,6 +84,7 @@ export default function ExplorarPage() {
     apCoins: 0,
     scenariosWon: 0,
     scenariosCreated: 0,
+    scenariosStolen: 0,
   });
 
   // Filtros
@@ -119,10 +121,17 @@ export default function ExplorarPage() {
           .eq('user_id', user.id)
           .eq('status', 'WON');
 
+        // Contar escenarios robados (thief_id = user.id)
+        const { count: scenariosStolen } = await supabase
+          .from('scenario_steal_history')
+          .select('*', { count: 'exact', head: true })
+          .eq('thief_id', user.id);
+
         setUserStats({
           apCoins: (userData as { ap_coins: number } | null)?.ap_coins || 0,
           scenariosWon: scenariosWon || 0,
           scenariosCreated: scenariosCreated || 0,
+          scenariosStolen: scenariosStolen || 0,
         });
       } catch (err) {
         console.error('Error loading user stats:', err);
@@ -223,7 +232,7 @@ export default function ExplorarPage() {
               </section>
 
               {/* Stats Cards - Datos reales de Supabase */}
-              <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <StaggerItem>
                   <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
                     <Flame className="w-6 h-6 text-orange-400" />
@@ -255,6 +264,16 @@ export default function ExplorarPage() {
                     </div>
                   </div>
                 </StaggerItem>
+
+                <StaggerItem>
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3">
+                    <Skull className="w-6 h-6 text-red-400" />
+                    <div>
+                      <p className="text-xs text-zinc-400">{t('dashboard.scenariosStolen')}</p>
+                      <p className="text-xl font-bold">{userStats.scenariosStolen}</p>
+                    </div>
+                  </div>
+                </StaggerItem>
               </StaggerContainer>
 
               {/* Featured Scenarios Section */}
@@ -272,7 +291,7 @@ export default function ExplorarPage() {
                       }}
                       className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
                     >
-                      {t('dashboard.viewAll')} <ArrowRight className="w-4 h-4" />
+                      {t('common.viewAll')} <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
