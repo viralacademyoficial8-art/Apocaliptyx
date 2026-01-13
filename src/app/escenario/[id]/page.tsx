@@ -11,7 +11,7 @@ import { createClient } from "@supabase/supabase-js";
 import {
   Loader2, ArrowLeft, Clock, Users, Flame,
   TrendingUp, TrendingDown, AlertCircle, Share2, Flag, X,
-  Shield, Crown, Zap, Coins
+  Shield, Crown, Zap, Coins, User
 } from "lucide-react";
 import { useScenarioStealing } from "@/hooks/useScenarioStealing";
 import { toast } from "@/components/ui/toast";
@@ -430,7 +430,29 @@ export default function EscenarioPage() {
           </div>
           
           <h1 className="text-3xl font-bold mb-4">{scenario.title}</h1>
-          <p className="text-gray-400 text-lg">{scenario.description}</p>
+          <p className="text-gray-400 text-lg mb-4">{scenario.description}</p>
+
+          {/* Creator & Owner Tags */}
+          <div className="flex flex-wrap gap-3">
+            {scenario.creator_username && (
+              <button
+                onClick={() => router.push(`/perfil/${scenario.creator_username}`)}
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-colors text-sm"
+              >
+                <User className="w-4 h-4" />
+                Creado por @{scenario.creator_username}
+              </button>
+            )}
+            {scenario.current_holder_id && scenario.current_holder_id !== scenario.creator_id && scenario.holder_username && (
+              <button
+                onClick={() => router.push(`/perfil/${scenario.holder_username}`)}
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-full border border-red-500/20 hover:bg-red-500/20 transition-colors text-sm"
+              >
+                <Crown className="w-4 h-4" />
+                Robado por @{scenario.holder_username}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Stats cards */}
