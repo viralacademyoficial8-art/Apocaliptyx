@@ -257,19 +257,58 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Upload to storage
-        const fileName = `${user.id}/${Date.now()}-${file.name}`;
-        const { error: uploadError } = await supabase().storage
-          .from('stories')
-          .upload(fileName, file);
+        // Validate file size (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+          return NextResponse.json(
+            { error: 'La imagen es demasiado grande. Máximo 10MB.' },
+            { status: 400 }
+          );
+        }
 
-        if (uploadError) throw uploadError;
+        // Convert File to Buffer for server-side upload
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-        const { data: { publicUrl } } = supabase().storage
-          .from('stories')
-          .getPublicUrl(fileName);
+        const fileExt = file.name.split('.').pop();
+        const fileName = `stories/${user.id}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        mediaUrl = publicUrl;
+        // Try uploading to forum-images bucket first
+        let uploadResult = await supabase().storage
+          .from('forum-images')
+          .upload(fileName, buffer, {
+            contentType: file.type,
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        // If forum-images doesn't exist, try stories bucket
+        if (uploadResult.error) {
+          uploadResult = await supabase().storage
+            .from('stories')
+            .upload(fileName, buffer, {
+              contentType: file.type,
+              cacheControl: '3600',
+              upsert: false,
+            });
+
+          if (uploadResult.error) {
+            console.error('Story upload error:', uploadResult.error);
+            return NextResponse.json(
+              { error: `Error al subir imagen: ${uploadResult.error.message}` },
+              { status: 400 }
+            );
+          }
+
+          const { data: { publicUrl } } = supabase().storage
+            .from('stories')
+            .getPublicUrl(fileName);
+          mediaUrl = publicUrl;
+        } else {
+          const { data: { publicUrl } } = supabase().storage
+            .from('forum-images')
+            .getPublicUrl(fileName);
+          mediaUrl = publicUrl;
+        }
       }
     } else {
       // Handle JSON body (text-only story or link story)
