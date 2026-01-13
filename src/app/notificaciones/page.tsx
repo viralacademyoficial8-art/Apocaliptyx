@@ -44,6 +44,13 @@ import {
   AlertTriangle,
   CheckCircle,
   ArrowLeft,
+  Video,
+  Radio,
+  SmilePlus,
+  Palette,
+  Users,
+  Gamepad2,
+  ClipboardCheck,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -79,7 +86,7 @@ function formatTimeAgo(dateString: string): string {
   return `Hace ${diffInYears} ${diffInYears === 1 ? "año" : "años"}`;
 }
 
-// Configuración de iconos y colores por tipo
+// Configuración de iconos y colores por tipo (40+ tipos)
 const notificationConfig: Record<
   NotificationType,
   {
@@ -88,6 +95,7 @@ const notificationConfig: Record<
     bgColor: string;
   }
 > = {
+  // Usuario
   welcome: { icon: Gift, color: "text-green-400", bgColor: "bg-green-500/20" },
   new_follower: { icon: UserPlus, color: "text-purple-400", bgColor: "bg-purple-500/20" },
   daily_login: { icon: Calendar, color: "text-indigo-400", bgColor: "bg-indigo-500/20" },
@@ -95,6 +103,8 @@ const notificationConfig: Record<
   level_up: { icon: TrendingUp, color: "text-yellow-400", bgColor: "bg-yellow-500/20" },
   account_verified: { icon: BadgeCheck, color: "text-blue-400", bgColor: "bg-blue-500/20" },
   premium_activated: { icon: Crown, color: "text-amber-400", bgColor: "bg-amber-500/20" },
+
+  // Escenarios
   scenario_created: { icon: FileText, color: "text-cyan-400", bgColor: "bg-cyan-500/20" },
   scenario_stolen: { icon: Swords, color: "text-red-400", bgColor: "bg-red-500/20" },
   scenario_recovered: { icon: Shield, color: "text-emerald-400", bgColor: "bg-emerald-500/20" },
@@ -103,23 +113,51 @@ const notificationConfig: Record<
   scenario_resolved: { icon: Check, color: "text-blue-400", bgColor: "bg-blue-500/20" },
   scenario_expiring: { icon: Clock, color: "text-orange-400", bgColor: "bg-orange-500/20" },
   scenario_vote: { icon: Vote, color: "text-violet-400", bgColor: "bg-violet-500/20" },
+
+  // Tienda
   purchase: { icon: ShoppingBag, color: "text-pink-400", bgColor: "bg-pink-500/20" },
   item_used: { icon: Sparkles, color: "text-purple-400", bgColor: "bg-purple-500/20" },
   gift_received: { icon: Gift, color: "text-rose-400", bgColor: "bg-rose-500/20" },
   coins_received: { icon: Coins, color: "text-yellow-400", bgColor: "bg-yellow-500/20" },
   promo_code: { icon: Ticket, color: "text-lime-400", bgColor: "bg-lime-500/20" },
+
+  // Logros
   achievement_unlocked: { icon: Star, color: "text-amber-400", bgColor: "bg-amber-500/20" },
   medal_earned: { icon: Medal, color: "text-yellow-400", bgColor: "bg-yellow-500/20" },
   ranking_position: { icon: BarChart3, color: "text-cyan-400", bgColor: "bg-cyan-500/20" },
   win_streak: { icon: Zap, color: "text-orange-400", bgColor: "bg-orange-500/20" },
+
+  // Social
   comment_received: { icon: MessageCircle, color: "text-blue-400", bgColor: "bg-blue-500/20" },
   like_received: { icon: Heart, color: "text-red-400", bgColor: "bg-red-500/20" },
   mention: { icon: AtSign, color: "text-purple-400", bgColor: "bg-purple-500/20" },
   comment_reply: { icon: Reply, color: "text-indigo-400", bgColor: "bg-indigo-500/20" },
+
+  // Comunidades
   community_post: { icon: FileText, color: "text-cyan-400", bgColor: "bg-cyan-500/20" },
   community_like: { icon: Heart, color: "text-red-400", bgColor: "bg-red-500/20" },
   community_comment: { icon: MessageCircle, color: "text-blue-400", bgColor: "bg-blue-500/20" },
   community_reply: { icon: Reply, color: "text-indigo-400", bgColor: "bg-indigo-500/20" },
+
+  // Reels y Streaming
+  reel_like: { icon: Video, color: "text-pink-400", bgColor: "bg-pink-500/20" },
+  stream_like: { icon: Radio, color: "text-red-400", bgColor: "bg-red-500/20" },
+
+  // Chat
+  message_received: { icon: MessageCircle, color: "text-blue-400", bgColor: "bg-blue-500/20" },
+  message_reaction: { icon: SmilePlus, color: "text-yellow-400", bgColor: "bg-yellow-500/20" },
+
+  // Coleccionables
+  collectible_purchased: { icon: Palette, color: "text-fuchsia-400", bgColor: "bg-fuchsia-500/20" },
+
+  // Comunidades extra
+  community_new_member: { icon: Users, color: "text-green-400", bgColor: "bg-green-500/20" },
+
+  // Torneos
+  tournament_joined: { icon: Gamepad2, color: "text-purple-400", bgColor: "bg-purple-500/20" },
+  tournament_registration: { icon: ClipboardCheck, color: "text-emerald-400", bgColor: "bg-emerald-500/20" },
+
+  // Sistema
   system_announcement: { icon: Megaphone, color: "text-blue-400", bgColor: "bg-blue-500/20" },
   maintenance: { icon: Wrench, color: "text-gray-400", bgColor: "bg-gray-500/20" },
   account_warning: { icon: AlertTriangle, color: "text-yellow-400", bgColor: "bg-yellow-500/20" },
