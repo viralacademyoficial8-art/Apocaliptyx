@@ -2131,16 +2131,18 @@ function ForoContent() {
               {/* Post original */}
               <div className="bg-gray-800/50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold">
-                    {(selectedPost.author?.display_name || selectedPost.author?.username || 'U')[0].toUpperCase()}
-                  </div>
+                  <Link href={`/perfil/${selectedPost.author?.username}`}>
+                    <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
+                      {(selectedPost.author?.display_name || selectedPost.author?.username || 'U')[0].toUpperCase()}
+                    </div>
+                  </Link>
                   <div>
-                    <span className="font-semibold">
+                    <Link href={`/perfil/${selectedPost.author?.username}`} className="font-semibold hover:text-purple-400 transition-colors">
                       {selectedPost.author?.display_name || selectedPost.author?.username}
-                    </span>
-                    <span className="text-gray-500 text-sm ml-2">
+                    </Link>
+                    <Link href={`/perfil/${selectedPost.author?.username}`} className="text-gray-500 text-sm ml-2 hover:text-purple-400 transition-colors">
                       @{selectedPost.author?.username}
-                    </span>
+                    </Link>
                   </div>
                 </div>
                 <p className="text-gray-300">{selectedPost.content}</p>
@@ -2160,12 +2162,14 @@ function ForoContent() {
                   {comments.map((comment) => (
                     <div key={comment.id} className="bg-gray-800/30 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold">
-                          {(comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
-                        </div>
-                        <span className="font-medium text-sm">
+                        <Link href={`/perfil/${comment.author?.username}`}>
+                          <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
+                            {(comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
+                          </div>
+                        </Link>
+                        <Link href={`/perfil/${comment.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
                           {comment.author?.display_name || comment.author?.username}
-                        </span>
+                        </Link>
                         <span className="text-gray-500 text-xs">
                           {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
                         </span>
@@ -2219,12 +2223,14 @@ function ForoContent() {
             <>
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 mb-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold">
-                    {(repostingPost.author?.display_name || repostingPost.author?.username || 'U')[0].toUpperCase()}
-                  </div>
-                  <span className="font-medium text-sm">
+                  <Link href={`/perfil/${repostingPost.author?.username}`}>
+                    <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
+                      {(repostingPost.author?.display_name || repostingPost.author?.username || 'U')[0].toUpperCase()}
+                    </div>
+                  </Link>
+                  <Link href={`/perfil/${repostingPost.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
                     {repostingPost.author?.display_name || repostingPost.author?.username}
-                  </span>
+                  </Link>
                 </div>
                 <p className="text-gray-300 text-sm line-clamp-3">{repostingPost.content}</p>
               </div>
@@ -2279,7 +2285,7 @@ function ForoContent() {
               <div className="bg-gray-800/50 rounded-lg p-3 mb-4 border border-gray-700">
                 <p className="text-gray-300 text-sm line-clamp-2">{awardingPost.content}</p>
                 <span className="text-xs text-gray-500 mt-1 block">
-                  {t('forum.actions.by')} @{awardingPost.author?.username}
+                  {t('forum.actions.by')} <Link href={`/perfil/${awardingPost.author?.username}`} className="hover:text-purple-400 transition-colors">@{awardingPost.author?.username}</Link>
                 </span>
               </div>
 
@@ -2450,14 +2456,16 @@ function PostCard({
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-            {(post.author?.display_name || post.author?.username || 'U')[0].toUpperCase()}
-          </div>
+          <Link href={`/perfil/${post.author?.username}`}>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
+              {(post.author?.display_name || post.author?.username || 'U')[0].toUpperCase()}
+            </div>
+          </Link>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold">
+              <Link href={`/perfil/${post.author?.username}`} className="font-semibold hover:text-purple-400 transition-colors">
                 {post.author?.display_name || post.author?.username}
-              </span>
+              </Link>
               {/* Badges */}
               {post.author?.badges?.map((badge, i) => (
                 <span
@@ -2477,7 +2485,9 @@ function PostCard({
               {post.is_locked && <Lock className="w-4 h-4 text-red-400" />}
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>@{post.author?.username}</span>
+              <Link href={`/perfil/${post.author?.username}`} className="hover:text-purple-400 transition-colors">
+                @{post.author?.username}
+              </Link>
               <span>•</span>
               <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: dateLocale })}</span>
             </div>
