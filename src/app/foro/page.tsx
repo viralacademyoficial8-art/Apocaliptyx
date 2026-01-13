@@ -2132,8 +2132,11 @@ function ForoContent() {
               <div className="bg-gray-800/50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Link href={`/perfil/${selectedPost.author?.username}`}>
-                    <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
-                      {(selectedPost.author?.display_name || selectedPost.author?.username || 'U')[0].toUpperCase()}
+                    <div
+                      className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                      style={selectedPost.author?.avatar_url ? { background: `url(${selectedPost.author.avatar_url}) center/cover` } : undefined}
+                    >
+                      {!selectedPost.author?.avatar_url && (selectedPost.author?.display_name || selectedPost.author?.username || 'U')[0].toUpperCase()}
                     </div>
                   </Link>
                   <div>
@@ -2163,8 +2166,11 @@ function ForoContent() {
                     <div key={comment.id} className="bg-gray-800/30 rounded-lg p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <Link href={`/perfil/${comment.author?.username}`}>
-                          <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
-                            {(comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
+                          <div
+                            className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                            style={comment.author?.avatar_url ? { background: `url(${comment.author.avatar_url}) center/cover` } : undefined}
+                          >
+                            {!comment.author?.avatar_url && (comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
                           </div>
                         </Link>
                         <Link href={`/perfil/${comment.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
@@ -2224,8 +2230,11 @@ function ForoContent() {
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 mb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Link href={`/perfil/${repostingPost.author?.username}`}>
-                    <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
-                      {(repostingPost.author?.display_name || repostingPost.author?.username || 'U')[0].toUpperCase()}
+                    <div
+                      className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                      style={repostingPost.author?.avatar_url ? { background: `url(${repostingPost.author.avatar_url}) center/cover` } : undefined}
+                    >
+                      {!repostingPost.author?.avatar_url && (repostingPost.author?.display_name || repostingPost.author?.username || 'U')[0].toUpperCase()}
                     </div>
                   </Link>
                   <Link href={`/perfil/${repostingPost.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
@@ -2457,8 +2466,11 @@ function PostCard({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <Link href={`/perfil/${post.author?.username}`}>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all">
-              {(post.author?.display_name || post.author?.username || 'U')[0].toUpperCase()}
+            <div
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+              style={post.author?.avatar_url ? { background: `url(${post.author.avatar_url}) center/cover` } : undefined}
+            >
+              {!post.author?.avatar_url && (post.author?.display_name || post.author?.username || 'U')[0].toUpperCase()}
             </div>
           </Link>
           <div>
