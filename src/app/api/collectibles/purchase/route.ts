@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-
+import { notificationsService } from '@/services/notifications.service';
 
 // POST /api/collectibles/purchase - Purchase a collectible
 export async function POST(request: NextRequest) {
@@ -32,6 +32,14 @@ export async function POST(request: NextRequest) {
     if (!result?.success) {
       return NextResponse.json({ error: result?.error || 'Error desconocido' }, { status: 400 });
     }
+
+    // Send notification for successful purchase
+    await notificationsService.notifyCollectiblePurchased(
+      user.id,
+      result.collectible_name || 'Coleccionable',
+      result.serial_number || 1,
+      result.cost || 0
+    );
 
     return NextResponse.json({
       success: true,
