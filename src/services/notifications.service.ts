@@ -40,6 +40,11 @@ export type NotificationType =
   | 'like_received'
   | 'mention'
   | 'comment_reply'
+  // Comunidades (4)
+  | 'community_post'
+  | 'community_like'
+  | 'community_comment'
+  | 'community_reply'
   // Sistema (4)
   | 'system_announcement'
   | 'maintenance'

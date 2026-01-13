@@ -119,7 +119,13 @@ const notificationConfig: Record<NotificationType, {
   like_received: { icon: Heart, color: 'text-red-400', bgColor: 'bg-red-500/20' },
   mention: { icon: AtSign, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },
   comment_reply: { icon: Reply, color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
-  
+
+  // Comunidades
+  community_post: { icon: FileText, color: 'text-cyan-400', bgColor: 'bg-cyan-500/20' },
+  community_like: { icon: Heart, color: 'text-red-400', bgColor: 'bg-red-500/20' },
+  community_comment: { icon: MessageCircle, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
+  community_reply: { icon: Reply, color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
+
   // Sistema
   system_announcement: { icon: Megaphone, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
   maintenance: { icon: Wrench, color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
