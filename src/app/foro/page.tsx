@@ -1075,7 +1075,7 @@ function ForoContent() {
     setSelectedImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Upload image to Supabase Storage
+  // Upload image via API (server-side to bypass RLS)
   const uploadPostImage = async (file: File): Promise<string | null> => {
     if (!user?.id) return null;
 
@@ -1091,44 +1091,24 @@ function ForoContent() {
       return null;
     }
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-
     try {
-      const { data, error } = await supabase.storage
-        .from('forum-images')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false,
-        });
+      const formData = new FormData();
+      formData.append('file', file);
 
-      if (error) {
-        console.error('Upload error:', error);
-        // Try alternate bucket name
-        const { data: data2, error: error2 } = await supabase.storage
-          .from('posts')
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false,
-          });
+      const response = await fetch('/api/forum/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
 
-        if (error2) {
-          console.error('Upload error (alternate):', error2);
-          toast.error('Error al subir la imagen');
-          return null;
-        }
+      const data = await response.json();
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('posts')
-          .getPublicUrl(fileName);
-        return publicUrl;
+      if (!response.ok) {
+        console.error('Upload error:', data.error);
+        toast.error(data.error || 'Error al subir la imagen');
+        return null;
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('forum-images')
-        .getPublicUrl(fileName);
-
-      return publicUrl;
+      return data.url;
     } catch (error) {
       console.error('Upload exception:', error);
       toast.error('Error al subir la imagen');
