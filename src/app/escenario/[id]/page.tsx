@@ -561,13 +561,20 @@ export default function EscenarioPage() {
                       <Shield className="w-5 h-5 text-green-400" />
                       <span className="text-green-400 font-semibold">Este escenario es tuyo</span>
                     </div>
-                    <button
-                      onClick={() => setShowShieldModal(true)}
-                      className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-colors"
-                    >
-                      <Shield className="w-5 h-5" />
-                      Proteger
-                    </button>
+                    {isProtected ? (
+                      <div className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-500/20 border border-blue-500/30 rounded-xl">
+                        <Shield className="w-5 h-5 text-blue-400" />
+                        <span className="text-blue-400 font-semibold">Ya protegido</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowShieldModal(true)}
+                        className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-colors"
+                      >
+                        <Shield className="w-5 h-5" />
+                        Proteger
+                      </button>
+                    )}
                   </>
                 )}
               </>
