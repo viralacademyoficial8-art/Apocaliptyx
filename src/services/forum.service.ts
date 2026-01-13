@@ -1050,21 +1050,50 @@ class ForumService {
     quoteContent?: string
   ): Promise<{ success: boolean; error?: string; repost_id?: string }> {
     try {
-      const { data, error } = await (getSupabase().rpc as any)('create_repost', {
-        p_original_post_id: originalPostId,
-        p_user_id: userId,
-        p_quote_content: quoteContent || null,
-      });
+      // Check if user already reposted this post (without quote)
+      if (!quoteContent) {
+        const { data: existingRepost } = await getSupabase()
+          .from('forum_reposts')
+          .select('id')
+          .eq('original_post_id', originalPostId)
+          .eq('user_id', userId)
+          .is('quote_content', null)
+          .single();
 
-      if (error) {
-        console.error('Error creating repost:', error);
-        return { success: false, error: error.message };
+        if (existingRepost) {
+          return { success: false, error: 'Ya compartiste esta publicación' };
+        }
       }
 
-      const rpcData = data as { success?: boolean; error?: string; repost_id?: string } | null;
-      if (!rpcData?.success) {
-        return { success: false, error: rpcData?.error };
+      // Create the repost
+      const { data: newRepost, error: insertError } = await getSupabase()
+        .from('forum_reposts')
+        .insert({
+          original_post_id: originalPostId,
+          user_id: userId,
+          quote_content: quoteContent || null,
+        })
+        .select('id')
+        .single();
+
+      if (insertError) {
+        console.error('Error creating repost:', insertError);
+        return { success: false, error: insertError.message };
       }
+
+      // Update repost counter on original post
+      const { data: postData } = await getSupabase()
+        .from('forum_posts')
+        .select('reposts_count')
+        .eq('id', originalPostId)
+        .single();
+
+      const currentCount = (postData as { reposts_count?: number } | null)?.reposts_count || 0;
+
+      await getSupabase()
+        .from('forum_posts')
+        .update({ reposts_count: currentCount + 1 })
+        .eq('id', originalPostId);
 
       // Notify original post author
       const { data: originalPostRaw } = await getSupabase()
@@ -1095,7 +1124,7 @@ class ForumService {
         }
       }
 
-      return { success: true, repost_id: rpcData?.repost_id };
+      return { success: true, repost_id: (newRepost as { id: string }).id };
     } catch (error) {
       console.error('Error in createRepost:', error);
       return { success: false, error: 'Error al compartir' };
