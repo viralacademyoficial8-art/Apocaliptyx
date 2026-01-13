@@ -6,7 +6,7 @@ import { getSupabaseClient } from '@/lib/supabase';
 // TIPOS DE NOTIFICACIÓN (32 tipos)
 // ============================================
 
-export type NotificationType = 
+export type NotificationType =
   // Usuario (7)
   | 'welcome'
   | 'new_follower'
@@ -45,6 +45,19 @@ export type NotificationType =
   | 'community_like'
   | 'community_comment'
   | 'community_reply'
+  // Reels y Streaming (2)
+  | 'reel_like'
+  | 'stream_like'
+  // Chat (2)
+  | 'message_received'
+  | 'message_reaction'
+  // Coleccionables (1)
+  | 'collectible_purchased'
+  // Comunidades extra (1)
+  | 'community_new_member'
+  // Torneos (2)
+  | 'tournament_joined'
+  | 'tournament_registration'
   // Sistema (4)
   | 'system_announcement'
   | 'maintenance'
@@ -601,6 +614,120 @@ export const notificationsService = {
       title: '✅ Cuenta Restaurada',
       message: 'Tu cuenta ha sido restaurada y ya puedes usar todas las funciones normalmente.',
       linkUrl: '/dashboard',
+    });
+  },
+
+  // ============================================
+  // 🎬 BLOQUE 7: REELS Y STREAMING (2 notificaciones)
+  // ============================================
+
+  // 33. Like en un Reel
+  async notifyReelLike(userId: string, likerUsername: string, likerAvatar: string | undefined, reelId: string): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'reel_like',
+      title: '❤️ Nuevo like en tu Reel',
+      message: `A @${likerUsername} le gustó tu Reel.`,
+      imageUrl: likerAvatar,
+      linkUrl: `/reels/${reelId}`,
+    });
+  },
+
+  // 34. Like en un Stream
+  async notifyStreamLike(userId: string, likerUsername: string, likerAvatar: string | undefined, streamId: string): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'stream_like',
+      title: '❤️ Nuevo like en tu Stream',
+      message: `A @${likerUsername} le gustó tu Stream en vivo.`,
+      imageUrl: likerAvatar,
+      linkUrl: `/streaming/${streamId}`,
+    });
+  },
+
+  // ============================================
+  // 💬 BLOQUE 8: CHAT (2 notificaciones)
+  // ============================================
+
+  // 35. Mensaje recibido (ya existe en chat.service, este es para completitud)
+  async notifyMessageReceived(userId: string, senderUsername: string, senderAvatar: string | undefined, conversationId: string, preview: string): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'message_received',
+      title: `💬 Mensaje de @${senderUsername}`,
+      message: preview.length > 50 ? preview.substring(0, 50) + '...' : preview,
+      imageUrl: senderAvatar,
+      linkUrl: `/mensajes?conv=${conversationId}`,
+    });
+  },
+
+  // 36. Reacción a un mensaje
+  async notifyMessageReaction(userId: string, reactorUsername: string, reactorAvatar: string | undefined, emoji: string, conversationId: string): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'message_reaction',
+      title: `${emoji} Reacción a tu mensaje`,
+      message: `@${reactorUsername} reaccionó con ${emoji} a tu mensaje.`,
+      imageUrl: reactorAvatar,
+      linkUrl: `/mensajes?conv=${conversationId}`,
+    });
+  },
+
+  // ============================================
+  // 🎨 BLOQUE 9: COLECCIONABLES (1 notificación)
+  // ============================================
+
+  // 37. Compra de coleccionable
+  async notifyCollectiblePurchased(userId: string, collectibleName: string, serialNumber: number, cost: number): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'collectible_purchased',
+      title: '🎨 ¡Nuevo Coleccionable!',
+      message: `Has adquirido "${collectibleName}" #${serialNumber} por ${cost.toLocaleString()} AP Coins.`,
+      linkUrl: '/inventario/coleccionables',
+    });
+  },
+
+  // ============================================
+  // 👥 BLOQUE 10: COMUNIDADES EXTRA (1 notificación)
+  // ============================================
+
+  // 38. Nuevo miembro en comunidad (para admins)
+  async notifyCommunityNewMember(userId: string, memberUsername: string, memberAvatar: string | undefined, communityName: string, communityId: string): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'community_new_member',
+      title: '👥 Nuevo miembro',
+      message: `@${memberUsername} se unió a tu comunidad "${communityName}".`,
+      imageUrl: memberAvatar,
+      linkUrl: `/comunidades/${communityId}`,
+    });
+  },
+
+  // ============================================
+  // 🏆 BLOQUE 11: TORNEOS (2 notificaciones)
+  // ============================================
+
+  // 39. Te uniste a un torneo
+  async notifyTournamentJoined(userId: string, tournamentName: string, tournamentId: string, entryFee?: number): Promise<Notification | null> {
+    const feeText = entryFee && entryFee > 0 ? ` Entry fee: ${entryFee.toLocaleString()} AP.` : '';
+    return this.create({
+      userId,
+      type: 'tournament_joined',
+      title: '🏆 ¡Inscrito en Torneo!',
+      message: `Te has inscrito exitosamente en "${tournamentName}".${feeText}`,
+      linkUrl: `/torneos/${tournamentId}`,
+    });
+  },
+
+  // 40. Confirmación de registro en torneo
+  async notifyTournamentRegistration(userId: string, tournamentName: string, tournamentId: string, startDate: string): Promise<Notification | null> {
+    return this.create({
+      userId,
+      type: 'tournament_registration',
+      title: '📋 Registro Confirmado',
+      message: `Tu registro en "${tournamentName}" ha sido confirmado. Inicia: ${startDate}.`,
+      linkUrl: `/torneos/${tournamentId}`,
     });
   },
 

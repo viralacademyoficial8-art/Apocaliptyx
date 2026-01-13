@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { notificationsService } from '@/services/notifications.service';
 
 // POST /api/reels/[id]/like - Like a reel
 export async function POST(
@@ -39,19 +40,38 @@ export async function POST(
 
     if (likeError) throw likeError;
 
-    // Increment like count
+    // Increment like count and get reel owner info
     const { data: reelRaw } = await supabase
       .from('user_reels')
-      .select('likes_count')
+      .select('likes_count, user_id')
       .eq('id', reelId)
       .single();
 
-    const reel = reelRaw as { likes_count?: number } | null;
+    const reel = reelRaw as { likes_count?: number; user_id?: string } | null;
 
     await supabase
       .from('user_reels')
       .update({ likes_count: (reel?.likes_count || 0) + 1 } as never)
       .eq('id', reelId);
+
+    // Send notification to reel owner (if not self-liking)
+    if (reel?.user_id && reel.user_id !== user.id) {
+      // Get liker's info
+      const { data: likerInfo } = await supabase
+        .from('users')
+        .select('username, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      const likerData = likerInfo as { username?: string; avatar_url?: string } | null;
+
+      await notificationsService.notifyReelLike(
+        reel.user_id,
+        likerData?.username || 'Usuario',
+        likerData?.avatar_url,
+        reelId
+      );
+    }
 
     return NextResponse.json({ success: true, liked: true });
   } catch (error) {

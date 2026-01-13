@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { notificationsService } from '@/services/notifications.service';
 
 interface TournamentRow {
   id: string;
@@ -112,6 +113,14 @@ export async function POST(
       .from('prediction_tournaments')
       .update({ participants_count: tournament.participants_count + 1 } as never)
       .eq('id', tournamentId);
+
+    // Send notification for successful tournament registration
+    await notificationsService.notifyTournamentJoined(
+      user.id,
+      tournament.name,
+      tournamentId,
+      tournament.entry_fee > 0 ? tournament.entry_fee : undefined
+    );
 
     return NextResponse.json({
       success: true,

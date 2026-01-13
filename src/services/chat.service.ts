@@ -821,7 +821,55 @@ class ChatService {
       .from('message_reactions')
       .insert({ message_id: messageId, user_id: userId, emoji });
 
+    if (!error) {
+      // Send notification to message owner
+      await this.sendReactionNotification(messageId, userId, emoji);
+    }
+
     return !error;
+  }
+
+  private async sendReactionNotification(messageId: string, reactorId: string, emoji: string): Promise<void> {
+    try {
+      // Get message info
+      const { data: message } = await supabase
+        .from('messages')
+        .select('sender_id, conversation_id')
+        .eq('id', messageId)
+        .single();
+
+      if (!message || message.sender_id === reactorId) return; // Don't notify self
+
+      // Get reactor info
+      const { data: reactorInfo } = await supabase
+        .from('users')
+        .select('username, avatar_url')
+        .eq('id', reactorId)
+        .single();
+
+      // Check if message owner has muted this conversation
+      const { data: prefs } = await supabase
+        .from('conversation_preferences')
+        .select('is_muted')
+        .eq('conversation_id', message.conversation_id)
+        .eq('user_id', message.sender_id)
+        .single();
+
+      if (prefs?.is_muted) return; // Don't notify if muted
+
+      // Create notification
+      await supabase.from('notifications').insert({
+        user_id: message.sender_id,
+        type: 'message_reaction',
+        title: `${emoji} Reacción a tu mensaje`,
+        message: `@${reactorInfo?.username || 'Usuario'} reaccionó con ${emoji} a tu mensaje.`,
+        image_url: reactorInfo?.avatar_url || null,
+        link_url: `/mensajes?conv=${message.conversation_id}`,
+        is_read: false,
+      });
+    } catch (error) {
+      console.error('Error sending reaction notification:', error);
+    }
   }
 
   async getReactions(messageId: string): Promise<MessageReaction[]> {

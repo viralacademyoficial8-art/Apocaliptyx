@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { notificationsService } from '@/services/notifications.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,6 +68,36 @@ export async function POST(
       .from('communities')
       .update({ members_count: (community as any).members_count + 1 })
       .eq('id', communityId);
+
+    // Get new member info
+    const { data: memberInfo } = await supabase()
+      .from('users')
+      .select('username, avatar_url')
+      .eq('id', session.user.id)
+      .single();
+
+    const memberData = memberInfo as { username?: string; avatar_url?: string } | null;
+
+    // Notify community admins/owner about new member
+    const { data: admins } = await supabase()
+      .from('community_members')
+      .select('user_id')
+      .eq('community_id', communityId)
+      .in('role', ['owner', 'admin']);
+
+    if (admins && admins.length > 0) {
+      for (const admin of admins) {
+        if (admin.user_id !== session.user.id) {
+          await notificationsService.notifyCommunityNewMember(
+            admin.user_id,
+            memberData?.username || 'Usuario',
+            memberData?.avatar_url,
+            (community as any).name || 'Comunidad',
+            communityId
+          );
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,

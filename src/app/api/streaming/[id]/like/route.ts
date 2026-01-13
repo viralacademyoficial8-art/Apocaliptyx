@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-
+import { notificationsService } from '@/services/notifications.service';
 
 // POST /api/streaming/[id]/like - Like a stream
 export async function POST(
@@ -39,19 +39,38 @@ export async function POST(
 
     if (likeError) throw likeError;
 
-    // Increment like count
+    // Increment like count and get stream owner info
     const { data: streamRaw } = await supabase
       .from('live_streams')
-      .select('likes_count')
+      .select('likes_count, user_id')
       .eq('id', streamId)
       .single();
 
-    const stream = streamRaw as { likes_count?: number } | null;
+    const stream = streamRaw as { likes_count?: number; user_id?: string } | null;
 
     await supabase
       .from('live_streams')
       .update({ likes_count: (stream?.likes_count || 0) + 1 } as never)
       .eq('id', streamId);
+
+    // Send notification to stream owner (if not self-liking)
+    if (stream?.user_id && stream.user_id !== user.id) {
+      // Get liker's info
+      const { data: likerInfo } = await supabase
+        .from('users')
+        .select('username, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      const likerData = likerInfo as { username?: string; avatar_url?: string } | null;
+
+      await notificationsService.notifyStreamLike(
+        stream.user_id,
+        likerData?.username || 'Usuario',
+        likerData?.avatar_url,
+        streamId
+      );
+    }
 
     return NextResponse.json({ success: true, liked: true });
   } catch (error) {
