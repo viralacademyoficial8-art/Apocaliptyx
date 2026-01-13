@@ -64,7 +64,14 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow, type Locale } from 'date-fns';
 import { es, enUS, pt, fr, de, ru } from 'date-fns/locale';
 import toast from 'react-hot-toast';
+import { createClient } from '@supabase/supabase-js';
 import { useTranslation } from '@/hooks/useTranslation';
+
+// Supabase client for image uploads
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories';
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
@@ -762,13 +769,27 @@ function ForoContent() {
     }
 
     // Regular post
-    if (!newPostContent.trim() && !selectedGif) {
+    if (!newPostContent.trim() && !selectedGif && selectedImages.length === 0) {
       toast.error(t('forum.actions.writeToPublish'));
       return;
     }
 
     setCreating(true);
     try {
+      // Upload images if any
+      let imageUrl: string | null = null;
+      if (selectedImages.length > 0) {
+        toast.loading('Subiendo imagen...', { id: 'upload-image' });
+        imageUrl = await uploadPostImage(selectedImages[0]);
+        toast.dismiss('upload-image');
+
+        if (!imageUrl && !newPostContent.trim() && !selectedGif) {
+          toast.error('Error al subir la imagen');
+          setCreating(false);
+          return;
+        }
+      }
+
       const response = await fetch('/api/forum/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -779,6 +800,7 @@ function ForoContent() {
           gif_url: selectedGif?.url,
           gif_width: selectedGif?.width,
           gif_height: selectedGif?.height,
+          image_url: imageUrl,
         }),
       });
 
@@ -1051,6 +1073,67 @@ function ForoContent() {
 
   const removeImage = (index: number) => {
     setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Upload image to Supabase Storage
+  const uploadPostImage = async (file: File): Promise<string | null> => {
+    if (!user?.id) return null;
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('La imagen no puede superar 5MB');
+      return null;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten imágenes');
+      return null;
+    }
+
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('forum-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        // Try alternate bucket name
+        const { data: data2, error: error2 } = await supabase.storage
+          .from('posts')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false,
+          });
+
+        if (error2) {
+          console.error('Upload error (alternate):', error2);
+          toast.error('Error al subir la imagen');
+          return null;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('posts')
+          .getPublicUrl(fileName);
+        return publicUrl;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('forum-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Upload exception:', error);
+      toast.error('Error al subir la imagen');
+      return null;
+    }
   };
 
   // Toggle tag en nuevo post

@@ -137,9 +137,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, category_id, tags } = body;
+    const { title, content, category_id, tags, gif_url, image_url } = body;
 
-    if (!content) {
+    if (!content && !gif_url && !image_url) {
       return NextResponse.json(
         { error: 'El contenido es requerido' },
         { status: 400 }
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       .from('forum_posts')
       .insert({
         title: title || '',
-        content,
+        content: content || '',
         author_id: session.user.id,
         category_id: category_id || null,
         tags: tags || [],
@@ -160,6 +160,8 @@ export async function POST(request: NextRequest) {
         views_count: 0,
         likes_count: 0,
         comments_count: 0,
+        gif_url: gif_url || null,
+        image_url: image_url || null,
       })
       .select(`
         *,
