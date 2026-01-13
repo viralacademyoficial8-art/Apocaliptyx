@@ -1,17 +1,9 @@
 // src/services/forum.service.ts
 
 import { getSupabaseClient } from '@/lib/supabase/client';
-import { createClient } from '@supabase/supabase-js';
 
 // Use the authenticated browser client
 const getSupabase = () => getSupabaseClient();
-
-// Admin client that bypasses RLS (for server-side operations)
-const getSupabaseAdmin = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-  return createClient(supabaseUrl, serviceKey);
-};
 
 // ==================== TYPES ====================
 
@@ -1058,82 +1050,23 @@ class ForumService {
     quoteContent?: string
   ): Promise<{ success: boolean; error?: string; repost_id?: string }> {
     try {
-      // Check if user already reposted this post (without quote)
-      if (!quoteContent) {
-        const { data: existingRepost } = await getSupabase()
-          .from('forum_reposts')
-          .select('id')
-          .eq('original_post_id', originalPostId)
-          .eq('user_id', userId)
-          .is('quote_content', null)
-          .single();
+      // Call API route to create repost (server-side to bypass RLS)
+      const response = await fetch('/api/forum/repost', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          originalPostId,
+          quoteContent: quoteContent || null,
+        }),
+      });
 
-        if (existingRepost) {
-          return { success: false, error: 'Ya compartiste esta publicación' };
-        }
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || 'Error al compartir' };
       }
 
-      // Create the repost using admin client to bypass RLS
-      const adminClient = getSupabaseAdmin();
-      const { data: newRepost, error: insertError } = await (adminClient
-        .from('forum_reposts') as any)
-        .insert({
-          original_post_id: originalPostId,
-          user_id: userId,
-          quote_content: quoteContent || null,
-        })
-        .select('id')
-        .single();
-
-      if (insertError) {
-        console.error('Error creating repost:', insertError);
-        return { success: false, error: insertError.message };
-      }
-
-      // Update repost counter on original post
-      const { data: postData } = await adminClient
-        .from('forum_posts')
-        .select('reposts_count')
-        .eq('id', originalPostId)
-        .single();
-
-      const currentCount = (postData as { reposts_count?: number } | null)?.reposts_count || 0;
-
-      await (adminClient
-        .from('forum_posts') as any)
-        .update({ reposts_count: currentCount + 1 })
-        .eq('id', originalPostId);
-
-      // Notify original post author
-      const { data: originalPostRaw } = await getSupabase()
-        .from('forum_posts')
-        .select('author_id, title, content')
-        .eq('id', originalPostId)
-        .single();
-
-      const originalPost = originalPostRaw as { author_id?: string; title?: string; content?: string } | null;
-      if (originalPost && originalPost.author_id !== userId) {
-        const { data: reposterRaw } = await getSupabase()
-          .from('users')
-          .select('username, avatar_url')
-          .eq('id', userId)
-          .single();
-
-        const reposter = reposterRaw as { username?: string; avatar_url?: string } | null;
-        if (reposter) {
-          const postTitle = originalPost.title || originalPost.content?.substring(0, 30) + '...';
-          await this.sendNotification(
-            originalPost.author_id!,
-            'repost_received',
-            '🔁 Compartieron tu Post',
-            `@${reposter.username} compartió tu publicación "${postTitle}"`,
-            `/foro`,
-            reposter.avatar_url
-          );
-        }
-      }
-
-      return { success: true, repost_id: (newRepost as { id: string }).id };
+      return { success: true, repost_id: data.repost_id };
     } catch (error) {
       console.error('Error in createRepost:', error);
       return { success: false, error: 'Error al compartir' };
