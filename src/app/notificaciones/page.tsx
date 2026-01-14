@@ -278,10 +278,10 @@ export default function NotificacionesPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
+      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-3xl pb-20 md:pb-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/dashboard"
               className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
@@ -289,51 +289,51 @@ export default function NotificacionesPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Bell className="w-6 h-6 text-purple-500" />
+              <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" />
                 Notificaciones
               </h1>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-xs sm:text-sm">
                 {unreadCount > 0
-                  ? `${unreadCount} notificaciones sin leer`
-                  : "Todas las notificaciones leídas"}
+                  ? `${unreadCount} sin leer`
+                  : "Todas leídas"}
               </p>
             </div>
           </div>
 
           {/* Acciones */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-10 sm:ml-0">
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
                 disabled={markingAll}
-                className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs sm:text-sm transition-colors disabled:opacity-50"
               >
                 {markingAll ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                 ) : (
-                  <CheckCheck className="w-4 h-4" />
+                  <CheckCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 )}
-                Marcar todas
+                <span className="hidden xs:inline">Marcar</span> todas
               </button>
             )}
             {notifications.length > 0 && (
               <button
                 onClick={handleDeleteAll}
-                className="flex items-center gap-2 px-3 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-sm transition-colors"
+                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-xs sm:text-sm transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
-                Eliminar todas
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden xs:inline">Eliminar</span> todas
               </button>
             )}
           </div>
         </div>
 
         {/* Filtros */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto pb-1 -mx-1 px-1">
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               filter === "all"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -343,7 +343,7 @@ export default function NotificacionesPage() {
           </button>
           <button
             onClick={() => setFilter("unread")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               filter === "unread"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -353,7 +353,7 @@ export default function NotificacionesPage() {
           </button>
           <button
             onClick={() => setFilter("read")}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               filter === "read"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"

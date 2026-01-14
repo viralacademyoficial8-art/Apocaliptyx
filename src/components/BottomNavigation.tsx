@@ -64,7 +64,7 @@ export function BottomNavigation() {
       label: 'Explorar',
     },
     {
-      href: '/escenarios/crear',
+      href: '/crear',
       icon: PlusSquare,
       label: 'Crear',
       requiresAuth: true,
@@ -77,7 +77,7 @@ export function BottomNavigation() {
       requiresAuth: true,
     },
     {
-      href: user?.username ? `/${user.username}` : '/perfil',
+      href: '/perfil',
       icon: User,
       label: 'Perfil',
       requiresAuth: true,
