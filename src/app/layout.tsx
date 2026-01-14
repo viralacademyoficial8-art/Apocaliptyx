@@ -7,6 +7,7 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import CookieConsent from '@/components/CookieConsent';
 import { Toaster } from 'react-hot-toast';
+import { BottomNavigation } from '@/components/BottomNavigation';
 
 export const metadata: Metadata = {
   title: 'Apocaliptics - Predice el Futuro',
@@ -48,9 +49,11 @@ export default function RootLayout({
           <LanguageProvider>
             <PWAProvider>
               {children}
+              <BottomNavigation />
               <CookieConsent />
               <Toaster
-                position="bottom-center"
+                position="top-center"
+                containerClassName="!top-16 md:!top-4"
                 toastOptions={{
                   duration: 3000,
                   style: {
