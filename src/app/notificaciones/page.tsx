@@ -278,62 +278,60 @@ export default function NotificacionesPage() {
     <div className="min-h-screen bg-gray-950 text-white">
       <Navbar />
 
-      <main className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-3xl pb-20 md:pb-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
-          <div className="flex items-center gap-3 sm:gap-4">
+      <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-8 max-w-3xl pb-20 md:pb-8">
+        {/* Header compacto */}
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard"
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-800 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
-                <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" />
+              <h1 className="text-lg sm:text-2xl font-bold flex items-center gap-1.5 sm:gap-2">
+                <Bell className="w-4 h-4 sm:w-6 sm:h-6 text-purple-500" />
                 Notificaciones
               </h1>
-              <p className="text-gray-400 text-xs sm:text-sm">
-                {unreadCount > 0
-                  ? `${unreadCount} sin leer`
-                  : "Todas leídas"}
+              <p className="text-gray-400 text-[10px] sm:text-sm">
+                {unreadCount > 0 ? `${unreadCount} sin leer` : "Todas leídas"}
               </p>
             </div>
           </div>
 
-          {/* Acciones */}
-          <div className="flex items-center gap-2 ml-10 sm:ml-0">
+          {/* Botones de acción compactos */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
                 disabled={markingAll}
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs sm:text-sm transition-colors disabled:opacity-50"
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-[10px] sm:text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {markingAll ? (
-                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
+                  <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                 ) : (
-                  <CheckCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <CheckCheck className="w-3 h-3 sm:w-4 sm:h-4" />
                 )}
-                <span className="hidden xs:inline">Marcar</span> todas
+                <span className="hidden sm:inline">Marcar</span> todas
               </button>
             )}
             {notifications.length > 0 && (
               <button
                 onClick={handleDeleteAll}
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-xs sm:text-sm transition-colors"
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg text-[10px] sm:text-sm font-medium transition-colors"
               >
-                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden xs:inline">Eliminar</span> todas
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Eliminar</span> todas
               </button>
             )}
           </div>
         </div>
 
-        {/* Filtros */}
-        <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto pb-1 -mx-1 px-1">
+        {/* Filtros en línea */}
+        <div className="flex gap-1.5 sm:gap-2 mb-3 sm:mb-6">
           <button
             onClick={() => setFilter("all")}
-            className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full text-[11px] sm:text-sm font-medium transition-colors ${
               filter === "all"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -343,7 +341,7 @@ export default function NotificacionesPage() {
           </button>
           <button
             onClick={() => setFilter("unread")}
-            className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full text-[11px] sm:text-sm font-medium transition-colors ${
               filter === "unread"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -353,7 +351,7 @@ export default function NotificacionesPage() {
           </button>
           <button
             onClick={() => setFilter("read")}
-            className={`flex-shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+            className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full text-[11px] sm:text-sm font-medium transition-colors ${
               filter === "read"
                 ? "bg-purple-600 text-white"
                 : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -366,10 +364,10 @@ export default function NotificacionesPage() {
         {/* Lista de notificaciones */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
           {filteredNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-gray-500">
-              <Bell className="w-16 h-16 mb-4 opacity-30" />
-              <p className="text-lg font-medium">No hay notificaciones</p>
-              <p className="text-sm">
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-gray-500">
+              <Bell className="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 opacity-30" />
+              <p className="text-base sm:text-lg font-medium">No hay notificaciones</p>
+              <p className="text-xs sm:text-sm text-center px-4">
                 {filter === "unread"
                   ? "No tienes notificaciones sin leer"
                   : filter === "read"
@@ -388,60 +386,60 @@ export default function NotificacionesPage() {
                 return (
                   <div
                     key={notification.id}
-                    className={`relative group p-4 hover:bg-gray-800/50 transition-colors cursor-pointer ${
+                    className={`relative group p-3 sm:p-4 hover:bg-gray-800/50 transition-colors cursor-pointer ${
                       !notification.is_read ? "bg-purple-500/5" : ""
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                   >
-                    <div className="flex gap-4">
+                    <div className="flex gap-2.5 sm:gap-4">
                       {/* Icono */}
                       <div
-                        className={`flex-shrink-0 w-12 h-12 rounded-full ${config.bgColor} flex items-center justify-center`}
+                        className={`flex-shrink-0 w-9 h-9 sm:w-12 sm:h-12 rounded-full ${config.bgColor} flex items-center justify-center`}
                       >
-                        <Icon className={`w-6 h-6 ${config.color}`} />
+                        <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${config.color}`} />
                       </div>
 
                       {/* Contenido */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-2">
                           <p
-                            className={`font-medium ${
+                            className={`text-sm sm:text-base font-medium leading-tight ${
                               !notification.is_read ? "text-white" : "text-gray-300"
                             }`}
                           >
                             {notification.title}
                           </p>
                           {!notification.is_read && (
-                            <span className="flex-shrink-0 w-2 h-2 bg-purple-500 rounded-full mt-2 ml-2" />
+                            <span className="flex-shrink-0 w-2 h-2 bg-purple-500 rounded-full mt-1.5" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-400 mt-1">
+                        <p className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1 line-clamp-2">
                           {notification.message}
                         </p>
-                        <div className="flex items-center gap-4 mt-2">
-                          <p className="text-xs text-gray-500">
+                        <div className="flex items-center gap-2 sm:gap-4 mt-1.5 sm:mt-2">
+                          <p className="text-[10px] sm:text-xs text-gray-500">
                             {formatTimeAgo(notification.created_at)}
                           </p>
                           {notification.link_url && (
-                            <span className="text-xs text-purple-400">
+                            <span className="text-[10px] sm:text-xs text-purple-400">
                               Click para ver más →
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Acciones */}
-                      <div className="flex-shrink-0 flex items-start gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {/* Acciones - visibles en hover en desktop, siempre en móvil */}
+                      <div className="flex-shrink-0 flex items-start gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         {!notification.is_read && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleMarkAsRead(notification);
                             }}
-                            className="p-2 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                            className="p-1.5 sm:p-2 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
                             title="Marcar como leída"
                           >
-                            <Check className="w-4 h-4" />
+                            <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
                         )}
                         <button
@@ -449,10 +447,10 @@ export default function NotificacionesPage() {
                             e.stopPropagation();
                             handleDelete(notification.id);
                           }}
-                          className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                          className="p-1.5 sm:p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                           title="Eliminar"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </button>
                       </div>
                     </div>
