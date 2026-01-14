@@ -107,6 +107,7 @@ export function BottomNavigation() {
             const Icon = item.icon;
             const isActive = pathname === item.href ||
               (item.href !== '/dashboard' && pathname?.startsWith(item.href));
+            const hasBadge = item.badge !== undefined && item.badge > 0;
 
             return (
               <Link
@@ -126,14 +127,14 @@ export function BottomNavigation() {
                 {/* Icono con badge */}
                 <div className="relative">
                   <Icon
-                    className={`w-6 h-6 ${isActive ? 'fill-purple-400/20' : ''}`}
+                    className="w-6 h-6"
                     strokeWidth={isActive ? 2.5 : 2}
                   />
 
-                  {/* Badge de notificaciones */}
-                  {item.badge && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold text-white bg-red-500 rounded-full">
-                      {item.badge > 99 ? '99+' : item.badge}
+                  {/* Badge de notificaciones - solo si hay más de 0 */}
+                  {hasBadge && (
+                    <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full animate-pulse">
+                      {item.badge! > 99 ? '99+' : item.badge}
                     </span>
                   )}
                 </div>
