@@ -43,6 +43,9 @@ import {
   UserX,
   Share2,
   Skull,
+  Bookmark,
+  Heart,
+  MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -56,6 +59,7 @@ import {
   DialogContent,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { forumService, ForumPost } from '@/services/forum.service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -72,7 +76,7 @@ const REPORT_REASONS = [
   { id: 'other', label: 'Otro motivo' },
 ];
 
-type TabType = 'general' | 'stolen' | 'scenarios' | 'activity';
+type TabType = 'general' | 'stolen' | 'scenarios' | 'activity' | 'guardados';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -89,6 +93,8 @@ export default function PublicProfilePage() {
   const [stolenScenarios, setStolenScenarios] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
+  const [bookmarks, setBookmarks] = useState<ForumPost[]>([]);
+  const [bookmarksLoading, setBookmarksLoading] = useState(false);
 
   // Estados para modales de seguidores/siguiendo
   const [showFollowersModal, setShowFollowersModal] = useState(false);
@@ -405,6 +411,24 @@ export default function PublicProfilePage() {
   useEffect(() => {
     loadTabData();
   }, [loadTabData]);
+
+  // Cargar bookmarks cuando se selecciona la pestaña guardados (solo perfil propio)
+  useEffect(() => {
+    async function loadBookmarks() {
+      if (activeTab !== 'guardados' || !isOwnProfile || !currentUser?.id) return;
+
+      setBookmarksLoading(true);
+      try {
+        const data = await forumService.getUserBookmarks(currentUser.id);
+        setBookmarks(data);
+      } catch (error) {
+        console.error('Error loading bookmarks:', error);
+      } finally {
+        setBookmarksLoading(false);
+      }
+    }
+    loadBookmarks();
+  }, [activeTab, isOwnProfile, currentUser?.id]);
 
   // Seguir/dejar de seguir
   const handleFollow = async () => {
@@ -778,6 +802,7 @@ export default function PublicProfilePage() {
               { id: 'stolen', label: 'Escenarios Robados', icon: Skull },
               { id: 'scenarios', label: 'Escenarios', icon: Zap },
               { id: 'activity', label: 'Actividad', icon: Eye },
+              ...(isOwnProfile ? [{ id: 'guardados', label: 'Guardados', icon: Bookmark }] : []),
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -956,6 +981,73 @@ export default function PublicProfilePage() {
                         {formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: es })}
                       </span>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'guardados' && isOwnProfile && (
+            <div className="space-y-4">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Bookmark className="w-5 h-5 text-purple-400" />
+                Publicaciones Guardadas
+              </h3>
+              {bookmarksLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+                </div>
+              ) : bookmarks.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  <Bookmark className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No tienes publicaciones guardadas</p>
+                  <p className="text-sm mt-2">Guarda publicaciones del foro haciendo clic en el icono de marcador</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {bookmarks.map((post) => (
+                    <Link
+                      key={post.id}
+                      href={`/foro/post/${post.id}`}
+                      className="block bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-purple-500/50 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden flex-shrink-0">
+                          {post.author?.avatar_url ? (
+                            <img
+                              src={post.author.avatar_url}
+                              alt={post.author.username}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-white font-bold">
+                              {(post.author?.display_name || post.author?.username || '?')[0].toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium">{post.author?.display_name || post.author?.username}</span>
+                            <span className="text-gray-500">@{post.author?.username}</span>
+                            <span className="text-gray-600">·</span>
+                            <span className="text-gray-500 text-sm">
+                              {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: es })}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-gray-300 line-clamp-3">{post.content}</p>
+                          <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Heart className="w-4 h-4" />
+                              {post.reactions_count || 0}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="w-4 h-4" />
+                              {post.comments_count || 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
                   ))}
                 </div>
               )}
