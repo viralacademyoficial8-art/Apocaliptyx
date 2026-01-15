@@ -37,6 +37,7 @@ interface ScenarioData {
   current_holder_id?: string | null;
   creator_username?: string;
   holder_username?: string;
+  steal_count?: number;
 }
 
 // Tipo para stats del usuario
@@ -73,7 +74,7 @@ export default function ExplorarPage() {
   ];
 
   const SORT_OPTIONS = [
-    { value: 'recent', label: t('scenarios.sort.latest') },
+    { value: 'recent', label: '🔥 ' + t('explore.trending') },
     { value: 'popular', label: t('scenarios.sort.popular') },
     { value: 'pool', label: t('explore.highestPool') },
     { value: 'ending', label: t('scenarios.sort.ending') },
@@ -192,15 +193,18 @@ export default function ExplorarPage() {
         result.sort((a, b) => b.total_pool - a.total_pool);
         break;
       case 'ending':
-        result.sort((a, b) => 
+        result.sort((a, b) =>
           new Date(a.resolution_date).getTime() - new Date(b.resolution_date).getTime()
         );
         break;
       case 'recent':
       default:
-        result.sort((a, b) => 
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+        // Ordenamiento por defecto: 1) Más robados, 2) Más votados
+        result.sort((a, b) => {
+          const stealDiff = (b.steal_count || 0) - (a.steal_count || 0);
+          if (stealDiff !== 0) return stealDiff;
+          return b.participant_count - a.participant_count;
+        });
     }
 
     setFilteredScenarios(result);
