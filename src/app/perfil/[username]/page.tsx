@@ -59,7 +59,7 @@ import {
   DialogContent,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { forumService, ForumPost } from '@/services/forum.service';
+import { ForumPost } from '@/services/forum.service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -419,8 +419,11 @@ export default function PublicProfilePage() {
 
       setBookmarksLoading(true);
       try {
-        const data = await forumService.getUserBookmarks(currentUser.id);
-        setBookmarks(data);
+        const response = await fetch('/api/forum/bookmarks');
+        const data = await response.json();
+        if (response.ok && data.posts) {
+          setBookmarks(data.posts);
+        }
       } catch (error) {
         console.error('Error loading bookmarks:', error);
       } finally {

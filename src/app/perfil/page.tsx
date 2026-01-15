@@ -32,7 +32,7 @@ import {
   MessageSquare,
   Heart,
 } from "lucide-react";
-import { forumService, ForumPost } from "@/services/forum.service";
+import { ForumPost } from "@/services/forum.service";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { toast } from "@/components/ui/toast";
@@ -143,8 +143,11 @@ export default function PerfilPage() {
 
       setBookmarksLoading(true);
       try {
-        const data = await forumService.getUserBookmarks(user.id);
-        setBookmarks(data);
+        const response = await fetch('/api/forum/bookmarks');
+        const data = await response.json();
+        if (response.ok && data.posts) {
+          setBookmarks(data.posts);
+        }
       } catch (error) {
         console.error("Error loading bookmarks:", error);
       } finally {
