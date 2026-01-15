@@ -63,6 +63,7 @@ interface CommunityPost {
   } | null;
   content: string;
   imageUrl?: string;
+  category?: string;
   likesCount: number;
   commentsCount: number;
   isPinned: boolean;
@@ -109,8 +110,17 @@ export default function CommunityPage() {
   // Create post state
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostImage, setNewPostImage] = useState<string | null>(null);
+  const [newPostCategory, setNewPostCategory] = useState('general');
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Category options
+  const categoryOptions = [
+    { value: 'general', label: 'General', icon: '💬', color: 'bg-gray-500' },
+    { value: 'predicciones', label: 'Predicciones', icon: '🔮', color: 'bg-purple-500' },
+    { value: 'ayuda', label: 'Ayuda', icon: '❓', color: 'bg-blue-500' },
+    { value: 'sugerencias', label: 'Sugerencias', icon: '💡', color: 'bg-yellow-500' },
+  ];
 
   // Load community data
   const loadCommunity = useCallback(async () => {
@@ -260,6 +270,7 @@ export default function CommunityPage() {
         body: JSON.stringify({
           content: newPostContent,
           imageUrl: newPostImage,
+          category: newPostCategory,
         }),
       });
 
@@ -274,6 +285,7 @@ export default function CommunityPage() {
       setPosts([data.post, ...posts]);
       setNewPostContent('');
       setNewPostImage(null);
+      setNewPostCategory('general');
       // Update posts count in community state
       if (community) {
         setCommunity({ ...community, postsCount: community.postsCount + 1 });
@@ -532,6 +544,31 @@ export default function CommunityPage() {
                           className="bg-gray-800 border-gray-700 min-h-[80px] resize-none"
                           maxLength={2000}
                         />
+
+                        {/* Category Selector */}
+                        <div className="mt-3">
+                          <label className="text-xs text-gray-400 mb-2 block">Categoría</label>
+                          <div className="flex flex-wrap gap-2">
+                            {categoryOptions.map((cat) => (
+                              <button
+                                key={cat.value}
+                                type="button"
+                                onClick={() => setNewPostCategory(cat.value)}
+                                className={`
+                                  flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all
+                                  ${newPostCategory === cat.value
+                                    ? `${cat.color} text-white`
+                                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                                  }
+                                `}
+                              >
+                                <span>{cat.icon}</span>
+                                <span>{cat.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
                         <div className="flex items-center justify-between mt-3">
                           <div className="flex gap-2">
                             <button
