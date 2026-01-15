@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScenarioCard } from '@/components/ScenarioCard';
 import { scenariosService, ScenarioFromDB } from '@/services/scenarios.service';
 import { forumService, ForumPost } from '@/services/forum.service';
-import { Loader2, Bookmark, MessageSquare, Heart } from 'lucide-react';
+import { Loader2, Bookmark, MessageSquare, Heart, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -88,6 +88,22 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
 
     loadBookmarks();
   }, [activeTab, isOwnProfile, currentUserId]);
+
+  // Function to remove a bookmark
+  const handleRemoveBookmark = async (e: React.MouseEvent, postId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!currentUserId) return;
+
+    try {
+      await forumService.toggleBookmark(postId, currentUserId);
+      // Remove from local state
+      setBookmarks(prev => prev.filter(b => b.id !== postId));
+    } catch (error) {
+      console.error('Error removing bookmark:', error);
+    }
+  };
 
   const escenariosActivos = scenarios
     .filter(s => s.status === 'ACTIVE')
@@ -248,55 +264,66 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
             ) : (
               <div className="space-y-4">
                 {bookmarks.map((post) => (
-                  <Link
+                  <div
                     key={post.id}
-                    href={`/foro?post=${post.id}`}
-                    className="block rounded-xl border border-gray-800 bg-gray-900/60 p-4 hover:border-purple-500/50 transition-all"
+                    className="rounded-xl border border-gray-800 bg-gray-900/60 p-4 hover:border-purple-500/50 transition-all"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0">
-                        {post.author?.avatar_url ? (
-                          <img
-                            src={post.author.avatar_url}
-                            alt={post.author.username}
-                            className="w-10 h-10 rounded-full"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
-                            {post.author?.username?.charAt(0).toUpperCase() || '?'}
+                      <Link
+                        href={`/foro?post=${post.id}`}
+                        className="flex items-start gap-3 flex-1 min-w-0"
+                      >
+                        <div className="flex-shrink-0">
+                          {post.author?.avatar_url ? (
+                            <img
+                              src={post.author.avatar_url}
+                              alt={post.author.username}
+                              className="w-10 h-10 rounded-full"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
+                              {post.author?.username?.charAt(0).toUpperCase() || '?'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="font-semibold text-white">
+                              {post.author?.display_name || post.author?.username}
+                            </span>
+                            <span className="text-gray-500">@{post.author?.username}</span>
+                            <span className="text-gray-600">•</span>
+                            <span className="text-gray-500 text-xs">
+                              {formatDistanceToNow(new Date(post.created_at), {
+                                addSuffix: true,
+                                locale: es,
+                              })}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="font-semibold text-white">
-                            {post.author?.display_name || post.author?.username}
-                          </span>
-                          <span className="text-gray-500">@{post.author?.username}</span>
-                          <span className="text-gray-600">•</span>
-                          <span className="text-gray-500 text-xs">
-                            {formatDistanceToNow(new Date(post.created_at), {
-                              addSuffix: true,
-                              locale: es,
-                            })}
-                          </span>
+                          <p className="text-gray-300 text-sm mt-1 line-clamp-2">
+                            {post.content}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Heart className="w-3.5 h-3.5" />
+                              {Object.values(post.reactions_count || {}).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              {post.comments_count || 0}
+                            </span>
+                          </div>
                         </div>
-                        <p className="text-gray-300 text-sm mt-1 line-clamp-2">
-                          {post.content}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <Heart className="w-3.5 h-3.5" />
-                            {Object.values(post.reactions_count || {}).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0)}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MessageSquare className="w-3.5 h-3.5" />
-                            {post.comments_count || 0}
-                          </span>
-                        </div>
-                      </div>
+                      </Link>
+                      <button
+                        onClick={(e) => handleRemoveBookmark(e, post.id)}
+                        className="flex-shrink-0 p-2 rounded-lg text-red-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                        title="Eliminar de guardados"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
