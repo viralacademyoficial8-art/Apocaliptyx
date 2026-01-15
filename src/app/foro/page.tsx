@@ -715,7 +715,7 @@ function ForoContent() {
         const post = await forumService.createPostWithPoll(user.id, {
           content: newPostContent || pollQuestion,
           tags: newPostTags,
-          category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
+          category_id: selectedCategory !== 'all' ? selectedCategory : categories.find(c => c.slug === 'general')?.id,
           poll: {
             question: pollQuestion,
             options: pollOptions.filter(o => o.trim()),
@@ -800,7 +800,7 @@ function ForoContent() {
         body: JSON.stringify({
           content: newPostContent,
           tags: newPostTags,
-          category_id: selectedCategory !== 'all' ? selectedCategory : undefined,
+          category_id: selectedCategory !== 'all' ? selectedCategory : categories.find(c => c.slug === 'general')?.id,
           gif_url: selectedGif?.url,
           gif_width: selectedGif?.width,
           gif_height: selectedGif?.height,
