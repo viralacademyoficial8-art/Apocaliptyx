@@ -20,6 +20,7 @@ interface CommunityPostRow {
   author_id: string;
   content: string;
   image_url?: string;
+  category?: string;
   likes_count: number;
   comments_count: number;
   is_pinned: boolean;
@@ -123,6 +124,7 @@ export async function GET(
       } : null,
       content: post.content,
       imageUrl: post.image_url,
+      category: post.category || 'general',
       likesCount: post.likes_count,
       commentsCount: post.comments_count,
       isPinned: post.is_pinned,
@@ -171,7 +173,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { content, imageUrl } = body;
+    const { content, imageUrl, category } = body;
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json({ error: 'El contenido es requerido' }, { status: 400 });
@@ -189,6 +191,7 @@ export async function POST(
         author_id: session.user.id,
         content: content.trim(),
         image_url: imageUrl || null,
+        category: category || 'general',
       })
       .select(`
         *,
@@ -272,6 +275,7 @@ export async function POST(
         } : null,
         content: (post as any).content,
         imageUrl: (post as any).image_url,
+        category: (post as any).category || 'general',
         likesCount: 0,
         commentsCount: 0,
         isPinned: false,

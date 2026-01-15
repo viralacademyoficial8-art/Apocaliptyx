@@ -51,12 +51,21 @@ interface Post {
   author: PostAuthor | null;
   content: string;
   imageUrl?: string;
+  category?: string;
   likesCount: number;
   commentsCount: number;
   isPinned: boolean;
   isLiked: boolean;
   createdAt: string;
 }
+
+// Category display config
+const categoryConfig: Record<string, { label: string; icon: string; color: string }> = {
+  general: { label: 'General', icon: '💬', color: 'bg-gray-500/20 text-gray-400' },
+  predicciones: { label: 'Predicciones', icon: '🔮', color: 'bg-purple-500/20 text-purple-400' },
+  ayuda: { label: 'Ayuda', icon: '❓', color: 'bg-blue-500/20 text-blue-400' },
+  sugerencias: { label: 'Sugerencias', icon: '💡', color: 'bg-yellow-500/20 text-yellow-400' },
+};
 
 interface PostCardProps {
   post: Post;
@@ -333,6 +342,11 @@ export function PostCard({
                 locale: es,
               })}
             </span>
+            {post.category && categoryConfig[post.category] && (
+              <span className={`px-2 py-0.5 text-xs rounded-full ${categoryConfig[post.category].color}`}>
+                {categoryConfig[post.category].icon} {categoryConfig[post.category].label}
+              </span>
+            )}
           </div>
 
           <div className="mt-2">
