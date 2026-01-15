@@ -1038,7 +1038,9 @@ export default function PublicProfilePage() {
                           <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
                               <Heart className="w-4 h-4" />
-                              {post.reactions_count || 0}
+                              {post.reactions_count
+                                ? Object.values(post.reactions_count).reduce((a, b) => a + b, 0)
+                                : 0}
                             </span>
                             <span className="flex items-center gap-1">
                               <MessageSquare className="w-4 h-4" />
