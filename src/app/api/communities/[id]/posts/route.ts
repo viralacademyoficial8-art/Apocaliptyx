@@ -239,12 +239,13 @@ export async function POST(
       const communityName = (communityInfo as any).name || 'la comunidad';
       const contentPreview = content.trim().substring(0, 50) + (content.trim().length > 50 ? '...' : '');
 
+      const postId = (post as any).id;
       const notifications = members.map((member: any) => ({
         user_id: member.user_id,
         type: 'community_post',
         title: `📝 Nueva publicación en ${communityName}`,
         message: `${authorName} publicó: "${contentPreview}"`,
-        link_url: `/foro/comunidad/${communityId}`,
+        link_url: `/foro/comunidad/${communityId}?post=${postId}`,
         is_read: false,
       }));
 
