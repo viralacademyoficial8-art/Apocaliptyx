@@ -217,9 +217,9 @@ class DuplicateDetectionService {
     // Tomar los top 5
     const topSimilar = similarScenarios.slice(0, 5);
 
-    // Considerar duplicado si hay alguno con similitud >= 70%
-    // Umbral reducido para ser más estrictos y forzar compra de escenarios existentes
-    const isDuplicate = topSimilar.some(s => s.similarity >= 70);
+    // Considerar duplicado si hay alguno con similitud >= 50%
+    // Umbral estricto para evitar escenarios duplicados - debe comprar el existente
+    const isDuplicate = topSimilar.some(s => s.similarity >= 50);
 
     return {
       isDuplicate,
