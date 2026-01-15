@@ -198,7 +198,7 @@ export async function POST(
           type: 'community_comment',
           title: '💬 Nuevo comentario en tu publicación',
           message: `${commenterName} comentó en tu publicación en ${communityName}: "${commentPreview}"`,
-          link_url: `/foro/comunidad/${communityId}`,
+          link_url: `/foro/comunidad/${communityId}?post=${postId}`,
           is_read: false,
         });
     }
@@ -223,7 +223,7 @@ export async function POST(
             type: 'community_reply',
             title: '↩️ Nueva respuesta a tu comentario',
             message: `${commenterName} te respondió en ${communityName}: "${commentPreview}"`,
-            link_url: `/foro/comunidad/${communityId}`,
+            link_url: `/foro/comunidad/${communityId}?post=${postId}`,
             is_read: false,
           });
       }

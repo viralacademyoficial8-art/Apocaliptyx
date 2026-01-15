@@ -93,7 +93,7 @@ export async function POST(
           type: 'community_like',
           title: '❤️ Nuevo like en tu publicación',
           message: `${likerName} le dio like a tu publicación en ${communityName}: "${contentPreview}"`,
-          link_url: `/foro/comunidad/${communityId}`,
+          link_url: `/foro/comunidad/${communityId}?post=${postId}`,
           is_read: false,
         });
     }
