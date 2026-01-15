@@ -40,6 +40,29 @@ export default function CrearPage() {
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(false);
 
+  // Calcular fecha mínima (mañana)
+  const getMinDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
+  // Validar fecha al cambiar
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedDate = e.target.value;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selected = new Date(selectedDate);
+
+    if (selected <= today) {
+      toast.error('La fecha debe ser posterior a hoy');
+      setDueDate('');
+      return;
+    }
+
+    setDueDate(selectedDate);
+  };
+
   // Debounce para verificar duplicados mientras escribe
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -410,9 +433,9 @@ export default function CrearPage() {
               <input
                 type="date"
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={handleDateChange}
                 disabled={isLoading}
-                min={new Date().toISOString().split('T')[0]}
+                min={getMinDate()}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
               />
               <p className="mt-1 text-[10px] text-zinc-500">
