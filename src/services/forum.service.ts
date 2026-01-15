@@ -1864,17 +1864,9 @@ class ForumService {
 
   async searchUsersForMention(query: string, limit: number = 10): Promise<MentionSuggestion[]> {
     try {
-      const { data, error } = await (getSupabase().rpc as any)('search_users_for_mention', {
-        p_query: query,
-        p_limit: limit,
-      });
-
-      if (error) {
-        console.error('Error searching users:', error);
-        return [];
-      }
-
-      return data || [];
+      const response = await fetch(`/api/forum/mentions?q=${encodeURIComponent(query)}&limit=${limit}`);
+      const data = await response.json();
+      return data.users || [];
     } catch (error) {
       console.error('Error in searchUsersForMention:', error);
       return [];

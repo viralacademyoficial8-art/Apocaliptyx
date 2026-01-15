@@ -190,6 +190,7 @@ function ForoContent() {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [selectedGif, setSelectedGif] = useState<{ url: string; width: number; height: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Poll creation
   const [pollQuestion, setPollQuestion] = useState('');
@@ -695,6 +696,26 @@ function ForoContent() {
     setNewPostContent(`${beforeMention}@${username} ${afterMention}`);
     setShowMentions(false);
     setMentionQuery('');
+  };
+
+  // Trigger mention mode (when @ button is clicked)
+  const triggerMention = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const curPos = textarea.selectionStart || newPostContent.length;
+      const before = newPostContent.substring(0, curPos);
+      const after = newPostContent.substring(curPos);
+      setNewPostContent(`${before}@${after}`);
+      setCursorPosition(curPos + 1);
+      setShowMentions(true);
+      setMentionQuery('');
+      searchMentions('');
+      // Focus and set cursor after @
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(curPos + 1, curPos + 1);
+      }, 0);
+    }
   };
 
   // Crear post
@@ -1907,6 +1928,7 @@ function ForoContent() {
             <>
               <div className="relative">
                 <textarea
+                  ref={textareaRef}
                   value={newPostContent}
                   onChange={(e) => handleContentChange(e.target.value, e.target.selectionStart)}
                   placeholder={t('forum.createModal.placeholder')}
@@ -2004,6 +2026,7 @@ function ForoContent() {
                   GIF
                 </button>
                 <button
+                  onClick={triggerMention}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                 >
                   <AtSign className="w-5 h-5" />
