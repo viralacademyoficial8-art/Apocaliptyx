@@ -224,12 +224,7 @@ export default function CrearPage() {
           </div>
 
           {/* Alerta de escenarios similares/duplicados */}
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            showDuplicateWarning && similarScenarios.length > 0
-              ? 'max-h-[600px] opacity-100'
-              : 'max-h-0 opacity-0'
-          }`}>
-            {similarScenarios.length > 0 && (
+          {showDuplicateWarning && similarScenarios.length > 0 && (
             <div className={`rounded-xl border p-4 ${
               isDuplicate
                 ? 'border-red-500/50 bg-red-500/10'
@@ -391,8 +386,7 @@ export default function CrearPage() {
                 </div>
               )}
             </div>
-            )}
-          </div>
+          )}
 
           {/* Indicador de que pasó la verificación */}
           {title.length >= 10 && !checkingDuplicates && similarScenarios.length === 0 && (
