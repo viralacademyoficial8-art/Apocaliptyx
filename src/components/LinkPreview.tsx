@@ -169,6 +169,16 @@ export function extractUrls(text: string): string[] {
   return [...new Set(matches.map(url => url.replace(/[.,;:!?)]+$/, '')))];
 }
 
+// Helper function to process mentions in text
+function processMentions(text: string): string {
+  // Match @username (alphanumeric and underscores)
+  const mentionRegex = /@(\w+)/g;
+  return text.replace(
+    mentionRegex,
+    '<a href="/perfil/$1" class="text-purple-400 hover:text-purple-300 hover:underline font-medium">@$1</a>'
+  );
+}
+
 // Component to render text with link previews
 export function TextWithLinkPreviews({
   text,
@@ -181,18 +191,26 @@ export function TextWithLinkPreviews({
 }) {
   const urls = extractUrls(text).slice(0, maxPreviews);
 
-  if (urls.length === 0) {
-    return <p className={className}>{text}</p>;
-  }
+  // Process mentions first
+  let processedText = processMentions(text);
 
   // Replace URLs in text with styled links
-  let processedText = text;
   urls.forEach(url => {
     processedText = processedText.replace(
       url,
       `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline break-all">${url}</a>`
     );
   });
+
+  // If no URLs, just return the text with mentions processed
+  if (urls.length === 0) {
+    return (
+      <p
+        className={className}
+        dangerouslySetInnerHTML={{ __html: processedText }}
+      />
+    );
+  }
 
   return (
     <div className="space-y-3">
