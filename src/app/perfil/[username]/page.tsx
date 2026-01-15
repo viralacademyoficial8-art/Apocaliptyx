@@ -1011,7 +1011,7 @@ export default function PublicProfilePage() {
                   {bookmarks.map((post) => (
                     <Link
                       key={post.id}
-                      href={`/foro/post/${post.id}`}
+                      href={`/foro?post=${post.id}`}
                       className="block bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-purple-500/50 transition-colors"
                     >
                       <div className="flex items-start gap-3">
