@@ -28,7 +28,13 @@ import {
   Sparkles,
   Gift,
   Box,
+  Bookmark,
+  MessageSquare,
+  Heart,
 } from "lucide-react";
+import { forumService, ForumPost } from "@/services/forum.service";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import { toast } from "@/components/ui/toast";
 import Link from "next/link";
 
@@ -67,9 +73,11 @@ export default function PerfilPage() {
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [scenariosHeld, setScenariosHeld] = useState<any[]>([]);
   const [inventory, setInventory] = useState<UserInventoryItem[]>([]);
+  const [bookmarks, setBookmarks] = useState<ForumPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bookmarksLoading, setBookmarksLoading] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "inventory" | "predictions" | "scenarios">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "inventory" | "predictions" | "scenarios" | "guardados">("overview");
 
   // Esperar hidratación de Zustand
   useEffect(() => {
@@ -127,6 +135,25 @@ export default function PerfilPage() {
 
     loadProfile();
   }, [hydrated, user?.id, router, loadProfile]);
+
+  // Cargar bookmarks cuando se selecciona la pestaña guardados
+  useEffect(() => {
+    async function loadBookmarks() {
+      if (activeTab !== "guardados" || !user?.id) return;
+
+      setBookmarksLoading(true);
+      try {
+        const data = await forumService.getUserBookmarks(user.id);
+        setBookmarks(data);
+      } catch (error) {
+        console.error("Error loading bookmarks:", error);
+      } finally {
+        setBookmarksLoading(false);
+      }
+    }
+
+    loadBookmarks();
+  }, [activeTab, user?.id]);
 
   // Mostrar loading mientras se hidrata o carga
   if (!hydrated || loading) {
@@ -366,6 +393,18 @@ export default function PerfilPage() {
             <span className="hidden sm:inline">Mis Escenarios</span>
             <span className="sm:hidden">Escenarios</span>
             <span className="text-xs ml-1">({scenarios.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("guardados")}
+            className={`px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base ${
+              activeTab === "guardados"
+                ? "bg-purple-500 text-white"
+                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+            }`}
+          >
+            <Bookmark className="w-4 h-4" />
+            <span className="hidden sm:inline">Guardados</span>
+            <span className="text-xs">({bookmarks.length})</span>
           </button>
         </div>
 
@@ -671,6 +710,101 @@ export default function PerfilPage() {
                         <p className="text-xs text-gray-400">
                           {scenario.participant_count} participantes
                         </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "guardados" && (
+          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Bookmark className="w-5 h-5" />
+                Publicaciones guardadas
+              </h3>
+              <Link
+                href="/foro"
+                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm"
+              >
+                Ir al Foro
+              </Link>
+            </div>
+            {bookmarksLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+              </div>
+            ) : bookmarks.length === 0 ? (
+              <div className="text-center py-12">
+                <Bookmark className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+                <p className="text-gray-400 mb-2">
+                  No tienes publicaciones guardadas
+                </p>
+                <p className="text-gray-500 text-sm mb-6">
+                  Guarda publicaciones del foro usando el ícono de marcador
+                </p>
+                <Link
+                  href="/foro"
+                  className="inline-block px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
+                >
+                  Explorar Foro
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {bookmarks.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/foro?post=${post.id}`}
+                    className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0">
+                        {post.author?.avatar_url ? (
+                          <img
+                            src={post.author.avatar_url}
+                            alt={post.author.username}
+                            className="w-10 h-10 rounded-full"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-bold">
+                            {post.author?.username?.charAt(0).toUpperCase() || "?"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 text-sm flex-wrap">
+                          <span className="font-semibold text-white">
+                            {post.author?.display_name || post.author?.username}
+                          </span>
+                          <span className="text-gray-500">@{post.author?.username}</span>
+                          <span className="text-gray-600">•</span>
+                          <span className="text-gray-500 text-xs">
+                            {formatDistanceToNow(new Date(post.created_at), {
+                              addSuffix: true,
+                              locale: es,
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-gray-300 text-sm mt-1 line-clamp-2">
+                          {post.content}
+                        </p>
+                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Heart className="w-3.5 h-3.5" />
+                            {Object.values(post.reactions_count || {}).reduce(
+                              (a: number, b: unknown) => a + (typeof b === "number" ? b : 0),
+                              0
+                            )}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MessageSquare className="w-3.5 h-3.5" />
+                            {post.comments_count || 0}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </Link>
