@@ -70,12 +70,12 @@ export function Navbar() {
     }
   }, [status, session, user, login]);
 
-  // Sincronizar AP coins desde la base de datos al cargar
+  // Sincronizar AP coins desde la base de datos al cargar y al cambiar de página
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       refreshBalance();
     }
-  }, [status, session, refreshBalance]);
+  }, [status, session, refreshBalance, pathname]);
 
   const navItems = [
     { href: "/explorar", label: t("nav.scenarios") },
