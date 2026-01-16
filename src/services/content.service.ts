@@ -153,7 +153,7 @@ export const contentService = {
     if (options.following && options.currentUserId) {
       // Get followed users
       const { data: follows } = await supabase
-        .from('user_follows')
+        .from('follows')
         .select('following_id')
         .eq('follower_id', options.currentUserId);
 

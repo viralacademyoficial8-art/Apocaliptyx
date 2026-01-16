@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     let followingIds: string[] = [];
     if (user) {
       const { data: followingRaw } = await supabase()
-        .from('user_follows')
+        .from('follows')
         .select('following_id')
         .eq('follower_id', user.id);
 

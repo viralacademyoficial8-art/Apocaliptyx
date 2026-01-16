@@ -58,11 +58,11 @@ class PublicProfileService {
     // Obtener contadores de seguidores
     const [followersResult, followingResult, rankResult] = await Promise.all([
       supabase
-        .from('user_follows')
+        .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('following_id', user.id),
       supabase
-        .from('user_follows')
+        .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('follower_id', user.id),
       this.getUserRank(user.id),
@@ -95,11 +95,11 @@ class PublicProfileService {
 
     const [followersResult, followingResult, rankResult] = await Promise.all([
       supabase
-        .from('user_follows')
+        .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('following_id', user.id),
       supabase
-        .from('user_follows')
+        .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('follower_id', user.id),
       this.getUserRank(user.id),
@@ -134,7 +134,7 @@ class PublicProfileService {
   // Verificar si un usuario sigue a otro
   async isFollowing(followerId: string, followingId: string): Promise<boolean> {
     const { data } = await supabase
-      .from('user_follows')
+      .from('follows')
       .select('id')
       .eq('follower_id', followerId)
       .eq('following_id', followingId)
@@ -148,7 +148,7 @@ class PublicProfileService {
     if (followerId === followingId) return false;
 
     const { error } = await supabase
-      .from('user_follows')
+      .from('follows')
       .insert({
         follower_id: followerId,
         following_id: followingId,
@@ -175,7 +175,7 @@ class PublicProfileService {
   // Dejar de seguir
   async unfollow(followerId: string, followingId: string): Promise<boolean> {
     const { error } = await supabase
-      .from('user_follows')
+      .from('follows')
       .delete()
       .eq('follower_id', followerId)
       .eq('following_id', followingId);
@@ -191,9 +191,9 @@ class PublicProfileService {
   // Obtener seguidores de un usuario
   async getFollowers(userId: string, limit = 50): Promise<PublicProfile[]> {
     const { data, error } = await supabase
-      .from('user_follows')
+      .from('follows')
       .select(`
-        follower:users!user_follows_follower_id_fkey(
+        follower:users!follows_follower_id_fkey(
           id, username, display_name, avatar_url, level, is_verified, is_premium
         )
       `)
@@ -208,9 +208,9 @@ class PublicProfileService {
   // Obtener usuarios que sigue
   async getFollowing(userId: string, limit = 50): Promise<PublicProfile[]> {
     const { data, error } = await supabase
-      .from('user_follows')
+      .from('follows')
       .select(`
-        following:users!user_follows_following_id_fkey(
+        following:users!follows_following_id_fkey(
           id, username, display_name, avatar_url, level, is_verified, is_premium
         )
       `)
