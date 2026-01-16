@@ -634,9 +634,10 @@ class ForumService {
       .eq('id', input.post_id)
       .single();
 
+    const currentCount = (postData as unknown as { comments_count?: number } | null)?.comments_count || 0;
     await getSupabase()
       .from('forum_posts')
-      .update({ comments_count: ((postData as { comments_count?: number })?.comments_count || 0) + 1 } as never)
+      .update({ comments_count: currentCount + 1 } as never)
       .eq('id', input.post_id);
 
     // 🔔 NOTIFICACIÓN: Comentario en post
@@ -730,9 +731,10 @@ class ForumService {
           .eq('id', commentData.post_id)
           .single();
 
+        const currentCount = (postData as unknown as { comments_count?: number } | null)?.comments_count || 1;
         await getSupabase()
           .from('forum_posts')
-          .update({ comments_count: Math.max(0, ((postData as { comments_count?: number })?.comments_count || 1) - 1) } as never)
+          .update({ comments_count: Math.max(0, currentCount - 1) } as never)
           .eq('id', commentData.post_id);
       }
     }
