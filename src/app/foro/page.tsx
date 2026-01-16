@@ -213,10 +213,15 @@ function ForoContent() {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
 
-  // Modal de confirmación de eliminación
+  // Modal de confirmación de eliminación de comentarios
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Modal de confirmación de eliminación de posts
+  const [deletePostConfirmOpen, setDeletePostConfirmOpen] = useState(false);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
 
   // Modal de repost
   const [repostModalOpen, setRepostModalOpen] = useState(false);
@@ -995,14 +1000,32 @@ function ForoContent() {
   };
 
   // Eliminar post
-  const handleDeletePost = async (postId: string) => {
-    if (!user?.id) return;
-    if (!confirm(t('forum.actions.deletePost'))) return;
+  // Abrir modal de confirmación para eliminar post
+  const openDeletePostConfirm = (postId: string) => {
+    setDeletingPostId(postId);
+    setDeletePostConfirmOpen(true);
+  };
 
-    const success = await forumService.deletePost(postId, user.id);
-    if (success) {
-      setPosts(prev => prev.filter(p => p.id !== postId));
-      toast.success(t('forum.actions.deleted'));
+  // Eliminar post (llamado desde el modal de confirmación)
+  const handleDeletePost = async () => {
+    if (!user?.id || !deletingPostId) return;
+
+    setIsDeletingPost(true);
+    try {
+      const success = await forumService.deletePost(deletingPostId, user.id);
+      if (success) {
+        setPosts(prev => prev.filter(p => p.id !== deletingPostId));
+        toast.success(t('forum.actions.deleted') || 'Publicación eliminada');
+      } else {
+        toast.error(t('forum.actions.deleteError') || 'Error al eliminar publicación');
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error(t('forum.actions.deleteError') || 'Error al eliminar publicación');
+    } finally {
+      setIsDeletingPost(false);
+      setDeletePostConfirmOpen(false);
+      setDeletingPostId(null);
     }
   };
 
@@ -1499,7 +1522,7 @@ function ForoContent() {
                     post={post}
                     currentUserId={user?.id}
                     onOpenComments={openComments}
-                    onDelete={handleDeletePost}
+                    onDelete={openDeletePostConfirm}
                     onReaction={handleReaction}
                     onBookmark={handleBookmark}
                     onRepost={openRepostModal}
@@ -2484,6 +2507,65 @@ function ForoContent() {
                 disabled={isDeleting}
               >
                 {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t('common.deleting') || 'Eliminando...'}
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {t('common.delete') || 'Eliminar'}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Post Confirmation Modal */}
+      <Dialog open={deletePostConfirmOpen} onOpenChange={(open) => {
+        if (!isDeletingPost) {
+          setDeletePostConfirmOpen(open);
+          if (!open) setDeletingPostId(null);
+        }
+      }}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-sm">
+          <div className="flex flex-col items-center text-center py-4">
+            {/* Icon */}
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+              <Trash2 className="w-8 h-8 text-red-500" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-bold text-white mb-2">
+              {t('forum.actions.deletePostTitle') || '¿Eliminar publicación?'}
+            </h2>
+
+            {/* Description */}
+            <p className="text-gray-400 text-sm mb-6">
+              {t('forum.actions.deletePostDescription') || 'Esta acción no se puede deshacer. La publicación será eliminada permanentemente.'}
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3 w-full">
+              <Button
+                variant="outline"
+                className="flex-1 border-gray-700 hover:bg-gray-800 text-gray-300"
+                onClick={() => {
+                  setDeletePostConfirmOpen(false);
+                  setDeletingPostId(null);
+                }}
+                disabled={isDeletingPost}
+              >
+                {t('common.cancel') || 'Cancelar'}
+              </Button>
+              <Button
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleDeletePost}
+                disabled={isDeletingPost}
+              >
+                {isDeletingPost ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {t('common.deleting') || 'Eliminando...'}
