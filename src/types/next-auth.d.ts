@@ -13,6 +13,7 @@ declare module "next-auth" {
       level: number;
       isVerified: boolean;
       isPremium: boolean;
+      createdAt: string;
     } & DefaultSession["user"];
   }
 
@@ -23,6 +24,7 @@ declare module "next-auth" {
     level: number;
     isVerified: boolean;
     isPremium: boolean;
+    createdAt: string;
   }
 }
 
@@ -35,5 +37,6 @@ declare module "next-auth/jwt" {
     level: number;
     isVerified: boolean;
     isPremium: boolean;
+    createdAt: string;
   }
 }
