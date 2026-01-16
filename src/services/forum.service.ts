@@ -628,7 +628,16 @@ class ForumService {
     }
 
     // Incrementar contador de comentarios en el post
-    await (getSupabase().rpc as any)('increment_comments_count', { post_id: input.post_id });
+    const { data: postData } = await getSupabase()
+      .from('forum_posts')
+      .select('comments_count')
+      .eq('id', input.post_id)
+      .single();
+
+    await getSupabase()
+      .from('forum_posts')
+      .update({ comments_count: ((postData as { comments_count?: number })?.comments_count || 0) + 1 } as never)
+      .eq('id', input.post_id);
 
     // 🔔 NOTIFICACIÓN: Comentario en post
     const { data: postRaw } = await getSupabase()
@@ -715,7 +724,16 @@ class ForumService {
     if (comment) {
       const commentData = comment as { post_id?: string } | null;
       if (commentData?.post_id) {
-        await (getSupabase().rpc as any)('decrement_comments_count', { post_id: commentData.post_id });
+        const { data: postData } = await getSupabase()
+          .from('forum_posts')
+          .select('comments_count')
+          .eq('id', commentData.post_id)
+          .single();
+
+        await getSupabase()
+          .from('forum_posts')
+          .update({ comments_count: Math.max(0, ((postData as { comments_count?: number })?.comments_count || 1) - 1) } as never)
+          .eq('id', commentData.post_id);
       }
     }
 
