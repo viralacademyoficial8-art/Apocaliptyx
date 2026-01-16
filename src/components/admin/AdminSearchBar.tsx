@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import {
   Search,
@@ -311,9 +312,15 @@ export function AdminSearchBar() {
                           onClick={() => navigateToUser(user.id)}
                           className="w-full text-left px-2 py-2 text-sm rounded hover:bg-muted transition-colors flex items-center gap-3"
                         >
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
                             {user.avatar_url ? (
-                              <img src={user.avatar_url} alt={user.username} className="w-full h-full object-cover" />
+                              <Image
+                                src={user.avatar_url}
+                                alt={user.username}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
                             ) : (
                               <span className="text-white text-xs font-bold">
                                 {user.username[0].toUpperCase()}
