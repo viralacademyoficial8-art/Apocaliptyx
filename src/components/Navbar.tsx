@@ -322,6 +322,7 @@ export function Navbar() {
                           {t("nav.streaming")}
                         </DropdownMenuItem>
 
+                        {/* Ocultos temporalmente:
                         <DropdownMenuItem
                           onClick={() => router.push("/coleccionables")}
                           className="cursor-pointer hover:bg-yellow-500/10"
@@ -337,6 +338,7 @@ export function Navbar() {
                           <Trophy className="mr-2 h-4 w-4 text-orange-400" />
                           {t("nav.tournaments")}
                         </DropdownMenuItem>
+                        */}
 
                         {/* Separador */}
                         <div className="my-1 h-px bg-border" />
