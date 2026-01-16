@@ -36,11 +36,26 @@ export default function AdminUsuariosPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const { can } = usePermissions();
-  
+
   const limit = 10;
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 when search changes
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Reset page when filter changes (immediate)
+  useEffect(() => {
+    setPage(1);
+  }, [roleFilter]);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -48,7 +63,7 @@ export default function AdminUsuariosPage() {
       const result = await adminService.getUsers({
         limit,
         offset: (page - 1) * limit,
-        search: search || undefined,
+        search: debouncedSearch || undefined,
         role: roleFilter !== 'all' ? roleFilter : undefined,
       });
       setUsers(result.users);
@@ -58,20 +73,11 @@ export default function AdminUsuariosPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, roleFilter, limit]);
+  }, [page, debouncedSearch, roleFilter, limit]);
 
   useEffect(() => {
     loadUsers();
   }, [loadUsers]);
-
-  // Reset to page 1 when search or filters change (debounced)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPage(1);
-    }, 300);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, roleFilter]);
 
   const handleBanUser = async (userId: string, currentlyBanned: boolean) => {
     setActionLoading(userId);
