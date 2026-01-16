@@ -1183,12 +1183,13 @@ function MensajesContent() {
                     </div>
                   )}
 
-                  {/* Unread badge */}
+                  {/* Unread badge - Oculto temporalmente
                   {conv.unread_count && conv.unread_count > 0 && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full text-[10px] flex items-center justify-center font-bold shadow-lg shadow-purple-500/50">
                       {conv.unread_count > 9 ? '9+' : conv.unread_count}
                     </span>
                   )}
+                  */}
                 </div>
 
                 {/* Conversation info */}
