@@ -100,8 +100,33 @@ export const useAuthStore = create<AuthState>()(
           if (response.ok) {
             const data = await response.json();
             const currentUser = get().user;
-            if (currentUser && data.apCoins !== undefined) {
-              set({ user: { ...currentUser, apCoins: data.apCoins } });
+
+            if (currentUser) {
+              // Actualizar usuario existente con los datos frescos de la BD
+              set({ user: { ...currentUser, apCoins: data.apCoins ?? currentUser.apCoins } });
+            } else if (data.id) {
+              // Si no hay usuario en Zustand pero la API devolvió datos, crear el usuario
+              set({
+                user: {
+                  id: data.id,
+                  email: data.email || '',
+                  username: data.username || '',
+                  displayName: data.displayName || data.username || '',
+                  avatarUrl: data.avatarUrl || '',
+                  prophetLevel: 'vidente',
+                  reputationScore: 0,
+                  apCoins: data.apCoins ?? 1000,
+                  scenariosCreated: 0,
+                  scenariosWon: 0,
+                  winRate: 0,
+                  followers: 0,
+                  following: 0,
+                  createdAt: new Date(),
+                  role: data.role || 'USER',
+                  isPremium: data.isPremium || false,
+                },
+                isAuthenticated: true,
+              });
             }
           }
         } catch (error) {
