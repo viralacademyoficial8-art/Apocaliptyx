@@ -22,6 +22,7 @@ export const {
         token.level = user.level;
         token.isVerified = user.isVerified;
         token.isPremium = user.isPremium;
+        token.createdAt = user.createdAt;
       }
 
       // Actualizar token cuando se actualiza la sesión
@@ -40,6 +41,7 @@ export const {
         session.user.level = token.level;
         session.user.isVerified = token.isVerified;
         session.user.isPremium = token.isPremium;
+        session.user.createdAt = token.createdAt;
       }
       return session;
     },

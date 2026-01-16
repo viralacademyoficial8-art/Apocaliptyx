@@ -72,6 +72,7 @@ export default {
             level: existingUser.level,
             isVerified: existingUser.is_verified,
             isPremium: existingUser.is_premium,
+            createdAt: existingUser.created_at,
           };
         }
 
@@ -124,6 +125,7 @@ export default {
           level: newUser.level,
           isVerified: newUser.is_verified,
           isPremium: newUser.is_premium,
+          createdAt: newUser.created_at,
         };
       },
     }),
@@ -169,6 +171,7 @@ export default {
             level: existingUser.level,
             isVerified: existingUser.is_verified,
             isPremium: existingUser.is_premium,
+            createdAt: existingUser.created_at,
           };
         }
 
@@ -221,6 +224,7 @@ export default {
           level: newUser.level,
           isVerified: newUser.is_verified,
           isPremium: newUser.is_premium,
+          createdAt: newUser.created_at,
         };
       },
     }),
@@ -299,6 +303,7 @@ export default {
             level: newUser.level,
             isVerified: newUser.is_verified,
             isPremium: newUser.is_premium,
+            createdAt: newUser.created_at,
           };
         }
 
@@ -317,6 +322,7 @@ export default {
           level: user.level,
           isVerified: user.is_verified,
           isPremium: user.is_premium,
+          createdAt: user.created_at,
         };
       },
     }),

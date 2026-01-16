@@ -31,7 +31,7 @@ export function AuthSync() {
       winRate: 0,
       followers: 0,
       following: 0,
-      createdAt: new Date(),
+      createdAt: sessionUser.createdAt ? new Date(sessionUser.createdAt) : new Date(),
       // Incluir el rol del usuario
       role: (sessionUser.role as UserRole) || 'USER',
     });
