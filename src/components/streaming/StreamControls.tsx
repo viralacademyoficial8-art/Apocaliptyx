@@ -11,8 +11,6 @@ import {
   VideoOff,
   Mic,
   MicOff,
-  Monitor,
-  MonitorOff,
   PhoneOff,
   Settings,
   AlertTriangle,
@@ -30,7 +28,6 @@ interface StreamControlsProps {
 export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
-  const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -66,21 +63,6 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
     } catch (error) {
       console.error('Error toggling mic:', error);
       toast.error('Error al cambiar micrófono');
-    }
-  };
-
-  const toggleScreenShare = async () => {
-    try {
-      if (isScreenSharing) {
-        await localParticipant?.setScreenShareEnabled(false);
-        setIsScreenSharing(false);
-      } else {
-        await localParticipant?.setScreenShareEnabled(true);
-        setIsScreenSharing(true);
-      }
-    } catch (error) {
-      console.error('Error toggling screen share:', error);
-      toast.error('Error al compartir pantalla');
     }
   };
 
@@ -258,24 +240,6 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
             )}
           </Button>
 
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleScreenShare}
-            className={`border-gray-700 ${
-              isScreenSharing
-                ? 'bg-green-600/20 border-green-500 text-green-400'
-                : ''
-            }`}
-            title={isScreenSharing ? 'Dejar de compartir' : 'Compartir pantalla'}
-          >
-            {isScreenSharing ? (
-              <MonitorOff className="w-5 h-5" />
-            ) : (
-              <Monitor className="w-5 h-5" />
-            )}
-          </Button>
-
           <div className="w-px h-8 bg-gray-700 mx-2" />
 
           <Button
@@ -332,12 +296,6 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
           <span className={`w-2 h-2 rounded-full ${isMicEnabled ? 'bg-green-500' : 'bg-red-500'}`} />
           Micrófono {isMicEnabled ? 'activo' : 'inactivo'}
         </div>
-        {isScreenSharing && (
-          <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Compartiendo pantalla
-          </div>
-        )}
       </div>
     </div>
     </>
