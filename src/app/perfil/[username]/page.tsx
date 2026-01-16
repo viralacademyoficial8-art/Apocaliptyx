@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -81,15 +81,20 @@ type TabType = 'general' | 'stolen' | 'scenarios' | 'activity' | 'guardados';
 export default function PublicProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const username = params.username as string;
   const { user: currentUser } = useAuthStore();
+
+  // Leer tab desde URL params
+  const tabFromUrl = searchParams.get('tab') as TabType | null;
+  const initialTab: TabType = tabFromUrl && ['general', 'stolen', 'scenarios', 'activity', 'guardados'].includes(tabFromUrl) ? tabFromUrl : 'general';
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>('general');
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [stolenScenarios, setStolenScenarios] = useState<any[]>([]);
   const [scenarios, setScenarios] = useState<any[]>([]);
   const [activity, setActivity] = useState<any[]>([]);
