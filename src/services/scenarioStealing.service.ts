@@ -1,6 +1,6 @@
 // src/services/scenarioStealing.service.ts
 
-import { getSupabaseClient } from '@/lib/supabase-server';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 import type {
   Scenario,
   ScenarioHolding,
@@ -71,8 +71,9 @@ export const SHIELD_TYPES = {
 } as const;
 
 class ScenarioStealingService {
+  // Using admin client to bypass RLS for RPC functions that need to update users table
   private supabase() {
-    return getSupabaseClient();
+    return getSupabaseAdmin();
   }
 
   /**
