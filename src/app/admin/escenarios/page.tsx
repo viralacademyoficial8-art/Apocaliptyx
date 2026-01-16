@@ -67,11 +67,26 @@ export default function AdminEscenariosPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  
+
   const limit = 10;
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to page 1 when search changes
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Reset page when filters change (immediate)
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter, categoryFilter]);
 
   const loadScenarios = useCallback(async () => {
     setLoading(true);
@@ -79,7 +94,7 @@ export default function AdminEscenariosPage() {
       const result = await adminService.getScenarios({
         limit,
         offset: (page - 1) * limit,
-        search: search || undefined,
+        search: debouncedSearch || undefined,
         status: statusFilter !== 'all' ? statusFilter : undefined,
         category: categoryFilter !== 'all' ? categoryFilter : undefined,
       });
@@ -90,20 +105,11 @@ export default function AdminEscenariosPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, statusFilter, categoryFilter, limit]);
+  }, [page, debouncedSearch, statusFilter, categoryFilter, limit]);
 
   useEffect(() => {
     loadScenarios();
   }, [loadScenarios]);
-
-  // Reset to page 1 when search or filters change (debounced)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPage(1);
-    }, 300);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, statusFilter, categoryFilter]);
 
   const handleToggleFeatured = async (scenarioId: string, currentFeatured: boolean) => {
     setActionLoading(scenarioId);
