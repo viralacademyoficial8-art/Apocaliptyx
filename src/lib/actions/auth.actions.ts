@@ -260,7 +260,7 @@ async function createWelcomeNotification(userId: string, username: string) {
     await supabase.from("notifications").insert({
       user_id: userId,
       type: "welcome",
-      title: "¡Bienvenido a Apocaliptics! 🎉",
+      title: "¡Bienvenido a Apocaliptyx! 🎉",
       message: `Hola @${username}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
       link_url: "/dashboard",
       is_read: false,

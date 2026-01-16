@@ -121,7 +121,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <div className="relative bg-gradient-to-br from-purple-600 to-pink-600 p-1.5 rounded-lg">
                   <Image
                     src="/apocaliptyx-logo.png"
-                    alt="Apocaliptics"
+                    alt="Apocaliptyx"
                     width={20}
                     height={20}
                     className="w-5 h-5"
@@ -129,7 +129,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 </div>
               </div>
               <span className="text-lg font-black tracking-tight bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-                APOCALIPTICS
+                APOCALIPTYX
               </span>
             </Link>
             <button

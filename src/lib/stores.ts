@@ -134,7 +134,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: "apocaliptics-auth",
+      name: "apocaliptyx-auth",
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
@@ -677,7 +677,7 @@ export const useSearchStore = create<SearchState>()(
       clearRecentSearches: () => set({ recentSearches: [] }),
     }),
     {
-      name: "apocaliptics-search",
+      name: "apocaliptyx-search",
       partialize: (state) => ({ recentSearches: state.recentSearches }),
     }
   )

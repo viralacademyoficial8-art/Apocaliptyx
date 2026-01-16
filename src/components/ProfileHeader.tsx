@@ -52,7 +52,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Perfil de ${user.displayName} en Apocaliptics`,
+          title: `Perfil de ${user.displayName} en Apocaliptyx`,
           text: `Mira el perfil de ${user.displayName}, nivel ${PROPHET_LEVELS[user.prophetLevel].name}`,
           url,
         });

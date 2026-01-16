@@ -19,7 +19,7 @@ export function getPredictionWonEmailHtml({
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>¡Ganaste! - Apocaliptics</title>
+  <title>¡Ganaste! - Apocaliptyx</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -27,7 +27,7 @@ export function getPredictionWonEmailHtml({
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 40px;">
       <h1 style="color: #ef4444; font-size: 32px; margin: 0;">
-        🔮 APOCALIPTICS
+        🔮 APOCALIPTYX
       </h1>
     </div>
     
@@ -83,7 +83,7 @@ export function getPredictionWonEmailHtml({
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px;">
       <p style="color: #6b7280; font-size: 12px; margin: 0;">
-        © 2024 Apocaliptics. Todos los derechos reservados.
+        © 2024 Apocaliptyx. Todos los derechos reservados.
       </p>
     </div>
     
@@ -120,6 +120,6 @@ Tu balance actual: ${totalBalance.toLocaleString()} AP Coins
 
 Sigue prediciendo en: https://apocaliptyx.vercel.app/explorar
 
-© 2024 Apocaliptics
+© 2024 Apocaliptyx
   `.trim();
 }

@@ -100,7 +100,7 @@ function getCurrentUserId(): string | null {
   }
 
   try {
-    const stored = window.localStorage.getItem('apocaliptics-auth');
+    const stored = window.localStorage.getItem('apocaliptyx-auth');
     if (stored) {
       const parsed = JSON.parse(stored);
       return parsed?.state?.user?.id || null;
@@ -460,7 +460,7 @@ export const useShopStore = create<ShopStore>()(
       setError: (error) => set({ error }),
     }),
     {
-      name: 'apocaliptics-shop',
+      name: 'apocaliptyx-shop',
       partialize: (state) => ({ cart: state.cart }),
     }
   )

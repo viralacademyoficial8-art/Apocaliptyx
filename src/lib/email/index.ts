@@ -16,7 +16,7 @@ import { getPurchaseReceiptEmailHtml, getPurchaseReceiptEmailText } from './temp
 export async function sendWelcomeEmail(to: string, username: string) {
   return sendEmail({
     to,
-    subject: '🎉 ¡Bienvenido a Apocaliptics! Tu bono de 1,000 AP Coins te espera',
+    subject: '🎉 ¡Bienvenido a Apocaliptyx! Tu bono de 1,000 AP Coins te espera',
     html: getWelcomeEmailHtml({ username }),
     text: getWelcomeEmailText({ username }),
   });
@@ -25,7 +25,7 @@ export async function sendWelcomeEmail(to: string, username: string) {
 export async function sendResetPasswordEmail(to: string, username: string, resetLink: string) {
   return sendEmail({
     to,
-    subject: '🔑 Recuperar contraseña - Apocaliptics',
+    subject: '🔑 Recuperar contraseña - Apocaliptyx',
     html: getResetPasswordEmailHtml({ username, resetLink }),
     text: getResetPasswordEmailText({ username, resetLink }),
   });
@@ -43,7 +43,7 @@ export async function sendPredictionWonEmail(
 ) {
   return sendEmail({
     to,
-    subject: `🎉 ¡Ganaste ${data.amountWon.toLocaleString()} AP Coins! - Apocaliptics`,
+    subject: `🎉 ¡Ganaste ${data.amountWon.toLocaleString()} AP Coins! - Apocaliptyx`,
     html: getPredictionWonEmailHtml(data),
     text: getPredictionWonEmailText(data),
   });
@@ -62,7 +62,7 @@ export async function sendPurchaseReceiptEmail(
 ) {
   return sendEmail({
     to,
-    subject: '🛒 Recibo de compra - Apocaliptics',
+    subject: '🛒 Recibo de compra - Apocaliptyx',
     html: getPurchaseReceiptEmailHtml(data),
     text: getPurchaseReceiptEmailText(data),
   });

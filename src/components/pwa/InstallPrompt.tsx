@@ -65,7 +65,7 @@ export function InstallPrompt() {
             <Download className="w-8 h-8 text-purple-400" />
           </div>
           <div className="flex-1">
-            <h3 className="text-white font-bold mb-1">Instala Apocaliptics</h3>
+            <h3 className="text-white font-bold mb-1">Instala Apocaliptyx</h3>
             <p className="text-gray-400 text-sm mb-4">
               Accede más rápido y recibe notificaciones de tus predicciones.
             </p>

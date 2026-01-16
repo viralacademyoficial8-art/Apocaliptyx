@@ -10,13 +10,13 @@ import { Toaster } from 'react-hot-toast';
 import { BottomNavigation } from '@/components/BottomNavigation';
 
 export const metadata: Metadata = {
-  title: 'Apocaliptics - Predice el Futuro',
+  title: 'Apocaliptyx - Predice el Futuro',
   description: 'Plataforma gamificada de predicciones con AP Coins',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Apocaliptics',
+    title: 'Apocaliptyx',
   },
 };
 
@@ -42,7 +42,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Apocaliptics" />
+        <meta name="apple-mobile-web-app-title" content="Apocaliptyx" />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <SessionProvider>

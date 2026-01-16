@@ -59,7 +59,7 @@ export function ForumPostCard({ post, onOpenComments }: ForumPostCardProps) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Post de ${post.authorDisplayName} en Apocaliptics`,
+          title: `Post de ${post.authorDisplayName} en Apocaliptyx`,
           text: post.content.substring(0, 100) + "...",
           url,
         });

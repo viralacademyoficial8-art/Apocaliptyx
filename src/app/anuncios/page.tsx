@@ -75,7 +75,7 @@ export default function AnunciosPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">Anuncios</h1>
-            <p className="text-gray-400">Noticias y actualizaciones de Apocaliptics</p>
+            <p className="text-gray-400">Noticias y actualizaciones de Apocaliptyx</p>
           </div>
         </div>
 

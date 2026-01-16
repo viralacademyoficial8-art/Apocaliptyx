@@ -13,7 +13,7 @@ export function getWelcomeEmailHtml({
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienvenido a Apocaliptics</title>
+  <title>Bienvenido a Apocaliptyx</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -21,7 +21,7 @@ export function getWelcomeEmailHtml({
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 40px;">
       <h1 style="color: #ef4444; font-size: 32px; margin: 0;">
-        🔮 APOCALIPTICS
+        🔮 APOCALIPTYX
       </h1>
       <p style="color: #9ca3af; margin-top: 8px;">Predice el Futuro. Gana Prediciendo.</p>
     </div>
@@ -56,7 +56,7 @@ export function getWelcomeEmailHtml({
       
       <!-- Features -->
       <div style="border-top: 1px solid #374151; padding-top: 24px;">
-        <p style="color: #9ca3af; font-size: 14px; margin: 0 0 16px 0;">¿Qué puedes hacer en Apocaliptics?</p>
+        <p style="color: #9ca3af; font-size: 14px; margin: 0 0 16px 0;">¿Qué puedes hacer en Apocaliptyx?</p>
         <ul style="color: #d1d5db; font-size: 14px; line-height: 2; margin: 0; padding-left: 20px;">
           <li>🎯 Crear escenarios de predicción</li>
           <li>💰 Apostar AP Coins en el futuro</li>
@@ -70,7 +70,7 @@ export function getWelcomeEmailHtml({
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px;">
       <p style="color: #6b7280; font-size: 12px; margin: 0;">
-        © 2024 Apocaliptics. Todos los derechos reservados.
+        © 2024 Apocaliptyx. Todos los derechos reservados.
       </p>
       <p style="color: #6b7280; font-size: 12px; margin: 8px 0 0 0;">
         <a href="https://apocaliptyx.vercel.app" style="color: #9ca3af;">Visitar sitio</a>
@@ -91,7 +91,7 @@ export function getWelcomeEmailText({
   apCoins?: number;
 }) {
   return `
-¡Bienvenido a Apocaliptics, ${username}! 🎉
+¡Bienvenido a Apocaliptyx, ${username}! 🎉
 
 Tu cuenta ha sido creada exitosamente.
 
@@ -105,6 +105,6 @@ Comienza a predecir en: https://apocaliptyx.vercel.app/dashboard
 - Competir en el leaderboard
 - Comprar items en la tienda
 
-© 2024 Apocaliptics
+© 2024 Apocaliptyx
   `.trim();
 }

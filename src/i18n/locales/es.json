@@ -141,7 +141,7 @@
     },
     "features": {
       "title": "¿Cómo funciona?",
-      "subtitle": "Apocaliptics es una plataforma donde tus predicciones valen",
+      "subtitle": "Apocaliptyx es una plataforma donde tus predicciones valen",
       "create": {
         "title": "Crea escenarios",
         "description": "Publica tus predicciones sobre tecnología, deportes, economía y más"
@@ -440,12 +440,12 @@
     }
   },
   "dashboard": {
-    "welcomeTitle": "Bienvenido a Apocaliptics",
+    "welcomeTitle": "Bienvenido a Apocaliptyx",
     "welcomeMessage": "Todavía no hay un profeta activo en esta sesión. Más adelante aquí podrás ver tu resumen personal (nivel, escenarios, monedas, etc.).",
     "featuredScenarios": "Escenarios Destacados",
     "noFeaturedScenarios": "No hay escenarios destacados aún.",
     "welcomeBack": "Bienvenido de nuevo,",
-    "memberSince": "En Apocaliptics desde",
+    "memberSince": "En Apocaliptyx desde",
     "apCoins": "AP Coins",
     "scenariosWon": "Escenarios ganados",
     "scenariosCreated": "Escenarios creados",
@@ -512,7 +512,7 @@
     "social": {
       "followUs": "Síguenos"
     },
-    "copyright": "© {{year}} Apocaliptics. Todos los derechos reservados."
+    "copyright": "© {{year}} Apocaliptyx. Todos los derechos reservados."
   },
   "errors": {
     "notFound": {

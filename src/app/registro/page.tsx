@@ -157,7 +157,7 @@ export default function RegistroPage() {
       await supabase.from('notifications').insert({
         user_id: authData.user.id,
         type: 'welcome',
-        title: 'Bienvenido a Apocaliptics!',
+        title: 'Bienvenido a Apocaliptyx!',
         message: 'Tu cuenta ha sido creada. Recibiste 1,000 AP Coins de bono de bienvenida. Comienza a predecir el futuro!',
         is_read: false,
       });
@@ -269,7 +269,7 @@ export default function RegistroPage() {
                   </div>
                 </Link>
                 <h1 className="text-2xl sm:text-3xl font-black mb-2">
-                  Unete a Apocaliptics
+                  Unete a Apocaliptyx
                 </h1>
                 <p className="text-zinc-400 text-sm">
                   Crea tu cuenta y comienza a predecir el futuro
