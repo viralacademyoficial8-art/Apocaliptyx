@@ -2645,7 +2645,7 @@ function PostCard({
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Award button */}
+          {/* Award button - Oculto temporalmente (monetización futura)
           {!isAuthor && currentUserId && (
             <button
               onClick={() => onAward(post)}
@@ -2655,6 +2655,7 @@ function PostCard({
               <Gift className="w-4 h-4" />
             </button>
           )}
+          */}
           {isAuthor && (
             <button
               onClick={() => onDelete(post.id)}
