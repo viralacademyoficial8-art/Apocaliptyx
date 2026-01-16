@@ -10,12 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, Search, Settings, LogOut, ChevronDown, Loader2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Bell, Settings, LogOut, ChevronDown, Loader2 } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 import { usePermissions } from '@/hooks/usePermissions';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { AdminSearchBar } from './AdminSearchBar';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -44,7 +44,6 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Cargar usuario actual
   useEffect(() => {
@@ -120,15 +119,6 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     router.push('/login');
   };
 
-  // Búsqueda
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/admin/usuarios?search=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery('');
-    }
-  };
-
   const displayName = user?.display_name || user?.username || 'Admin';
   const username = user?.username || 'admin';
   const initials = displayName.substring(0, 2).toUpperCase();
@@ -141,16 +131,10 @@ export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Buscador */}
-        <form onSubmit={handleSearch} className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar usuarios..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 w-64 bg-muted border-border"
-          />
-        </form>
+        {/* Buscador Global del Admin */}
+        <div className="hidden md:block">
+          <AdminSearchBar />
+        </div>
 
         {/* Notificaciones */}
         <DropdownMenu open={showNotifications} onOpenChange={setShowNotifications}>

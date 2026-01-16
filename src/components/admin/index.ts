@@ -2,6 +2,7 @@
 
 export { AdminSidebar } from './AdminSidebar';
 export { AdminHeader } from './AdminHeader';
+export { AdminSearchBar } from './AdminSearchBar';
 export { AdminGuard, PermissionGate } from './AdminGuard';
 export { StatsCard, MiniStats } from './StatsCard';
 export { ActivityFeed } from './ActivityFeed';
