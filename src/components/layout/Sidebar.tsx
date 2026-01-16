@@ -61,11 +61,12 @@ export function Sidebar() {
   ];
 
   const featureNavItems: NavItem[] = [
-    { icon: <Trophy className="w-6 h-6" />, label: t('nav.tournaments'), href: '/torneos' },
     { icon: <Target className="w-6 h-6" />, label: t('sidebar.predictions'), href: '/dashboard' },
     { icon: <TrendingUp className="w-6 h-6" />, label: t('nav.rankings'), href: '/leaderboard' },
     { icon: <ShoppingBag className="w-6 h-6" />, label: t('nav.shop'), href: '/tienda' },
-    { icon: <Sparkles className="w-6 h-6" />, label: t('nav.collectibles'), href: '/coleccionables' },
+    // Ocultos temporalmente:
+    // { icon: <Trophy className="w-6 h-6" />, label: t('nav.tournaments'), href: '/torneos' },
+    // { icon: <Sparkles className="w-6 h-6" />, label: t('nav.collectibles'), href: '/coleccionables' },
   ];
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [notifications, setNotifications] = useState(0);
