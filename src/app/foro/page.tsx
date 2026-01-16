@@ -213,6 +213,11 @@ function ForoContent() {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
 
+  // Modal de confirmación de eliminación
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Modal de repost
   const [repostModalOpen, setRepostModalOpen] = useState(false);
   const [repostingPost, setRepostingPost] = useState<ForumPost | null>(null);
@@ -1001,23 +1006,40 @@ function ForoContent() {
     }
   };
 
-  // Eliminar comentario
-  const handleDeleteComment = async (commentId: string) => {
-    if (!user?.id) return;
-    if (!confirm(t('forum.comments.deleteConfirm') || '¿Eliminar este comentario?')) return;
+  // Abrir modal de confirmación para eliminar comentario
+  const openDeleteConfirm = (commentId: string) => {
+    setDeletingCommentId(commentId);
+    setDeleteConfirmOpen(true);
+  };
 
-    const success = await forumService.deleteComment(commentId, user.id);
-    if (success) {
-      setComments(prev => prev.filter(c => c.id !== commentId));
-      // Decrementar contador de comentarios del post
-      if (selectedPostId) {
-        setPosts(prev => prev.map(p =>
-          p.id === selectedPostId
-            ? { ...p, comments_count: Math.max(0, (p.comments_count || 1) - 1) }
-            : p
-        ));
+  // Eliminar comentario (llamado desde el modal de confirmación)
+  const handleDeleteComment = async () => {
+    if (!user?.id || !deletingCommentId) return;
+
+    setIsDeleting(true);
+    try {
+      const success = await forumService.deleteComment(deletingCommentId, user.id);
+      if (success) {
+        setComments(prev => prev.filter(c => c.id !== deletingCommentId));
+        // Decrementar contador de comentarios del post
+        if (selectedPostId) {
+          setPosts(prev => prev.map(p =>
+            p.id === selectedPostId
+              ? { ...p, comments_count: Math.max(0, (p.comments_count || 1) - 1) }
+              : p
+          ));
+        }
+        toast.success(t('forum.comments.deleted') || 'Comentario eliminado');
+      } else {
+        toast.error(t('forum.comments.deleteError') || 'Error al eliminar comentario');
       }
-      toast.success(t('forum.comments.deleted') || 'Comentario eliminado');
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      toast.error(t('forum.comments.deleteError') || 'Error al eliminar comentario');
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmOpen(false);
+      setDeletingCommentId(null);
     }
   };
 
@@ -2374,7 +2396,7 @@ function ForoContent() {
                         </div>
                         {user?.id === comment.author_id && (
                           <button
-                            onClick={() => handleDeleteComment(comment.id)}
+                            onClick={() => openDeleteConfirm(comment.id)}
                             className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
                             title={t('forum.comments.delete') || 'Eliminar comentario'}
                           >
@@ -2416,6 +2438,65 @@ function ForoContent() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Comment Confirmation Modal */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={(open) => {
+        if (!isDeleting) {
+          setDeleteConfirmOpen(open);
+          if (!open) setDeletingCommentId(null);
+        }
+      }}>
+        <DialogContent className="bg-gray-900 border-gray-800 max-w-sm">
+          <div className="flex flex-col items-center text-center py-4">
+            {/* Icon */}
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+              <Trash2 className="w-8 h-8 text-red-500" />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-bold text-white mb-2">
+              {t('forum.comments.deleteTitle') || '¿Eliminar comentario?'}
+            </h2>
+
+            {/* Description */}
+            <p className="text-gray-400 text-sm mb-6">
+              {t('forum.comments.deleteDescription') || 'Esta acción no se puede deshacer. El comentario será eliminado permanentemente.'}
+            </p>
+
+            {/* Buttons */}
+            <div className="flex gap-3 w-full">
+              <Button
+                variant="outline"
+                className="flex-1 border-gray-700 hover:bg-gray-800 text-gray-300"
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setDeletingCommentId(null);
+                }}
+                disabled={isDeleting}
+              >
+                {t('common.cancel') || 'Cancelar'}
+              </Button>
+              <Button
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleDeleteComment}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t('common.deleting') || 'Eliminando...'}
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {t('common.delete') || 'Eliminar'}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

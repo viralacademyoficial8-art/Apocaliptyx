@@ -703,18 +703,32 @@ class ForumService {
   }
 
   async deleteComment(commentId: string, userId: string): Promise<boolean> {
-    // Obtener el post_id antes de eliminar
-    const { data: comment } = await getSupabase()
+    // Obtener el post_id y verificar autoría antes de eliminar
+    const { data: comment, error: fetchError } = await getSupabase()
       .from('forum_comments')
-      .select('post_id')
+      .select('post_id, author_id')
       .eq('id', commentId)
       .single();
 
-    const { error } = await getSupabase()
+    if (fetchError || !comment) {
+      console.error('Error fetching comment:', fetchError);
+      return false;
+    }
+
+    // Verificar que el usuario sea el autor
+    const commentData = comment as { post_id?: string; author_id?: string };
+    if (commentData.author_id !== userId) {
+      console.error('User is not the author of this comment');
+      return false;
+    }
+
+    // Hacer soft delete
+    const { error, count } = await getSupabase()
       .from('forum_comments')
       .update({ status: 'deleted' } as never)
       .eq('id', commentId)
-      .eq('author_id', userId);
+      .eq('author_id', userId)
+      .select();
 
     if (error) {
       console.error('Error deleting comment:', error);
@@ -722,21 +736,18 @@ class ForumService {
     }
 
     // Decrementar contador
-    if (comment) {
-      const commentData = comment as { post_id?: string } | null;
-      if (commentData?.post_id) {
-        const { data: postData } = await getSupabase()
-          .from('forum_posts')
-          .select('comments_count')
-          .eq('id', commentData.post_id)
-          .single();
+    if (commentData?.post_id) {
+      const { data: postData } = await getSupabase()
+        .from('forum_posts')
+        .select('comments_count')
+        .eq('id', commentData.post_id)
+        .single();
 
-        const currentCount = (postData as unknown as { comments_count?: number } | null)?.comments_count || 1;
-        await getSupabase()
-          .from('forum_posts')
-          .update({ comments_count: Math.max(0, currentCount - 1) } as never)
-          .eq('id', commentData.post_id);
-      }
+      const currentCount = (postData as unknown as { comments_count?: number } | null)?.comments_count || 1;
+      await getSupabase()
+        .from('forum_posts')
+        .update({ comments_count: Math.max(0, currentCount - 1) } as never)
+        .eq('id', commentData.post_id);
     }
 
     return true;
