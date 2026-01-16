@@ -235,7 +235,7 @@ export default function ExplorarPage() {
                   {user.displayName || user.username}
                 </h1>
                 <p className="text-xs text-zinc-500 mt-1">
-                  {t('dashboard.memberSince')} {formatDate(user.createdAt)}
+                  {t('dashboard.memberSince')} {formatDate(new Date(user.createdAt))}
                 </p>
               </section>
 
