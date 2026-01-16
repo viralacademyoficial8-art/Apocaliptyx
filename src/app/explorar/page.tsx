@@ -62,6 +62,7 @@ export default function ExplorarPage() {
   // Translated categories and sort options
   const CATEGORIES = [
     { key: 'all', label: t('common.all'), value: 'Todos' },
+    { key: 'featured', label: '⭐ Destacados', value: 'Destacados' },
     { key: 'crypto', label: 'Crypto', value: 'Crypto' },
     { key: 'sports', label: t('home.categories.sports'), value: 'Deportes' },
     { key: 'technology', label: t('home.categories.technology'), value: 'Tecnología' },
@@ -181,7 +182,12 @@ export default function ExplorarPage() {
 
     // Filtrar por categoría
     if (selectedCategory !== 'Todos') {
-      result = result.filter(s => s.category === selectedCategory);
+      if (selectedCategory === 'Destacados') {
+        // Filtrar por escenarios destacados o hot
+        result = result.filter(s => s.is_featured || s.is_hot);
+      } else {
+        result = result.filter(s => s.category === selectedCategory);
+      }
     }
 
     // Ordenar
