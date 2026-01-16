@@ -123,7 +123,6 @@ export const useAuthStore = create<AuthState>()(
                   following: 0,
                   createdAt: new Date(),
                   role: data.role || 'USER',
-                  isPremium: data.isPremium || false,
                 },
                 isAuthenticated: true,
               });
