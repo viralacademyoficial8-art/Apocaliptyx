@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { CommunityCard } from '@/components/communities/CommunityCard';
 import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
 import { useAuthStore } from '@/lib/stores';
+import { Navbar } from '@/components/Navbar';
 import toast from 'react-hot-toast';
 
 interface Community {
@@ -151,7 +152,8 @@ export default function ComunidadesPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pb-20">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 py-8 pt-20">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
