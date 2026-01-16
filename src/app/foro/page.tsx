@@ -348,6 +348,51 @@ function ForoContent() {
     streamsToday: 0,
   });
 
+  // Función para ordenar posts respetando el orden de los hilos
+  const sortPostsRespectingThreads = useCallback((posts: ForumPost[]): ForumPost[] => {
+    // Agrupar posts por thread_id
+    const threadGroups = new Map<string, ForumPost[]>();
+    const postsWithoutThread: ForumPost[] = [];
+    const processedThreads = new Set<string>();
+
+    // Separar posts con y sin hilo
+    posts.forEach((post) => {
+      if (post.thread_id) {
+        const group = threadGroups.get(post.thread_id) || [];
+        group.push(post);
+        threadGroups.set(post.thread_id, group);
+      } else {
+        postsWithoutThread.push(post);
+      }
+    });
+
+    // Ordenar cada grupo de hilo por thread_position
+    threadGroups.forEach((group, threadId) => {
+      group.sort((a, b) => (a.thread_position || 0) - (b.thread_position || 0));
+    });
+
+    // Reconstruir la lista respetando el orden original pero agrupando los hilos
+    const result: ForumPost[] = [];
+
+    posts.forEach((post) => {
+      if (post.thread_id) {
+        // Si es un post de hilo y no hemos procesado este hilo aún
+        if (!processedThreads.has(post.thread_id)) {
+          // Agregar todos los posts del hilo en orden
+          const threadPosts = threadGroups.get(post.thread_id) || [];
+          result.push(...threadPosts);
+          processedThreads.add(post.thread_id);
+        }
+        // Si ya procesamos el hilo, no hacer nada (ya se agregaron todos)
+      } else {
+        // Post sin hilo, agregar directamente
+        result.push(post);
+      }
+    });
+
+    return result;
+  }, []);
+
   // Cargar posts
   const loadPosts = useCallback(async () => {
     setLoading(true);
@@ -368,13 +413,15 @@ function ForoContent() {
           limit: 50,
         });
       }
-      setPosts(data);
+      // Ordenar posts respetando el orden de los hilos
+      const sortedData = sortPostsRespectingThreads(data);
+      setPosts(sortedData);
     } catch (error) {
       console.error('Error loading posts:', error);
     } finally {
       setLoading(false);
     }
-  }, [filter, selectedCategory, selectedTag, user?.id]);
+  }, [filter, selectedCategory, selectedTag, user?.id, sortPostsRespectingThreads]);
 
   // Cargar reels
   const loadReels = useCallback(async () => {
