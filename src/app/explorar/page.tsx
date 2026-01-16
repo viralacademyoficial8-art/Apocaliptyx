@@ -11,7 +11,7 @@ import { formatDate } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Skull, User, Crown
+  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Swords, User, Crown
 } from 'lucide-react';
 import {
   FadeInView,
@@ -284,10 +284,10 @@ export default function ExplorarPage() {
 
                 <StaggerItem>
                   <div
-                    onClick={() => router.push('/perfil/historial')}
+                    onClick={() => user?.username && router.push(`/perfil/${user.username}?tab=stolen`)}
                     className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-red-500/50 hover:bg-zinc-900 transition-all"
                   >
-                    <Skull className="w-6 h-6 text-red-400" />
+                    <Swords className="w-6 h-6 text-red-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.scenariosStolen')}</p>
                       <p className="text-xl font-bold">{userStats.scenariosStolen}</p>
