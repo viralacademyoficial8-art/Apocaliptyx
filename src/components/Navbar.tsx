@@ -27,13 +27,10 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const { user, isAuthenticated, logout, login, refreshBalance } = useAuthStore();
+  const { user, logout, refreshBalance } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
   const { hasInfiniteCoins, isAdmin, roleName, roleIcon, roleColor } = usePermissions();
-
-  // Estado para saber si ya cargamos los datos del usuario
-  const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
 
   // Determinar si está autenticado (priorizar session de NextAuth)
   const isLoggedIn = status === "authenticated" && !!session?.user;
@@ -45,49 +42,17 @@ export function Navbar() {
     username: session.user.username || session.user.email?.split("@")[0] || "user",
     displayName: session.user.name || "Usuario",
     avatarUrl: session.user.image || "",
-    apCoins: 0,
+    apCoins: null, // null indica que aún no se ha cargado
     role: session.user.role || "USER",
   } : null);
 
-  // Cargar datos del usuario desde la BD - UNA sola vez al autenticarse
+  // Cargar datos del usuario desde la BD cuando esté autenticado
   useEffect(() => {
-    const loadUserData = async () => {
-      if (status === "authenticated" && session?.user) {
-        try {
-          const response = await fetch('/api/me');
-          if (response.ok) {
-            const data = await response.json();
-            // Siempre actualizar con datos frescos de la BD
-            login({
-              id: data.id || session.user.id || "",
-              email: data.email || session.user.email || "",
-              username: data.username || session.user.username || session.user.email?.split("@")[0] || "user",
-              displayName: data.displayName || session.user.name || "Usuario",
-              avatarUrl: data.avatarUrl || session.user.image || "",
-              prophetLevel: "vidente",
-              reputationScore: 0,
-              apCoins: data.apCoins ?? 1000,
-              scenariosCreated: 0,
-              scenariosWon: 0,
-              winRate: 0,
-              followers: 0,
-              following: 0,
-              createdAt: new Date(),
-              role: data.role || session.user.role || "USER",
-            });
-            setIsBalanceLoaded(true);
-          }
-        } catch (error) {
-          console.error('Error loading user data:', error);
-        }
-      }
-    };
-
-    // Cargar datos cuando cambie la autenticación o la ruta
-    if (status === "authenticated") {
-      loadUserData();
+    if (status === "authenticated" && session?.user) {
+      // refreshBalance() crea el usuario en Zustand si no existe
+      refreshBalance();
     }
-  }, [status, session, login, pathname]);
+  }, [status, session, refreshBalance, pathname]);
 
   const navItems = [
     { href: "/explorar", label: t("nav.scenarios") },
@@ -207,7 +172,7 @@ export function Navbar() {
                       </div>
                     ) : (
                       <span className="font-bold text-yellow-400 text-sm">
-                        {isBalanceLoaded && user ? (user.apCoins || 0).toLocaleString("es-MX") : '...'}
+                        {user?.apCoins != null ? user.apCoins.toLocaleString("es-MX") : '...'}
                       </span>
                     )}
                   </div>
@@ -273,7 +238,7 @@ export function Navbar() {
                               </span>
                             ) : (
                               <span className="text-xs font-semibold text-yellow-400">
-                                {isBalanceLoaded && user ? (user.apCoins || 0).toLocaleString("es-MX") : '...'} AP Coins
+                                {user?.apCoins != null ? user.apCoins.toLocaleString("es-MX") : '...'} AP Coins
                               </span>
                             )}
                           </div>
