@@ -69,7 +69,7 @@ export default function StreamingPage() {
   const { t } = useTranslation();
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'live' | 'all' | 'following'>('live');
+  const [filter, setFilter] = useState<'live' | 'following'>('live');
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingStream, setIsStartingStream] = useState(false);
 
@@ -439,14 +439,6 @@ export default function StreamingPage() {
                   {t('streaming.live')}
                 </Button>
                 <Button
-                  variant={filter === 'all' ? 'default' : 'outline'}
-                  onClick={() => setFilter('all')}
-                  className={`text-sm ${filter === 'all' ? 'bg-purple-600' : 'border-gray-700'}`}
-                  size="sm"
-                >
-                  {t('streaming.all')}
-                </Button>
-                <Button
                   variant={filter === 'following' ? 'default' : 'outline'}
                   onClick={() => setFilter('following')}
                   className={`text-sm ${filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}`}
@@ -503,28 +495,17 @@ export default function StreamingPage() {
                 <p className="text-sm mb-4">Sigue a más usuarios para ver sus transmisiones aquí</p>
                 <Button
                   variant="link"
-                  onClick={() => setFilter('all')}
+                  onClick={() => setFilter('live')}
                   className="text-purple-400"
                 >
-                  Ver todos los streams
+                  Ver streams en vivo
                 </Button>
               </>
             ) : (
               <>
                 <p className="text-lg">
-                  {filter === 'live'
-                    ? t('streaming.noLiveStreams')
-                    : 'No hay streams disponibles'}
+                  {t('streaming.noLiveStreams')}
                 </p>
-                {filter === 'live' && (
-                  <Button
-                    variant="link"
-                    onClick={() => setFilter('all')}
-                    className="text-purple-400 mt-2"
-                  >
-                    {t('streaming.viewAllStreams')}
-                  </Button>
-                )}
               </>
             )}
           </div>
