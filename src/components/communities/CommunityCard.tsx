@@ -114,7 +114,7 @@ export function CommunityCard({
         <div className="flex gap-2">
           {isMember ? (
             <>
-              <Link href={`/comunidades/${community.slug}`} className="flex-1">
+              <Link href={`/foro/comunidad/${community.slug}`} className="flex-1">
                 <Button className="w-full bg-purple-600 hover:bg-purple-700">
                   Ver comunidad
                   <ArrowRight className="w-4 h-4 ml-2" />
