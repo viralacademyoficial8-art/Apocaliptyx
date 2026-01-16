@@ -42,7 +42,7 @@ export function Navbar() {
     username: session.user.username || session.user.email?.split("@")[0] || "user",
     displayName: session.user.name || "Usuario",
     avatarUrl: session.user.image || "",
-    apCoins: user?.apCoins ?? 0, // Usar solo el valor de Zustand, nunca el de sesión
+    apCoins: 0, // Será actualizado por refreshBalance()
     role: session.user.role || "USER",
   } : null);
 
