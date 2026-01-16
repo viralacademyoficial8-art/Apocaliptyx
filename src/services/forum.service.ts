@@ -1331,7 +1331,7 @@ class ForumService {
 
   // ==================== SHARES TRACKING ====================
 
-  async trackShare(postId: string, userId: string | null, shareType: 'clipboard' | 'twitter' | 'whatsapp' | 'facebook'): Promise<void> {
+  async trackShare(postId: string, userId: string | null, shareType: 'clipboard' | 'twitter' | 'whatsapp' | 'facebook' | 'tiktok'): Promise<void> {
     await getSupabase().from('forum_shares').insert({
       post_id: postId,
       user_id: userId,
