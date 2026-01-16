@@ -274,6 +274,27 @@ function ForoContent() {
     }
   }, [searchParams]);
 
+  // Handle direct link to a specific post
+  useEffect(() => {
+    const postId = searchParams.get('post');
+    if (postId && posts.length > 0) {
+      // Make sure we're on the feed tab
+      setActiveTab('feed');
+      // Wait for render then scroll to the post
+      setTimeout(() => {
+        const postElement = document.getElementById(`post-${postId}`);
+        if (postElement) {
+          postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight the post briefly
+          postElement.classList.add('ring-2', 'ring-purple-500');
+          setTimeout(() => {
+            postElement.classList.remove('ring-2', 'ring-purple-500');
+          }, 3000);
+        }
+      }, 100);
+    }
+  }, [searchParams, posts]);
+
   // Function to change tab and update URL + localStorage
   const changeTab = useCallback((tab: 'feed' | 'reels' | 'lives' | 'comunidades') => {
     setActiveTab(tab);
@@ -2588,7 +2609,7 @@ function PostCard({
     : [];
 
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
+    <div id={`post-${post.id}`} className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-all">
       {/* Thread indicator */}
       {post.thread_id && (
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-2 mb-3">
