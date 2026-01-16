@@ -110,6 +110,7 @@ export default function CommunityPage() {
   // Create post state
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostImage, setNewPostImage] = useState<string | null>(null);
+  const [newPostImageFile, setNewPostImageFile] = useState<File | null>(null);
   const [newPostCategory, setNewPostCategory] = useState('general');
   const [isCreatingPost, setIsCreatingPost] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -264,12 +265,33 @@ export default function CommunityPage() {
 
     setIsCreatingPost(true);
     try {
+      let uploadedImageUrl: string | null = null;
+
+      // Subir imagen al storage si hay una
+      if (newPostImageFile) {
+        const formData = new FormData();
+        formData.append('file', newPostImageFile);
+
+        const uploadResponse = await fetch('/api/forum/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const uploadData = await uploadResponse.json();
+
+        if (!uploadResponse.ok) {
+          throw new Error(uploadData.error || 'Error al subir imagen');
+        }
+
+        uploadedImageUrl = uploadData.url;
+      }
+
       const response = await fetch(`/api/communities/${community?.id}/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: newPostContent,
-          imageUrl: newPostImage,
+          imageUrl: uploadedImageUrl,
           category: newPostCategory,
         }),
       });
@@ -285,6 +307,7 @@ export default function CommunityPage() {
       setPosts([data.post, ...posts]);
       setNewPostContent('');
       setNewPostImage(null);
+      setNewPostImageFile(null);
       setNewPostCategory('general');
       // Update posts count in community state
       if (community) {
@@ -585,7 +608,14 @@ export default function CommunityPage() {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  // In production, upload to storage and get URL
+                                  // Validar tamaño (max 5MB)
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    toast.error('La imagen no puede superar los 5MB');
+                                    return;
+                                  }
+                                  // Guardar archivo para subir después
+                                  setNewPostImageFile(file);
+                                  // Crear preview temporal
                                   setNewPostImage(URL.createObjectURL(file));
                                 }
                               }}
@@ -619,7 +649,10 @@ export default function CommunityPage() {
                               className="max-h-40 rounded-lg"
                             />
                             <button
-                              onClick={() => setNewPostImage(null)}
+                              onClick={() => {
+                                setNewPostImage(null);
+                                setNewPostImageFile(null);
+                              }}
                               className="absolute top-2 right-2 p-1 bg-red-500 rounded-full"
                             >
                               <Trash2 className="w-3 h-3" />
