@@ -1039,9 +1039,11 @@ function MensajesContent() {
   // ============================================
 
   return (
-    <div className="h-screen bg-[#0a0a0f] text-white flex overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col overflow-hidden">
+      <Navbar />
       {userId && <PresenceTracker userId={userId} />}
 
+      <div className="flex-1 flex overflow-hidden">
       {/* Background decorations */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-purple-600/8 rounded-full blur-[100px]" />
@@ -2011,6 +2013,7 @@ function MensajesContent() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
