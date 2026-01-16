@@ -376,12 +376,12 @@ export default function PublicProfilePage() {
 
     if (activeTab === 'stolen' && stolenScenarios.length === 0) {
       // Obtener escenarios robados desde scenario_steal_history
-      const { data: steals } = await supabase
+      const { data: steals, error } = await supabase
         .from('scenario_steal_history')
         .select(`
           id,
           stolen_at,
-          steal_price,
+          price_paid,
           scenario:scenarios (
             id,
             title,
@@ -397,6 +397,9 @@ export default function PublicProfilePage() {
         .eq('thief_id', profile.id)
         .order('stolen_at', { ascending: false });
 
+      if (error) {
+        console.error('Error fetching stolen scenarios:', error);
+      }
       setStolenScenarios(steals || []);
     }
     if (activeTab === 'scenarios' && scenarios.length === 0) {
@@ -922,7 +925,7 @@ export default function PublicProfilePage() {
                         <span>{steal.scenario?.participant_count || 0} participantes</span>
                       </div>
                       <div className="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-500">
-                        <p>Robado a @{steal.victim?.username || 'desconocido'} por {steal.steal_price} AP</p>
+                        <p>Robado a @{steal.victim?.username || 'desconocido'} por {steal.price_paid} AP</p>
                         <p>{formatDistanceToNow(new Date(steal.stolen_at), { addSuffix: true, locale: es })}</p>
                       </div>
                     </Link>
