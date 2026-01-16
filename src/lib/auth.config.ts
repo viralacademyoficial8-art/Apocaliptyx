@@ -51,6 +51,7 @@ export default {
             level: 1,
             isVerified: false,
             isPremium: false,
+            createdAt: new Date().toISOString(),
           };
         }
 
@@ -111,6 +112,7 @@ export default {
             level: 1,
             isVerified: false,
             isPremium: false,
+            createdAt: new Date().toISOString(),
           };
         }
 
@@ -150,6 +152,7 @@ export default {
             level: 1,
             isVerified: false,
             isPremium: false,
+            createdAt: new Date().toISOString(),
           };
         }
 
@@ -210,6 +213,7 @@ export default {
             level: 1,
             isVerified: false,
             isPremium: false,
+            createdAt: new Date().toISOString(),
           };
         }
 
