@@ -116,33 +116,16 @@ function ForoContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
-  const { user, isAuthenticated, login } = useAuthStore();
+  const { user, isAuthenticated, refreshBalance } = useAuthStore();
   const { t } = useTranslation();
   const { language } = useLanguage();
 
-  // Sync NextAuth session with Zustand store
+  // Sync NextAuth session with Zustand store using refreshBalance
   useEffect(() => {
-    if (status === 'authenticated' && session?.user && !user) {
-      const sessionUser = session.user;
-      login({
-        id: sessionUser.id || '',
-        email: sessionUser.email || '',
-        username: sessionUser.username || sessionUser.email?.split('@')[0] || 'user',
-        displayName: sessionUser.name || 'Usuario',
-        avatarUrl: sessionUser.image || '',
-        prophetLevel: 'vidente',
-        reputationScore: 0,
-        apCoins: sessionUser.apCoins || 1000,
-        scenariosCreated: 0,
-        scenariosWon: 0,
-        winRate: 0,
-        followers: 0,
-        following: 0,
-        createdAt: new Date(),
-        role: sessionUser.role || 'USER',
-      });
+    if (status === 'authenticated' && session?.user) {
+      refreshBalance();
     }
-  }, [status, session, user, login]);
+  }, [status, session, refreshBalance]);
 
   // Determine if user is logged in (check both NextAuth and Zustand)
   const isLoggedIn = (status === 'authenticated' && !!session?.user) || isAuthenticated;
