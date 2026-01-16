@@ -2474,18 +2474,18 @@ function ForoContent() {
         <DialogContent className="bg-gray-900 border-gray-800 max-w-sm">
           <div className="flex flex-col items-center text-center py-4">
             {/* Icon */}
-            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4 animate-pulse">
               <Trash2 className="w-8 h-8 text-red-500" />
             </div>
 
             {/* Title */}
             <h2 className="text-xl font-bold text-white mb-2">
-              {t('forum.comments.deleteTitle') || '¿Eliminar comentario?'}
+              ¿Eliminar comentario?
             </h2>
 
             {/* Description */}
             <p className="text-gray-400 text-sm mb-6">
-              {t('forum.comments.deleteDescription') || 'Esta acción no se puede deshacer. El comentario será eliminado permanentemente.'}
+              Esta acción no se puede deshacer. El comentario será eliminado permanentemente.
             </p>
 
             {/* Buttons */}
@@ -2499,7 +2499,7 @@ function ForoContent() {
                 }}
                 disabled={isDeleting}
               >
-                {t('common.cancel') || 'Cancelar'}
+                Cancelar
               </Button>
               <Button
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white"
@@ -2509,12 +2509,12 @@ function ForoContent() {
                 {isDeleting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('common.deleting') || 'Eliminando...'}
+                    Eliminando...
                   </>
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4 mr-2" />
-                    {t('common.delete') || 'Eliminar'}
+                    Eliminar
                   </>
                 )}
               </Button>
@@ -2533,18 +2533,18 @@ function ForoContent() {
         <DialogContent className="bg-gray-900 border-gray-800 max-w-sm">
           <div className="flex flex-col items-center text-center py-4">
             {/* Icon */}
-            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4 animate-pulse">
               <Trash2 className="w-8 h-8 text-red-500" />
             </div>
 
             {/* Title */}
             <h2 className="text-xl font-bold text-white mb-2">
-              {t('forum.actions.deletePostTitle') || '¿Eliminar publicación?'}
+              ¿Eliminar publicación?
             </h2>
 
             {/* Description */}
             <p className="text-gray-400 text-sm mb-6">
-              {t('forum.actions.deletePostDescription') || 'Esta acción no se puede deshacer. La publicación será eliminada permanentemente.'}
+              Esta acción no se puede deshacer. La publicación será eliminada permanentemente.
             </p>
 
             {/* Buttons */}
@@ -2558,7 +2558,7 @@ function ForoContent() {
                 }}
                 disabled={isDeletingPost}
               >
-                {t('common.cancel') || 'Cancelar'}
+                Cancelar
               </Button>
               <Button
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white"
@@ -2568,12 +2568,12 @@ function ForoContent() {
                 {isDeletingPost ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('common.deleting') || 'Eliminando...'}
+                    Eliminando...
                   </>
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4 mr-2" />
-                    {t('common.delete') || 'Eliminar'}
+                    Eliminar
                   </>
                 )}
               </Button>
