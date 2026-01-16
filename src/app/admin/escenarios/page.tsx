@@ -96,14 +96,14 @@ export default function AdminEscenariosPage() {
     loadScenarios();
   }, [loadScenarios]);
 
+  // Reset to page 1 when search or filters change (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (page !== 1) {
-        setPage(1);
-      }
+      setPage(1);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, statusFilter, categoryFilter]);
 
   const handleToggleFeatured = async (scenarioId: string, currentFeatured: boolean) => {
     setActionLoading(scenarioId);

@@ -64,14 +64,14 @@ export default function AdminUsuariosPage() {
     loadUsers();
   }, [loadUsers]);
 
+  // Reset to page 1 when search or filters change (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (page !== 1) {
-        setPage(1);
-      }
+      setPage(1);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, roleFilter]);
 
   const handleBanUser = async (userId: string, currentlyBanned: boolean) => {
     setActionLoading(userId);
