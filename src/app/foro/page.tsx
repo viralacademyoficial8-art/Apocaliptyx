@@ -1012,16 +1012,18 @@ function ForoContent() {
 
     setIsDeletingPost(true);
     try {
+      console.log('Deleting post:', deletingPostId, 'User:', user.id);
       const success = await forumService.deletePost(deletingPostId, user.id);
+      console.log('Delete result:', success);
       if (success) {
         setPosts(prev => prev.filter(p => p.id !== deletingPostId));
-        toast.success(t('forum.actions.deleted') || 'Publicación eliminada');
+        toast.success('Publicación eliminada');
       } else {
-        toast.error(t('forum.actions.deleteError') || 'Error al eliminar publicación');
+        toast.error('Error al eliminar publicación');
       }
     } catch (error) {
       console.error('Error deleting post:', error);
-      toast.error(t('forum.actions.deleteError') || 'Error al eliminar publicación');
+      toast.error('Error al eliminar publicación');
     } finally {
       setIsDeletingPost(false);
       setDeletePostConfirmOpen(false);

@@ -479,12 +479,16 @@ class ForumService {
   }
 
   async deletePost(postId: string, userId: string): Promise<boolean> {
-    // Verificar que el post existe y el usuario es el autor
+    console.log('deletePost called with:', { postId, userId });
+
+    // Verificar que el post existe
     const { data: post, error: fetchError } = await getSupabase()
       .from('forum_posts')
       .select('id, author_id')
       .eq('id', postId)
       .single();
+
+    console.log('Fetch post result:', { post, fetchError });
 
     if (fetchError || !post) {
       console.error('Error fetching post:', fetchError);
@@ -493,18 +497,21 @@ class ForumService {
 
     // Verificar que el usuario sea el autor
     const postData = post as { id?: string; author_id?: string };
+    console.log('Author check:', { postAuthorId: postData.author_id, userId, match: postData.author_id === userId });
+
     if (postData.author_id !== userId) {
       console.error('User is not the author of this post');
       return false;
     }
 
-    // Soft delete - cambiar status a deleted
-    const { error } = await getSupabase()
+    // Soft delete - cambiar status a deleted (sin filtro de author_id ya que RLS lo permite)
+    const { data: updateData, error } = await getSupabase()
       .from('forum_posts')
       .update({ status: 'deleted' } as never)
       .eq('id', postId)
-      .eq('author_id', userId)
       .select();
+
+    console.log('Update result:', { updateData, error });
 
     if (error) {
       console.error('Error deleting post:', error);
