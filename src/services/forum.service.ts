@@ -1221,7 +1221,7 @@ class ForumService {
     try {
       // Get users being followed
       const { data: follows } = await getSupabase()
-        .from('user_follows')
+        .from('follows')
         .select('following_id')
         .eq('follower_id', userId);
 
@@ -1308,7 +1308,7 @@ class ForumService {
     followingId: string
   ): Promise<{ following: boolean }> {
     const { data: existingRaw } = await getSupabase()
-      .from('user_follows')
+      .from('follows')
       .select('id')
       .eq('follower_id', followerId)
       .eq('following_id', followingId)
@@ -1317,7 +1317,7 @@ class ForumService {
     const existing = existingRaw as { id?: string } | null;
 
     if (existing) {
-      await getSupabase().from('user_follows').delete().eq('id', existing.id!);
+      await getSupabase().from('follows').delete().eq('id', existing.id!);
       // Decrement followers_count manually
       const { data: followingUserRaw } = await getSupabase().from('users').select('followers_count').eq('id', followingId).single();
       const followingUser = followingUserRaw as { followers_count?: number } | null;
@@ -1328,14 +1328,14 @@ class ForumService {
       await getSupabase().from('users').update({ following_count: Math.max(0, (followerUser?.following_count || 1) - 1) } as never).eq('id', followerId);
       return { following: false };
     } else {
-      await getSupabase().from('user_follows').insert({ follower_id: followerId, following_id: followingId } as never);
+      await getSupabase().from('follows').insert({ follower_id: followerId, following_id: followingId } as never);
       return { following: true };
     }
   }
 
   async isFollowing(followerId: string, followingId: string): Promise<boolean> {
     const { data } = await getSupabase()
-      .from('user_follows')
+      .from('follows')
       .select('id')
       .eq('follower_id', followerId)
       .eq('following_id', followingId)
@@ -1345,9 +1345,9 @@ class ForumService {
 
   async getFollowers(userId: string): Promise<{ id: string; username: string; display_name: string; avatar_url: string }[]> {
     const { data } = await getSupabase()
-      .from('user_follows')
+      .from('follows')
       .select(`
-        follower:users!user_follows_follower_id_fkey(id, username, display_name, avatar_url)
+        follower:users!follows_follower_id_fkey(id, username, display_name, avatar_url)
       `)
       .eq('following_id', userId);
 
@@ -1357,9 +1357,9 @@ class ForumService {
 
   async getFollowing(userId: string): Promise<{ id: string; username: string; display_name: string; avatar_url: string }[]> {
     const { data } = await getSupabase()
-      .from('user_follows')
+      .from('follows')
       .select(`
-        following:users!user_follows_following_id_fkey(id, username, display_name, avatar_url)
+        following:users!follows_following_id_fkey(id, username, display_name, avatar_url)
       `)
       .eq('follower_id', userId);
 

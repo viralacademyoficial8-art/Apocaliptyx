@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     if (filter === 'following' && user) {
       // Get followed users
       const { data: followingRaw } = await supabase
-        .from('user_follows')
+        .from('follows')
         .select('following_id')
         .eq('follower_id', user.id);
 
