@@ -35,14 +35,14 @@ export function Navbar() {
   // Determinar si está autenticado (priorizar session de NextAuth)
   const isLoggedIn = status === "authenticated" && !!session?.user;
 
-  // Usar datos de Zustand si existen, sino de la session
+  // Usar datos de Zustand si existen, sino de la session (sin apCoins hardcodeado)
   const currentUser = user || (session?.user ? {
     id: session.user.id || "",
     email: session.user.email || "",
     username: session.user.username || session.user.email?.split("@")[0] || "user",
     displayName: session.user.name || "Usuario",
     avatarUrl: session.user.image || "",
-    apCoins: session.user.apCoins || 1000,
+    apCoins: user?.apCoins ?? 0, // Usar solo el valor de Zustand, nunca el de sesión
     role: session.user.role || "USER",
   } : null);
 
@@ -58,7 +58,7 @@ export function Navbar() {
         avatarUrl: sessionUser.image || "",
         prophetLevel: "vidente",
         reputationScore: 0,
-        apCoins: sessionUser.apCoins || 1000,
+        apCoins: 0, // No usar valor de sesión, refreshBalance lo actualizará
         scenariosCreated: 0,
         scenariosWon: 0,
         winRate: 0,
@@ -67,8 +67,10 @@ export function Navbar() {
         createdAt: new Date(),
         role: sessionUser.role || "USER",
       });
+      // Inmediatamente refrescar el balance real desde la BD
+      refreshBalance();
     }
-  }, [status, session, user, login]);
+  }, [status, session, user, login, refreshBalance]);
 
   // Sincronizar AP coins desde la base de datos al cargar y al cambiar de página
   useEffect(() => {
