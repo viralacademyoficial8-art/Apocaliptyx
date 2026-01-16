@@ -153,8 +153,18 @@ export function AdminSearchBar() {
 
         setUserResults(usersRes.data || []);
         setScenarioResults(scenariosRes.data || []);
-        setReportResults(reportsRes.data || []);
-        setForumResults(forumRes.data || []);
+        // Transform reports data to match expected type
+        const transformedReports = (reportsRes.data || []).map((r: any) => ({
+          ...r,
+          reporter: Array.isArray(r.reporter) ? r.reporter[0] : r.reporter
+        }));
+        setReportResults(transformedReports);
+        // Transform forum posts data to match expected type
+        const transformedPosts = (forumRes.data || []).map((p: any) => ({
+          ...p,
+          author: Array.isArray(p.author) ? p.author[0] : p.author
+        }));
+        setForumResults(transformedPosts);
       } catch (error) {
         console.error('Admin search error:', error);
       } finally {
