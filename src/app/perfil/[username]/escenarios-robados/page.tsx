@@ -118,7 +118,23 @@ export default function EscenariosRobadosPage() {
         .eq('thief_id', userData.id)
         .order('stolen_at', { ascending: false });
 
-      const scenarios = (steals || []) as StolenScenario[];
+      // Transform data - Supabase returns arrays for joined relations
+      const scenarios = (steals || []).map((steal: unknown) => {
+        const s = steal as {
+          id: string;
+          stolen_at: string;
+          steal_price: number;
+          scenario: Array<StolenScenario['scenario']> | StolenScenario['scenario'];
+          victim: Array<StolenScenario['victim']> | StolenScenario['victim'];
+        };
+        return {
+          id: s.id,
+          stolen_at: s.stolen_at,
+          steal_price: s.steal_price,
+          scenario: Array.isArray(s.scenario) ? s.scenario[0] : s.scenario,
+          victim: Array.isArray(s.victim) ? s.victim[0] : s.victim,
+        } as StolenScenario;
+      });
       setStolenScenarios(scenarios);
 
       // Calcular estadísticas
