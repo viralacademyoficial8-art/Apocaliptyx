@@ -103,7 +103,10 @@ export const useAuthStore = create<AuthState>()(
 
             if (currentUser) {
               // Actualizar usuario existente con los datos frescos de la BD
-              set({ user: { ...currentUser, apCoins: data.apCoins ?? currentUser.apCoins } });
+              set({
+                user: { ...currentUser, apCoins: data.apCoins ?? currentUser.apCoins },
+                isAuthenticated: true
+              });
             } else if (data.id) {
               // Si no hay usuario en Zustand pero la API devolvió datos, crear el usuario
               set({
