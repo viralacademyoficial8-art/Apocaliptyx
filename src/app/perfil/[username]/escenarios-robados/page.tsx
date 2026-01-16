@@ -195,15 +195,11 @@ export default function EscenariosRobadosPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 p-1 shadow-lg shadow-red-500/30">
-                <img
-                  src={profile.avatar_url || '/default-avatar.png'}
-                  alt={profile.username}
-                  className="w-full h-full rounded-xl object-cover"
-                />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+                <Swords className="w-10 h-10 text-white" />
               </div>
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gray-900 border-2 border-red-500 flex items-center justify-center">
-                <Swords className="w-4 h-4 text-red-400" />
+                <Zap className="w-4 h-4 text-red-400" />
               </div>
             </div>
             <div>
@@ -211,11 +207,17 @@ export default function EscenariosRobadosPage() {
                 Escenarios Robados
               </h1>
               <p className="text-gray-400 flex items-center gap-2">
-                <img
-                  src={profile.avatar_url || '/default-avatar.png'}
-                  alt={profile.username}
-                  className="w-6 h-6 rounded-full"
-                />
+                {profile.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.username}
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">{profile.username?.charAt(0).toUpperCase()}</span>
+                  </div>
+                )}
                 Historial de conquistas de <span className="text-red-400 font-semibold">@{profile.username}</span>
               </p>
             </div>
