@@ -195,11 +195,15 @@ export default function EscenariosRobadosPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-lg shadow-red-500/30">
-                <Swords className="w-10 h-10 text-white" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 p-1 shadow-lg shadow-red-500/30">
+                <img
+                  src={profile.avatar_url || '/default-avatar.png'}
+                  alt={profile.username}
+                  className="w-full h-full rounded-xl object-cover"
+                />
               </div>
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gray-900 border-2 border-red-500 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-red-400" />
+                <Swords className="w-4 h-4 text-red-400" />
               </div>
             </div>
             <div>
