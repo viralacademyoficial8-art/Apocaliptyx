@@ -1076,7 +1076,7 @@ function ForoContent() {
   };
 
   // Handle share
-  const handleShare = async (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp') => {
+  const handleShare = async (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp' | 'facebook' | 'tiktok') => {
     const url = `${window.location.origin}/foro?post=${post.id}`;
     const text = post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '');
 
@@ -1087,6 +1087,12 @@ function ForoContent() {
       window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     } else if (type === 'whatsapp') {
       window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+    } else if (type === 'facebook') {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
+    } else if (type === 'tiktok') {
+      // TikTok no tiene API de compartir web directa, copiamos el link y notificamos
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copiado - Pégalo en TikTok');
     }
 
     forumService.trackShare(post.id, user?.id || null, type);
@@ -2555,7 +2561,7 @@ function PostCard({
   onReaction: (postId: string, reactionType: ReactionType) => void;
   onBookmark: (postId: string) => void;
   onRepost: (post: ForumPost) => void;
-  onShare: (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp') => void;
+  onShare: (post: ForumPost, type: 'clipboard' | 'twitter' | 'whatsapp' | 'facebook' | 'tiktok') => void;
   onAward: (post: ForumPost) => void;
   REACTIONS: { type: ReactionType; emoji: string; label: string; color: string }[];
   FORUM_TAGS: { id: string; label: string; color: string }[];
@@ -2843,6 +2849,24 @@ function PostCard({
                 className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
               >
                 💬 WhatsApp
+              </button>
+              <button
+                onClick={() => {
+                  onShare(post, 'facebook');
+                  setShowShareMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+              >
+                📘 Facebook
+              </button>
+              <button
+                onClick={() => {
+                  onShare(post, 'tiktok');
+                  setShowShareMenu(false);
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-2"
+              >
+                🎵 TikTok
               </button>
             </div>
           )}
