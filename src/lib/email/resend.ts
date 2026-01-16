@@ -21,7 +21,7 @@ export const resend = {
 };
 
 // Email por defecto (dominio verificado en Resend)
-export const FROM_EMAIL = 'Apocaliptics <noreply@apocaliptyx.com>';
+export const FROM_EMAIL = 'Apocaliptyx <noreply@apocaliptyx.com>';
 
 // Tipos de email
 export type EmailType = 

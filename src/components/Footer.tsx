@@ -352,10 +352,10 @@ export function Footer() {
   }, []);
 
   const socialLinks = [
-    { href: 'https://twitter.com/apocaliptics', icon: Twitter, label: 'Twitter' },
-    { href: 'https://instagram.com/apocaliptics', icon: Instagram, label: 'Instagram' },
-    { href: 'https://youtube.com/@apocaliptics', icon: Youtube, label: 'YouTube' },
-    { href: 'https://discord.gg/apocaliptics', icon: MessageCircle, label: 'Discord' },
+    { href: 'https://twitter.com/apocaliptyx', icon: Twitter, label: 'Twitter' },
+    { href: 'https://instagram.com/apocaliptyx', icon: Instagram, label: 'Instagram' },
+    { href: 'https://youtube.com/@apocaliptyx', icon: Youtube, label: 'YouTube' },
+    { href: 'https://discord.gg/apocaliptyx', icon: MessageCircle, label: 'Discord' },
   ];
 
   return (
@@ -533,7 +533,7 @@ export function Footer() {
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <span>© {currentYear}</span>
               <Link href="/" className="text-gray-400 hover:text-white transition-colors">
-                Apocaliptics
+                Apocaliptyx
               </Link>
               <span className="hidden sm:inline">•</span>
               <span className="hidden sm:inline">{t.labels.rights}</span>

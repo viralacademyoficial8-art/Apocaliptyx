@@ -20,7 +20,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined,
 );
 
-const STORAGE_KEY = 'apocaliptics-language';
+const STORAGE_KEY = 'apocaliptyx-language';
 
 // Detectar idioma del navegador
 const detectBrowserLanguage = (): LanguageCode => {

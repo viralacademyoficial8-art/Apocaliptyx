@@ -13,7 +13,7 @@ export function getResetPasswordEmailHtml({
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recuperar Contraseña - Apocaliptics</title>
+  <title>Recuperar Contraseña - Apocaliptyx</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #09090b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -22,7 +22,7 @@ export function getResetPasswordEmailHtml({
     <div style="text-align: center; margin-bottom: 32px;">
       <div style="display: inline-block; background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%); padding: 16px 32px; border-radius: 16px;">
         <h1 style="color: #ffffff; font-size: 28px; margin: 0; font-weight: 900; letter-spacing: -0.5px;">
-          APOCALIPTICS
+          APOCALIPTYX
         </h1>
       </div>
     </div>
@@ -55,7 +55,7 @@ export function getResetPasswordEmailHtml({
       </p>
 
       <p style="color: #a1a1aa; font-size: 16px; line-height: 1.7; margin: 0 0 32px 0;">
-        Recibimos una solicitud para restablecer la contraseña de tu cuenta en Apocaliptics. Haz clic en el boton de abajo para crear una nueva contraseña:
+        Recibimos una solicitud para restablecer la contraseña de tu cuenta en Apocaliptyx. Haz clic en el boton de abajo para crear una nueva contraseña:
       </p>
 
       <!-- CTA Button -->
@@ -84,7 +84,7 @@ export function getResetPasswordEmailHtml({
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px;">
       <p style="color: #52525b; font-size: 12px; margin: 0 0 8px 0;">
-        © 2025 Apocaliptics. Todos los derechos reservados.
+        © 2025 Apocaliptyx. Todos los derechos reservados.
       </p>
       <p style="color: #3f3f46; font-size: 11px; margin: 0;">
         Este correo fue enviado desde noreply@apocaliptyx.com
@@ -105,11 +105,11 @@ export function getResetPasswordEmailText({
   resetLink: string;
 }) {
   return `
-APOCALIPTICS - Recuperar Contraseña
+APOCALIPTYX - Recuperar Contraseña
 
 Hola ${username},
 
-Recibimos una solicitud para restablecer la contraseña de tu cuenta en Apocaliptics.
+Recibimos una solicitud para restablecer la contraseña de tu cuenta en Apocaliptyx.
 
 Haz clic en el siguiente enlace para crear una nueva contraseña:
 ${resetLink}
@@ -119,6 +119,6 @@ ${resetLink}
 Si no solicitaste este cambio, puedes ignorar este correo. Tu contraseña no será modificada.
 
 ---
-© 2025 Apocaliptics. Todos los derechos reservados.
+© 2025 Apocaliptyx. Todos los derechos reservados.
   `.trim();
 }

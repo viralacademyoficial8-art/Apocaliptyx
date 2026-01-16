@@ -241,7 +241,7 @@ export const notificationsService = {
     return this.create({
       userId,
       type: 'welcome',
-      title: '¡Bienvenido a Apocaliptics! 🎉',
+      title: '¡Bienvenido a Apocaliptyx! 🎉',
       message: `Hola @${username}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
       linkUrl: '/dashboard',
     });

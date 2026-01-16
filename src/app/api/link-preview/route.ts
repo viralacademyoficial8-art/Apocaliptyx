@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       const response = await fetch(url, {
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; Apocaliptics/1.0; +https://apocaliptics.com)',
+          'User-Agent': 'Mozilla/5.0 (compatible; Apocaliptyx/1.0; +https://apocaliptyx.com)',
           'Accept': 'text/html,application/xhtml+xml',
         },
       });

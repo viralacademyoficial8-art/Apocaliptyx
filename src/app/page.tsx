@@ -253,7 +253,7 @@ export default function LandingPage() {
                 4 pasos para ganar
               </h2>
               <p className="text-zinc-400 max-w-xl mx-auto">
-                Simple, adictivo y estrategico. Asi es Apocaliptics.
+                Simple, adictivo y estrategico. Asi es Apocaliptyx.
               </p>
             </div>
           </FadeInView>
@@ -518,7 +518,7 @@ export default function LandingPage() {
 
           <StaggerContainer className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-              { text: "Apocaliptics es adictivo. La mecanica de robo le da un giro unico a las predicciones.", author: "Luis M.", level: "Nostradamus" },
+              { text: "Apocaliptyx es adictivo. La mecanica de robo le da un giro unico a las predicciones.", author: "Luis M.", level: "Nostradamus" },
               { text: "Como chess pero con predicciones. Estrategia pura y recompensas reales.", author: "Fadil P.", level: "Vidente" },
               { text: "Perfecto para gamers que les gustan las noticias. Lo juego todos los dias.", author: "Leo G.", level: "Oraculo" },
             ].map((t, i) => (

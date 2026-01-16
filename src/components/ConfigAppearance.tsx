@@ -72,7 +72,7 @@ export function ConfigAppearance() {
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      localStorage.setItem('apocaliptics-accent', accentColor);
+      localStorage.setItem('apocaliptyx-accent', accentColor);
       toast.success('Preferencias de apariencia guardadas');
     } catch {
       toast.error('Error al guardar preferencias');
@@ -86,7 +86,7 @@ export function ConfigAppearance() {
       <div>
         <h2 className="text-2xl font-bold mb-2">Apariencia</h2>
         <p className="text-muted-foreground">
-          Personaliza cómo se ve Apocaliptics para ti.
+          Personaliza cómo se ve Apocaliptyx para ti.
         </p>
       </div>
 

@@ -246,12 +246,12 @@
     }
   },
   "dashboard": {
-    "welcomeTitle": "Bienvenue sur Apocaliptics",
+    "welcomeTitle": "Bienvenue sur Apocaliptyx",
     "welcomeMessage": "Il n'y a pas encore de prophète actif dans cette session. Plus tard, vous pourrez voir votre résumé personnel ici (niveau, scénarios, pièces, etc.).",
     "featuredScenarios": "Scénarios en Vedette",
     "noFeaturedScenarios": "Pas de scénarios en vedette pour le moment.",
     "welcomeBack": "Bon retour,",
-    "memberSince": "Sur Apocaliptics depuis",
+    "memberSince": "Sur Apocaliptyx depuis",
     "apCoins": "AP Coins",
     "scenariosWon": "Scénarios gagnés",
     "scenariosCreated": "Scénarios créés",
@@ -265,7 +265,7 @@
   "footer": {
     "description": "La plateforme de prédictions où les prophètes rivalisent.",
     "links": { "about": "À propos", "terms": "Conditions", "privacy": "Confidentialité", "contact": "Contact" },
-    "copyright": "© {{year}} Apocaliptics. Tous droits réservés."
+    "copyright": "© {{year}} Apocaliptyx. Tous droits réservés."
   },
   "errors": {
     "notFound": { "title": "Page non trouvée", "backHome": "Retour à l'accueil" },

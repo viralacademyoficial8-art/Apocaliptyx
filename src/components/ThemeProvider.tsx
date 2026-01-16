@@ -28,7 +28,7 @@ interface ThemeProviderProps {
 export function ThemeProvider({
   children,
   defaultTheme = 'dark',
-  storageKey = 'apocaliptics-theme',
+  storageKey = 'apocaliptyx-theme',
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('dark');

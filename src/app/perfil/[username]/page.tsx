@@ -162,7 +162,7 @@ export default function PublicProfilePage() {
       try {
         await navigator.share({
           title: `Perfil de ${profile?.display_name || profile?.username}`,
-          text: `Mira el perfil de ${profile?.display_name || profile?.username} en Apocaliptics`,
+          text: `Mira el perfil de ${profile?.display_name || profile?.username} en Apocaliptyx`,
           url: url,
         });
       } catch (error) {

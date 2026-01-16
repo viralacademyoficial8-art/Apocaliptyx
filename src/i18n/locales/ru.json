@@ -246,12 +246,12 @@
     }
   },
   "dashboard": {
-    "welcomeTitle": "Добро пожаловать в Apocaliptics",
+    "welcomeTitle": "Добро пожаловать в Apocaliptyx",
     "welcomeMessage": "В этой сессии пока нет активного пророка. Позже здесь вы сможете увидеть свою личную сводку (уровень, сценарии, монеты и т.д.).",
     "featuredScenarios": "Избранные Сценарии",
     "noFeaturedScenarios": "Пока нет избранных сценариев.",
     "welcomeBack": "С возвращением,",
-    "memberSince": "В Apocaliptics с",
+    "memberSince": "В Apocaliptyx с",
     "apCoins": "AP Coins",
     "scenariosWon": "Выигранные сценарии",
     "scenariosCreated": "Созданные сценарии",
@@ -265,7 +265,7 @@
   "footer": {
     "description": "Платформа предсказаний, где пророки соревнуются.",
     "links": { "about": "О нас", "terms": "Условия", "privacy": "Конфиденциальность", "contact": "Контакты" },
-    "copyright": "© {{year}} Apocaliptics. Все права защищены."
+    "copyright": "© {{year}} Apocaliptyx. Все права защищены."
   },
   "errors": {
     "notFound": { "title": "Страница не найдена", "backHome": "Вернуться на главную" },

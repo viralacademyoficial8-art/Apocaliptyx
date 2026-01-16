@@ -21,7 +21,7 @@ export function getPurchaseReceiptEmailHtml({
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recibo de Compra - Apocaliptics</title>
+  <title>Recibo de Compra - Apocaliptyx</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
   <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
@@ -29,7 +29,7 @@ export function getPurchaseReceiptEmailHtml({
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 40px;">
       <h1 style="color: #ef4444; font-size: 32px; margin: 0;">
-        🔮 APOCALIPTICS
+        🔮 APOCALIPTYX
       </h1>
       <p style="color: #9ca3af; margin-top: 8px;">Recibo de Compra</p>
     </div>
@@ -85,7 +85,7 @@ export function getPurchaseReceiptEmailHtml({
     <!-- Footer -->
     <div style="text-align: center; margin-top: 32px;">
       <p style="color: #6b7280; font-size: 12px; margin: 0;">
-        © 2024 Apocaliptics. Todos los derechos reservados.
+        © 2024 Apocaliptyx. Todos los derechos reservados.
       </p>
     </div>
     
@@ -111,7 +111,7 @@ export function getPurchaseReceiptEmailText({
   remainingBalance: number;
 }) {
   return `
-RECIBO DE COMPRA - Apocaliptics
+RECIBO DE COMPRA - Apocaliptyx
 
 ¡Gracias por tu compra, ${username}!
 
@@ -125,6 +125,6 @@ Balance restante: ${remainingBalance.toLocaleString()} AP Coins
 
 Ver tu inventario: https://apocaliptyx.vercel.app/perfil
 
-© 2024 Apocaliptics
+© 2024 Apocaliptyx
   `.trim();
 }

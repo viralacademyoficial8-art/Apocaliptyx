@@ -11,7 +11,7 @@ let vapidConfigured = false;
 const configureVapid = () => {
   if (!vapidConfigured && process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
     webpush.setVapidDetails(
-      'mailto:soporte@apocaliptics.com',
+      'mailto:soporte@apocaliptyx.com',
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
       process.env.VAPID_PRIVATE_KEY
     );

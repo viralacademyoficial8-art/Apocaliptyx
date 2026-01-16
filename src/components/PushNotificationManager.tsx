@@ -68,7 +68,7 @@ export function PushNotificationManager({
         // Mostrar notificación de prueba
         setTimeout(() => {
           pushNotificationsService.showLocalNotification(
-            '¡Bienvenido a Apocaliptics! 🎉',
+            '¡Bienvenido a Apocaliptyx! 🎉',
             {
               body: 'Ahora recibirás notificaciones de mensajes, likes y más.',
               icon: '/icon-192x192.png',

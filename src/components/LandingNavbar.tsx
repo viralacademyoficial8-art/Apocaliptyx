@@ -46,7 +46,7 @@ export function LandingNavbar() {
                 <div className="relative bg-gradient-to-br from-purple-600 to-pink-600 p-2 rounded-xl">
                   <Image
                     src="/apocaliptyx-logo.png"
-                    alt="Apocaliptics"
+                    alt="Apocaliptyx"
                     width={28}
                     height={28}
                     className="w-6 h-6 sm:w-7 sm:h-7"
@@ -55,7 +55,7 @@ export function LandingNavbar() {
               </div>
               <span className="text-xl sm:text-2xl font-black tracking-tight hidden sm:block">
                 <span className="bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-                  APOCALIPTICS
+                  APOCALIPTYX
                 </span>
               </span>
             </Link>

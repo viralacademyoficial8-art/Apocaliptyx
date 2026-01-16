@@ -34,7 +34,7 @@ export function AdminGuard({
     // Verificar si ya hay datos en localStorage
     const checkHydration = () => {
       try {
-        const stored = localStorage.getItem('apocaliptics-auth');
+        const stored = localStorage.getItem('apocaliptyx-auth');
         if (stored) {
           const parsed = JSON.parse(stored);
           if (parsed?.state?.user) {

@@ -295,7 +295,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
       try {
         await navigator.share({
           title: scenario.title,
-          text: `Mira este escenario en Apocaliptics: ${scenario.title}`,
+          text: `Mira este escenario en Apocaliptyx: ${scenario.title}`,
           url,
         });
       } catch {

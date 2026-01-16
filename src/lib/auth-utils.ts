@@ -108,7 +108,7 @@ export function validateUsername(username: string): {
     return { isValid: false, error: 'No puede comenzar con un número' };
   }
 
-  const reserved = ['admin', 'moderator', 'apocaliptics', 'system', 'support', 'help'];
+  const reserved = ['admin', 'moderator', 'apocaliptyx', 'system', 'support', 'help'];
   if (reserved.includes(username.toLowerCase())) {
     return { isValid: false, error: 'Este username está reservado' };
   }

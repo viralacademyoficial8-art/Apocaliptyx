@@ -96,7 +96,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
   }
 }
 
-// Notification types for Apocaliptics
+// Notification types for Apocaliptyx
 export const NotificationTypes = {
   SCENARIO_RESOLVED: 'scenario_resolved',
   SCENARIO_STOLEN: 'scenario_stolen',
@@ -180,7 +180,7 @@ export function createNotificationPayload(
     
     default:
       return {
-        title: 'Apocaliptics',
+        title: 'Apocaliptyx',
         body: 'Tienes una nueva notificación',
         data: { url: '/' },
       };

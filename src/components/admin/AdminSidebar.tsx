@@ -244,10 +244,10 @@ export function AdminSidebar() {
             'flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground',
             collapsed && 'justify-center',
           )}
-          title={collapsed ? 'Volver a Apocaliptics' : undefined}
+          title={collapsed ? 'Volver a Apocaliptyx' : undefined}
         >
           <Skull className="w-5 h-5" />
-          {!collapsed && <span>Volver a Apocaliptics</span>}
+          {!collapsed && <span>Volver a Apocaliptyx</span>}
         </Link>
       </div>
     </aside>
