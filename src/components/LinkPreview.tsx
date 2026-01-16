@@ -194,13 +194,16 @@ export function TextWithLinkPreviews({
   // Process mentions first
   let processedText = processMentions(text);
 
-  // Replace URLs in text with styled links
+  // Remove URLs from the displayed text (they will show as previews)
   urls.forEach(url => {
-    processedText = processedText.replace(
-      url,
-      `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline break-all">${url}</a>`
-    );
+    processedText = processedText.replace(url, '');
   });
+
+  // Clean up extra whitespace and line breaks from removed URLs
+  processedText = processedText
+    .replace(/\n\s*\n/g, '\n')  // Remove empty lines
+    .replace(/^\s+|\s+$/g, '')  // Trim
+    .replace(/\s{2,}/g, ' ');   // Multiple spaces to single
 
   // If no URLs, just return the text with mentions processed
   if (urls.length === 0) {
@@ -214,10 +217,13 @@ export function TextWithLinkPreviews({
 
   return (
     <div className="space-y-3">
-      <p
-        className={className}
-        dangerouslySetInnerHTML={{ __html: processedText }}
-      />
+      {/* Only show text if there's content besides the URL */}
+      {processedText.trim() && (
+        <p
+          className={className}
+          dangerouslySetInnerHTML={{ __html: processedText }}
+        />
+      )}
       {/* Link previews */}
       <div className="space-y-2">
         {urls.map((url, index) => (
