@@ -286,7 +286,7 @@ class PublicProfileService {
     return predictions.map(p => ({
       id: p.id,
       type: 'prediction',
-      title: p.prediction === 'YES' ? 'Predijo SÍ' : 'Predijo NO',
+      title: p.prediction === 'YES' ? 'Me gusta' : 'No me gusta',
       description: p.scenario?.title || 'Escenario',
       amount: p.amount,
       status: p.status,
