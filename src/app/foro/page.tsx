@@ -1001,6 +1001,26 @@ function ForoContent() {
     }
   };
 
+  // Eliminar comentario
+  const handleDeleteComment = async (commentId: string) => {
+    if (!user?.id) return;
+    if (!confirm(t('forum.comments.deleteConfirm') || '¿Eliminar este comentario?')) return;
+
+    const success = await forumService.deleteComment(commentId, user.id);
+    if (success) {
+      setComments(prev => prev.filter(c => c.id !== commentId));
+      // Decrementar contador de comentarios del post
+      if (selectedPostId) {
+        setPosts(prev => prev.map(p =>
+          p.id === selectedPostId
+            ? { ...p, comments_count: Math.max(0, (p.comments_count || 1) - 1) }
+            : p
+        ));
+      }
+      toast.success(t('forum.comments.deleted') || 'Comentario eliminado');
+    }
+  };
+
   // Toggle reaction
   const handleReaction = async (postId: string, reactionType: ReactionType) => {
     if (!user?.id) {
@@ -2335,21 +2355,32 @@ function ForoContent() {
                 <div className="space-y-3">
                   {comments.map((comment) => (
                     <div key={comment.id} className="bg-gray-800/30 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Link href={`/perfil/${comment.author?.username}`}>
-                          <div
-                            className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
-                            style={comment.author?.avatar_url ? { background: `url(${comment.author.avatar_url}) center/cover` } : undefined}
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <Link href={`/perfil/${comment.author?.username}`}>
+                            <div
+                              className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                              style={comment.author?.avatar_url ? { background: `url(${comment.author.avatar_url}) center/cover` } : undefined}
+                            >
+                              {!comment.author?.avatar_url && (comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
+                            </div>
+                          </Link>
+                          <Link href={`/perfil/${comment.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
+                            {comment.author?.display_name || comment.author?.username}
+                          </Link>
+                          <span className="text-gray-500 text-xs">
+                            {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
+                          </span>
+                        </div>
+                        {user?.id === comment.author_id && (
+                          <button
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                            title={t('forum.comments.delete') || 'Eliminar comentario'}
                           >
-                            {!comment.author?.avatar_url && (comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
-                          </div>
-                        </Link>
-                        <Link href={`/perfil/${comment.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
-                          {comment.author?.display_name || comment.author?.username}
-                        </Link>
-                        <span className="text-gray-500 text-xs">
-                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
-                        </span>
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                       <p className="text-gray-300 text-sm ml-8">{comment.content}</p>
                     </div>
