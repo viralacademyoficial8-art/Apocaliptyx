@@ -46,31 +46,40 @@ export function Navbar() {
     role: session.user.role || "USER",
   } : null);
 
-  // Sincronizar Zustand si hay session pero no user
+  // Sincronizar Zustand si hay session pero no user - obtener datos reales de BD
   useEffect(() => {
-    if (status === "authenticated" && session?.user && !user) {
-      const sessionUser = session.user;
-      login({
-        id: sessionUser.id || "",
-        email: sessionUser.email || "",
-        username: sessionUser.username || sessionUser.email?.split("@")[0] || "user",
-        displayName: sessionUser.name || "Usuario",
-        avatarUrl: sessionUser.image || "",
-        prophetLevel: "vidente",
-        reputationScore: 0,
-        apCoins: 0, // No usar valor de sesión, refreshBalance lo actualizará
-        scenariosCreated: 0,
-        scenariosWon: 0,
-        winRate: 0,
-        followers: 0,
-        following: 0,
-        createdAt: new Date(),
-        role: sessionUser.role || "USER",
-      });
-      // Inmediatamente refrescar el balance real desde la BD
-      refreshBalance();
-    }
-  }, [status, session, user, login, refreshBalance]);
+    const syncUserFromDB = async () => {
+      if (status === "authenticated" && session?.user && !user) {
+        try {
+          // Primero obtener datos reales de la BD
+          const response = await fetch('/api/me');
+          if (response.ok) {
+            const data = await response.json();
+            login({
+              id: data.id || session.user.id || "",
+              email: data.email || session.user.email || "",
+              username: data.username || session.user.username || session.user.email?.split("@")[0] || "user",
+              displayName: data.displayName || session.user.name || "Usuario",
+              avatarUrl: data.avatarUrl || session.user.image || "",
+              prophetLevel: "vidente",
+              reputationScore: 0,
+              apCoins: data.apCoins ?? 1000, // Usar valor real de BD
+              scenariosCreated: 0,
+              scenariosWon: 0,
+              winRate: 0,
+              followers: 0,
+              following: 0,
+              createdAt: new Date(),
+              role: data.role || session.user.role || "USER",
+            });
+          }
+        } catch (error) {
+          console.error('Error syncing user from DB:', error);
+        }
+      }
+    };
+    syncUserFromDB();
+  }, [status, session, user, login]);
 
   // Sincronizar AP coins desde la base de datos al cargar y al cambiar de página
   useEffect(() => {
@@ -197,7 +206,7 @@ export function Navbar() {
                       </div>
                     ) : (
                       <span className="font-bold text-yellow-400 text-sm">
-                        {(currentUser.apCoins || 0).toLocaleString("es-MX")}
+                        {user ? (user.apCoins || 0).toLocaleString("es-MX") : '...'}
                       </span>
                     )}
                   </div>
@@ -263,7 +272,7 @@ export function Navbar() {
                               </span>
                             ) : (
                               <span className="text-xs font-semibold text-yellow-400">
-                                {(currentUser.apCoins || 0).toLocaleString("es-MX")} AP Coins
+                                {user ? (user.apCoins || 0).toLocaleString("es-MX") : '...'} AP Coins
                               </span>
                             )}
                           </div>
