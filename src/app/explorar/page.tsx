@@ -284,7 +284,7 @@ export default function ExplorarPage() {
 
                 <StaggerItem>
                   <div
-                    onClick={() => user?.username && router.push(`/perfil/${user.username}?tab=stolen`)}
+                    onClick={() => user?.username && router.push(`/perfil/${user.username}/escenarios-robados`)}
                     className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-red-500/50 hover:bg-zinc-900 transition-all"
                   >
                     <Swords className="w-6 h-6 text-red-400" />
