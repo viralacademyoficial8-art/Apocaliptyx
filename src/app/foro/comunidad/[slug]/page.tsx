@@ -237,14 +237,13 @@ export default function CommunityPage() {
     }
   };
 
-  const handleLeaveCommunity = async () => {
-    if (userRole === 'owner') {
-      toast.error('El propietario no puede abandonar la comunidad');
-      return;
-    }
-
+  const handleLeaveCommunity = async (confirmTransfer: boolean = false) => {
     try {
-      const response = await fetch(`/api/communities/${community?.id}/join`, {
+      const url = confirmTransfer
+        ? `/api/communities/${community?.id}/join?confirmTransfer=true`
+        : `/api/communities/${community?.id}/join`;
+
+      const response = await fetch(url, {
         method: 'DELETE',
       });
       const data = await response.json();
@@ -254,12 +253,34 @@ export default function CommunityPage() {
         return;
       }
 
+      // If requires confirmation (owner leaving), show confirmation dialog
+      if (data.requiresConfirmation) {
+        const nextOwnerName = data.nextOwner?.displayName || data.nextOwner?.username || 'otro miembro';
+        const confirmed = confirm(
+          `⚠️ Advertencia: Eres el propietario de esta comunidad.\n\n` +
+          `Si abandonas, "${nextOwnerName}" se convertirá en el nuevo propietario.\n\n` +
+          `¿Estás seguro de que quieres abandonar y transferir la propiedad?`
+        );
+
+        if (confirmed) {
+          // Call again with confirmation
+          handleLeaveCommunity(true);
+        }
+        return;
+      }
+
+      // Successfully left
+      if (data.ownershipTransferred) {
+        toast.success(`Has abandonado la comunidad. ${data.newOwner} es el nuevo propietario.`);
+      } else {
+        toast.success('Has abandonado la comunidad');
+      }
+
       setIsMember(false);
       setUserRole(null);
       if (community) {
         setCommunity({ ...community, membersCount: community.membersCount - 1 });
       }
-      toast.success('Has abandonado la comunidad');
     } catch (error) {
       console.error('Error leaving community:', error);
       toast.error('Error al abandonar la comunidad');
