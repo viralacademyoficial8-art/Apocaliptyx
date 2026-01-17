@@ -164,7 +164,13 @@ export type NotificationType =
   | 'scenario_completed'
   | 'new_follower'
   | 'comment'
-  | 'mention';
+  | 'mention'
+  | 'community_join_request'
+  | 'community_request_approved'
+  | 'community_request_rejected'
+  | 'community_new_member'
+  | 'community_ownership_transferred'
+  | 'community_post';
 
 /**
  * Tipo único de notificación en toda la app
