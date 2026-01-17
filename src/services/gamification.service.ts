@@ -394,7 +394,7 @@ export const gamificationService = {
     if (rewards.xp) {
       await supabase
         .from('users')
-        .update({ xp: supabase.rpc('increment_value', { x: rewards.xp }) })
+        .update({ experience: supabase.rpc('increment_value', { x: rewards.xp }) })
         .eq('id', userId);
     }
 
@@ -667,13 +667,13 @@ export const gamificationService = {
   async addXP(userId: string, amount: number, reason: string): Promise<{ newXP: number; newLevel: number; leveledUp: boolean }> {
     const { data: user } = await supabase
       .from('users')
-      .select('xp, level')
+      .select('experience, level')
       .eq('id', userId)
       .single();
 
     if (!user) return { newXP: 0, newLevel: 1, leveledUp: false };
 
-    const newXP = user.xp + amount;
+    const newXP = user.experience + amount;
 
     // XP required per level: level * 100
     const xpForNextLevel = (user.level + 1) * 100;
@@ -684,7 +684,7 @@ export const gamificationService = {
     await supabase
       .from('users')
       .update({
-        xp: remainingXP,
+        experience: remainingXP,
         level: newLevel
       })
       .eq('id', userId);

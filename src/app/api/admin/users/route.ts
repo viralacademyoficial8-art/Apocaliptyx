@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       prophetLevel: getLevelName(user.level || 1),
       apCoins: user.ap_coins || 0,
       level: user.level || 1,
-      xp: user.xp || 0,
+      xp: user.experience || 0,
       isVerified: user.is_verified || false,
       isPremium: user.is_premium || false,
       totalPredictions: user.total_predictions || 0,

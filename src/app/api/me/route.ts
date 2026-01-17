@@ -73,7 +73,7 @@ export async function GET() {
           role: 'USER',
           ap_coins: 1000, // Bonus de bienvenida para usuarios nuevos
           level: 1,
-          xp: 0,
+          experience: 0,
           is_verified: false,
           is_premium: false,
           is_banned: false,
