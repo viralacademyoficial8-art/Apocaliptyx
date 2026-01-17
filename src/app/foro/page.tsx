@@ -77,6 +77,7 @@ import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories'
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
 import { CreateReelModal } from '@/components/reels/CreateReelModal';
 import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
+import { ActivityFeed } from '@/components/feed';
 import Link from 'next/link';
 
 // Reaction and tag definitions are now inside ForoContent component for i18n support
@@ -1376,7 +1377,13 @@ function ForoContent() {
         {activeTab === 'feed' && (
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
-          <div className="flex-1">
+          <div className="flex-1 space-y-8">
+            {/* Activity Feed Section */}
+            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <ActivityFeed />
+            </div>
+
+            {/* Community Posts Section */}
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
