@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { useAuthStore } from "@/lib/stores";
@@ -68,8 +69,25 @@ interface ScenarioData {
 export default function EscenarioPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuthStore();
-  
+  const { data: session, status } = useSession();
+  const { user, refreshBalance } = useAuthStore();
+
+  // Sincronizar sesión de NextAuth con Zustand
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user && !user) {
+      refreshBalance();
+    }
+  }, [status, session, user, refreshBalance]);
+
+  // Usar datos de Zustand si existen, sino de la session
+  const currentUser = user || (session?.user ? {
+    id: session.currentUser?.id || "",
+    username: (session.user as any).username || session.user.email?.split("@")[0] || "user",
+    apCoins: 0,
+  } : null);
+
+  const isLoggedIn = status === "authenticated" && !!session?.user;
+
   const [scenario, setScenario] = useState<ScenarioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,9 +128,9 @@ export default function EscenarioPage() {
         setScenario(data);
         
         // Cargar predicción del usuario si está logueado
-        if (user?.id) {
+        if (currentUser?.id) {
           const prediction = await predictionsService.getUserPrediction(
-            user.id,
+            currentUser?.id,
             scenarioId
           );
           setUserPrediction(prediction);
@@ -130,7 +148,7 @@ export default function EscenarioPage() {
 
   // Manejar voto
   const handleVote = async () => {
-    if (!user) {
+    if (!isLoggedIn || !currentUser) {
       toast.error("Debes iniciar sesión para votar");
       router.push("/login");
       return;
@@ -153,7 +171,7 @@ export default function EscenarioPage() {
         scenarioId,
         prediction: selectedVote,
         amount: 0,
-        userId: user.id,
+        userId: currentUser?.id,
       });
 
       if (result.success && result.data) {
@@ -178,7 +196,7 @@ export default function EscenarioPage() {
 
   // Manejar reporte
   const handleReport = async () => {
-    if (!user) {
+    if (!isLoggedIn || !currentUser) {
       toast.error("Debes iniciar sesión para reportar");
       router.push("/login");
       return;
@@ -195,7 +213,7 @@ export default function EscenarioPage() {
       const { data: reportData } = await supabase
         .from('scenario_reports')
         .insert({
-          reporter_id: user.id,
+          reporter_id: currentUser?.id,
           scenario_id: scenarioId,
           reason: reportReason,
           description: reportDescription,
@@ -208,7 +226,7 @@ export default function EscenarioPage() {
       await supabase
         .from('notifications')
         .insert({
-          user_id: user.id,
+          user_id: currentUser?.id,
           type: 'system',
           title: '📋 Reporte enviado',
           message: `Tu reporte sobre "${scenario?.title?.substring(0, 30)}..." ha sido recibido. Lo revisaremos pronto.`,
@@ -230,7 +248,7 @@ export default function EscenarioPage() {
           user_id: admin.id,
           type: 'system',
           title: '🚨 Nuevo reporte de escenario',
-          message: `@${user.username} reportó: "${scenario?.title?.substring(0, 25)}..." - Motivo: ${reasonLabel}`,
+          message: `@${currentUser?.username} reportó: "${scenario?.title?.substring(0, 25)}..." - Motivo: ${reasonLabel}`,
           link_url: '/admin/reportes',
           is_read: false,
         }));
@@ -260,16 +278,16 @@ export default function EscenarioPage() {
   const isProtected = scenario?.is_protected && scenario?.protected_until && new Date(scenario.protected_until) > new Date();
 
   const canSteal = () => {
-    if (!user) return false;
+    if (!isLoggedIn || !currentUser) return false;
     if (isOwner) return false;
     if (scenario?.status !== "ACTIVE") return false;
     if (isProtected) return false;
-    if ((user.apCoins || 0) < currentPrice) return false;
+    if ((currentUser?.apCoins || 0) < currentPrice) return false;
     return true;
   };
 
   const handleSteal = async () => {
-    if (!user) {
+    if (!isLoggedIn || !currentUser) {
       toast.error("Debes iniciar sesión");
       router.push("/login");
       return;
@@ -301,7 +319,7 @@ export default function EscenarioPage() {
   };
 
   const handleApplyShield = async (shieldType: string) => {
-    if (!user) {
+    if (!isLoggedIn || !currentUser) {
       toast.error("Debes iniciar sesión");
       return;
     }
@@ -852,7 +870,7 @@ export default function EscenarioPage() {
                       disabled={
                         applyingShield !== null ||
                         !user ||
-                        (user.apCoins || 0) < shield.price
+                        (currentUser?.apCoins || 0) < shield.price
                       }
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
                     >
@@ -863,7 +881,7 @@ export default function EscenarioPage() {
                       )}
                     </button>
                   </div>
-                  {user && (user.apCoins || 0) < shield.price && (
+                  {isLoggedIn && (currentUser?.apCoins || 0) < shield.price && (
                     <p className="text-xs text-red-400 mt-2">
                       No tienes suficientes AP coins
                     </p>
@@ -872,10 +890,10 @@ export default function EscenarioPage() {
               ))}
             </div>
 
-            {user && (
+            {isLoggedIn && (
               <div className="mt-4 pt-4 border-t border-gray-700 text-center">
                 <span className="text-sm text-gray-400">Tu balance: </span>
-                <span className="font-bold text-yellow-400">{user.apCoins || 0} AP</span>
+                <span className="font-bold text-yellow-400">{currentUser?.apCoins || 0} AP</span>
               </div>
             )}
           </div>

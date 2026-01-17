@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/Navbar";
 import { useAuthStore } from "@/lib/stores";
 import { scenariosService } from "@/services/scenarios.service";
@@ -14,8 +15,24 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CrearPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, refreshBalance } = useAuthStore();
   const { t } = useTranslation();
+
+  // Sincronizar sesión de NextAuth con Zustand
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user && !user) {
+      refreshBalance();
+    }
+  }, [status, session, user, refreshBalance]);
+
+  // Usar datos de Zustand si existen, sino de la session
+  const currentUser = user || (session?.user ? {
+    id: session.user.id || "",
+    username: (session.user as any).username || session.user.email?.split("@")[0] || "user",
+  } : null);
+
+  const isLoggedIn = status === "authenticated" && !!session?.user;
 
   const CATEGORIES: { value: ScenarioCategory; label: string }[] = [
     { value: "tecnologia", label: `💻 ${t('home.categories.technology')}` },
@@ -103,8 +120,9 @@ export default function CrearPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
+    if (!isLoggedIn || !currentUser?.id) {
       toast.error(t('create.errors.loginRequired'));
+      router.push('/login');
       return;
     }
 
@@ -141,7 +159,7 @@ export default function CrearPage() {
         description,
         category,
         resolutionDate: new Date(dueDate).toISOString(),
-        creatorId: user.id,
+        creatorId: currentUser.id,
         contentHash, // Agregar el hash
       });
 
@@ -153,7 +171,7 @@ export default function CrearPage() {
 
       // Crear notificación de escenario creado
       await notificationsService.notifyScenarioCreated(
-        user.id,
+        currentUser.id,
         title,
         newScenario.id
       );
