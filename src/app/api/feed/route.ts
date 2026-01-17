@@ -150,17 +150,17 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 3. Votos recientes en escenarios
-    const { data: votes } = await supabase
-      .from('votes')
+    // 3. Predicciones/Votos recientes en escenarios
+    const { data: predictions } = await supabase
+      .from('predictions')
       .select(`
         id,
-        vote_type,
+        prediction,
         amount,
         created_at,
         user_id,
         scenario_id,
-        users!votes_user_id_fkey (
+        users!predictions_user_id_fkey (
           id,
           username,
           display_name,
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
           level,
           is_verified
         ),
-        scenarios!votes_scenario_id_fkey (
+        scenarios!predictions_scenario_id_fkey (
           id,
           title
         )
@@ -176,18 +176,18 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(30);
 
-    if (votes) {
-      for (const vote of votes) {
-        const user = vote.users as any;
-        const scenario = vote.scenarios as any;
+    if (predictions) {
+      for (const pred of predictions) {
+        const user = pred.users as any;
+        const scenario = pred.scenarios as any;
         if (user && scenario) {
           feedItems.push({
-            id: `vote_${vote.id}`,
+            id: `prediction_${pred.id}`,
             type: 'scenario_vote',
-            title: vote.vote_type === 'YES' ? 'Votó SÍ' : 'Votó NO',
-            description: `${user.display_name || user.username} apostó ${vote.amount?.toLocaleString() || 0} AP en "${scenario.title}"`,
-            icon: vote.vote_type === 'YES' ? '👍' : '👎',
-            timestamp: vote.created_at,
+            title: pred.prediction === true ? 'Votó SÍ' : 'Votó NO',
+            description: `${user.display_name || user.username} apostó ${pred.amount?.toLocaleString() || 0} AP en "${scenario.title}"`,
+            icon: pred.prediction === true ? '👍' : '👎',
+            timestamp: pred.created_at,
             user: {
               id: user.id,
               username: user.username,
@@ -199,8 +199,8 @@ export async function GET(request: NextRequest) {
             metadata: {
               scenarioId: scenario.id,
               scenarioTitle: scenario.title,
-              amount: vote.amount,
-              voteType: vote.vote_type,
+              amount: pred.amount,
+              voteType: pred.prediction === true ? 'YES' : 'NO',
             },
           });
         }

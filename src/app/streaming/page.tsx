@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Radio, Search, TrendingUp, Users, Clock, X, Sparkles, Video, Mic, Flame, Crown, Eye, Star, Folder, ChevronRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -65,8 +66,23 @@ const STREAM_CATEGORIES = [
 
 export default function StreamingPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, refreshBalance } = useAuthStore();
   const { t } = useTranslation();
+
+  // Sincronizar sesión de NextAuth con Zustand
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user && !user) {
+      refreshBalance();
+    }
+  }, [status, session, user, refreshBalance]);
+
+  const currentUser = user || (session?.user ? {
+    id: session.user.id || "",
+    username: (session.user as any).username || session.user.email?.split("@")[0] || "user",
+  } : null);
+
+  const isLoggedIn = status === "authenticated" && !!session?.user;
   const [streams, setStreams] = useState<LiveStream[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'live' | 'following'>('live');
@@ -180,8 +196,9 @@ export default function StreamingPage() {
   };
 
   const openStartModal = () => {
-    if (!user) {
+    if (!isLoggedIn || !currentUser) {
       toast.error(t('streaming.chat.loginRequired'));
+      router.push('/login');
       return;
     }
     setStreamTitle('');

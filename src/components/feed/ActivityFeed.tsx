@@ -321,10 +321,14 @@ export function ActivityFeed() {
       )
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'votes' },
+        { event: 'INSERT', schema: 'public', table: 'predictions' },
         (payload) => {
-          console.log('New vote:', payload);
+          console.log('New prediction:', payload);
           setNewItemsCount(prev => prev + 1);
+          toast('🎲 ¡Nueva predicción!', {
+            icon: '💰',
+            style: { background: '#1f2937', color: '#fff' },
+          });
         }
       )
       .on(
@@ -352,6 +356,18 @@ export function ActivityFeed() {
           setNewItemsCount(prev => prev + 1);
           toast('🏆 ¡Nuevo logro desbloqueado!', {
             icon: '🎉',
+            style: { background: '#1f2937', color: '#fff' },
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'live_streams' },
+        (payload) => {
+          console.log('New live stream:', payload);
+          setNewItemsCount(prev => prev + 1);
+          toast('🔴 ¡Nueva transmisión en vivo!', {
+            icon: '📺',
             style: { background: '#1f2937', color: '#fff' },
           });
         }
