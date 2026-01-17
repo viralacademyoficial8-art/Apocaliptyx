@@ -151,6 +151,7 @@ const notificationConfig: Record<NotificationType, {
   community_join_request: { icon: UserPlus, color: 'text-amber-400', bgColor: 'bg-amber-500/20' },
   community_request_approved: { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' },
   community_request_rejected: { icon: XCircle, color: 'text-red-400', bgColor: 'bg-red-500/20' },
+  community_ownership_transferred: { icon: Crown, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
 
   // Torneos
   tournament_joined: { icon: Gamepad2, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },

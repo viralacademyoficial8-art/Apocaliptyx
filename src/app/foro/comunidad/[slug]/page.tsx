@@ -516,7 +516,7 @@ export default function CommunityPage() {
                   <Button
                     variant="outline"
                     className="border-gray-700"
-                    onClick={handleLeaveCommunity}
+                    onClick={() => handleLeaveCommunity()}
                   >
                     <UserMinus className="w-4 h-4 mr-2" />
                     Salir
