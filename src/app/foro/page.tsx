@@ -789,7 +789,7 @@ function ForoContent() {
 
   // Crear post
   const handleCreatePost = async () => {
-    if (!user?.id) {
+    if (!isLoggedIn || !currentUserId) {
       router.push('/login');
       return;
     }
@@ -802,7 +802,7 @@ function ForoContent() {
 
       setCreating(true);
       try {
-        const post = await forumService.createPostWithPoll(user.id, {
+        const post = await forumService.createPostWithPoll(currentUserId, {
           content: newPostContent || pollQuestion,
           tags: newPostTags,
           category_id: selectedCategory !== 'all' ? selectedCategory : categories.find(c => c.slug === 'general')?.id,
@@ -836,7 +836,7 @@ function ForoContent() {
       setCreating(true);
       try {
         const result = await forumService.createThread(
-          user.id,
+          currentUserId,
           newPostContent || t('forum.createModal.thread'),
           validPosts.map(content => ({ content, tags: newPostTags }))
         );
@@ -2033,6 +2033,7 @@ function ForoContent() {
           {/* Post Type Selector */}
           <div className="flex gap-2 mb-4">
             <button
+              type="button"
               onClick={() => setCreateMode('post')}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 createMode === 'post'
@@ -2044,6 +2045,7 @@ function ForoContent() {
               {t('forum.createModal.post')}
             </button>
             <button
+              type="button"
               onClick={() => setCreateMode('poll')}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 createMode === 'poll'
@@ -2055,6 +2057,7 @@ function ForoContent() {
               {t('forum.createModal.poll')}
             </button>
             <button
+              type="button"
               onClick={() => setCreateMode('thread')}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 createMode === 'thread'
@@ -2085,6 +2088,7 @@ function ForoContent() {
                   <div className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
                     {mentionSuggestions.map((user) => (
                       <button
+                        type="button"
                         key={user.id}
                         onClick={() => insertMention(user.username)}
                         className="w-full px-4 py-2 flex items-center gap-3 hover:bg-gray-700 transition-colors"
@@ -2117,6 +2121,7 @@ function ForoContent() {
                     className="max-h-48 rounded-lg"
                   />
                   <button
+                    type="button"
                     onClick={() => setSelectedGif(null)}
                     className="absolute top-2 right-2 w-6 h-6 bg-gray-900/80 rounded-full flex items-center justify-center text-white hover:bg-gray-900"
                   >
@@ -2136,6 +2141,7 @@ function ForoContent() {
                         className="w-20 h-20 object-cover rounded-lg border border-gray-700"
                       />
                       <button
+                        type="button"
                         onClick={() => removeImage(index)}
                         className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       >
@@ -2157,6 +2163,7 @@ function ForoContent() {
                   className="hidden"
                 />
                 <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={selectedImages.length >= 4}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
@@ -2165,11 +2172,13 @@ function ForoContent() {
                   {t('forum.createModal.image')}
                 </button>
                 <button
+                  type="button"
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                 >
                   GIF
                 </button>
                 <button
+                  type="button"
                   onClick={triggerMention}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                 >
@@ -2212,6 +2221,7 @@ function ForoContent() {
                       />
                       {pollOptions.length > 2 && (
                         <button
+                          type="button"
                           onClick={() => removePollOption(index)}
                           className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg"
                         >
@@ -2223,6 +2233,7 @@ function ForoContent() {
                 </div>
                 {pollOptions.length < 6 && (
                   <button
+                    type="button"
                     onClick={addPollOption}
                     className="mt-2 text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"
                   >
@@ -2291,6 +2302,7 @@ function ForoContent() {
                 </div>
                 {threadPosts.length < 10 && (
                   <button
+                    type="button"
                     onClick={addThreadPost}
                     className="mt-3 text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
                   >
@@ -2308,6 +2320,7 @@ function ForoContent() {
             <div className="flex flex-wrap gap-2">
               {FORUM_TAGS.map((tag) => (
                 <button
+                  type="button"
                   key={tag.id}
                   onClick={() => toggleTag(tag.id)}
                   className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
