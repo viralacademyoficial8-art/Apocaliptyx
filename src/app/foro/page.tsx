@@ -2776,6 +2776,7 @@ function PostCard({
   const { t } = useTranslation();
   const [showReactions, setShowReactions] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const isAuthor = currentUserId === post.author_id;
 
   // Calculate total reactions
@@ -2919,11 +2920,14 @@ function PostCard({
 
       {/* Image */}
       {post.image_url && (
-        <div className="mb-4 rounded-xl overflow-hidden">
+        <div
+          className="mb-4 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+          onClick={() => setShowImageModal(true)}
+        >
           <img
             src={post.image_url}
             alt="Imagen del post"
-            className="max-h-[500px] w-auto max-w-full object-contain"
+            className="w-full max-h-[500px] object-contain bg-gray-800/50"
           />
         </div>
       )}
@@ -3120,6 +3124,27 @@ function PostCard({
           {post.views_count || 0} {t('forum.posts.views')}
         </span>
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && post.image_url && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 text-white hover:text-gray-300 transition-colors z-10"
+            onClick={() => setShowImageModal(false)}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={post.image_url}
+            alt=""
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
