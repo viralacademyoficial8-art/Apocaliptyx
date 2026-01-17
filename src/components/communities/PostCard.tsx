@@ -75,9 +75,9 @@ interface PostCardProps {
   userRole: string | null;
   isAuthenticated: boolean;
   isMember: boolean;
-  onLike: (postId: string) => void;
-  onDelete: (postId: string) => void;
-  onPin: (postId: string, isPinned: boolean) => void;
+  onLike: (postId: string) => void | Promise<void>;
+  onDelete: (postId: string) => void | Promise<void>;
+  onPin: (postId: string, isPinned: boolean) => void | Promise<void>;
 }
 
 export function PostCard({

@@ -551,7 +551,7 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
     }
   },
 
-  changeUserRole: async (id, role) => {
+  changeUserRole: async (id: string, role: AdminUser['role']) => {
     try {
       const res = await fetch('/api/admin/users', {
         method: 'PATCH',
