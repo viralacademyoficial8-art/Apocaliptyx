@@ -47,6 +47,7 @@ import {
   Wrench,
   AlertTriangle,
   CheckCircle,
+  XCircle,
   Video,
   Radio,
   SmilePlus,
@@ -147,6 +148,9 @@ const notificationConfig: Record<NotificationType, {
 
   // Comunidades extra
   community_new_member: { icon: Users, color: 'text-green-400', bgColor: 'bg-green-500/20' },
+  community_join_request: { icon: UserPlus, color: 'text-amber-400', bgColor: 'bg-amber-500/20' },
+  community_request_approved: { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' },
+  community_request_rejected: { icon: XCircle, color: 'text-red-400', bgColor: 'bg-red-500/20' },
 
   // Torneos
   tournament_joined: { icon: Gamepad2, color: 'text-purple-400', bgColor: 'bg-purple-500/20' },

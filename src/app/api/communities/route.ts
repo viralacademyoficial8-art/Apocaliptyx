@@ -93,6 +93,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Get user's pending join requests for private communities
+    let userRequests: Record<string, string> = {};
+    if (session?.user?.id) {
+      const { data: requests } = await supabase()
+        .from('community_join_requests')
+        .select('community_id, status')
+        .eq('user_id', session.user.id);
+
+      if (requests) {
+        for (const req of requests as { community_id: string; status: string }[]) {
+          userRequests[req.community_id] = req.status;
+        }
+      }
+    }
+
     const result = filteredCommunities.map(community => ({
       id: community.id,
       name: community.name,
@@ -107,6 +122,7 @@ export async function GET(request: NextRequest) {
       postsCount: community.posts_count,
       categories: community.categories || [],
       isMember: userCommunities.includes(community.id),
+      requestStatus: userRequests[community.id] || null,
     }));
 
     return NextResponse.json({ communities: result, userCommunities });
