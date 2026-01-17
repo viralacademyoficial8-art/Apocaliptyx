@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { useAuthStore } from "@/lib/stores";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -27,6 +29,9 @@ import {
   Zap,
   Target,
   Mail,
+  Shield,
+  Infinity,
+  Bell,
 } from "lucide-react";
 
 interface MobileMenuProps {
@@ -36,8 +41,31 @@ interface MobileMenuProps {
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const pathname = usePathname();
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, logout, refreshBalance } = useAuthStore();
+  const { hasInfiniteCoins, isAdmin, roleName, roleIcon, roleColor } = usePermissions();
   const { t } = useTranslation();
+
+  // Determinar si está autenticado (priorizar session de NextAuth)
+  const isAuthenticated = status === "authenticated" && !!session?.user;
+
+  // Usar datos de Zustand si existen, sino de la session
+  const currentUser = user || (session?.user ? {
+    id: session.user.id || "",
+    email: session.user.email || "",
+    username: session.user.username || session.user.email?.split("@")[0] || "user",
+    displayName: session.user.name || "Usuario",
+    avatarUrl: session.user.image || "",
+    apCoins: null,
+    role: session.user.role || "USER",
+  } : null);
+
+  // Cargar datos del usuario desde la BD cuando esté autenticado
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      refreshBalance();
+    }
+  }, [status, session, refreshBalance]);
 
   // Cerrar menú al cambiar de ruta
   useEffect(() => {
@@ -80,8 +108,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       ]
     : [];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     logout();
+    await signOut({ callbackUrl: "/" });
     onClose();
   };
 
@@ -142,41 +171,65 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </div>
 
           {/* User Info Card */}
-          {isAuthenticated && user && (
+          {isAuthenticated && currentUser && (
             <div className="p-4">
               <div className="relative">
                 {/* Glow effect */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-2xl blur" />
+                <div className={`absolute -inset-0.5 bg-gradient-to-r ${isAdmin ? 'from-yellow-500/30 to-orange-500/30' : 'from-purple-600/30 to-pink-600/30'} rounded-2xl blur`} />
 
                 <div className="relative bg-zinc-900/80 border border-zinc-800/50 rounded-2xl p-4">
                   <div className="flex items-center gap-3">
                     <div className="relative">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur-sm opacity-50" />
-                      <Avatar className="relative w-14 h-14 border-2 border-zinc-700">
-                        <AvatarImage src={user.avatarUrl} alt={user.username} />
+                      <div className={`absolute -inset-1 bg-gradient-to-r ${isAdmin ? 'from-yellow-500 to-orange-500' : 'from-purple-600 to-pink-600'} rounded-full blur-sm opacity-50`} />
+                      <Avatar className={`relative w-14 h-14 border-2 ${isAdmin ? 'border-yellow-500' : 'border-zinc-700'}`}>
+                        <AvatarImage src={currentUser.avatarUrl} alt={currentUser.username} />
                         <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white font-bold">
-                          {user.username.substring(0, 2).toUpperCase()}
+                          {currentUser.username?.substring(0, 2).toUpperCase() || "US"}
                         </AvatarFallback>
                       </Avatar>
+                      {/* Badge de rol para admin */}
+                      {isAdmin && (
+                        <span className="absolute -bottom-1 -right-1 text-sm">
+                          {roleIcon}
+                        </span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold text-white truncate">
-                        {user.displayName}
+                      <div className="font-bold text-white truncate flex items-center gap-2">
+                        {currentUser.displayName}
+                        {isAdmin && (
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${roleColor.bg} ${roleColor.text}`}>
+                            {roleName}
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm text-zinc-500 truncate">
-                        @{user.username}
+                        @{currentUser.username}
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-zinc-600" />
                   </div>
 
                   {/* AP Coins */}
-                  <div className="mt-3 flex items-center gap-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl px-3 py-2.5">
+                  <div className={`mt-3 flex items-center gap-2 ${
+                    hasInfiniteCoins
+                      ? 'bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30'
+                      : 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20'
+                  } rounded-xl px-3 py-2.5`}>
                     <div className="p-1.5 bg-yellow-500/20 rounded-lg">
                       <Flame className="w-4 h-4 text-yellow-400" />
                     </div>
-                    <span className="font-bold text-yellow-400">{(user.apCoins || 0).toLocaleString()}</span>
-                    <span className="text-sm text-yellow-500/70">AP Coins</span>
+                    {hasInfiniteCoins ? (
+                      <>
+                        <Infinity className="w-5 h-5 text-yellow-400" />
+                        <span className="text-sm text-yellow-500/70 font-medium">AP Coins Infinitas {roleIcon}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-bold text-yellow-400">{(user?.apCoins || 0).toLocaleString()}</span>
+                        <span className="text-sm text-yellow-500/70">AP Coins</span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -271,10 +324,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             )}
 
             {/* User Actions */}
-            {isAuthenticated && user && (
+            {isAuthenticated && currentUser && (
               <div className="mt-6 pt-4 border-t border-zinc-800/50 space-y-1.5">
                 <Link
-                  href={`/perfil/${user.username}`}
+                  href={`/perfil/${currentUser.username}`}
                   onClick={onClose}
                   className="flex items-center gap-3 px-3 py-3 rounded-xl text-zinc-400 hover:bg-zinc-800/50 hover:text-white transition-all touch-target"
                 >
@@ -305,6 +358,21 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </div>
                   <span className="font-medium">Mensajes</span>
                 </Link>
+
+                {/* Admin Panel Link */}
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={onClose}
+                    className="flex items-center gap-3 px-3 py-3 rounded-xl text-yellow-400 hover:bg-yellow-500/10 transition-all touch-target"
+                  >
+                    <div className="p-2 rounded-lg bg-yellow-500/20">
+                      <Shield className="w-4 h-4 text-yellow-400" />
+                    </div>
+                    <span className="font-medium">{t("nav.adminPanel")}</span>
+                    <span className="ml-auto text-xs">{roleIcon}</span>
+                  </Link>
+                )}
 
                 {/* Language Selector */}
                 <LanguageSelector variant="mobile" />
