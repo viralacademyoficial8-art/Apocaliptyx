@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     // Get user with level
     const { data: userDataRaw, error: userError } = await supabase
       .from('users')
-      .select('id, level, xp, ap_coins, achievement_points, active_title_id')
+      .select('id, level, experience, ap_coins, achievement_points, active_title_id')
       .eq('id', user.id)
       .single();
 
