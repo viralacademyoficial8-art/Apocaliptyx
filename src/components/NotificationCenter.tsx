@@ -4,6 +4,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { createClient } from '@supabase/supabase-js';
 import { useAuthStore } from '@/lib/stores';
 import { notificationsService, type Notification, type NotificationType } from '@/services/notifications.service';
@@ -174,13 +175,24 @@ const notificationConfig: Record<NotificationType, {
 
 export function NotificationCenter() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, refreshBalance } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [markingAll, setMarkingAll] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // Determinar autenticación desde NextAuth
+  const isAuthenticated = status === "authenticated" && !!session?.user;
+
+  // Cargar datos del usuario si no están en Zustand
+  useEffect(() => {
+    if (isAuthenticated && !user?.id) {
+      refreshBalance();
+    }
+  }, [isAuthenticated, user?.id, refreshBalance]);
 
   const loadNotifications = useCallback(async () => {
     if (!user?.id) return;
