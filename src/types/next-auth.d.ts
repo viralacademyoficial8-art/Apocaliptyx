@@ -8,7 +8,7 @@ declare module "next-auth" {
     user: {
       id: string;
       username: string;
-      role: "USER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
+      role: "USER" | "STAFF" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
       apCoins: number;
       level: number;
       isVerified: boolean;
@@ -19,7 +19,7 @@ declare module "next-auth" {
 
   interface User extends DefaultUser {
     username: string;
-    role: "USER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
+    role: "USER" | "STAFF" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
     apCoins: number;
     level: number;
     isVerified: boolean;
@@ -32,7 +32,7 @@ declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
     username: string;
-    role: "USER" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
+    role: "USER" | "STAFF" | "MODERATOR" | "ADMIN" | "SUPER_ADMIN";
     apCoins: number;
     level: number;
     isVerified: boolean;
