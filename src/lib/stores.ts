@@ -124,7 +124,7 @@ export const useAuthStore = create<AuthState>()(
                   winRate: 0,
                   followers: 0,
                   following: 0,
-                  createdAt: new Date(),
+                  createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
                   role: data.role || 'USER',
                 },
                 isAuthenticated: true,
