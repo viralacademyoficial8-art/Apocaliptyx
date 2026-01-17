@@ -15,6 +15,9 @@ export async function GET() {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    // Normalizar el email a minúsculas para comparación case-insensitive
+    const normalizedEmail = session.user.email.toLowerCase().trim();
+
     const supabase = getSupabaseAdmin();
     let { data: user, error } = await supabase
       .from('users')
@@ -32,7 +35,7 @@ export async function GET() {
         is_premium,
         created_at
       `)
-      .eq('email', session.user.email)
+      .ilike('email', normalizedEmail)
       .single();
 
     // Si el usuario no existe en la tabla users, crearlo automáticamente
@@ -66,7 +69,7 @@ export async function GET() {
       const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert({
-          email: session.user.email,
+          email: normalizedEmail,
           username: username,
           display_name: displayName,
           avatar_url: session.user.image || null,

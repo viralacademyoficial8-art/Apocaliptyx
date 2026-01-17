@@ -38,14 +38,18 @@ export default {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       async profile(profile) {
-        const supabase = getSupabase();
+        // Normalizar email a minúsculas para consistencia
+        const normalizedEmail = profile.email?.toLowerCase().trim() || '';
+
+        // Usar cliente admin para bypasear RLS policies
+        const supabase = getSupabaseAdmin();
         if (!supabase) {
           return {
             id: profile.sub,
             name: profile.name,
-            email: profile.email,
+            email: normalizedEmail,
             image: profile.picture,
-            username: profile.email?.split("@")[0] || `user_${profile.sub.slice(-6)}`,
+            username: normalizedEmail.split("@")[0] || `user_${profile.sub.slice(-6)}`,
             role: "USER",
             apCoins: 1000,
             level: 1,
@@ -58,17 +62,21 @@ export default {
         const { data: existingUser } = await supabase
           .from("users")
           .select("*")
-          .eq("email", profile.email)
+          .ilike("email", normalizedEmail)
           .single();
 
         if (existingUser) {
+          // Normalizar rol a mayúsculas para consistencia
+          const normalizedRole = (existingUser.role || 'USER').toUpperCase();
+          console.log('[Google OAuth] User found:', existingUser.email, 'Role:', normalizedRole);
+
           return {
             id: existingUser.id,
             name: existingUser.display_name,
             email: existingUser.email,
             image: existingUser.avatar_url,
             username: existingUser.username,
-            role: existingUser.role,
+            role: normalizedRole,
             apCoins: existingUser.ap_coins,
             level: existingUser.level,
             isVerified: existingUser.is_verified,
@@ -77,11 +85,11 @@ export default {
           };
         }
 
-        const username = profile.email?.split("@")[0] || `user_${profile.sub.slice(-6)}`;
+        const username = normalizedEmail.split("@")[0] || `user_${profile.sub.slice(-6)}`;
         const { data: newUser, error } = await supabase
           .from("users")
           .insert({
-            email: profile.email,
+            email: normalizedEmail,
             username: username,
             display_name: profile.name,
             avatar_url: profile.picture,
@@ -104,7 +112,7 @@ export default {
           return {
             id: profile.sub,
             name: profile.name,
-            email: profile.email,
+            email: normalizedEmail,
             image: profile.picture,
             username: username,
             role: "USER",
@@ -119,7 +127,7 @@ export default {
         return {
           id: newUser.id,
           name: newUser.display_name,
-          email: newUser.email,
+          email: normalizedEmail,
           image: newUser.avatar_url,
           username: newUser.username,
           role: newUser.role,
@@ -135,7 +143,11 @@ export default {
       clientId: process.env.DISCORD_CLIENT_ID,
       clientSecret: process.env.DISCORD_CLIENT_SECRET,
       async profile(profile) {
-        const supabase = getSupabase();
+        // Normalizar email a minúsculas para consistencia
+        const normalizedEmail = profile.email?.toLowerCase().trim() || '';
+
+        // Usar cliente admin para bypasear RLS policies
+        const supabase = getSupabaseAdmin();
         const avatarUrl = profile.avatar
           ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
           : null;
@@ -144,7 +156,7 @@ export default {
           return {
             id: profile.id,
             name: profile.global_name || profile.username,
-            email: profile.email,
+            email: normalizedEmail,
             image: avatarUrl,
             username: profile.username || `discord_${profile.id.slice(-6)}`,
             role: "USER",
@@ -159,17 +171,21 @@ export default {
         const { data: existingUser } = await supabase
           .from("users")
           .select("*")
-          .eq("email", profile.email)
+          .ilike("email", normalizedEmail)
           .single();
 
         if (existingUser) {
+          // Normalizar rol a mayúsculas para consistencia
+          const normalizedRole = (existingUser.role || 'USER').toUpperCase();
+          console.log('[Discord OAuth] User found:', existingUser.email, 'Role:', normalizedRole);
+
           return {
             id: existingUser.id,
             name: existingUser.display_name,
             email: existingUser.email,
             image: existingUser.avatar_url,
             username: existingUser.username,
-            role: existingUser.role,
+            role: normalizedRole,
             apCoins: existingUser.ap_coins,
             level: existingUser.level,
             isVerified: existingUser.is_verified,
@@ -182,7 +198,7 @@ export default {
         const { data: newUser, error } = await supabase
           .from("users")
           .insert({
-            email: profile.email,
+            email: normalizedEmail,
             username: username,
             display_name: profile.global_name || profile.username,
             avatar_url: avatarUrl,
@@ -205,7 +221,7 @@ export default {
           return {
             id: profile.id,
             name: profile.global_name || profile.username,
-            email: profile.email,
+            email: normalizedEmail,
             image: avatarUrl,
             username: username,
             role: "USER",
@@ -220,7 +236,7 @@ export default {
         return {
           id: newUser.id,
           name: newUser.display_name,
-          email: newUser.email,
+          email: normalizedEmail,
           image: newUser.avatar_url,
           username: newUser.username,
           role: newUser.role,
