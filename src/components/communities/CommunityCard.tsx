@@ -353,13 +353,18 @@ export function CommunityCard({
                 Solicitud pendiente
               </Button>
             ) : !community.isPublic ? (
-              <Button
-                onClick={handleJoinClick}
-                className="w-full bg-amber-600 hover:bg-amber-700"
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                Solicitar unirse
-              </Button>
+              <div className="flex gap-2 w-full items-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-amber-600/20 rounded-lg">
+                  <Lock className="w-5 h-5 text-amber-500" />
+                </div>
+                <Button
+                  onClick={handleJoinClick}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Solicitar unirse
+                </Button>
+              </div>
             ) : (
               <Button
                 onClick={handleJoinClick}
