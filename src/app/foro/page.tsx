@@ -631,7 +631,7 @@ function ForoContent() {
     categories: string[];
     themeColor: string;
   }): Promise<boolean> => {
-    if (!user) {
+    if (!isLoggedIn) {
       toast.error(t('forum.communities.loginToCreate'));
       return false;
     }
