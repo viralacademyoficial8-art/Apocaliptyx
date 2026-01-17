@@ -23,7 +23,6 @@ import {
   Bell,
   ChevronDown,
   ChevronUp,
-  Filter,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -310,7 +309,6 @@ export function ActivityFeed() {
   const [newItemIds, setNewItemIds] = useState<Set<string>>(new Set());
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [showFilters, setShowFilters] = useState(false);
   const channelRef = useRef<any>(null);
 
   const fetchFeed = useCallback(async (reset = false, silent = false) => {
@@ -468,36 +466,26 @@ export function ActivityFeed() {
             <WifiOff className="w-3 h-3 text-gray-500" />
           )}
         </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`p-1.5 rounded-lg transition-colors ${showFilters ? 'bg-purple-500/20 text-purple-400' : 'hover:bg-gray-800 text-gray-400'}`}
-          >
-            <Filter className="w-4 h-4" />
-          </button>
-          <button onClick={handleRefresh} disabled={refreshing} className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
-            <RefreshCw className={`w-4 h-4 text-gray-400 ${refreshing ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
+        <button onClick={handleRefresh} disabled={refreshing} className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
+          <RefreshCw className={`w-4 h-4 text-gray-400 ${refreshing ? 'animate-spin' : ''}`} />
+        </button>
       </div>
 
-      {/* Filters */}
-      {showFilters && (
-        <div className="p-2 border-b border-gray-800 flex flex-wrap gap-1">
-          {FILTER_OPTIONS.map(filter => (
-            <button
-              key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-              className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] border transition-all ${
-                activeFilter === filter.id ? filter.color : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:border-gray-600'
-              }`}
-            >
-              {filter.icon}
-              {filter.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Filters - Always visible */}
+      <div className="p-2 border-b border-gray-800 flex flex-wrap gap-1">
+        {FILTER_OPTIONS.map(filter => (
+          <button
+            key={filter.id}
+            onClick={() => setActiveFilter(filter.id)}
+            className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] border transition-all ${
+              activeFilter === filter.id ? filter.color : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:border-gray-600'
+            }`}
+          >
+            {filter.icon}
+            {filter.label}
+          </button>
+        ))}
+      </div>
 
       {/* New items notification */}
       {newItemsCount > 0 && (
