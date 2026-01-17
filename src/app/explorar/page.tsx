@@ -358,23 +358,6 @@ export default function ExplorarPage() {
                 </section>
               )}
 
-              {/* CTA Buttons */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  onClick={() => router.push('/tienda')}
-                  className="p-5 rounded-xl bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 hover:border-purple-500/60 transition-all text-left"
-                >
-                  <h3 className="font-semibold text-white mb-1">{t('dashboard.goToShop')}</h3>
-                  <p className="text-sm text-zinc-400">{t('dashboard.shopDescription')}</p>
-                </button>
-                <button
-                  onClick={() => router.push('/leaderboard')}
-                  className="p-5 rounded-xl bg-gradient-to-r from-zinc-900/80 to-zinc-800/50 border border-zinc-700/50 hover:border-zinc-600 transition-all text-left"
-                >
-                  <h3 className="font-semibold text-white mb-1">{t('dashboard.viewLeaderboard')}</h3>
-                  <p className="text-sm text-zinc-400">{t('dashboard.leaderboardDescription')}</p>
-                </button>
-              </div>
             </div>
           </FadeInView>
         )}
@@ -387,28 +370,9 @@ export default function ExplorarPage() {
           </p>
         </div>
 
-        {/* Search & Filters */}
+        {/* Filters */}
         <div className="mb-6 space-y-4">
-          {/* Search bar */}
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-              <input
-                type="text"
-                placeholder={`${t('common.search')}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+          <div className="flex justify-end">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className={`px-4 py-3 rounded-xl border transition-colors flex items-center gap-2 ${
