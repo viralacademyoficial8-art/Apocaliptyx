@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,8 +23,20 @@ import {
   X,
   Loader2,
   AlertTriangle,
+  Users,
+  UserPlus,
+  UserMinus,
+  Shield,
+  ShieldOff,
+  Crown,
+  Search,
+  Check,
+  Ban,
+  Clock,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface Community {
   id: string;
@@ -45,6 +57,36 @@ interface Community {
   creatorId: string;
 }
 
+interface JoinRequest {
+  id: string;
+  userId: string;
+  message: string;
+  createdAt: string;
+  user?: {
+    id: string;
+    username: string;
+    displayName?: string;
+    avatarUrl?: string;
+  };
+  users?: {
+    id: string;
+    username: string;
+    display_name?: string;
+    avatar_url?: string;
+  };
+}
+
+interface Member {
+  id: string;
+  userId: string;
+  username: string;
+  displayName?: string;
+  avatarUrl?: string;
+  level: number;
+  role: string;
+  joinedAt: string;
+}
+
 interface CommunitySettingsModalProps {
   community: Community;
   userRole: string | null;
@@ -54,6 +96,8 @@ interface CommunitySettingsModalProps {
   onDelete: () => void;
 }
 
+type Section = 'general' | 'privacy' | 'rules' | 'requests' | 'members' | 'danger';
+
 export function CommunitySettingsModal({
   community,
   userRole,
@@ -62,7 +106,7 @@ export function CommunitySettingsModal({
   onUpdate,
   onDelete,
 }: CommunitySettingsModalProps) {
-  const [activeSection, setActiveSection] = useState<'general' | 'privacy' | 'rules' | 'danger'>('general');
+  const [activeSection, setActiveSection] = useState<Section>('general');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -77,7 +121,134 @@ export function CommunitySettingsModal({
   const [rules, setRules] = useState<string[]>(community.rules || []);
   const [newRule, setNewRule] = useState('');
 
+  // Requests state
+  const [requests, setRequests] = useState<JoinRequest[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [processingRequest, setProcessingRequest] = useState<string | null>(null);
+
+  // Members state
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [memberSearch, setMemberSearch] = useState('');
+  const [processingMember, setProcessingMember] = useState<string | null>(null);
+
   const isOwner = userRole === 'owner';
+  const isAdmin = userRole === 'admin' || isOwner;
+
+  // Load requests when section changes
+  useEffect(() => {
+    if (activeSection === 'requests' && isAdmin) {
+      loadRequests();
+    }
+  }, [activeSection, isAdmin]);
+
+  // Load members when section changes
+  useEffect(() => {
+    if (activeSection === 'members') {
+      loadMembers();
+    }
+  }, [activeSection]);
+
+  const loadRequests = async () => {
+    setLoadingRequests(true);
+    try {
+      const response = await fetch(`/api/communities/${community.id}/requests`);
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setRequests(data.requests || []);
+    } catch (error) {
+      console.error('Error loading requests:', error);
+      toast.error('Error al cargar solicitudes');
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
+  const loadMembers = async () => {
+    setLoadingMembers(true);
+    try {
+      const response = await fetch(`/api/communities/${community.id}/members`);
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setMembers(data.members || []);
+    } catch (error) {
+      console.error('Error loading members:', error);
+      toast.error('Error al cargar miembros');
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  const handleRequest = async (requestId: string, action: 'approve' | 'reject') => {
+    setProcessingRequest(requestId);
+    try {
+      const response = await fetch(`/api/communities/${community.id}/requests`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, action }),
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      toast.success(action === 'approve' ? 'Solicitud aprobada' : 'Solicitud rechazada');
+      setRequests(requests.filter(r => r.id !== requestId));
+
+      if (action === 'approve') {
+        loadMembers();
+        onUpdate({ membersCount: community.membersCount + 1 });
+      }
+    } catch (error: any) {
+      console.error('Error processing request:', error);
+      toast.error(error.message || 'Error al procesar solicitud');
+    } finally {
+      setProcessingRequest(null);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    setProcessingMember(userId);
+    try {
+      const response = await fetch(`/api/communities/${community.id}/members`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, newRole }),
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      toast.success('Rol actualizado');
+      setMembers(members.map(m => m.userId === userId ? { ...m, role: newRole } : m));
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      toast.error(error.message || 'Error al actualizar rol');
+    } finally {
+      setProcessingMember(null);
+    }
+  };
+
+  const handleRemoveMember = async (userId: string, ban: boolean = false) => {
+    if (!confirm(ban ? '¿Banear a este usuario? No podrá volver a unirse.' : '¿Expulsar a este usuario?')) {
+      return;
+    }
+
+    setProcessingMember(userId);
+    try {
+      const response = await fetch(`/api/communities/${community.id}/members?userId=${userId}&ban=${ban}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      toast.success(ban ? 'Usuario baneado' : 'Usuario expulsado');
+      setMembers(members.filter(m => m.userId !== userId));
+      onUpdate({ membersCount: community.membersCount - 1 });
+    } catch (error: any) {
+      console.error('Error removing member:', error);
+      toast.error(error.message || 'Error al expulsar usuario');
+    } finally {
+      setProcessingMember(null);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -105,11 +276,11 @@ export function CommunitySettingsModal({
       }
 
       onUpdate(updates);
-      toast.success('Configuración guardada');
+      toast.success('Configuracion guardada');
       onClose();
     } catch (error) {
       console.error('Error saving settings:', error);
-      toast.error('Error al guardar configuración');
+      toast.error('Error al guardar configuracion');
     } finally {
       setSaving(false);
     }
@@ -155,22 +326,40 @@ export function CommunitySettingsModal({
     setRules(rules.filter((_, i) => i !== index));
   };
 
+  const filteredMembers = members.filter(m =>
+    m.username?.toLowerCase().includes(memberSearch.toLowerCase()) ||
+    m.displayName?.toLowerCase().includes(memberSearch.toLowerCase())
+  );
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'owner':
+        return <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 text-xs rounded-full"><Crown className="w-3 h-3" /> Owner</span>;
+      case 'admin':
+        return <span className="flex items-center gap-1 px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full"><Shield className="w-3 h-3" /> Admin</span>;
+      case 'moderator':
+        return <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full"><Shield className="w-3 h-3" /> Mod</span>;
+      default:
+        return <span className="px-2 py-0.5 bg-gray-500/20 text-gray-400 text-xs rounded-full">Miembro</span>;
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
-            Configuración de la comunidad
+            Configuracion de la comunidad
           </DialogTitle>
           <DialogDescription>
-            Administra la configuración de {community.name}
+            Administra la configuracion de {community.name}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex gap-4 flex-1 min-h-0 mt-4">
           {/* Sidebar */}
-          <div className="w-40 shrink-0 space-y-1">
+          <div className="w-44 shrink-0 space-y-1">
             <button
               onClick={() => setActiveSection('general')}
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
@@ -200,6 +389,37 @@ export function CommunitySettingsModal({
               }`}
             >
               Reglas
+            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setActiveSection('requests')}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${
+                  activeSection === 'requests'
+                    ? 'bg-purple-600 text-white'
+                    : 'text-gray-400 hover:bg-gray-800'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Solicitudes
+                </span>
+                {requests.length > 0 && (
+                  <span className="bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {requests.length}
+                  </span>
+                )}
+              </button>
+            )}
+            <button
+              onClick={() => setActiveSection('members')}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
+                activeSection === 'members'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-gray-400 hover:bg-gray-800'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Miembros
             </button>
             {isOwner && (
               <button
@@ -231,7 +451,7 @@ export function CommunitySettingsModal({
                 </div>
 
                 <div>
-                  <Label htmlFor="description">Descripción</Label>
+                  <Label htmlFor="description">Descripcion</Label>
                   <Textarea
                     id="description"
                     value={description}
@@ -293,7 +513,7 @@ export function CommunitySettingsModal({
                           className={isPublic ? 'bg-green-600' : 'border-gray-700'}
                         >
                           <Globe className="w-4 h-4 mr-1" />
-                          Pública
+                          Publica
                         </Button>
                         <Button
                           size="sm"
@@ -312,9 +532,9 @@ export function CommunitySettingsModal({
                 <div className="p-4 bg-gray-800/50 rounded-xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium">Requiere aprobación</h4>
+                      <h4 className="font-medium">Requiere aprobacion</h4>
                       <p className="text-sm text-gray-400 mt-1">
-                        Los nuevos miembros necesitan aprobación para unirse
+                        Los nuevos miembros necesitan aprobacion para unirse
                       </p>
                     </div>
                     <button
@@ -337,7 +557,7 @@ export function CommunitySettingsModal({
             {activeSection === 'rules' && (
               <div className="space-y-4">
                 <p className="text-sm text-gray-400">
-                  Define las reglas de tu comunidad. Máximo 10 reglas.
+                  Define las reglas de tu comunidad. Maximo 10 reglas.
                 </p>
 
                 {rules.length > 0 && (
@@ -384,7 +604,206 @@ export function CommunitySettingsModal({
                 {rules.length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <p>No hay reglas definidas</p>
-                    <p className="text-sm">Añade reglas para mantener el orden en tu comunidad</p>
+                    <p className="text-sm">Anade reglas para mantener el orden en tu comunidad</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeSection === 'requests' && isAdmin && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium flex items-center gap-2">
+                    <UserPlus className="w-5 h-5 text-amber-500" />
+                    Solicitudes de admision
+                  </h3>
+                  <Button size="sm" variant="outline" onClick={loadRequests} disabled={loadingRequests}>
+                    {loadingRequests ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Actualizar'}
+                  </Button>
+                </div>
+
+                {loadingRequests ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                  </div>
+                ) : requests.length > 0 ? (
+                  <div className="space-y-3">
+                    {requests.map((request) => {
+                      const userData = request.user || request.users;
+                      const username = userData?.username || 'Usuario';
+                      const displayName = (request.user?.displayName || request.users?.display_name) || username;
+                      const avatarUrl = request.user?.avatarUrl || request.users?.avatar_url;
+
+                      return (
+                        <div key={request.id} className="p-4 bg-gray-800/50 rounded-xl">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                              style={{
+                                background: avatarUrl
+                                  ? `url(${avatarUrl}) center/cover`
+                                  : 'linear-gradient(135deg, #6366f1, #ec4899)',
+                              }}
+                            >
+                              {!avatarUrl && username?.[0]?.toUpperCase()}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium">{displayName}</p>
+                              <p className="text-sm text-gray-400">@{username}</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <Clock className="w-3 h-3" />
+                              {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true, locale: es })}
+                            </div>
+                          </div>
+
+                          {request.message && (
+                            <p className="mt-2 text-sm text-gray-400 italic">"{request.message}"</p>
+                          )}
+
+                          <div className="flex gap-2 mt-3">
+                            <Button
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => handleRequest(request.id, 'approve')}
+                              disabled={processingRequest === request.id}
+                            >
+                              {processingRequest === request.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <>
+                                  <Check className="w-4 h-4 mr-1" />
+                                  Aprobar
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-red-500 text-red-400 hover:bg-red-500/20"
+                              onClick={() => handleRequest(request.id, 'reject')}
+                              disabled={processingRequest === request.id}
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Rechazar
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <UserPlus className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No hay solicitudes pendientes</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeSection === 'members' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <Input
+                      value={memberSearch}
+                      onChange={(e) => setMemberSearch(e.target.value)}
+                      placeholder="Buscar miembros..."
+                      className="pl-9 bg-gray-800 border-gray-700"
+                    />
+                  </div>
+                  <Button size="sm" variant="outline" onClick={loadMembers} disabled={loadingMembers}>
+                    {loadingMembers ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Actualizar'}
+                  </Button>
+                </div>
+
+                {loadingMembers ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                  </div>
+                ) : filteredMembers.length > 0 ? (
+                  <div className="space-y-2">
+                    {filteredMembers.map((member) => (
+                      <div key={member.id} className="p-3 bg-gray-800/50 rounded-xl flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                          style={{
+                            background: member.avatarUrl
+                              ? `url(${member.avatarUrl}) center/cover`
+                              : 'linear-gradient(135deg, #6366f1, #ec4899)',
+                          }}
+                        >
+                          {!member.avatarUrl && member.username?.[0]?.toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium truncate">{member.displayName || member.username}</p>
+                            {getRoleBadge(member.role)}
+                          </div>
+                          <p className="text-xs text-gray-500">@{member.username}</p>
+                        </div>
+
+                        {/* Actions - only show for non-owners and if current user has permission */}
+                        {member.role !== 'owner' && isAdmin && (
+                          <div className="flex items-center gap-1">
+                            {isOwner && member.role !== 'admin' && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 px-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                                onClick={() => handleRoleChange(member.userId, 'admin')}
+                                disabled={processingMember === member.userId}
+                                title="Hacer admin"
+                              >
+                                <Shield className="w-4 h-4" />
+                              </Button>
+                            )}
+                            {isOwner && member.role === 'admin' && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 px-2 text-gray-400 hover:text-gray-300 hover:bg-gray-500/20"
+                                onClick={() => handleRoleChange(member.userId, 'member')}
+                                disabled={processingMember === member.userId}
+                                title="Quitar admin"
+                              >
+                                <ShieldOff className="w-4 h-4" />
+                              </Button>
+                            )}
+                            {(isOwner || (isAdmin && member.role !== 'admin')) && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                                  onClick={() => handleRemoveMember(member.userId, false)}
+                                  disabled={processingMember === member.userId}
+                                  title="Expulsar"
+                                >
+                                  <UserMinus className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 px-2 text-red-600 hover:text-red-500 hover:bg-red-500/20"
+                                  onClick={() => handleRemoveMember(member.userId, true)}
+                                  disabled={processingMember === member.userId}
+                                  title="Banear"
+                                >
+                                  <Ban className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>{memberSearch ? 'No se encontraron miembros' : 'No hay miembros'}</p>
                   </div>
                 )}
               </div>
@@ -398,7 +817,7 @@ export function CommunitySettingsModal({
                     <div>
                       <h4 className="font-medium text-red-400">Eliminar comunidad</h4>
                       <p className="text-sm text-gray-400 mt-1">
-                        Esta acción es irreversible. Se eliminarán todos los posts, miembros y datos de la comunidad.
+                        Esta accion es irreversible. Se eliminaran todos los posts, miembros y datos de la comunidad.
                       </p>
 
                       {!showDeleteConfirm ? (
