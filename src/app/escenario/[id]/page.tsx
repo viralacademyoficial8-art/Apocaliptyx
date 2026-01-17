@@ -81,7 +81,7 @@ export default function EscenarioPage() {
 
   // Usar datos de Zustand si existen, sino de la session
   const currentUser = user || (session?.user ? {
-    id: session.currentUser?.id || "",
+    id: session.user.id || "",
     username: (session.user as any).username || session.user.email?.split("@")[0] || "user",
     apCoins: 0,
   } : null);
