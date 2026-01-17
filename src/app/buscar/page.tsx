@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuthStore } from '@/lib/stores';
+import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
 import { LandingNavbar } from '@/components/LandingNavbar';
 import { createClient } from '@supabase/supabase-js';
@@ -79,8 +79,9 @@ const SORT_OPTIONS = [
 function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
-  
+  const { status } = useSession();
+  const isAuthenticated = status === 'authenticated';
+
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);

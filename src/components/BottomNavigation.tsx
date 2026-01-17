@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { useEffect, useState, useCallback } from 'react';
 import { notificationsService } from '@/services/notifications.service';
@@ -26,7 +27,9 @@ interface NavItem {
 
 export function BottomNavigation() {
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuthStore();
+  const { status } = useSession();
+  const { user } = useAuthStore();
+  const isAuthenticated = status === 'authenticated';
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
 

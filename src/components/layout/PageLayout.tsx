@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useAuthStore } from "@/lib/stores";
+import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/Navbar";
 import { LandingNavbar } from "@/components/LandingNavbar";
 import { ResponsiveContainer } from "./ResponsiveContainer";
@@ -28,7 +28,8 @@ export function PageLayout({
   showBackButton = false,
   onBack,
 }: PageLayoutProps) {
-  const { isAuthenticated } = useAuthStore();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
 
   const handleBack = () => {
     if (onBack) return onBack();

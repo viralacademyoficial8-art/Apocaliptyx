@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
@@ -41,9 +42,11 @@ interface NavItem {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuthStore();
+  const { status } = useSession();
+  const { user } = useAuthStore();
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const isAuthenticated = status === 'authenticated';
 
   const mainNavItems: NavItem[] = [
     { icon: <Home className="w-6 h-6" />, label: t('nav.home'), href: '/' },

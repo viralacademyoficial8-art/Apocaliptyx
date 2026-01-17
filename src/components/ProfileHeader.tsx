@@ -15,6 +15,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import toast from 'react-hot-toast';
 import { PROPHET_LEVELS } from '@/types';
@@ -25,7 +26,10 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
-  const { user: currentUser } = useAuthStore();
+  const { data: session } = useSession();
+  const { user: storeUser } = useAuthStore();
+  // Usar session de NextAuth como fuente primaria, Zustand como fallback
+  const currentUser = storeUser || (session?.user ? { id: session.user.id } : null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(user.followers);
 
