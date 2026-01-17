@@ -41,7 +41,8 @@ export default {
         // Normalizar email a minúsculas para consistencia
         const normalizedEmail = profile.email?.toLowerCase().trim() || '';
 
-        const supabase = getSupabase();
+        // Usar cliente admin para bypasear RLS policies
+        const supabase = getSupabaseAdmin();
         if (!supabase) {
           return {
             id: profile.sub,
@@ -65,13 +66,17 @@ export default {
           .single();
 
         if (existingUser) {
+          // Normalizar rol a mayúsculas para consistencia
+          const normalizedRole = (existingUser.role || 'USER').toUpperCase();
+          console.log('[Google OAuth] User found:', existingUser.email, 'Role:', normalizedRole);
+
           return {
             id: existingUser.id,
             name: existingUser.display_name,
             email: existingUser.email,
             image: existingUser.avatar_url,
             username: existingUser.username,
-            role: existingUser.role,
+            role: normalizedRole,
             apCoins: existingUser.ap_coins,
             level: existingUser.level,
             isVerified: existingUser.is_verified,
@@ -141,7 +146,8 @@ export default {
         // Normalizar email a minúsculas para consistencia
         const normalizedEmail = profile.email?.toLowerCase().trim() || '';
 
-        const supabase = getSupabase();
+        // Usar cliente admin para bypasear RLS policies
+        const supabase = getSupabaseAdmin();
         const avatarUrl = profile.avatar
           ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
           : null;
@@ -169,13 +175,17 @@ export default {
           .single();
 
         if (existingUser) {
+          // Normalizar rol a mayúsculas para consistencia
+          const normalizedRole = (existingUser.role || 'USER').toUpperCase();
+          console.log('[Discord OAuth] User found:', existingUser.email, 'Role:', normalizedRole);
+
           return {
             id: existingUser.id,
             name: existingUser.display_name,
             email: existingUser.email,
             image: existingUser.avatar_url,
             username: existingUser.username,
-            role: existingUser.role,
+            role: normalizedRole,
             apCoins: existingUser.ap_coins,
             level: existingUser.level,
             isVerified: existingUser.is_verified,

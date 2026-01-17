@@ -3,6 +3,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import {
   UserRole,
@@ -23,12 +24,26 @@ import {
 
 export function usePermissions() {
   const { user } = useAuthStore();
+  const { data: session } = useSession();
 
   const role: UserRole = useMemo(() => {
-    // Obtener rol del usuario, default a USER
-    const userRole = user?.role as UserRole | undefined;
-    return userRole || 'USER';
-  }, [user?.role]);
+    // Prioridad: 1) Zustand store, 2) NextAuth session, 3) default USER
+    // El store Zustand se actualiza con refreshBalance(), pero la session
+    // siempre tiene el rol más reciente del login
+    const zustandRole = user?.role as UserRole | undefined;
+    const sessionRole = session?.user?.role as UserRole | undefined;
+
+    // Si Zustand tiene un rol válido (no USER por defecto), usarlo
+    // Si no, usar el rol de la session de NextAuth
+    // Esto asegura que los roles admin se muestren correctamente
+    if (zustandRole && zustandRole !== 'USER') {
+      return zustandRole;
+    }
+    if (sessionRole) {
+      return sessionRole;
+    }
+    return zustandRole || 'USER';
+  }, [user?.role, session?.user?.role]);
 
   const permissions = useMemo(() => {
     return ROLE_PERMISSIONS[role] || [];
