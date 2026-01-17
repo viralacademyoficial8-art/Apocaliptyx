@@ -27,22 +27,34 @@ export function usePermissions() {
   const { data: session } = useSession();
 
   const role: UserRole = useMemo(() => {
-    // Prioridad: 1) Zustand store, 2) NextAuth session, 3) default USER
-    // El store Zustand se actualiza con refreshBalance(), pero la session
-    // siempre tiene el rol más reciente del login
+    // Obtener roles de ambas fuentes
     const zustandRole = user?.role as UserRole | undefined;
     const sessionRole = session?.user?.role as UserRole | undefined;
 
-    // Si Zustand tiene un rol válido (no USER por defecto), usarlo
-    // Si no, usar el rol de la session de NextAuth
-    // Esto asegura que los roles admin se muestren correctamente
-    if (zustandRole && zustandRole !== 'USER') {
-      return zustandRole;
+    // Debug: mostrar qué roles tenemos
+    if (typeof window !== 'undefined') {
+      console.log('[usePermissions] Zustand role:', zustandRole, '| Session role:', sessionRole);
     }
-    if (sessionRole) {
+
+    // Prioridad:
+    // 1) Si la session tiene un rol admin, usarlo (viene del login más reciente)
+    // 2) Si Zustand tiene un rol admin, usarlo (puede venir de /api/me)
+    // 3) Cualquier rol que tengamos
+    // 4) Default a USER
+
+    // Verificar si es un rol de admin
+    const isAdminSessionRole = sessionRole && ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'STAFF'].includes(sessionRole);
+    const isAdminZustandRole = zustandRole && ['SUPER_ADMIN', 'ADMIN', 'MODERATOR', 'STAFF'].includes(zustandRole);
+
+    if (isAdminSessionRole) {
       return sessionRole;
     }
-    return zustandRole || 'USER';
+    if (isAdminZustandRole) {
+      return zustandRole;
+    }
+
+    // Si ninguno es admin, usar el que tengamos
+    return sessionRole || zustandRole || 'USER';
   }, [user?.role, session?.user?.role]);
 
   const permissions = useMemo(() => {
