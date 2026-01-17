@@ -150,7 +150,64 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 3. Predicciones/Votos recientes en escenarios
+    // 3. Transacciones de protección (PROTECT)
+    const { data: protects } = await supabase
+      .from('transactions')
+      .select(`
+        id,
+        amount,
+        description,
+        created_at,
+        user_id,
+        scenario_id,
+        users!transactions_user_id_fkey (
+          id,
+          username,
+          display_name,
+          avatar_url,
+          level,
+          is_verified
+        ),
+        scenarios!transactions_scenario_id_fkey (
+          id,
+          title
+        )
+      `)
+      .eq('type', 'PROTECT')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (protects) {
+      for (const protect of protects) {
+        const user = protect.users as any;
+        const scenario = protect.scenarios as any;
+        if (user && scenario) {
+          feedItems.push({
+            id: `protect_${protect.id}`,
+            type: 'scenario_protected',
+            title: '¡Escenario protegido!',
+            description: `${user.display_name || user.username} protegió "${scenario.title}"`,
+            icon: '🛡️',
+            timestamp: protect.created_at,
+            user: {
+              id: user.id,
+              username: user.username,
+              displayName: user.display_name,
+              avatarUrl: user.avatar_url,
+              level: user.level || 1,
+              isVerified: user.is_verified || false,
+            },
+            metadata: {
+              scenarioId: scenario.id,
+              scenarioTitle: scenario.title,
+              amount: protect.amount,
+            },
+          });
+        }
+      }
+    }
+
+    // 4. Predicciones/Votos recientes en escenarios
     const { data: predictions } = await supabase
       .from('predictions')
       .select(`
@@ -207,7 +264,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 4. Escenarios resueltos/cerrados
+    // 5. Escenarios resueltos/cerrados
     const { data: resolved } = await supabase
       .from('scenarios')
       .select(`
@@ -262,7 +319,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 5. Logros desbloqueados
+    // 6. Logros desbloqueados
     const { data: achievements } = await supabase
       .from('user_achievements')
       .select(`
@@ -300,6 +357,53 @@ export async function GET(request: NextRequest) {
             description: `${user.display_name || user.username} desbloqueó "${achievement.name}"`,
             icon: achievement.icon || '🏆',
             timestamp: ua.unlocked_at,
+            user: {
+              id: user.id,
+              username: user.username,
+              displayName: user.display_name,
+              avatarUrl: user.avatar_url,
+              level: user.level || 1,
+              isVerified: user.is_verified || false,
+            },
+          });
+        }
+      }
+    }
+
+    // 7. Transmisiones en vivo
+    const { data: streams } = await supabase
+      .from('live_streams')
+      .select(`
+        id,
+        title,
+        status,
+        started_at,
+        created_at,
+        user_id,
+        users!live_streams_user_id_fkey (
+          id,
+          username,
+          display_name,
+          avatar_url,
+          level,
+          is_verified
+        )
+      `)
+      .eq('status', 'live')
+      .order('started_at', { ascending: false })
+      .limit(10);
+
+    if (streams) {
+      for (const stream of streams) {
+        const user = stream.users as any;
+        if (user) {
+          feedItems.push({
+            id: `stream_${stream.id}`,
+            type: 'live_stream',
+            title: '¡En vivo ahora!',
+            description: `${user.display_name || user.username} está transmitiendo: "${stream.title}"`,
+            icon: '🔴',
+            timestamp: stream.started_at || stream.created_at,
             user: {
               id: user.id,
               username: user.username,
