@@ -152,13 +152,13 @@ export async function PATCH(
         .eq('id', requestId);
 
       // Notify user their request was approved
-      await notificationsService.notify(
-        requestData.user_id,
-        'community_request_approved',
-        `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue aprobada`,
-        undefined,
-        `/foro/comunidad/${communityInfo?.slug || communityId}`
-      );
+      await notificationsService.create({
+        userId: requestData.user_id,
+        type: 'community_request_approved',
+        title: 'Solicitud aprobada',
+        message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue aprobada`,
+        linkUrl: `/foro/comunidad/${communityInfo?.slug || communityId}`
+      });
 
       return NextResponse.json({
         success: true,
@@ -176,13 +176,13 @@ export async function PATCH(
         .eq('id', requestId);
 
       // Notify user their request was rejected
-      await notificationsService.notify(
-        requestData.user_id,
-        'community_request_rejected',
-        `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue rechazada`,
-        undefined,
-        `/comunidades`
-      );
+      await notificationsService.create({
+        userId: requestData.user_id,
+        type: 'community_request_rejected',
+        title: 'Solicitud rechazada',
+        message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue rechazada`,
+        linkUrl: `/comunidades`
+      });
 
       return NextResponse.json({
         success: true,

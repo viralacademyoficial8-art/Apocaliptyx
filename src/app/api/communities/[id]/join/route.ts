@@ -119,13 +119,14 @@ export async function POST(
 
       if (admins && admins.length > 0) {
         for (const admin of admins) {
-          await notificationsService.notify(
-            admin.user_id,
-            'community_join_request',
-            `${requesterData?.username || 'Un usuario'} quiere unirse a ${communityData.name}`,
-            requesterData?.avatar_url,
-            `/comunidades/${communityData.slug}/solicitudes`
-          );
+          await notificationsService.create({
+            userId: admin.user_id,
+            type: 'community_join_request',
+            title: 'Nueva solicitud de admisión',
+            message: `${requesterData?.username || 'Un usuario'} quiere unirse a ${communityData.name}`,
+            imageUrl: requesterData?.avatar_url,
+            linkUrl: `/comunidades/${communityData.slug}/solicitudes`
+          });
         }
       }
 
