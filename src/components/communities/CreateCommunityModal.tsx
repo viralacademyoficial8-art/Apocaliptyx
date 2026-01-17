@@ -210,7 +210,9 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                   <Lock className="w-5 h-5 text-yellow-400" />
                 )}
                 <div>
-                  <p className="font-medium">Comunidad pública</p>
+                  <p className="font-medium">
+                    {isPublic ? 'Comunidad pública' : 'Comunidad privada'}
+                  </p>
                   <p className="text-xs text-gray-400">
                     {isPublic
                       ? 'Cualquiera puede ver y unirse'
