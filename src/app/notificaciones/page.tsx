@@ -142,6 +142,7 @@ const notificationConfig: Record<
   // Reels y Streaming
   reel_like: { icon: Video, color: "text-pink-400", bgColor: "bg-pink-500/20" },
   stream_like: { icon: Radio, color: "text-red-400", bgColor: "bg-red-500/20" },
+  stream_started: { icon: Radio, color: "text-red-400", bgColor: "bg-red-500/20" },
 
   // Chat
   message_received: { icon: MessageCircle, color: "text-blue-400", bgColor: "bg-blue-500/20" },
