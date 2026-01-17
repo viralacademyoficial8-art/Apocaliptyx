@@ -40,7 +40,27 @@ export async function GET() {
     if (error?.code === 'PGRST116' || !user) {
       console.log('User not found in users table, creating profile for:', session.user.email);
 
-      const username = session.user.email.split('@')[0] || `user_${Date.now()}`;
+      // Generar username único
+      let baseUsername = session.user.email.split('@')[0] || 'user';
+      baseUsername = baseUsername.replace(/[^a-zA-Z0-9_]/g, '').slice(0, 20);
+      let username = baseUsername;
+      let attempts = 0;
+
+      // Verificar si el username ya existe y generar uno único
+      while (attempts < 5) {
+        const { data: existingUser } = await supabase
+          .from('users')
+          .select('id')
+          .eq('username', username)
+          .single();
+
+        if (!existingUser) break;
+
+        // Si existe, añadir números aleatorios
+        username = `${baseUsername}${Math.floor(Math.random() * 9999)}`;
+        attempts++;
+      }
+
       const displayName = session.user.name || username;
 
       const { data: newUser, error: insertError } = await supabase
