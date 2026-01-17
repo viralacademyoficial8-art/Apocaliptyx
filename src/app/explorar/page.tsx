@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { scenariosService } from '@/services';
@@ -57,7 +58,29 @@ const CATEGORY_KEYS = [
 export default function ExplorarPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { user, isAuthenticated } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user, isAuthenticated, refreshBalance } = useAuthStore();
+
+  // Verificar autenticación usando session de NextAuth (más confiable)
+  const isLoggedIn = status === "authenticated" && !!session?.user;
+
+  // Usar datos de Zustand si existen, sino crear objeto temporal de session
+  const currentUser = user || (session?.user ? {
+    id: session.user.id || "",
+    email: session.user.email || "",
+    username: (session.user as { username?: string }).username || session.user.email?.split("@")[0] || "user",
+    displayName: session.user.name || "Usuario",
+    avatarUrl: session.user.image || "",
+    createdAt: new Date(),
+    role: (session.user as { role?: string }).role || "USER",
+  } : null);
+
+  // Cargar datos del usuario desde la BD cuando esté autenticado
+  useEffect(() => {
+    if (status === "authenticated" && session?.user && !user) {
+      refreshBalance();
+    }
+  }, [status, session, user, refreshBalance]);
 
   // Translated categories and sort options
   const CATEGORIES = [
@@ -102,7 +125,8 @@ export default function ExplorarPage() {
   // Cargar stats del usuario desde Supabase
   useEffect(() => {
     async function loadUserStats() {
-      if (!isAuthenticated || !user?.id) return;
+      // Usar isLoggedIn y currentUser para mayor confiabilidad
+      if (!isLoggedIn || !currentUser?.id) return;
 
       const supabase = getSupabaseClient();
 
@@ -111,27 +135,27 @@ export default function ExplorarPage() {
         const { data: userData } = await supabase
           .from('users')
           .select('ap_coins')
-          .eq('id', user.id)
+          .eq('id', currentUser.id)
           .single();
 
         // Contar escenarios creados por el usuario
         const { count: scenariosCreated } = await supabase
           .from('scenarios')
           .select('*', { count: 'exact', head: true })
-          .eq('creator_id', user.id);
+          .eq('creator_id', currentUser.id);
 
         // Contar predicciones ganadas (status = 'WON')
         const { count: scenariosWon } = await supabase
           .from('predictions')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
+          .eq('user_id', currentUser.id)
           .eq('status', 'WON');
 
         // Contar escenarios robados (thief_id = user.id)
         const { count: scenariosStolen } = await supabase
           .from('scenario_steal_history')
           .select('*', { count: 'exact', head: true })
-          .eq('thief_id', user.id);
+          .eq('thief_id', currentUser.id);
 
         setUserStats({
           apCoins: (userData as { ap_coins: number } | null)?.ap_coins || 0,
@@ -145,7 +169,7 @@ export default function ExplorarPage() {
     }
 
     loadUserStats();
-  }, [isAuthenticated, user?.id]);
+  }, [isLoggedIn, currentUser?.id]);
 
   // Cargar escenarios de Supabase
   useEffect(() => {
@@ -231,17 +255,17 @@ export default function ExplorarPage() {
 
       <main className="container mx-auto px-4 py-8 space-y-8">
         {/* User Stats Section - Only when authenticated */}
-        {isAuthenticated && user && (
+        {isLoggedIn && currentUser && (
           <FadeInView direction="up" delay={0.05}>
             <div className="space-y-6">
               {/* Welcome Header */}
               <section>
                 <p className="text-xs text-zinc-400">{t('dashboard.welcomeBack')}</p>
                 <h1 className="text-2xl font-bold text-zinc-50">
-                  {user.displayName || user.username}
+                  {currentUser.displayName || currentUser.username}
                 </h1>
                 <p className="text-xs text-zinc-500 mt-1">
-                  {t('dashboard.memberSince')} {formatDate(new Date(user.createdAt))}
+                  {t('dashboard.memberSince')} {formatDate(new Date(currentUser.createdAt))}
                 </p>
               </section>
 
@@ -277,7 +301,7 @@ export default function ExplorarPage() {
 
                 <StaggerItem>
                   <div
-                    onClick={() => router.push(`/perfil/${user.username}`)}
+                    onClick={() => router.push(`/perfil/${currentUser.username}`)}
                     className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 hover:bg-zinc-900 transition-all"
                   >
                     <ShoppingBag className="w-6 h-6 text-emerald-400" />
@@ -290,7 +314,7 @@ export default function ExplorarPage() {
 
                 <StaggerItem>
                   <div
-                    onClick={() => user?.username && router.push(`/perfil/${user.username}/escenarios-robados`)}
+                    onClick={() => currentUser?.username && router.push(`/perfil/${currentUser.username}/escenarios-robados`)}
                     className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-red-500/50 hover:bg-zinc-900 transition-all"
                   >
                     <Swords className="w-6 h-6 text-red-400" />
