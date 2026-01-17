@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const filter = searchParams.get('filter'); // 'joined', 'popular', 'all'
 
-    // Get user's joined communities first (needed for private community access)
+    // Get user's joined communities first
     let userCommunities: string[] = [];
     if (session?.user?.id) {
       const { data: memberships } = await supabase()
@@ -41,53 +41,27 @@ export async function GET(request: NextRequest) {
       userCommunities = (memberships as { community_id: string }[] | null)?.map(m => m.community_id) || [];
     }
 
-    // Get all public communities
-    let publicQuery = supabase()
+    // Get ALL communities (both public and private)
+    // Private communities will appear locked for non-members
+    let query = supabase()
       .from('communities')
       .select('*')
-      .eq('is_public', true)
       .order('members_count', { ascending: false });
 
     if (search) {
-      publicQuery = publicQuery.ilike('name', `%${search}%`);
+      query = query.ilike('name', `%${search}%`);
     }
 
-    const { data: publicCommunitiesRaw, error: publicError } = await publicQuery;
+    const { data: allCommunitiesRaw, error } = await query;
 
-    if (publicError) throw publicError;
+    if (error) throw error;
 
-    let allCommunities = (publicCommunitiesRaw as CommunityRow[] | null) || [];
-
-    // For authenticated users, also get private communities they are members of
-    if (session?.user?.id && userCommunities.length > 0) {
-      let privateQuery = supabase()
-        .from('communities')
-        .select('*')
-        .eq('is_public', false)
-        .in('id', userCommunities)
-        .order('members_count', { ascending: false });
-
-      if (search) {
-        privateQuery = privateQuery.ilike('name', `%${search}%`);
-      }
-
-      const { data: privateCommunitiesRaw, error: privateError } = await privateQuery;
-
-      if (!privateError && privateCommunitiesRaw) {
-        // Merge private communities with public ones (avoiding duplicates)
-        const privateComms = privateCommunitiesRaw as CommunityRow[];
-        const existingIds = new Set(allCommunities.map(c => c.id));
-        for (const privateCommunity of privateComms) {
-          if (!existingIds.has(privateCommunity.id)) {
-            allCommunities.push(privateCommunity);
-          }
-        }
-      }
-    }
+    let allCommunities = (allCommunitiesRaw as CommunityRow[] | null) || [];
 
     // Filter if needed
     let filteredCommunities = allCommunities;
     if (filter === 'joined' && session?.user?.id) {
+      // For "Mis comunidades", only show communities user is a member of
       filteredCommunities = filteredCommunities.filter(c =>
         userCommunities.includes(c.id)
       );
