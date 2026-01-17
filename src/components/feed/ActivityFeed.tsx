@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { createClient } from '@supabase/supabase-js';
 import {
   Loader2,
   Target,
@@ -18,9 +18,19 @@ import {
   Users,
   TrendingUp,
   RefreshCw,
+  Wifi,
+  WifiOff,
+  Bell,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import toast from 'react-hot-toast';
+
+// Supabase client for realtime
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface FeedUser {
   id: string;
@@ -103,7 +113,15 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
   achievement: <Trophy className="w-5 h-5" />,
 };
 
-function FeedItemCard({ item }: { item: FeedItem }) {
+const ACTIVITY_MESSAGES: Record<string, string> = {
+  scenario_created: '¡Nuevo escenario creado!',
+  scenario_stolen: '¡Escenario robado!',
+  scenario_vote: '¡Nueva votación!',
+  scenario_resolved: '¡Escenario resuelto!',
+  achievement: '¡Logro desbloqueado!',
+};
+
+function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
   const router = useRouter();
   const styles = TYPE_STYLES[item.type] || TYPE_STYLES.scenario_created;
 
@@ -121,7 +139,9 @@ function FeedItemCard({ item }: { item: FeedItem }) {
   return (
     <div
       onClick={handleCardClick}
-      className={`p-4 rounded-xl border ${styles.bg} ${styles.border} hover:bg-gray-800/50 transition-all cursor-pointer`}
+      className={`p-4 rounded-xl border ${styles.bg} ${styles.border} hover:bg-gray-800/50 transition-all cursor-pointer ${
+        isNew ? 'animate-pulse ring-2 ring-purple-500/50' : ''
+      }`}
     >
       <div className="flex items-start gap-3">
         {/* User Avatar */}
@@ -162,6 +182,11 @@ function FeedItemCard({ item }: { item: FeedItem }) {
             <span className="text-xs text-gray-500">@{item.user.username}</span>
             <span className="text-xs text-gray-600">•</span>
             <span className="text-xs text-gray-500">Nivel {item.user.level}</span>
+            {isNew && (
+              <span className="px-1.5 py-0.5 text-[10px] bg-purple-500/20 text-purple-400 rounded-full">
+                NUEVO
+              </span>
+            )}
           </div>
 
           {/* Activity Type Badge */}
@@ -207,10 +232,14 @@ export function ActivityFeed() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [offset, setOffset] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
+  const [newItemsCount, setNewItemsCount] = useState(0);
+  const [newItemIds, setNewItemIds] = useState<Set<string>>(new Set());
+  const channelRef = useRef<any>(null);
 
-  const fetchFeed = async (reset = false) => {
+  const fetchFeed = useCallback(async (reset = false, silent = false) => {
     try {
-      if (reset) {
+      if (reset && !silent) {
         setRefreshing(true);
         setOffset(0);
       }
@@ -223,7 +252,18 @@ export function ActivityFeed() {
       const data = await res.json();
 
       if (reset) {
+        // Check for new items
+        if (silent && items.length > 0) {
+          const existingIds = new Set(items.map(i => i.id));
+          const newItems = data.items.filter((item: FeedItem) => !existingIds.has(item.id));
+          if (newItems.length > 0) {
+            setNewItemIds(new Set(newItems.map((i: FeedItem) => i.id)));
+            // Clear new item highlight after 5 seconds
+            setTimeout(() => setNewItemIds(new Set()), 5000);
+          }
+        }
         setItems(data.items);
+        setNewItemsCount(0);
       } else {
         setItems(prev => [...prev, ...data.items]);
       }
@@ -232,20 +272,111 @@ export function ActivityFeed() {
       setOffset(currentOffset + data.items.length);
       setError(null);
     } catch (err) {
-      setError('Error al cargar la actividad');
+      if (!silent) {
+        setError('Error al cargar la actividad');
+      }
       console.error(err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [offset, items]);
 
+  // Initial fetch
   useEffect(() => {
     fetchFeed(true);
   }, []);
 
+  // Setup Supabase Realtime subscriptions
+  useEffect(() => {
+    // Create a channel for all activity-related tables
+    const channel = supabase
+      .channel('activity-feed')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'scenarios' },
+        (payload) => {
+          console.log('New scenario created:', payload);
+          setNewItemsCount(prev => prev + 1);
+          toast('🎯 ¡Nuevo escenario creado!', {
+            icon: '🆕',
+            style: { background: '#1f2937', color: '#fff' },
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'transactions' },
+        (payload) => {
+          const type = (payload.new as any)?.type;
+          if (type === 'STEAL') {
+            console.log('New steal:', payload);
+            setNewItemsCount(prev => prev + 1);
+            toast('🦹 ¡Escenario robado!', {
+              icon: '⚔️',
+              style: { background: '#1f2937', color: '#fff' },
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'votes' },
+        (payload) => {
+          console.log('New vote:', payload);
+          setNewItemsCount(prev => prev + 1);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'scenarios' },
+        (payload) => {
+          const newData = payload.new as any;
+          const oldData = payload.old as any;
+          // Check if scenario was just resolved
+          if (newData.resolved_at && !oldData?.resolved_at) {
+            console.log('Scenario resolved:', payload);
+            setNewItemsCount(prev => prev + 1);
+            toast('✅ ¡Escenario resuelto!', {
+              icon: '🏆',
+              style: { background: '#1f2937', color: '#fff' },
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'user_achievements' },
+        (payload) => {
+          console.log('New achievement:', payload);
+          setNewItemsCount(prev => prev + 1);
+          toast('🏆 ¡Nuevo logro desbloqueado!', {
+            icon: '🎉',
+            style: { background: '#1f2937', color: '#fff' },
+          });
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+        setIsConnected(status === 'SUBSCRIBED');
+      });
+
+    channelRef.current = channel;
+
+    // Cleanup on unmount
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
+  }, []);
+
   const handleRefresh = () => {
     fetchFeed(true);
+  };
+
+  const handleLoadNewItems = () => {
+    fetchFeed(true, true);
   };
 
   const handleLoadMore = () => {
@@ -280,7 +411,20 @@ export function ActivityFeed() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-purple-400" />
-          <h2 className="text-lg font-semibold text-white">Actividad Reciente</h2>
+          <h2 className="text-lg font-semibold text-white">Actividad en Tiempo Real</h2>
+          {/* Connection status indicator */}
+          <div className="flex items-center gap-1">
+            {isConnected ? (
+              <span className="flex items-center gap-1 text-xs text-green-400">
+                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <Wifi className="w-3 h-3" />
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-xs text-gray-500">
+                <WifiOff className="w-3 h-3" />
+              </span>
+            )}
+          </div>
         </div>
         <button
           onClick={handleRefresh}
@@ -291,12 +435,28 @@ export function ActivityFeed() {
         </button>
       </div>
 
+      {/* New items notification */}
+      {newItemsCount > 0 && (
+        <button
+          onClick={handleLoadNewItems}
+          className="w-full py-3 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-xl text-purple-400 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        >
+          <Bell className="w-4 h-4 animate-bounce" />
+          {newItemsCount} {newItemsCount === 1 ? 'nueva actividad' : 'nuevas actividades'}
+          <span className="text-xs text-purple-500">• Click para ver</span>
+        </button>
+      )}
+
       {/* Feed Items */}
       {items.length > 0 ? (
         <>
           <div className="space-y-3">
             {items.map((item) => (
-              <FeedItemCard key={item.id} item={item} />
+              <FeedItemCard
+                key={item.id}
+                item={item}
+                isNew={newItemIds.has(item.id)}
+              />
             ))}
           </div>
 
@@ -314,7 +474,7 @@ export function ActivityFeed() {
           <Users className="w-12 h-12 text-gray-600 mx-auto mb-3" />
           <p className="text-gray-400">No hay actividad reciente</p>
           <p className="text-gray-500 text-sm mt-1">
-            La actividad de la plataforma aparecerá aquí
+            La actividad de la plataforma aparecerá aquí en tiempo real
           </p>
         </div>
       )}
