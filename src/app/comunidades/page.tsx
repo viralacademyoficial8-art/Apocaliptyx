@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { Users, Search, TrendingUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,9 @@ interface Community {
 }
 
 export default function ComunidadesPage() {
+  const { data: session, status } = useSession();
   const { user } = useAuthStore();
+  const isLoggedIn = status === 'authenticated' && !!session?.user;
   const [communities, setCommunities] = useState<Community[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'joined' | 'popular'>('all');
@@ -60,7 +63,7 @@ export default function ComunidadesPage() {
   };
 
   const handleJoinCommunity = async (communityId: string) => {
-    if (!user) {
+    if (!isLoggedIn) {
       toast.error('Debes iniciar sesión');
       return;
     }
@@ -107,7 +110,7 @@ export default function ComunidadesPage() {
   };
 
   const handleRequestJoinCommunity = async (communityId: string) => {
-    if (!user) {
+    if (!isLoggedIn) {
       toast.error('Debes iniciar sesión');
       return;
     }
@@ -205,7 +208,7 @@ export default function ComunidadesPage() {
               Únete a comunidades de predicciones y comparte con otros profetas
             </p>
           </div>
-          {user && <CreateCommunityModal onCreateCommunity={handleCreateCommunity} />}
+          {isLoggedIn && <CreateCommunityModal onCreateCommunity={handleCreateCommunity} />}
         </div>
 
         {/* Search & Filters */}
