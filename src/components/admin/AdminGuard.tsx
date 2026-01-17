@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { usePermissions } from '@/hooks/usePermissions';
 import { Permission } from '@/types/roles';
@@ -25,43 +26,30 @@ export function AdminGuard({
   fallback,
 }: AdminGuardProps) {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user } = useAuthStore();
   const { can, canAny, canAll, canAccessAdmin, role, isAdmin } = usePermissions();
   const [hydrated, setHydrated] = useState(false);
 
+  // Determinar autenticación desde NextAuth (fuente de verdad)
+  const isAuthenticated = status === 'authenticated' && !!session?.user;
+  const isLoading = status === 'loading';
+
   // Esperar hidratación del store
   useEffect(() => {
-    // Verificar si ya hay datos en localStorage
-    const checkHydration = () => {
-      try {
-        const stored = localStorage.getItem('apocaliptyx-auth');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed?.state?.user) {
-            setHydrated(true);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error('Error checking hydration:', e);
-      }
-      
-      // Si no hay datos o hay error, esperar un poco más
-      setTimeout(() => setHydrated(true), 500);
-    };
-
-    checkHydration();
+    const timer = setTimeout(() => setHydrated(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // Debug logs
   useEffect(() => {
-    if (hydrated) {
-      console.log('[AdminGuard] Hydrated - User:', user?.email, 'Role:', role, 'isAdmin:', isAdmin, 'canAccessAdmin:', canAccessAdmin);
+    if (hydrated && !isLoading) {
+      console.log('[AdminGuard] Status:', status, '| User:', session?.user?.email, '| Role:', role, '| isAdmin:', isAdmin, '| canAccessAdmin:', canAccessAdmin);
     }
-  }, [hydrated, user, role, isAdmin, canAccessAdmin]);
+  }, [hydrated, isLoading, status, session, role, isAdmin, canAccessAdmin]);
 
-  // Mostrar loading mientras se hidrata
-  if (!hydrated) {
+  // Mostrar loading mientras se carga la session
+  if (isLoading || !hydrated) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -70,7 +58,7 @@ export function AdminGuard({
   }
 
   // Si no está autenticado, redirigir a login
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticated) {
     console.log('[AdminGuard] Not authenticated, redirecting to login');
     router.push('/login');
     return (
