@@ -102,6 +102,7 @@ export function PostCard({
   const [copied, setCopied] = useState(false);
   const [localCommentsCount, setLocalCommentsCount] = useState(post.commentsCount);
   const [replyingTo, setReplyingTo] = useState<Comment | null>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const shareRef = useRef<HTMLDivElement>(null);
   const commentInputRef = useRef<HTMLInputElement>(null);
@@ -358,11 +359,16 @@ export function PostCard({
           </div>
 
           {post.imageUrl && (
-            <img
-              src={post.imageUrl}
-              alt=""
-              className="mt-3 rounded-xl max-h-96 object-cover"
-            />
+            <div
+              className="mt-3 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => setShowImageModal(true)}
+            >
+              <img
+                src={post.imageUrl}
+                alt=""
+                className="w-full max-h-[500px] object-contain bg-gray-800/50"
+              />
+            </div>
           )}
 
           {/* Actions */}
@@ -663,6 +669,27 @@ export function PostCard({
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && post.imageUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 text-white hover:text-gray-300 transition-colors z-10"
+            onClick={() => setShowImageModal(false)}
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={post.imageUrl}
+            alt=""
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
