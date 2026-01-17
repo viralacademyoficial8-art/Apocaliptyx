@@ -1333,6 +1333,7 @@ function ForoContent() {
         {/* Social Hub Tabs */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
           <button
+            type="button"
             onClick={() => changeTab('feed')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'feed'
@@ -1344,6 +1345,7 @@ function ForoContent() {
             Feed
           </button>
           <button
+            type="button"
             onClick={() => changeTab('reels')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'reels'
@@ -1355,6 +1357,7 @@ function ForoContent() {
             Reels
           </button>
           <button
+            type="button"
             onClick={() => changeTab('lives')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all relative ${
               activeTab === 'lives'
@@ -1368,6 +1371,7 @@ function ForoContent() {
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
           </button>
           <button
+            type="button"
             onClick={() => changeTab('comunidades')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'comunidades'
