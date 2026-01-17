@@ -370,6 +370,45 @@ export async function POST(request: NextRequest) {
 
     const stream = streamRaw as { id: string; title?: string } | null;
 
+    // Notificar a los seguidores que el usuario está en vivo
+    if (stream?.id) {
+      try {
+        // Obtener información del streamer
+        const { data: streamerInfo } = await supabase
+          .from('users')
+          .select('username, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+        const streamerData = streamerInfo as { username?: string; avatar_url?: string } | null;
+
+        // Obtener lista de seguidores del streamer
+        const { data: followers } = await supabase
+          .from('follows')
+          .select('follower_id')
+          .eq('following_id', user.id);
+
+        if (followers && followers.length > 0) {
+          const followerIds = followers.map((f: { follower_id: string }) => f.follower_id);
+
+          // Importar el servicio de notificaciones y enviar notificaciones
+          const { notificationsService } = await import('@/services/notifications.service');
+          await notificationsService.notifyStreamStarted(
+            followerIds,
+            streamerData?.username || 'Usuario',
+            streamerData?.avatar_url,
+            title,
+            stream.id
+          );
+
+          console.log(`Notified ${followerIds.length} followers about stream start`);
+        }
+      } catch (notifyError) {
+        // No fallar si las notificaciones fallan, el stream ya fue creado
+        console.error('Error sending stream notifications:', notifyError);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       stream: {

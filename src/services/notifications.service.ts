@@ -45,9 +45,10 @@ export type NotificationType =
   | 'community_like'
   | 'community_comment'
   | 'community_reply'
-  // Reels y Streaming (2)
+  // Reels y Streaming (3)
   | 'reel_like'
   | 'stream_like'
+  | 'stream_started'
   // Chat (2)
   | 'message_received'
   | 'message_reaction'
@@ -643,6 +644,31 @@ export const notificationsService = {
       imageUrl: likerAvatar,
       linkUrl: `/streaming/${streamId}`,
     });
+  },
+
+  // 35. Notificar inicio de Stream en vivo a seguidores
+  async notifyStreamStarted(
+    followerIds: string[],
+    streamerUsername: string,
+    streamerAvatar: string | undefined,
+    streamTitle: string,
+    streamId: string
+  ): Promise<number> {
+    let successCount = 0;
+
+    for (const followerId of followerIds) {
+      const result = await this.create({
+        userId: followerId,
+        type: 'stream_started',
+        title: '🔴 ¡En vivo ahora!',
+        message: `@${streamerUsername} está transmitiendo: "${streamTitle}"`,
+        imageUrl: streamerAvatar,
+        linkUrl: `/streaming/live/${streamId}`,
+      });
+      if (result) successCount++;
+    }
+
+    return successCount;
   },
 
   // ============================================
