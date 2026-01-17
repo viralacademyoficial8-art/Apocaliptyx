@@ -98,30 +98,42 @@ export default function AdminComunidadesPage() {
 
   const handleToggleVerified = async (community: Community) => {
     setActionLoading(community.id);
-    const { error } = await supabase
-      .from('communities')
-      .update({ is_verified: !community.is_verified, updated_at: new Date().toISOString() })
-      .eq('id', community.id);
+    try {
+      const response = await fetch('/api/admin/communities', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: community.id, is_verified: !community.is_verified }),
+      });
+      const data = await response.json();
 
-    if (error) {
-      toast.error('Error: ' + error.message);
-    } else {
-      loadCommunities();
+      if (data.error) {
+        toast.error('Error: ' + data.error);
+      } else {
+        loadCommunities();
+      }
+    } catch (error) {
+      toast.error('Error al actualizar comunidad');
     }
     setActionLoading(null);
   };
 
   const handleTogglePublic = async (community: Community) => {
     setActionLoading(community.id);
-    const { error } = await supabase
-      .from('communities')
-      .update({ is_public: !community.is_public, updated_at: new Date().toISOString() })
-      .eq('id', community.id);
+    try {
+      const response = await fetch('/api/admin/communities', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: community.id, is_public: !community.is_public }),
+      });
+      const data = await response.json();
 
-    if (error) {
-      toast.error('Error: ' + error.message);
-    } else {
-      loadCommunities();
+      if (data.error) {
+        toast.error('Error: ' + data.error);
+      } else {
+        loadCommunities();
+      }
+    } catch (error) {
+      toast.error('Error al actualizar comunidad');
     }
     setActionLoading(null);
   };
@@ -130,15 +142,20 @@ export default function AdminComunidadesPage() {
     if (!confirm('¿Eliminar esta comunidad? Esta acción no se puede deshacer.')) return;
 
     setActionLoading(community.id);
-    const { error } = await supabase
-      .from('communities')
-      .delete()
-      .eq('id', community.id);
+    try {
+      const response = await fetch(`/api/admin/communities?id=${community.id}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
 
-    if (error) {
-      toast.error('Error: ' + error.message);
-    } else {
-      loadCommunities();
+      if (data.error) {
+        toast.error('Error: ' + data.error);
+      } else {
+        toast.success('Comunidad eliminada');
+        loadCommunities();
+      }
+    } catch (error) {
+      toast.error('Error al eliminar comunidad');
     }
     setActionLoading(null);
   };
@@ -161,27 +178,34 @@ export default function AdminComunidadesPage() {
     if (!editingCommunity) return;
 
     const communityData = {
+      id: editingCommunity.id,
       name: formData.name,
       description: formData.description,
       theme_color: formData.theme_color,
       is_public: formData.is_public,
       is_verified: formData.is_verified,
       requires_approval: formData.requires_approval,
-      updated_at: new Date().toISOString(),
     };
 
     setActionLoading('saving');
 
-    const { error } = await supabase
-      .from('communities')
-      .update(communityData)
-      .eq('id', editingCommunity.id);
+    try {
+      const response = await fetch('/api/admin/communities', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(communityData),
+      });
+      const data = await response.json();
 
-    if (error) {
-      toast.error('Error: ' + error.message);
-    } else {
-      setShowModal(false);
-      loadCommunities();
+      if (data.error) {
+        toast.error('Error: ' + data.error);
+      } else {
+        toast.success('Comunidad actualizada');
+        setShowModal(false);
+        loadCommunities();
+      }
+    } catch (error) {
+      toast.error('Error al actualizar comunidad');
     }
 
     setActionLoading(null);
