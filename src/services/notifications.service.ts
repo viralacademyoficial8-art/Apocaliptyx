@@ -54,8 +54,11 @@ export type NotificationType =
   | 'message_reaction'
   // Coleccionables (1)
   | 'collectible_purchased'
-  // Comunidades extra (1)
+  // Comunidades extra (4)
   | 'community_new_member'
+  | 'community_join_request'
+  | 'community_request_approved'
+  | 'community_request_rejected'
   // Torneos (2)
   | 'tournament_joined'
   | 'tournament_registration'

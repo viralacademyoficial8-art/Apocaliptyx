@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 const supabase = () => getSupabaseAdmin();
 
-// POST /api/communities/[id]/join - Join a community
+// POST /api/communities/[id]/join - Join a community or request to join
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,6 +31,8 @@ export async function POST(
       return NextResponse.json({ error: 'Comunidad no encontrada' }, { status: 404 });
     }
 
+    const communityData = community as any;
+
     // Check if already a member
     const { data: existingMember } = await supabase()
       .from('community_members')
@@ -52,7 +54,90 @@ export async function POST(
       );
     }
 
-    // Join community
+    // If community is private, create a join request instead of joining directly
+    if (!communityData.is_public) {
+      // Check if already has a pending request
+      const { data: existingRequest } = await supabase()
+        .from('community_join_requests')
+        .select('id, status')
+        .eq('community_id', communityId)
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (existingRequest) {
+        const requestData = existingRequest as { id: string; status: string };
+        if (requestData.status === 'pending') {
+          return NextResponse.json(
+            { error: 'Ya tienes una solicitud pendiente' },
+            { status: 400 }
+          );
+        }
+        if (requestData.status === 'rejected') {
+          return NextResponse.json(
+            { error: 'Tu solicitud fue rechazada anteriormente' },
+            { status: 403 }
+          );
+        }
+      }
+
+      // Get request message from body if provided
+      let requestMessage = '';
+      try {
+        const body = await request.json();
+        requestMessage = body.message || '';
+      } catch {
+        // No body provided, that's fine
+      }
+
+      // Create join request
+      const { error: requestError } = await supabase()
+        .from('community_join_requests')
+        .insert({
+          community_id: communityId,
+          user_id: session.user.id,
+          message: requestMessage,
+          status: 'pending',
+        });
+
+      if (requestError) throw requestError;
+
+      // Get requester info for notification
+      const { data: requesterInfo } = await supabase()
+        .from('users')
+        .select('username, avatar_url')
+        .eq('id', session.user.id)
+        .single();
+
+      const requesterData = requesterInfo as { username?: string; avatar_url?: string } | null;
+
+      // Notify community admins/owner about the join request
+      const { data: admins } = await supabase()
+        .from('community_members')
+        .select('user_id')
+        .eq('community_id', communityId)
+        .in('role', ['owner', 'admin']);
+
+      if (admins && admins.length > 0) {
+        for (const admin of admins) {
+          await notificationsService.create({
+            userId: admin.user_id,
+            type: 'community_join_request',
+            title: 'Nueva solicitud de admisión',
+            message: `${requesterData?.username || 'Un usuario'} quiere unirse a ${communityData.name}`,
+            imageUrl: requesterData?.avatar_url,
+            linkUrl: `/comunidades/${communityData.slug}/solicitudes`
+          });
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        requestPending: true,
+        message: 'Solicitud de admisión enviada',
+      });
+    }
+
+    // Public community - join directly
     const { error: joinError } = await supabase()
       .from('community_members')
       .insert({
@@ -66,7 +151,7 @@ export async function POST(
     // Increment member count
     await supabase()
       .from('communities')
-      .update({ members_count: (community as any).members_count + 1 })
+      .update({ members_count: communityData.members_count + 1 })
       .eq('id', communityId);
 
     // Get new member info
@@ -92,7 +177,7 @@ export async function POST(
             admin.user_id,
             memberData?.username || 'Usuario',
             memberData?.avatar_url,
-            (community as any).name || 'Comunidad',
+            communityData.name || 'Comunidad',
             communityId
           );
         }

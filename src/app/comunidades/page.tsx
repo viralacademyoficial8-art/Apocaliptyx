@@ -24,6 +24,7 @@ interface Community {
   postsCount: number;
   categories: string[];
   isMember?: boolean;
+  requestStatus?: 'pending' | 'approved' | 'rejected' | null;
 }
 
 export default function ComunidadesPage() {
@@ -102,6 +103,45 @@ export default function ComunidadesPage() {
     } catch (error) {
       console.error('Error leaving community:', error);
       toast.error('Error al salir de la comunidad');
+    }
+  };
+
+  const handleRequestJoinCommunity = async (communityId: string) => {
+    if (!user) {
+      toast.error('Debes iniciar sesión');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/communities/${communityId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      if (data.requestPending) {
+        // Update local state to show pending request
+        setCommunities(communities.map(c =>
+          c.id === communityId
+            ? { ...c, requestStatus: 'pending' }
+            : c
+        ));
+        toast.success('Solicitud de admisión enviada');
+      } else {
+        // Direct join (shouldn't happen for private communities)
+        setCommunities(communities.map(c =>
+          c.id === communityId
+            ? { ...c, isMember: true, membersCount: c.membersCount + 1 }
+            : c
+        ));
+        toast.success('Te has unido a la comunidad');
+      }
+    } catch (error: any) {
+      console.error('Error requesting to join community:', error);
+      toast.error(error.message || 'Error al solicitar unirse');
     }
   };
 
@@ -221,6 +261,7 @@ export default function ComunidadesPage() {
                 isMember={community.isMember || false}
                 onJoin={handleJoinCommunity}
                 onLeave={handleLeaveCommunity}
+                onRequestJoin={handleRequestJoinCommunity}
               />
             ))}
           </div>
