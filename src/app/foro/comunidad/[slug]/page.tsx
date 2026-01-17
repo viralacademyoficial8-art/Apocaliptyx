@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
@@ -95,7 +96,9 @@ export default function CommunityPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params.slug as string;
-  const { user, isAuthenticated } = useAuthStore();
+  const { data: session, status } = useSession();
+  const { user } = useAuthStore();
+  const isAuthenticated = status === 'authenticated' && !!session?.user;
 
   const [community, setCommunity] = useState<Community | null>(null);
   const [posts, setPosts] = useState<CommunityPost[]>([]);

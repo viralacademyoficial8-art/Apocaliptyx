@@ -60,7 +60,11 @@ export async function GET(
     }
 
     // Check membership for private communities
-    if (!community.is_public && session?.user?.id) {
+    if (!community.is_public) {
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: 'Debes iniciar sesión para ver esta comunidad privada' }, { status: 401 });
+      }
+
       const { data: membership } = await supabase()
         .from('community_members')
         .select('id')
