@@ -205,6 +205,8 @@ export async function DELETE(
   try {
     const { id: communityId } = await params;
     const session = await auth();
+    const { searchParams } = new URL(request.url);
+    const confirmTransfer = searchParams.get('confirmTransfer') === 'true';
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -225,14 +227,123 @@ export async function DELETE(
       );
     }
 
-    if ((membership as any).role === 'owner') {
-      return NextResponse.json(
-        { error: 'El dueño no puede abandonar la comunidad' },
-        { status: 400 }
-      );
+    const isOwner = (membership as any).role === 'owner';
+
+    if (isOwner) {
+      // Get total member count
+      const { data: membersData } = await supabase()
+        .from('community_members')
+        .select('user_id, role, joined_at')
+        .eq('community_id', communityId)
+        .eq('is_banned', false)
+        .order('joined_at', { ascending: true });
+
+      const members = membersData as { user_id: string; role: string; joined_at: string }[] || [];
+
+      // If owner is the only member, they can't leave (must delete community)
+      if (members.length <= 1) {
+        return NextResponse.json(
+          { error: 'Eres el único miembro. Debes eliminar la comunidad desde la configuración.' },
+          { status: 400 }
+        );
+      }
+
+      // Find the next member (excluding the owner, prioritize admins, then by join date)
+      const otherMembers = members.filter(m => m.user_id !== session.user.id);
+      const admins = otherMembers.filter(m => m.role === 'admin');
+      const nextOwner = admins.length > 0 ? admins[0] : otherMembers[0];
+
+      if (!nextOwner) {
+        return NextResponse.json(
+          { error: 'No hay otros miembros para transferir la propiedad' },
+          { status: 400 }
+        );
+      }
+
+      // Get next owner info for response
+      const { data: nextOwnerInfo } = await supabase()
+        .from('users')
+        .select('username, display_name')
+        .eq('id', nextOwner.user_id)
+        .single();
+
+      const nextOwnerData = nextOwnerInfo as { username: string; display_name?: string } | null;
+      const nextOwnerName = nextOwnerData?.display_name || nextOwnerData?.username || 'otro miembro';
+
+      // If not confirmed, return info about who will become the new owner
+      if (!confirmTransfer) {
+        return NextResponse.json({
+          requiresConfirmation: true,
+          nextOwner: {
+            userId: nextOwner.user_id,
+            username: nextOwnerData?.username,
+            displayName: nextOwnerData?.display_name,
+          },
+          message: `Si abandonas, ${nextOwnerName} se convertirá en el nuevo propietario.`,
+        });
+      }
+
+      // Transfer ownership
+      await supabase()
+        .from('community_members')
+        .update({ role: 'owner' })
+        .eq('community_id', communityId)
+        .eq('user_id', nextOwner.user_id);
+
+      // Get community info for notification
+      const { data: communityInfo } = await supabase()
+        .from('communities')
+        .select('name, slug, creator_id')
+        .eq('id', communityId)
+        .single();
+
+      const community = communityInfo as { name: string; slug: string; creator_id: string } | null;
+
+      // Update community creator_id
+      await supabase()
+        .from('communities')
+        .update({ creator_id: nextOwner.user_id })
+        .eq('id', communityId);
+
+      // Notify the new owner
+      await notificationsService.create({
+        userId: nextOwner.user_id,
+        type: 'community_ownership_transferred',
+        title: '¡Ahora eres propietario!',
+        message: `Has sido nombrado propietario de la comunidad "${community?.name}"`,
+        linkUrl: `/foro/comunidad/${community?.slug}`,
+      });
+
+      // Remove the old owner from the community
+      await supabase()
+        .from('community_members')
+        .delete()
+        .eq('community_id', communityId)
+        .eq('user_id', session.user.id);
+
+      // Decrement member count
+      const { data: communityCount } = await supabase()
+        .from('communities')
+        .select('members_count')
+        .eq('id', communityId)
+        .single();
+
+      if (communityCount) {
+        await supabase()
+          .from('communities')
+          .update({ members_count: Math.max(0, (communityCount as any).members_count - 1) })
+          .eq('id', communityId);
+      }
+
+      return NextResponse.json({
+        success: true,
+        ownershipTransferred: true,
+        newOwner: nextOwnerName,
+        message: `Has abandonado la comunidad. ${nextOwnerName} es el nuevo propietario.`,
+      });
     }
 
-    // Leave community
+    // Non-owner: just leave
     const { error: leaveError } = await supabase()
       .from('community_members')
       .delete()
