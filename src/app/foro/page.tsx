@@ -1739,6 +1739,7 @@ function ForoContent() {
               </div>
               {isLoggedIn && (
                 <Button
+                  type="button"
                   className="bg-red-600 hover:bg-red-700"
                   onClick={() => router.push('/streaming')}
                 >
@@ -1836,6 +1837,7 @@ function ForoContent() {
                 </p>
                 {isLoggedIn && (
                   <Button
+                    type="button"
                     className="bg-red-600 hover:bg-red-700"
                     onClick={() => router.push('/streaming')}
                   >
