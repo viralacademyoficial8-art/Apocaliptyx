@@ -22,7 +22,7 @@ export interface Database {
           role: 'USER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
           ap_coins: number;
           level: number;
-          xp: number;
+          experience: number;
           is_verified: boolean;
           is_premium: boolean;
           is_banned: boolean;
@@ -42,7 +42,7 @@ export interface Database {
           role?: 'USER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
           ap_coins?: number;
           level?: number;
-          xp?: number;
+          experience?: number;
           is_verified?: boolean;
           is_premium?: boolean;
           is_banned?: boolean;
@@ -62,7 +62,7 @@ export interface Database {
           role?: 'USER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
           ap_coins?: number;
           level?: number;
-          xp?: number;
+          experience?: number;
           is_verified?: boolean;
           is_premium?: boolean;
           is_banned?: boolean;
@@ -200,7 +200,7 @@ export interface Database {
         Row: {
           id: string;
           user_id: string;
-          type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER';
+          type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER' | 'STEAL' | 'PROTECT';
           amount: number;
           balance_after: number;
           description: string | null;
@@ -211,7 +211,7 @@ export interface Database {
         Insert: {
           id?: string;
           user_id: string;
-          type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER';
+          type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER' | 'STEAL' | 'PROTECT';
           amount: number;
           balance_after: number;
           description?: string | null;
@@ -542,7 +542,7 @@ export interface Database {
       user_role: 'USER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
       scenario_status: 'DRAFT' | 'ACTIVE' | 'CLOSED' | 'RESOLVED' | 'CANCELLED';
       prediction_status: 'PENDING' | 'WON' | 'LOST' | 'CANCELLED' | 'REFUNDED';
-      transaction_type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER';
+      transaction_type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER' | 'STEAL' | 'PROTECT';
       item_type: 'PROTECTION' | 'BOOST' | 'POWER' | 'COSMETIC' | 'SPECIAL' | 'BUNDLE';
       rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
     };

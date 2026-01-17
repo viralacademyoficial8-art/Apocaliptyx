@@ -238,12 +238,13 @@ export async function GET(request: NextRequest) {
         const user = pred.users as any;
         const scenario = pred.scenarios as any;
         if (user && scenario) {
+          const isYesVote = pred.prediction === 'YES' || pred.prediction === true;
           feedItems.push({
             id: `prediction_${pred.id}`,
             type: 'scenario_vote',
-            title: pred.prediction === true ? 'Votó SÍ' : 'Votó NO',
+            title: isYesVote ? 'Votó SÍ' : 'Votó NO',
             description: `${user.display_name || user.username} apostó ${pred.amount?.toLocaleString() || 0} AP en "${scenario.title}"`,
-            icon: pred.prediction === true ? '👍' : '👎',
+            icon: isYesVote ? '👍' : '👎',
             timestamp: pred.created_at,
             user: {
               id: user.id,
@@ -257,7 +258,7 @@ export async function GET(request: NextRequest) {
               scenarioId: scenario.id,
               scenarioTitle: scenario.title,
               amount: pred.amount,
-              voteType: pred.prediction === true ? 'YES' : 'NO',
+              voteType: isYesVote ? 'YES' : 'NO',
             },
           });
         }
