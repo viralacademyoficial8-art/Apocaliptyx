@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       iconUrl: community.icon_url,
       bannerUrl: community.banner_url,
       themeColor: community.theme_color,
-      isPublic: community.is_public,
+      isPublic: community.is_public === true,
       isVerified: community.is_verified,
       membersCount: community.members_count,
       postsCount: community.posts_count,
