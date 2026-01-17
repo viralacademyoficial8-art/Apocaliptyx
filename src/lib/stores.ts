@@ -103,8 +103,16 @@ export const useAuthStore = create<AuthState>()(
 
             if (currentUser) {
               // Actualizar usuario existente con los datos frescos de la BD
+              // Incluye role, apCoins y otros datos importantes
               set({
-                user: { ...currentUser, apCoins: data.apCoins ?? currentUser.apCoins },
+                user: {
+                  ...currentUser,
+                  apCoins: data.apCoins ?? currentUser.apCoins,
+                  role: data.role ?? currentUser.role,
+                  displayName: data.displayName ?? currentUser.displayName,
+                  avatarUrl: data.avatarUrl ?? currentUser.avatarUrl,
+                  username: data.username ?? currentUser.username,
+                },
                 isAuthenticated: true
               });
             } else if (data.id) {
