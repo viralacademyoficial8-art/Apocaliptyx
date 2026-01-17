@@ -354,9 +354,10 @@ export function ActivityFeed() {
     }
   }, [offset, items]);
 
-  // Initial fetch
+  // Initial fetch - intentionally empty deps to run only on mount
   useEffect(() => {
     fetchFeed(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Setup Supabase Realtime subscriptions
