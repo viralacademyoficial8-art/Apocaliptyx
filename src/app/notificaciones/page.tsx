@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/lib/stores";
 import { notificationsService, type Notification, type NotificationType } from "@/services/notifications.service";
 import { Navbar } from "@/components/Navbar";
@@ -174,7 +175,9 @@ type FilterType = "all" | "unread" | "read";
 
 export default function NotificacionesPage() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const { status } = useSession();
+  const { user } = useAuthStore();
+  const isAuthenticated = status === "authenticated";
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [markingAll, setMarkingAll] = useState(false);
