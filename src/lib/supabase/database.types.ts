@@ -19,7 +19,7 @@ export interface Database {
           display_name: string | null;
           avatar_url: string | null;
           bio: string | null;
-          role: 'USER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
+          role: 'USER' | 'STAFF' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
           ap_coins: number;
           level: number;
           experience: number;
@@ -539,7 +539,7 @@ export interface Database {
       [_ in never]: never;
     };
     Enums: {
-      user_role: 'USER' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
+      user_role: 'USER' | 'STAFF' | 'MODERATOR' | 'ADMIN' | 'SUPER_ADMIN';
       scenario_status: 'DRAFT' | 'ACTIVE' | 'CLOSED' | 'RESOLVED' | 'CANCELLED';
       prediction_status: 'PENDING' | 'WON' | 'LOST' | 'CANCELLED' | 'REFUNDED';
       transaction_type: 'DEPOSIT' | 'WITHDRAWAL' | 'BET' | 'WIN' | 'REFUND' | 'BONUS' | 'PURCHASE' | 'TRANSFER' | 'STEAL' | 'PROTECT';

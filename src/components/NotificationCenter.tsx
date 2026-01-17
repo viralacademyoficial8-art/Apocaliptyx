@@ -4,8 +4,16 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 import { useAuthStore } from '@/lib/stores';
 import { notificationsService, type Notification, type NotificationType } from '@/services/notifications.service';
+import toast from 'react-hot-toast';
+
+// Supabase client for realtime notifications
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 import {
   Bell,
   BellRing,
@@ -206,13 +214,51 @@ export function NotificationCenter() {
     }
   }, [isOpen, user?.id, loadNotifications]);
 
-  // Cargar contador de no leídas al montar
+  // Cargar contador de no leídas al montar y suscribirse a realtime
   useEffect(() => {
     if (isAuthenticated && user?.id) {
       loadUnreadCount();
-      // Actualizar cada 30 segundos
+
+      // Setup real-time subscription for new notifications
+      const channel = supabase
+        .channel(`notifications-${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          (payload) => {
+            console.log('New notification received:', payload);
+            const newNotification = payload.new as Notification;
+
+            // Add to notifications list if panel is open
+            setNotifications(prev => [newNotification, ...prev].slice(0, 20));
+
+            // Increment unread count
+            setUnreadCount(prev => prev + 1);
+
+            // Show toast notification
+            toast(newNotification.title, {
+              icon: '🔔',
+              style: { background: '#1f2937', color: '#fff' },
+              duration: 4000,
+            });
+          }
+        )
+        .subscribe((status) => {
+          console.log('Notification subscription status:', status);
+        });
+
+      // Fallback: Actualizar cada 30 segundos
       const interval = setInterval(loadUnreadCount, 30000);
-      return () => clearInterval(interval);
+
+      return () => {
+        clearInterval(interval);
+        supabase.removeChannel(channel);
+      };
     }
   }, [isAuthenticated, user?.id, loadUnreadCount]);
 
