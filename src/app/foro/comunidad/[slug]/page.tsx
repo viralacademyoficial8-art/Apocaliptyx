@@ -149,9 +149,14 @@ export default function CommunityPage() {
     }
   }, [slug, router]);
 
-  // Load posts
+  // Load posts - only if member or public community
   const loadPosts = useCallback(async () => {
     if (!community) return;
+    // Don't load posts for private communities if not a member
+    if (!community.isPublic && !isMember) {
+      setPosts([]);
+      return;
+    }
     setPostsLoading(true);
     try {
       const response = await fetch(`/api/communities/${community.id}/posts?sort=pinned`);
@@ -160,11 +165,14 @@ export default function CommunityPage() {
       setPosts(data.posts || []);
     } catch (error) {
       console.error('Error loading posts:', error);
-      toast.error('Error al cargar publicaciones');
+      // Don't show error toast for private communities
+      if (community.isPublic || isMember) {
+        toast.error('Error al cargar publicaciones');
+      }
     } finally {
       setPostsLoading(false);
     }
-  }, [community]);
+  }, [community, isMember]);
 
   // Load members
   const loadMembers = useCallback(async () => {
@@ -200,6 +208,8 @@ export default function CommunityPage() {
     try {
       const response = await fetch(`/api/communities/${community?.id}/join`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
       });
       const data = await response.json();
 
@@ -208,12 +218,19 @@ export default function CommunityPage() {
         return;
       }
 
-      setIsMember(true);
-      setUserRole('member');
-      if (community) {
-        setCommunity({ ...community, membersCount: community.membersCount + 1 });
+      // Check if it's a join request (private community) or direct join
+      if (data.requestPending) {
+        toast.success('Solicitud de admisión enviada. Espera a que un administrador la apruebe.');
+      } else {
+        setIsMember(true);
+        setUserRole('member');
+        if (community) {
+          setCommunity({ ...community, membersCount: community.membersCount + 1 });
+        }
+        toast.success('Te has unido a la comunidad');
+        // Reload posts now that we're a member
+        loadPosts();
       }
-      toast.success('Te has unido a la comunidad');
     } catch (error) {
       console.error('Error joining community:', error);
       toast.error('Error al unirse a la comunidad');
@@ -691,6 +708,21 @@ export default function CommunityPage() {
                         onPin={handlePinPost}
                       />
                     ))}
+                  </div>
+                ) : !community.isPublic && !isMember ? (
+                  <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+                    <Lock className="w-12 h-12 mx-auto mb-4 text-amber-500" />
+                    <h3 className="text-lg font-semibold mb-2">Comunidad privada</h3>
+                    <p className="text-gray-400 mb-4">
+                      Debes ser miembro para ver las publicaciones de esta comunidad.
+                    </p>
+                    <Button
+                      onClick={handleJoinCommunity}
+                      className="bg-amber-600 hover:bg-amber-700"
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Solicitar unirse
+                    </Button>
                   </div>
                 ) : (
                   <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
