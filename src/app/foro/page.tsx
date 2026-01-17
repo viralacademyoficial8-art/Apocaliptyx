@@ -443,6 +443,7 @@ function ForoContent() {
     setReelsLoading(true);
     try {
       const response = await fetch(`/api/reels?filter=${reelsFilter}`);
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setReels(data.reels || []);
@@ -466,6 +467,7 @@ function ForoContent() {
     try {
       const method = reel.isLiked ? 'DELETE' : 'POST';
       const response = await fetch(`/api/reels/${reelId}/like`, { method });
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
@@ -517,6 +519,7 @@ function ForoContent() {
         method: 'POST',
         body: formData,
       });
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const result = await response.json();
       if (result.error) throw new Error(result.error);
 
@@ -533,6 +536,7 @@ function ForoContent() {
     setStreamsLoading(true);
     try {
       const response = await fetch('/api/streaming?filter=live');
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
 
       if (data.error) throw new Error(data.error);
@@ -566,6 +570,7 @@ function ForoContent() {
       if (communitiesFilter === 'joined') params.set('filter', 'joined');
 
       const response = await fetch(`/api/communities?${params.toString()}`);
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
@@ -589,6 +594,7 @@ function ForoContent() {
       const response = await fetch(`/api/communities/${communityId}/join`, {
         method: 'POST',
       });
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
@@ -609,6 +615,7 @@ function ForoContent() {
       const response = await fetch(`/api/communities/${communityId}/join`, {
         method: 'DELETE',
       });
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
