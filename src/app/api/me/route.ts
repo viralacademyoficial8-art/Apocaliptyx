@@ -118,13 +118,16 @@ export async function GET() {
       return NextResponse.json({ error: 'Error de base de datos' }, { status: 500 });
     }
 
+    // Normalizar el rol a mayúsculas para consistencia
+    const normalizedRole = (user.role || 'USER').toUpperCase();
+
     return NextResponse.json({
       id: user.id,
       email: user.email,
       username: user.username,
       displayName: user.display_name,
       avatarUrl: user.avatar_url,
-      role: user.role,
+      role: normalizedRole,
       apCoins: user.ap_coins,
       level: user.level,
       experience: user.experience,
