@@ -32,6 +32,7 @@ import {
   Send,
   MessageCircle,
   Film,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -95,6 +96,7 @@ const allMenuItems: MenuSection[] = [
     items: [
       { href: '/admin/anuncios', label: 'Anuncios', icon: Bell, permission: 'admin.notifications.send' },
       { href: '/admin/notificaciones', label: 'Notificaciones', icon: Send, permission: 'admin.notifications.send' },
+      { href: '/admin/newsletter', label: 'Newsletter', icon: Mail, permission: 'admin.notifications.send' },
     ],
   },
   {
