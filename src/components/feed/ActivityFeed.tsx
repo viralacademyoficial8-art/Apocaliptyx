@@ -159,6 +159,7 @@ function CompactFeedItem({ item, onClick }: { item: FeedItem; onClick: () => voi
 
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`w-full flex items-center gap-2 p-2 rounded-lg ${styles.bg} ${styles.border} border hover:bg-gray-800/50 transition-all text-left`}
     >
@@ -253,7 +254,7 @@ function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
     >
       <div className="flex items-center gap-2">
         {/* User Avatar */}
-        <button onClick={handleUserClick} className="flex-shrink-0">
+        <button type="button" onClick={handleUserClick} className="flex-shrink-0">
           <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500">
             {item.user.avatarUrl ? (
               <img src={item.user.avatarUrl} alt={item.user.username} className="w-full h-full object-cover" />
@@ -268,7 +269,7 @@ function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <button onClick={handleUserClick} className="font-medium text-white text-sm hover:text-purple-400 transition-colors">
+            <button type="button" onClick={handleUserClick} className="font-medium text-white text-sm hover:text-purple-400 transition-colors">
               {item.user.displayName || item.user.username}
             </button>
             <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${styles.iconBg}`}>
@@ -444,7 +445,7 @@ export function ActivityFeed() {
     return (
       <div className="text-center py-6">
         <p className="text-red-400 text-sm mb-2">{error}</p>
-        <button onClick={() => fetchFeed(true)} className="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 rounded-lg text-white text-sm transition-colors">
+        <button type="button" onClick={() => fetchFeed(true)} className="px-3 py-1.5 bg-purple-500 hover:bg-purple-600 rounded-lg text-white text-sm transition-colors">
           Reintentar
         </button>
       </div>
@@ -467,7 +468,7 @@ export function ActivityFeed() {
             <WifiOff className="w-3 h-3 text-gray-500" />
           )}
         </div>
-        <button onClick={handleRefresh} disabled={refreshing} className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
+        <button type="button" onClick={handleRefresh} disabled={refreshing} className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
           <RefreshCw className={`w-4 h-4 text-gray-400 ${refreshing ? 'animate-spin' : ''}`} />
         </button>
       </div>
@@ -476,6 +477,7 @@ export function ActivityFeed() {
       <div className="p-2 border-b border-gray-800 flex flex-wrap gap-1">
         {FILTER_OPTIONS.map(filter => (
           <button
+            type="button"
             key={filter.id}
             onClick={() => setActiveFilter(filter.id)}
             className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] border transition-all ${
@@ -491,6 +493,7 @@ export function ActivityFeed() {
       {/* New items notification */}
       {newItemsCount > 0 && (
         <button
+          type="button"
           onClick={handleLoadNewItems}
           className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-medium transition-colors flex items-center justify-center gap-2 border-b border-gray-800"
         >
@@ -527,6 +530,7 @@ export function ActivityFeed() {
       <div className="border-t border-gray-800">
         {filteredItems.length > 5 && (
           <button
+            type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             className="w-full py-2 text-center text-purple-400 hover:text-purple-300 text-xs font-medium transition-colors flex items-center justify-center gap-1"
           >
@@ -545,6 +549,7 @@ export function ActivityFeed() {
         )}
         {isExpanded && hasMore && (
           <button
+            type="button"
             onClick={handleLoadMore}
             className="w-full py-2 text-center text-gray-400 hover:text-gray-300 text-xs transition-colors border-t border-gray-800"
           >
