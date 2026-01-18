@@ -139,6 +139,7 @@ export default function StreamingPage() {
       if (selectedCategory) params.set('category', selectedCategory);
 
       const response = await fetch(`/api/streaming?${params.toString()}`);
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
 
       if (data.error) throw new Error(data.error);
@@ -307,6 +308,7 @@ export default function StreamingPage() {
                   <div className="grid grid-cols-3 gap-2">
                     {STREAM_CATEGORIES.map((cat) => (
                       <button
+                        type="button"
                         key={cat.id}
                         onClick={() => setStreamCategory(streamCategory === cat.id ? '' : cat.id)}
                         className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
@@ -345,6 +347,7 @@ export default function StreamingPage() {
               {/* Footer */}
               <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-800 flex items-center justify-between">
                 <button
+                  type="button"
                   onClick={() => setShowStartModal(false)}
                   className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
                   disabled={isStartingStream}
@@ -352,6 +355,7 @@ export default function StreamingPage() {
                   Cancelar
                 </button>
                 <button
+                  type="button"
                   onClick={handleStartStream}
                   disabled={isStartingStream || !streamTitle.trim()}
                   className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 rounded-xl font-semibold flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -477,6 +481,7 @@ export default function StreamingPage() {
                   <Folder className="w-3 h-3" />
                   {selectedCategory}
                   <button
+                    type="button"
                     onClick={() => setSelectedCategory(null)}
                     className="ml-1 hover:text-white"
                   >
@@ -502,7 +507,7 @@ export default function StreamingPage() {
         ) : (
           <div className="text-center py-16 text-gray-400">
             <Radio className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            {filter === 'following' && !user ? (
+            {filter === 'following' && !isLoggedIn ? (
               <>
                 <p className="text-lg mb-2">Inicia sesión para ver streams</p>
                 <p className="text-sm">Debes iniciar sesión para ver streams de usuarios que sigues</p>
@@ -662,6 +667,7 @@ export default function StreamingPage() {
                     );
                     return (
                       <button
+                        type="button"
                         key={cat.name}
                         onClick={() => setSelectedCategory(selectedCategory === cat.name ? null : cat.name)}
                         className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors ${
