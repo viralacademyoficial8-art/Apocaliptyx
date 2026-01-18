@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
       categories: community.categories || [],
       isMember: userCommunities.includes(community.id),
       requestStatus: userRequests[community.id] || null,
+      hasPendingRequest: userRequests[community.id] === 'pending',
     }));
 
     return NextResponse.json({ communities: result, userCommunities });
