@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuthStore } from '@/lib/stores';
+import { useSession } from 'next-auth/react';
 
 interface ChatMessage {
   id: string;
@@ -30,6 +31,11 @@ const CHAT_TOPIC = 'chat';
 
 export function LiveKitChat({ streamId }: LiveKitChatProps) {
   const { user } = useAuthStore();
+  const { data: session, status } = useSession();
+
+  // Check if user is logged in (NextAuth or Zustand)
+  const isLoggedIn = (status === 'authenticated' && !!session?.user) || !!user;
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [showHighlight, setShowHighlight] = useState(false);
@@ -173,7 +179,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
       </div>
 
       {/* Input */}
-      {user ? (
+      {isLoggedIn ? (
         <div className="p-3 border-t border-gray-800">
           {showHighlight && (
             <div className="flex items-center justify-between bg-yellow-500/20 p-2 rounded-lg mb-2">
