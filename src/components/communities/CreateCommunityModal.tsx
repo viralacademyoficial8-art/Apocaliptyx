@@ -97,7 +97,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !isLoading && setIsOpen(open)}>
       <DialogTrigger asChild>
-        <Button className="bg-purple-600 hover:bg-purple-700">
+        <Button type="button" className="bg-purple-600 hover:bg-purple-700">
           <Plus className="w-4 h-4 mr-2" />
           Crear comunidad
         </Button>
@@ -163,6 +163,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
             <div className="flex flex-wrap gap-2">
               {predefinedCategories.map((cat) => (
                 <button
+                  type="button"
                   key={cat}
                   onClick={() => toggleCategory(cat)}
                   disabled={isLoading}
@@ -186,6 +187,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
             <div className="flex gap-2">
               {themeColors.map((color) => (
                 <button
+                  type="button"
                   key={color}
                   onClick={() => setThemeColor(color)}
                   disabled={isLoading}
@@ -246,6 +248,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
 
           {/* Submit */}
           <Button
+            type="button"
             onClick={handleSubmit}
             disabled={!name.trim() || isLoading}
             className="w-full bg-purple-600 hover:bg-purple-700"

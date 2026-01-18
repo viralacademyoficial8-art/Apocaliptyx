@@ -585,7 +585,7 @@ function ForoContent() {
 
   // Communities handlers
   const handleJoinCommunity = async (communityId: string) => {
-    if (!user) {
+    if (!isLoggedIn) {
       toast.error(t('forum.errors.loginRequired'));
       return;
     }
@@ -1888,6 +1888,7 @@ function ForoContent() {
               </div>
               <div className="flex gap-2">
                 <Button
+                  type="button"
                   variant={communitiesFilter === 'all' ? 'default' : 'outline'}
                   onClick={() => setCommunitiesFilter('all')}
                   className={communitiesFilter === 'all' ? 'bg-blue-600' : 'border-gray-700'}
@@ -1896,6 +1897,7 @@ function ForoContent() {
                   {t('forum.communities.all')}
                 </Button>
                 <Button
+                  type="button"
                   variant={communitiesFilter === 'joined' ? 'default' : 'outline'}
                   onClick={() => setCommunitiesFilter('joined')}
                   className={communitiesFilter === 'joined' ? 'bg-blue-600' : 'border-gray-700'}
@@ -1904,6 +1906,7 @@ function ForoContent() {
                   {t('forum.communities.myCommunities')}
                 </Button>
                 <Button
+                  type="button"
                   variant={communitiesFilter === 'popular' ? 'default' : 'outline'}
                   onClick={() => setCommunitiesFilter('popular')}
                   className={communitiesFilter === 'popular' ? 'bg-blue-600' : 'border-gray-700'}
@@ -1971,6 +1974,7 @@ function ForoContent() {
                       <div className="flex gap-2">
                         <Link href={`/foro/comunidad/${community.slug}`} className="flex-1">
                           <Button
+                            type="button"
                             size="sm"
                             className="w-full bg-blue-600 hover:bg-blue-700"
                           >
@@ -1979,6 +1983,7 @@ function ForoContent() {
                         </Link>
                         {community.isMember ? (
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             className="border-gray-600 text-gray-400 hover:text-red-400 hover:border-red-500/50"
@@ -1991,6 +1996,7 @@ function ForoContent() {
                           </Button>
                         ) : (
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
@@ -2018,6 +2024,7 @@ function ForoContent() {
                 </p>
                 {communitySearch && (
                   <Button
+                    type="button"
                     variant="link"
                     onClick={() => setCommunitySearch('')}
                     className="text-blue-400"
