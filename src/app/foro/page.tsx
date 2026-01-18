@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { TextWithLinkPreviews } from '@/components/LinkPreview';
 import {
   MessageSquarePlus,
+  MessageSquare,
   TrendingUp,
   Clock,
   Users,
@@ -59,6 +60,7 @@ import {
   Radio,
   Globe,
   Search,
+  MoreVertical,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow, type Locale } from 'date-fns';
@@ -337,6 +339,8 @@ function ForoContent() {
     postsCount: number;
     categories: string[];
     isMember?: boolean;
+    hasPendingRequest?: boolean;
+    requiresApproval?: boolean;
   }
   const [communities, setCommunities] = useState<Community[]>([]);
   const [communitiesFilter, setCommunitiesFilter] = useState<'all' | 'joined' | 'popular'>('all');
@@ -1930,8 +1934,24 @@ function ForoContent() {
                 {filteredCommunities.map((community, i) => (
                   <div
                     key={community.id}
-                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors"
+                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors relative"
                   >
+                    {/* Private Badge & Menu */}
+                    <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
+                      {!community.isPublic && (
+                        <span className="bg-gray-900/80 backdrop-blur-sm text-gray-300 text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                          <Lock className="w-3 h-3" />
+                          Privada
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        className="w-7 h-7 rounded-full bg-gray-900/80 backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+
                     <Link href={`/foro/comunidad/${community.slug}`}>
                       <div
                         className="h-20 cursor-pointer"
@@ -1946,42 +1966,81 @@ function ForoContent() {
                       <Link href={`/foro/comunidad/${community.slug}`}>
                         <div className="flex items-center gap-3 mb-2 cursor-pointer hover:opacity-80 transition-opacity">
                           <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
+                            className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg lowercase"
                             style={{
                               background: community.iconUrl
                                 ? `url(${community.iconUrl}) center/cover`
                                 : `linear-gradient(135deg, ${community.themeColor || '#6366f1'}, ${community.themeColor || '#6366f1'}cc)`
                             }}
                           >
-                            {!community.iconUrl && community.name[0].toUpperCase()}
+                            {!community.iconUrl && community.name[0].toLowerCase()}
                           </div>
-                          <div>
-                            <h3 className="font-semibold flex items-center gap-1">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold flex items-center gap-1 truncate">
                               {community.name}
                               {community.isVerified && (
-                                <Check className="w-4 h-4 text-blue-400" />
+                                <Check className="w-4 h-4 text-blue-400 flex-shrink-0" />
                               )}
                             </h3>
-                            <p className="text-xs text-gray-500">
-                              {community.membersCount.toLocaleString()} {t('forum.communities.members')}
-                            </p>
                           </div>
                         </div>
                       </Link>
+
                       <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                         {community.description || t('forum.communities.defaultDescription')}
                       </p>
-                      <div className="flex gap-2">
-                        <Link href={`/foro/comunidad/${community.slug}`} className="flex-1">
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="w-full bg-blue-600 hover:bg-blue-700"
-                          >
-                            {t('forum.communities.viewCommunity')}
-                          </Button>
-                        </Link>
-                        {community.isMember ? (
+
+                      {/* Category Tags */}
+                      {community.categories && community.categories.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {community.categories.slice(0, 3).map((cat, idx) => (
+                            <span
+                              key={idx}
+                              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700"
+                            >
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Stats */}
+                      <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                        <span className="flex items-center gap-1">
+                          <Users className="w-3 h-3" />
+                          {community.membersCount} miembros
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="w-3 h-3" />
+                          {community.postsCount || 0} posts
+                        </span>
+                      </div>
+
+                      {/* Action Buttons */}
+                      {community.hasPendingRequest ? (
+                        // Pending request state
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled
+                          className="w-full border-orange-500/50 text-orange-400 bg-orange-500/10"
+                        >
+                          <Clock className="w-4 h-4 mr-2" />
+                          Solicitud pendiente
+                        </Button>
+                      ) : community.isMember ? (
+                        // Member state - View + Leave
+                        <div className="flex gap-2">
+                          <Link href={`/foro/comunidad/${community.slug}`} className="flex-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              className="w-full bg-blue-600 hover:bg-blue-700"
+                            >
+                              {t('forum.communities.viewCommunity')} →
+                            </Button>
+                          </Link>
                           <Button
                             type="button"
                             size="sm"
@@ -1994,21 +2053,35 @@ function ForoContent() {
                           >
                             {t('forum.communities.leave')}
                           </Button>
-                        ) : (
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleJoinCommunity(community.id);
-                            }}
-                          >
-                            {t('forum.communities.join')}
-                          </Button>
-                        )}
-                      </div>
+                        </div>
+                      ) : !community.isPublic ? (
+                        // Private community - Request to join
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleJoinCommunity(community.id);
+                          }}
+                        >
+                          <Lock className="w-4 h-4 mr-2" />
+                          Solicitar unirse
+                        </Button>
+                      ) : (
+                        // Public community - Join directly
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleJoinCommunity(community.id);
+                          }}
+                        >
+                          {t('forum.communities.join')}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
