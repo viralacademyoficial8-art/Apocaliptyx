@@ -98,7 +98,7 @@ export default function EscenariosRobadosPage() {
         .select(`
           id,
           stolen_at,
-          steal_price,
+          price_paid,
           scenario:scenarios (
             id,
             title,
@@ -123,14 +123,14 @@ export default function EscenariosRobadosPage() {
         const s = steal as {
           id: string;
           stolen_at: string;
-          steal_price: number;
+          price_paid: number;
           scenario: Array<StolenScenario['scenario']> | StolenScenario['scenario'];
           victim: Array<StolenScenario['victim']> | StolenScenario['victim'];
         };
         return {
           id: s.id,
           stolen_at: s.stolen_at,
-          steal_price: s.steal_price,
+          steal_price: s.price_paid,
           scenario: Array.isArray(s.scenario) ? s.scenario[0] : s.scenario,
           victim: Array.isArray(s.victim) ? s.victim[0] : s.victim,
         } as StolenScenario;
