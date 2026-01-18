@@ -786,7 +786,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       <div className="flex flex-wrap gap-2 mb-4 text-xs">
         {scenario.creator_username && (
           <span
-            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20"
+            className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 hover:border-blue-500/40 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               router.push(`/perfil/${scenario.creator_username}`);
@@ -798,7 +798,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
         )}
         {wasStolen && scenario.holder_username && (
           <span
-            className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-400 rounded-full border border-red-500/20"
+            className="inline-flex items-center gap-1 px-2 py-1 bg-red-500/10 text-red-400 rounded-full border border-red-500/20 cursor-pointer hover:bg-red-500/20 hover:border-red-500/40 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               router.push(`/perfil/${scenario.holder_username}`);
