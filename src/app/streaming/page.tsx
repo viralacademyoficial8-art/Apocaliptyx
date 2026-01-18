@@ -386,8 +386,9 @@ export default function StreamingPage() {
               {t('streaming.subtitle')}
             </p>
           </div>
-          {user && (
+          {isLoggedIn && (
             <Button
+              type="button"
               className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 border-0"
               onClick={openStartModal}
               disabled={isStartingStream}
@@ -520,9 +521,22 @@ export default function StreamingPage() {
               </>
             ) : (
               <>
-                <p className="text-lg">
+                <p className="text-lg mb-2">
                   {t('streaming.noLiveStreams')}
                 </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Sé el primero en iniciar una transmisión
+                </p>
+                {isLoggedIn && (
+                  <Button
+                    type="button"
+                    className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500"
+                    onClick={openStartModal}
+                  >
+                    <Radio className="w-4 h-4 mr-2" />
+                    Iniciar mi primer stream
+                  </Button>
+                )}
               </>
             )}
           </div>
