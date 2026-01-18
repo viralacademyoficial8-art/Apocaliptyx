@@ -49,7 +49,8 @@ export async function GET(request: NextRequest) {
       .order('members_count', { ascending: false });
 
     if (search) {
-      query = query.ilike('name', `%${search}%`);
+      // Search in both name and description
+      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
     }
 
     const { data: allCommunitiesRaw, error } = await query;
