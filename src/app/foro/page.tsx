@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { TextWithLinkPreviews } from '@/components/LinkPreview';
 import {
   MessageSquarePlus,
+  MessageSquare,
   TrendingUp,
   Clock,
   Users,
