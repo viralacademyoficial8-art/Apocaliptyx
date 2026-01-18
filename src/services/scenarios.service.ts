@@ -59,13 +59,18 @@ class ScenariosService {
    */
   async create(input: CreateScenarioInput): Promise<ScenarioFromDB | null> {
     try {
+      // Normalize category to UPPERCASE to match database enum
+      const normalizedCategory = typeof input.category === 'string'
+        ? input.category.toUpperCase()
+        : input.category;
+
       const { data, error } = await supabase
         .from("scenarios")
         .insert({
           creator_id: input.creatorId,
           title: input.title,
           description: input.description,
-          category: input.category,
+          category: normalizedCategory,
           image_url: input.imageUrl || null,
           content_hash: input.contentHash || null,
           status: "ACTIVE",

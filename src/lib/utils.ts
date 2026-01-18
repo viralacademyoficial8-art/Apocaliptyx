@@ -66,9 +66,13 @@ export function getCategoryColor(category: string): string {
     guerra: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     economia: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     salud: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    ciencia: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    entretenimiento: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
     otros: 'bg-gray-500/20 text-gray-400 border-gray-500/30'
   };
-  return colors[category] || colors.otros;
+  // Normalize to lowercase to handle any case input
+  const normalizedCategory = category?.toLowerCase() || 'otros';
+  return colors[normalizedCategory] || colors.otros;
 }
 
 // ─────────────────────────────────────────────

@@ -85,18 +85,20 @@ export default function ExplorarPage() {
   }, [status, session, user, refreshBalance]);
 
   // Translated categories and sort options
+  // 'value' is the DB value (UPPERCASE), 'label' is the display name
   const CATEGORIES = [
     { key: 'all', label: t('common.all'), value: 'Todos' },
     { key: 'featured', label: '⭐ Destacados', value: 'Destacados' },
-    { key: 'crypto', label: 'Crypto', value: 'Crypto' },
-    { key: 'sports', label: t('home.categories.sports'), value: 'Deportes' },
-    { key: 'technology', label: t('home.categories.technology'), value: 'Tecnología' },
-    { key: 'politics', label: t('home.categories.politics'), value: 'Política' },
-    { key: 'entertainment', label: t('home.categories.entertainment'), value: 'Entretenimiento' },
-    { key: 'economy', label: t('home.categories.economy'), value: 'Economía' },
-    { key: 'science', label: t('home.categories.science'), value: 'Ciencia' },
-    { key: 'gaming', label: 'Gaming', value: 'Gaming' },
-    { key: 'other', label: t('explore.other'), value: 'Otros' },
+    { key: 'sports', label: t('home.categories.sports'), value: 'DEPORTES' },
+    { key: 'technology', label: t('home.categories.technology'), value: 'TECNOLOGIA' },
+    { key: 'politics', label: t('home.categories.politics'), value: 'POLITICA' },
+    { key: 'entertainment', label: t('home.categories.entertainment'), value: 'ENTRETENIMIENTO' },
+    { key: 'economy', label: t('home.categories.economy'), value: 'ECONOMIA' },
+    { key: 'war', label: '⚔️ Guerra', value: 'GUERRA' },
+    { key: 'health', label: '🏥 Salud', value: 'SALUD' },
+    { key: 'science', label: t('home.categories.science'), value: 'CIENCIA' },
+    { key: 'farandula', label: '🎭 Farándula', value: 'FARANDULA' },
+    { key: 'other', label: t('explore.other'), value: 'OTROS' },
   ];
 
   const SORT_OPTIONS = [
@@ -229,7 +231,8 @@ export default function ExplorarPage() {
         // Filtrar por escenarios destacados o hot
         result = result.filter(s => s.is_featured || s.is_hot);
       } else {
-        result = result.filter(s => s.category === selectedCategory);
+        // Case-insensitive comparison to handle both old lowercase and new UPPERCASE categories
+        result = result.filter(s => s.category?.toUpperCase() === selectedCategory.toUpperCase());
       }
     }
 
