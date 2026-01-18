@@ -181,7 +181,7 @@ export async function PATCH(
         type: 'community_request_rejected',
         title: 'Solicitud rechazada',
         message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue rechazada`,
-        linkUrl: `/comunidades`
+        linkUrl: `/foro?tab=comunidades`
       });
 
       return NextResponse.json({

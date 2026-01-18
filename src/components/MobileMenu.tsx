@@ -104,7 +104,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     ? [
         { href: "/streaming", label: t("nav.streaming"), icon: Radio, color: "from-red-500 to-rose-500", badge: "LIVE" },
         { href: "/reels", label: t("nav.reels"), icon: Film, color: "from-pink-500 to-fuchsia-500" },
-        { href: "/comunidades", label: t("nav.communities"), icon: Users, color: "from-blue-500 to-indigo-500" },
+        { href: "/foro?tab=comunidades", label: t("nav.communities"), icon: Users, color: "from-blue-500 to-indigo-500" },
       ]
     : [];
 
