@@ -276,7 +276,7 @@ export function Navbar() {
                         </div>
 
                         <DropdownMenuItem
-                          onClick={() => router.push("/comunidades")}
+                          onClick={() => router.push("/foro?tab=comunidades")}
                           className="cursor-pointer hover:bg-muted"
                         >
                           <Users className="mr-2 h-4 w-4 text-blue-400" />
