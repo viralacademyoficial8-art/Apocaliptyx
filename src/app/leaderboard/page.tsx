@@ -222,39 +222,104 @@ export default function LeaderboardPage() {
 
         {/* Stats Overview */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3">
-            <Users className="w-6 h-6 text-blue-400" />
-            <div>
+          {/* Total Prophets Card */}
+          <div
+            onClick={() => router.push('/comunidad')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 hover:border-blue-500/30 transition-all group"
+          >
+            <div className="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
+              <Users className="w-6 h-6 text-blue-400" />
+            </div>
+            <div className="flex-1">
               <div className="text-xs sm:text-sm text-gray-400">
                 {t('leaderboard.totalProphets')}
               </div>
               <div className="text-2xl font-bold">{users.length}</div>
             </div>
-          </div>
-
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3">
-            <Trophy className="w-6 h-6 text-yellow-400" />
-            <div>
-              <div className="text-xs sm:text-sm text-gray-400">
-                {t('leaderboard.currentLeader')}
-              </div>
-              <div className="text-base sm:text-lg font-bold truncate">
-                {sortedUsers.length > 0
-                  ? sortedUsers[0].display_name || sortedUsers[0].username
-                  : '-'}
-              </div>
+            <div className="text-gray-600 group-hover:text-blue-400 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3">
-            <TrendingUp className="w-6 h-6 text-green-400" />
-            <div>
+          {/* Current Leader Card */}
+          <div
+            onClick={() => sortedUsers.length > 0 && router.push(`/perfil/${sortedUsers[0].username}`)}
+            className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/30 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:from-yellow-500/20 hover:to-amber-500/20 hover:border-yellow-500/50 transition-all group"
+          >
+            <div className="p-2 bg-yellow-500/20 rounded-lg group-hover:bg-yellow-500/30 transition-colors">
+              <Trophy className="w-6 h-6 text-yellow-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs sm:text-sm text-gray-400">
+                {t('leaderboard.currentLeader')}
+              </div>
+              <div className="flex items-center gap-2">
+                {sortedUsers.length > 0 && sortedUsers[0].avatar_url ? (
+                  <Image
+                    src={sortedUsers[0].avatar_url}
+                    alt={sortedUsers[0].display_name || sortedUsers[0].username}
+                    width={24}
+                    height={24}
+                    className="w-6 h-6 rounded-full object-cover ring-2 ring-yellow-400"
+                  />
+                ) : sortedUsers.length > 0 ? (
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-yellow-400">
+                    {(sortedUsers[0].display_name || sortedUsers[0].username).charAt(0).toUpperCase()}
+                  </div>
+                ) : null}
+                <span className="text-base sm:text-lg font-bold truncate text-yellow-400">
+                  {sortedUsers.length > 0
+                    ? sortedUsers[0].display_name || sortedUsers[0].username
+                    : '-'}
+                </span>
+                {sortedUsers.length > 0 && sortedUsers[0].is_verified && (
+                  <span className="flex-shrink-0 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-[8px] text-white">✓</span>
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="text-yellow-600 group-hover:text-yellow-400 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Average Win Rate Card */}
+          <div
+            onClick={() => router.push('/estadisticas')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 hover:border-green-500/30 transition-all group"
+          >
+            <div className="p-2 bg-green-500/20 rounded-lg group-hover:bg-green-500/30 transition-colors">
+              <TrendingUp className="w-6 h-6 text-green-400" />
+            </div>
+            <div className="flex-1">
               <div className="text-xs sm:text-sm text-gray-400">
                 {t('leaderboard.avgWinRate')}
               </div>
-              <div className="text-2xl font-bold">
-                {avgWinRate.toFixed(1)}%
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">
+                  {avgWinRate.toFixed(1)}%
+                </span>
+                {/* Mini indicator */}
+                <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  avgWinRate >= 50
+                    ? 'bg-green-500/20 text-green-400'
+                    : avgWinRate >= 30
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : 'bg-red-500/20 text-red-400'
+                }`}>
+                  {avgWinRate >= 50 ? '↑' : avgWinRate >= 30 ? '→' : '↓'}
+                </div>
               </div>
+            </div>
+            <div className="text-gray-600 group-hover:text-green-400 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </div>
         </section>
@@ -269,28 +334,102 @@ export default function LeaderboardPage() {
               const Icon = option.icon;
               const isActive = sortBy === option.id;
 
+              // Get top user for this category
+              const getTopUserForCategory = () => {
+                if (users.length === 0) return null;
+                const sorted = [...users].sort((a, b) => {
+                  switch (option.id) {
+                    case 'ap_coins': return b.ap_coins - a.ap_coins;
+                    case 'level': return b.level - a.level;
+                    case 'correct_predictions': return b.correct_predictions - a.correct_predictions;
+                    case 'total_earnings': return b.total_earnings - a.total_earnings;
+                    default: return 0;
+                  }
+                });
+                return sorted[0];
+              };
+
+              const getTopValue = (topUser: UserData | null) => {
+                if (!topUser) return '-';
+                switch (option.id) {
+                  case 'ap_coins': return topUser.ap_coins.toLocaleString();
+                  case 'level': return `Lvl ${topUser.level}`;
+                  case 'correct_predictions': return `${topUser.correct_predictions}/${topUser.total_predictions}`;
+                  case 'total_earnings': return topUser.total_earnings.toLocaleString();
+                  default: return '-';
+                }
+              };
+
+              const topUser = getTopUserForCategory();
+              const topValue = getTopValue(topUser);
+
               return (
                 <button
                   key={option.id}
                   onClick={() => setSortBy(option.id)}
                   className={`
                     ${option.bgColor} ${option.borderColor}
-                    border-2 rounded-lg p-3 sm:p-4 transition-all text-left
+                    border-2 rounded-xl p-3 sm:p-4 transition-all text-left relative overflow-hidden
                     ${isActive
-                      ? 'scale-[1.02] sm:scale-105 shadow-lg'
-                      : 'opacity-80 hover:opacity-100'
+                      ? 'scale-[1.02] sm:scale-105 shadow-lg ring-2 ring-offset-2 ring-offset-gray-950'
+                      : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
                     }
+                    ${isActive ? option.borderColor.replace('border-', 'ring-').replace('/30', '/50') : ''}
                   `}
                 >
-                  <div className="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2">
-                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${option.color}`} />
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div className="absolute top-2 right-2">
+                      <div className={`w-2 h-2 rounded-full ${option.color.replace('text-', 'bg-')} animate-pulse`} />
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className={`p-1.5 rounded-lg ${option.bgColor}`}>
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${option.color}`} />
+                    </div>
                     <span className="font-semibold text-sm sm:text-base">
                       {option.label}
                     </span>
                   </div>
-                  <p className="text-[11px] sm:text-xs text-gray-400">
+
+                  <p className="text-[11px] sm:text-xs text-gray-400 mb-3">
                     {option.description}
                   </p>
+
+                  {/* Top User Preview */}
+                  {topUser && (
+                    <div
+                      className="flex items-center gap-2 pt-2 border-t border-gray-700/50 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/perfil/${topUser.username}`);
+                      }}
+                    >
+                      {topUser.avatar_url ? (
+                        <Image
+                          src={topUser.avatar_url}
+                          alt={topUser.display_name || topUser.username}
+                          width={20}
+                          height={20}
+                          className="w-5 h-5 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-[10px] font-bold">
+                          {(topUser.display_name || topUser.username).charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] text-gray-500">Top #1</div>
+                        <div className="text-xs font-medium truncate text-gray-300 hover:text-white transition-colors">
+                          {topUser.display_name || topUser.username}
+                        </div>
+                      </div>
+                      <div className={`text-xs font-bold ${option.color}`}>
+                        {topValue}
+                      </div>
+                    </div>
+                  )}
                 </button>
               );
             })}
