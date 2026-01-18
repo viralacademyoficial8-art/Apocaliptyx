@@ -238,18 +238,15 @@ export async function DELETE(
       if (error) throw error;
     }
 
-    // Decrement member count
-    const { data: community } = await supabase()
-      .from('communities')
-      .select('members_count')
-      .eq('id', communityId)
-      .single();
-
-    if (community) {
-      await supabase()
-        .from('communities')
-        .update({ members_count: Math.max(0, (community as any).members_count - 1) })
-        .eq('id', communityId);
+    // Decrement member count atomically
+    try {
+      await supabase().rpc('decrement', {
+        row_id: communityId,
+        table_name: 'communities',
+        column_name: 'members_count'
+      });
+    } catch (countError) {
+      console.error('Error decrementing member count:', countError);
     }
 
     return NextResponse.json({

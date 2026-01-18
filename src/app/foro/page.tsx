@@ -598,40 +598,80 @@ function ForoContent() {
       const response = await fetch(`/api/communities/${communityId}/join`, {
         method: 'POST',
       });
-      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error: ${response.status}`);
+      }
       if (data.error) throw new Error(data.error);
 
-      setCommunities(communities.map(c =>
-        c.id === communityId
-          ? { ...c, isMember: true, membersCount: c.membersCount + 1 }
-          : c
-      ));
-      toast.success(t('forum.communities.joined'));
-    } catch (error) {
+      // Check if it's a join request (private community) or direct join
+      if (data.requestPending) {
+        setCommunities(communities.map(c =>
+          c.id === communityId
+            ? { ...c, hasPendingRequest: true }
+            : c
+        ));
+        toast.success('Solicitud de admisión enviada');
+      } else {
+        setCommunities(communities.map(c =>
+          c.id === communityId
+            ? { ...c, isMember: true, membersCount: c.membersCount + 1 }
+            : c
+        ));
+        toast.success(t('forum.communities.joined'));
+      }
+    } catch (error: any) {
       console.error('Error joining community:', error);
-      toast.error(t('forum.communities.joinError'));
+      toast.error(error.message || t('forum.communities.joinError'));
     }
   };
 
-  const handleLeaveCommunity = async (communityId: string) => {
+  const handleLeaveCommunity = async (communityId: string, confirmTransfer: boolean = false) => {
     try {
-      const response = await fetch(`/api/communities/${communityId}/join`, {
+      const url = confirmTransfer
+        ? `/api/communities/${communityId}/join?confirmTransfer=true`
+        : `/api/communities/${communityId}/join`;
+
+      const response = await fetch(url, {
         method: 'DELETE',
       });
-      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error: ${response.status}`);
+      }
       if (data.error) throw new Error(data.error);
+
+      // If requires confirmation (owner leaving), show confirmation dialog
+      if (data.requiresConfirmation) {
+        const nextOwnerName = data.nextOwner?.displayName || data.nextOwner?.username || 'otro miembro';
+        const confirmed = confirm(
+          `⚠️ Advertencia: Eres el propietario de esta comunidad.\n\n` +
+          `Si abandonas, "${nextOwnerName}" se convertirá en el nuevo propietario.\n\n` +
+          `¿Estás seguro de que quieres abandonar y transferir la propiedad?`
+        );
+
+        if (confirmed) {
+          handleLeaveCommunity(communityId, true);
+        }
+        return;
+      }
 
       setCommunities(communities.map(c =>
         c.id === communityId
           ? { ...c, isMember: false, membersCount: Math.max(0, c.membersCount - 1) }
           : c
       ));
-      toast.success(t('forum.communities.left'));
-    } catch (error) {
+
+      if (data.ownershipTransferred) {
+        toast.success(`Has abandonado la comunidad. ${data.newOwner} es el nuevo propietario.`);
+      } else {
+        toast.success(t('forum.communities.left'));
+      }
+    } catch (error: any) {
       console.error('Error leaving community:', error);
-      toast.error(t('forum.communities.leaveError'));
+      toast.error(error.message || t('forum.communities.leaveError'));
     }
   };
 

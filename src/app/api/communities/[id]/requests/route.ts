@@ -135,11 +135,16 @@ export async function PATCH(
 
       if (memberError) throw memberError;
 
-      // Increment member count
-      await supabase()
-        .from('communities')
-        .update({ members_count: (communityInfo?.members_count || 0) + 1 })
-        .eq('id', communityId);
+      // Increment member count atomically
+      try {
+        await supabase().rpc('increment', {
+          row_id: communityId,
+          table_name: 'communities',
+          column_name: 'members_count'
+        });
+      } catch (countError) {
+        console.error('Error incrementing member count:', countError);
+      }
 
       // Update request status
       await supabase()
@@ -152,13 +157,17 @@ export async function PATCH(
         .eq('id', requestId);
 
       // Notify user their request was approved
-      await notificationsService.create({
-        userId: requestData.user_id,
-        type: 'community_request_approved',
-        title: 'Solicitud aprobada',
-        message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue aprobada`,
-        linkUrl: `/foro/comunidad/${communityInfo?.slug || communityId}`
-      });
+      try {
+        await notificationsService.create({
+          userId: requestData.user_id,
+          type: 'community_request_approved',
+          title: 'Solicitud aprobada',
+          message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue aprobada`,
+          linkUrl: `/foro/comunidad/${communityInfo?.slug || communityId}`
+        });
+      } catch (notifError) {
+        console.error('Error sending approval notification:', notifError);
+      }
 
       return NextResponse.json({
         success: true,
@@ -176,13 +185,17 @@ export async function PATCH(
         .eq('id', requestId);
 
       // Notify user their request was rejected
-      await notificationsService.create({
-        userId: requestData.user_id,
-        type: 'community_request_rejected',
-        title: 'Solicitud rechazada',
-        message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue rechazada`,
-        linkUrl: `/foro?tab=comunidades`
-      });
+      try {
+        await notificationsService.create({
+          userId: requestData.user_id,
+          type: 'community_request_rejected',
+          title: 'Solicitud rechazada',
+          message: `Tu solicitud para unirte a ${communityInfo?.name || 'la comunidad'} fue rechazada`,
+          linkUrl: `/foro?tab=comunidades`
+        });
+      } catch (notifError) {
+        console.error('Error sending rejection notification:', notifError);
+      }
 
       return NextResponse.json({
         success: true,

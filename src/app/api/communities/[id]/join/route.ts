@@ -119,14 +119,18 @@ export async function POST(
 
       if (admins && admins.length > 0) {
         for (const admin of admins) {
-          await notificationsService.create({
-            userId: admin.user_id,
-            type: 'community_join_request',
-            title: 'Nueva solicitud de admisión',
-            message: `${requesterData?.username || 'Un usuario'} quiere unirse a ${communityData.name}`,
-            imageUrl: requesterData?.avatar_url,
-            linkUrl: `/comunidades/${communityData.slug}/solicitudes`
-          });
+          try {
+            await notificationsService.create({
+              userId: admin.user_id,
+              type: 'community_join_request',
+              title: 'Nueva solicitud de admisión',
+              message: `${requesterData?.username || 'Un usuario'} quiere unirse a ${communityData.name}`,
+              imageUrl: requesterData?.avatar_url,
+              linkUrl: `/foro/comunidad/${communityData.slug}`
+            });
+          } catch (notifError) {
+            console.error('Error sending join request notification:', notifError);
+          }
         }
       }
 
@@ -148,11 +152,16 @@ export async function POST(
 
     if (joinError) throw joinError;
 
-    // Increment member count
-    await supabase()
-      .from('communities')
-      .update({ members_count: communityData.members_count + 1 })
-      .eq('id', communityId);
+    // Increment member count atomically
+    try {
+      await supabase().rpc('increment', {
+        row_id: communityId,
+        table_name: 'communities',
+        column_name: 'members_count'
+      });
+    } catch (countError) {
+      console.error('Error incrementing member count:', countError);
+    }
 
     // Get new member info
     const { data: memberInfo } = await supabase()
@@ -173,13 +182,17 @@ export async function POST(
     if (admins && admins.length > 0) {
       for (const admin of admins) {
         if (admin.user_id !== session.user.id) {
-          await notificationsService.notifyCommunityNewMember(
-            admin.user_id,
-            memberData?.username || 'Usuario',
-            memberData?.avatar_url,
-            communityData.name || 'Comunidad',
-            communityId
-          );
+          try {
+            await notificationsService.notifyCommunityNewMember(
+              admin.user_id,
+              memberData?.username || 'Usuario',
+              memberData?.avatar_url,
+              communityData.name || 'Comunidad',
+              communityId
+            );
+          } catch (notifError) {
+            console.error('Error sending new member notification:', notifError);
+          }
         }
       }
     }
@@ -321,18 +334,15 @@ export async function DELETE(
         .eq('community_id', communityId)
         .eq('user_id', session.user.id);
 
-      // Decrement member count
-      const { data: communityCount } = await supabase()
-        .from('communities')
-        .select('members_count')
-        .eq('id', communityId)
-        .single();
-
-      if (communityCount) {
-        await supabase()
-          .from('communities')
-          .update({ members_count: Math.max(0, (communityCount as any).members_count - 1) })
-          .eq('id', communityId);
+      // Decrement member count atomically
+      try {
+        await supabase().rpc('decrement', {
+          row_id: communityId,
+          table_name: 'communities',
+          column_name: 'members_count'
+        });
+      } catch (countError) {
+        console.error('Error decrementing member count:', countError);
       }
 
       return NextResponse.json({
@@ -352,18 +362,15 @@ export async function DELETE(
 
     if (leaveError) throw leaveError;
 
-    // Decrement member count
-    const { data: community } = await supabase()
-      .from('communities')
-      .select('members_count')
-      .eq('id', communityId)
-      .single();
-
-    if (community) {
-      await supabase()
-        .from('communities')
-        .update({ members_count: Math.max(0, (community as any).members_count - 1) })
-        .eq('id', communityId);
+    // Decrement member count atomically
+    try {
+      await supabase().rpc('decrement', {
+        row_id: communityId,
+        table_name: 'communities',
+        column_name: 'members_count'
+      });
+    } catch (countError) {
+      console.error('Error decrementing member count:', countError);
     }
 
     return NextResponse.json({
