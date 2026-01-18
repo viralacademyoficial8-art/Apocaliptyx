@@ -393,6 +393,7 @@ export default function EscenarioPage() {
           <p className="text-gray-400 mb-6">El escenario que buscas no existe o ha sido eliminado.</p>
           <div className="flex gap-4">
             <button
+              type="button"
               onClick={() => router.back()}
               className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center gap-2"
             >
@@ -400,6 +401,7 @@ export default function EscenarioPage() {
               Volver
             </button>
             <button
+              type="button"
               onClick={() => router.push("/explorar")}
               className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
             >
@@ -418,6 +420,7 @@ export default function EscenarioPage() {
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Back button */}
         <button
+          type="button"
           onClick={() => router.back()}
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
         >
@@ -457,6 +460,7 @@ export default function EscenarioPage() {
           <div className="flex flex-wrap gap-3">
             {scenario.creator_username && (
               <button
+                type="button"
                 onClick={() => router.push(`/perfil/${scenario.creator_username}`)}
                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-colors text-sm"
               >
@@ -466,6 +470,7 @@ export default function EscenarioPage() {
             )}
             {scenario.current_holder_id && scenario.current_holder_id !== scenario.creator_id && scenario.holder_username && (
               <button
+                type="button"
                 onClick={() => router.push(`/perfil/${scenario.holder_username}`)}
                 className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/10 text-red-400 rounded-full border border-red-500/20 hover:bg-red-500/20 transition-colors text-sm"
               >
@@ -555,6 +560,7 @@ export default function EscenarioPage() {
               <>
                 {!isOwner && scenario.status === "ACTIVE" && (
                   <button
+                    type="button"
                     onClick={handleSteal}
                     disabled={!canSteal() || isStealing}
                     className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors"
@@ -586,6 +592,7 @@ export default function EscenarioPage() {
                       </div>
                     ) : (
                       <button
+                        type="button"
                         onClick={() => setShowShieldModal(true)}
                         className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold transition-colors"
                       >
@@ -602,6 +609,7 @@ export default function EscenarioPage() {
           {!user && scenario.status === "ACTIVE" && (
             <p className="text-center text-gray-500 text-sm mt-4">
               <button
+                type="button"
                 onClick={() => router.push('/login')}
                 className="text-purple-400 hover:underline"
               >
@@ -648,6 +656,7 @@ export default function EscenarioPage() {
               {/* Vote options */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <button
+                  type="button"
                   onClick={() => setSelectedVote("YES")}
                   className={`p-6 rounded-xl border-2 transition-all ${
                     selectedVote === "YES"
@@ -663,6 +672,7 @@ export default function EscenarioPage() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => setSelectedVote("NO")}
                   className={`p-6 rounded-xl border-2 transition-all ${
                     selectedVote === "NO"
@@ -680,6 +690,7 @@ export default function EscenarioPage() {
 
               {/* Submit button */}
               <button
+                type="button"
                 onClick={handleVote}
                 disabled={!selectedVote || isVoting}
                 className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -719,6 +730,7 @@ export default function EscenarioPage() {
         {/* Actions */}
         <div className="flex gap-4">
           <button
+            type="button"
             onClick={handleShare}
             className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
           >
@@ -726,6 +738,7 @@ export default function EscenarioPage() {
             Compartir
           </button>
           <button
+            type="button"
             onClick={() => setShowReportModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors text-gray-400"
           >
@@ -745,6 +758,7 @@ export default function EscenarioPage() {
                 Reportar escenario
               </h2>
               <button
+                type="button"
                 onClick={() => setShowReportModal(false)}
                 className="text-gray-400 hover:text-white"
               >
@@ -760,6 +774,7 @@ export default function EscenarioPage() {
                 <div className="space-y-2">
                   {REPORT_REASONS.map((reason) => (
                     <button
+                      type="button"
                       key={reason.id}
                       onClick={() => setReportReason(reason.id)}
                       className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
@@ -793,6 +808,7 @@ export default function EscenarioPage() {
               
               <div className="flex gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={() => {
                     setShowReportModal(false);
                     setReportReason('');
@@ -803,6 +819,7 @@ export default function EscenarioPage() {
                   Cancelar
                 </button>
                 <button
+                  type="button"
                   onClick={handleReport}
                   disabled={!reportReason || reportLoading}
                   className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -832,6 +849,7 @@ export default function EscenarioPage() {
                 Proteger Escenario
               </h2>
               <button
+                type="button"
                 onClick={() => setShowShieldModal(false)}
                 className="text-gray-400 hover:text-white"
               >
@@ -866,6 +884,7 @@ export default function EscenarioPage() {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleApplyShield(shield.id)}
                       disabled={
                         applyingShield !== null ||
