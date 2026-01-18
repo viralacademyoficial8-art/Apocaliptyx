@@ -19,10 +19,14 @@ import {
   Loader2,
   Crown,
   Flame,
-  TrendingUp,
-  ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Skull,
   Zap,
+  ExternalLink,
+  TrendingUp,
+  Eye,
+  User,
 } from 'lucide-react';
 
 // Supabase client
@@ -60,6 +64,198 @@ interface UserProfile {
   level: number;
 }
 
+// Accordion Item Component
+function AccordionItem({
+  steal,
+  index,
+  isExpanded,
+  onToggle,
+}: {
+  steal: StolenScenario;
+  index: number;
+  isExpanded: boolean;
+  onToggle: () => void;
+}) {
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      tecnologia: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      deportes: 'bg-green-500/20 text-green-400 border-green-500/30',
+      politica: 'bg-red-500/20 text-red-400 border-red-500/30',
+      entretenimiento: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+      economia: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      ciencia: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+      gaming: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+      cripto: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    };
+    return colors[category?.toLowerCase()] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  };
+
+  const getStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'active':
+        return (
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium flex items-center gap-1 border border-green-500/30">
+            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            Activo
+          </span>
+        );
+      case 'resolved':
+        return (
+          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium border border-blue-500/30">
+            Resuelto
+          </span>
+        );
+      case 'cancelled':
+        return (
+          <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-medium border border-gray-500/30">
+            Cancelado
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-all">
+      {/* Collapsed Header - Always visible */}
+      <button
+        onClick={onToggle}
+        className="w-full p-4 flex items-center gap-4 text-left hover:bg-gray-800/30 transition-colors"
+      >
+        {/* Rank Badge */}
+        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 flex items-center justify-center">
+          <span className="text-sm font-bold text-red-400">#{index + 1}</span>
+        </div>
+
+        {/* Main Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getCategoryColor(steal.scenario?.category || '')}`}>
+              {steal.scenario?.category || 'Sin categoría'}
+            </span>
+            {getStatusBadge(steal.scenario?.status)}
+          </div>
+          <h3 className="font-semibold text-white truncate">
+            {steal.scenario?.title || 'Escenario eliminado'}
+          </h3>
+          <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+            <Calendar className="w-3.5 h-3.5" />
+            {formatDistanceToNow(new Date(steal.stolen_at), { addSuffix: true, locale: es })}
+          </p>
+        </div>
+
+        {/* Price Badge */}
+        <div className="flex-shrink-0 text-right">
+          <p className="text-xs text-gray-500 mb-0.5">Precio</p>
+          <p className="text-lg font-bold text-red-400">{steal.steal_price?.toLocaleString() || 0} <span className="text-sm">AP</span></p>
+        </div>
+
+        {/* Expand/Collapse Icon */}
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-4 h-4 text-gray-400" />
+          )}
+        </div>
+      </button>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="border-t border-gray-800 bg-gray-900/50">
+          {/* Description */}
+          {steal.scenario?.description && (
+            <div className="px-4 py-3 border-b border-gray-800/50">
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {steal.scenario.description}
+              </p>
+            </div>
+          )}
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4">
+            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <Users className="w-4 h-4 text-purple-400 mx-auto mb-1" />
+              <p className="text-lg font-bold text-white">{steal.scenario?.participant_count || 0}</p>
+              <p className="text-xs text-gray-500">Participantes</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
+              <p className="text-lg font-bold text-white">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
+              <p className="text-xs text-gray-500">Pool Total</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
+              <p className="text-lg font-bold text-white">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
+              <p className="text-xs text-gray-500">Pool Sí</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <TrendingUp className="w-4 h-4 text-red-400 mx-auto mb-1 rotate-180" />
+              <p className="text-lg font-bold text-white">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
+              <p className="text-xs text-gray-500">Pool No</p>
+            </div>
+          </div>
+
+          {/* Action Links */}
+          <div className="flex flex-col sm:flex-row gap-3 p-4 pt-0">
+            {/* Victim Link */}
+            {steal.victim && (
+              <Link
+                href={`/perfil/${steal.victim.username}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex-1 flex items-center gap-3 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 hover:border-purple-500/50 rounded-lg p-3 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center overflow-hidden">
+                  {steal.victim.avatar_url ? (
+                    <img
+                      src={steal.victim.avatar_url}
+                      alt={steal.victim.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-5 h-5 text-purple-400" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 mb-0.5 flex items-center gap-1">
+                    <Skull className="w-3 h-3 text-red-400" />
+                    Víctima del robo
+                  </p>
+                  <p className="font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
+                    @{steal.victim.username}
+                  </p>
+                </div>
+                <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-purple-400 transition-colors" />
+              </Link>
+            )}
+
+            {/* Scenario Link */}
+            {steal.scenario?.id && (
+              <Link
+                href={`/escenario/${steal.scenario.id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex-1 flex items-center gap-3 bg-gradient-to-r from-red-500/10 to-orange-500/10 hover:from-red-500/20 hover:to-orange-500/20 border border-red-500/30 hover:border-red-500/50 rounded-lg p-3 transition-all group"
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 flex items-center justify-center">
+                  <Eye className="w-5 h-5 text-red-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 mb-0.5">Ver escenario</p>
+                  <p className="font-semibold text-white truncate group-hover:text-red-400 transition-colors">
+                    Ir al escenario completo
+                  </p>
+                </div>
+                <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-red-400 transition-colors" />
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function EscenariosRobadosPage() {
   const params = useParams();
   const router = useRouter();
@@ -68,12 +264,33 @@ export default function EscenariosRobadosPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stolenScenarios, setStolenScenarios] = useState<StolenScenario[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [stats, setStats] = useState({
     totalStolen: 0,
     totalValue: 0,
     uniqueVictims: 0,
     biggestHeist: 0,
   });
+
+  const toggleItem = (id: string) => {
+    setExpandedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const expandAll = () => {
+    setExpandedItems(new Set(stolenScenarios.map(s => s.id)));
+  };
+
+  const collapseAll = () => {
+    setExpandedItems(new Set());
+  };
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -206,26 +423,29 @@ export default function EscenariosRobadosPage() {
               <h1 className="text-3xl md:text-4xl font-bold mb-2">
                 Escenarios Robados
               </h1>
-              <p className="text-gray-400 flex items-center gap-2">
+              <Link
+                href={`/perfil/${profile.username}`}
+                className="text-gray-400 flex items-center gap-2 hover:text-white transition-colors group"
+              >
                 {profile.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.username}
-                    className="w-6 h-6 rounded-full object-cover"
+                    className="w-6 h-6 rounded-full object-cover ring-2 ring-transparent group-hover:ring-red-500/50 transition-all"
                   />
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                     <span className="text-xs text-white font-bold">{profile.username?.charAt(0).toUpperCase()}</span>
                   </div>
                 )}
-                Historial de conquistas de <span className="text-red-400 font-semibold">@{profile.username}</span>
-              </p>
+                Historial de conquistas de <span className="text-red-400 font-semibold group-hover:underline">@{profile.username}</span>
+              </Link>
             </div>
           </div>
 
-          {/* Stats Cards */}
+          {/* Stats Cards - Clickable */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-red-500/30 rounded-xl p-4 hover:border-red-500/60 transition-all">
+            <div className="bg-gray-900/80 backdrop-blur-sm border border-red-500/30 rounded-xl p-4 hover:border-red-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
                   <Swords className="w-5 h-5 text-red-400" />
@@ -235,7 +455,7 @@ export default function EscenariosRobadosPage() {
               <p className="text-3xl font-bold text-white">{stats.totalStolen}</p>
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4 hover:border-yellow-500/60 transition-all">
+            <div className="bg-gray-900/80 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4 hover:border-yellow-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
                   <Coins className="w-5 h-5 text-yellow-400" />
@@ -245,17 +465,17 @@ export default function EscenariosRobadosPage() {
               <p className="text-3xl font-bold text-white">{stats.totalValue.toLocaleString()} <span className="text-lg text-yellow-400">AP</span></p>
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 hover:border-purple-500/60 transition-all">
+            <div className="bg-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 hover:border-purple-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
                   <Users className="w-5 h-5 text-purple-400" />
                 </div>
-                <span className="text-sm text-gray-400">Victimas</span>
+                <span className="text-sm text-gray-400">Víctimas</span>
               </div>
               <p className="text-3xl font-bold text-white">{stats.uniqueVictims}</p>
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4 hover:border-orange-500/60 transition-all">
+            <div className="bg-gray-900/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4 hover:border-orange-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
                   <Crown className="w-5 h-5 text-orange-400" />
@@ -286,103 +506,43 @@ export default function EscenariosRobadosPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-6">
+          <div className="space-y-3">
+            {/* Header with controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 <Flame className="w-5 h-5 text-orange-400" />
                 Historial de Robos
+                <span className="text-sm font-normal text-gray-500 ml-2">({stolenScenarios.length} escenarios)</span>
               </h2>
-              <span className="text-sm text-gray-400">{stolenScenarios.length} escenarios</span>
+
+              {/* Expand/Collapse Controls */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={expandAll}
+                  className="px-3 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                  Expandir todo
+                </button>
+                <button
+                  onClick={collapseAll}
+                  className="px-3 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                  Colapsar todo
+                </button>
+              </div>
             </div>
 
+            {/* Accordion List */}
             {stolenScenarios.map((steal, index) => (
-              <Link
+              <AccordionItem
                 key={steal.id}
-                href={`/escenario/${steal.scenario?.id}`}
-                className="block group"
-              >
-                <div className="relative bg-gray-900/80 border border-gray-800 rounded-xl p-5 hover:border-red-500/50 transition-all overflow-hidden">
-                  {/* Ranking Badge */}
-                  <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-sm font-bold text-gray-400">
-                    #{index + 1}
-                  </div>
-
-                  {/* Glow effect on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <div className="relative flex flex-col md:flex-row md:items-center gap-4">
-                    {/* Scenario Info */}
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs font-medium">
-                          {steal.scenario?.category || 'Sin categoría'}
-                        </span>
-                        {steal.scenario?.status === 'active' && (
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                            Activo
-                          </span>
-                        )}
-                        {steal.scenario?.status === 'resolved' && (
-                          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium">
-                            Resuelto
-                          </span>
-                        )}
-                      </div>
-
-                      <h3 className="text-lg font-semibold mb-2 group-hover:text-red-400 transition-colors line-clamp-2">
-                        {steal.scenario?.title || 'Escenario eliminado'}
-                      </h3>
-
-                      {steal.scenario?.description && (
-                        <p className="text-sm text-gray-400 line-clamp-1 mb-3">
-                          {steal.scenario.description}
-                        </p>
-                      )}
-
-                      {/* Meta info */}
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {formatDistanceToNow(new Date(steal.stolen_at), { addSuffix: true, locale: es })}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          {steal.scenario?.participant_count || 0} participantes
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Trophy className="w-4 h-4" />
-                          Pool: {steal.scenario?.total_pool?.toLocaleString() || 0} AP
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right side - Price and Victim */}
-                    <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-2 pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-gray-800 md:pl-6">
-                      {/* Steal Price */}
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500 mb-1">Precio de robo</p>
-                        <p className="text-xl font-bold text-red-400">{steal.steal_price?.toLocaleString() || 0} AP</p>
-                      </div>
-
-                      {/* Victim */}
-                      {steal.victim && (
-                        <div className="flex items-center gap-2 bg-gray-800/50 px-3 py-2 rounded-lg">
-                          <Skull className="w-4 h-4 text-red-400" />
-                          <span className="text-sm text-gray-400">
-                            Robado a <span className="text-white">@{steal.victim.username}</span>
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* View indicator */}
-                  <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ChevronRight className="w-5 h-5 text-red-400" />
-                  </div>
-                </div>
-              </Link>
+                steal={steal}
+                index={index}
+                isExpanded={expandedItems.has(steal.id)}
+                onToggle={() => toggleItem(steal.id)}
+              />
             ))}
           </div>
         )}
