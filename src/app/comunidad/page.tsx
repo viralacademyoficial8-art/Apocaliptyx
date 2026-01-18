@@ -19,7 +19,7 @@ import {
   AlertCircle,
   UserPlus,
   Filter,
-  Grid3X3,
+  LayoutGrid,
   List,
   Crown,
   Medal,
@@ -262,7 +262,7 @@ export default function ComunidadPage() {
                 viewMode === 'grid' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'
               }`}
             >
-              <Grid3X3 className="w-5 h-5" />
+              <LayoutGrid className="w-5 h-5" />
             </button>
             <button
               onClick={() => setViewMode('list')}
