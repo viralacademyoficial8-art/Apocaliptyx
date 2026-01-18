@@ -53,6 +53,13 @@ interface UserData {
   is_verified: boolean;
 }
 
+interface ScenarioData {
+  id: string;
+  status: string;
+  category: string;
+  total_pool: number;
+}
+
 interface CategoryStat {
   category: string;
   count: number;
@@ -98,11 +105,13 @@ export default function EstadisticasPage() {
         }).length;
 
         // Load scenario stats
-        const { data: scenarios, error: scenariosError } = await supabase
+        const { data: scenariosData, error: scenariosError } = await supabase
           .from('scenarios')
           .select('id, status, category, total_pool');
 
         if (scenariosError) throw scenariosError;
+
+        const scenarios = scenariosData as ScenarioData[] | null;
 
         const totalScenarios = scenarios?.length || 0;
         const activeScenarios = scenarios?.filter((s) => s.status === 'ACTIVE').length || 0;
