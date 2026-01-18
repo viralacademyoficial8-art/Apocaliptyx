@@ -79,8 +79,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
       // Disconnect from room
       await room.disconnect();
 
-      toast.success('Stream finalizado');
-
+      // Note: Toast is shown by onEndStream callback to avoid duplicates
       if (onEndStream) {
         onEndStream();
       }
