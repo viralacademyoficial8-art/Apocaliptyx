@@ -70,11 +70,17 @@ function AccordionItem({
   index,
   isExpanded,
   onToggle,
+  isBiggestHeist,
+  totalVictims,
+  totalValue,
 }: {
   steal: StolenScenario;
   index: number;
   isExpanded: boolean;
   onToggle: () => void;
+  isBiggestHeist: boolean;
+  totalVictims: number;
+  totalValue: number;
 }) {
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -173,33 +179,72 @@ function AccordionItem({
             </div>
           )}
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4">
-            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-              <Users className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-              <p className="text-lg font-bold text-white">{steal.scenario?.participant_count || 0}</p>
-              <p className="text-xs text-gray-500">Participantes</p>
+          {/* Robbery Stats - Valor, Víctima, Mayor Golpe */}
+          <div className="grid grid-cols-3 gap-3 p-4 border-b border-gray-800/50">
+            <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-3 text-center">
+              <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
+              <p className="text-xl font-bold text-white">{steal.steal_price?.toLocaleString() || 0}</p>
+              <p className="text-xs text-yellow-400/80">Valor del Robo</p>
             </div>
-            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-              <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-              <p className="text-lg font-bold text-white">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
-              <p className="text-xs text-gray-500">Pool Total</p>
+            <Link
+              href={steal.victim ? `/perfil/${steal.victim.username}` : '#'}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 hover:border-purple-500/60 rounded-lg p-3 text-center transition-all group"
+            >
+              <div className="w-8 h-8 mx-auto mb-1 rounded-full overflow-hidden bg-purple-500/20 flex items-center justify-center">
+                {steal.victim?.avatar_url ? (
+                  <img src={steal.victim.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-4 h-4 text-purple-400" />
+                )}
+              </div>
+              <p className="text-sm font-bold text-white truncate group-hover:text-purple-400 transition-colors">
+                @{steal.victim?.username || 'N/A'}
+              </p>
+              <p className="text-xs text-purple-400/80">Víctima</p>
+            </Link>
+            <div className={`rounded-lg p-3 text-center ${isBiggestHeist ? 'bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/50' : 'bg-gray-800/50 border border-gray-700'}`}>
+              <Crown className={`w-5 h-5 mx-auto mb-1 ${isBiggestHeist ? 'text-orange-400' : 'text-gray-500'}`} />
+              <p className={`text-xl font-bold ${isBiggestHeist ? 'text-orange-400' : 'text-gray-500'}`}>
+                {isBiggestHeist ? 'SÍ' : 'NO'}
+              </p>
+              <p className={`text-xs ${isBiggestHeist ? 'text-orange-400/80' : 'text-gray-500'}`}>Mayor Golpe</p>
             </div>
-            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-              <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
-              <p className="text-lg font-bold text-white">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
-              <p className="text-xs text-gray-500">Pool Sí</p>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-3 text-center">
-              <TrendingUp className="w-4 h-4 text-red-400 mx-auto mb-1 rotate-180" />
-              <p className="text-lg font-bold text-white">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
-              <p className="text-xs text-gray-500">Pool No</p>
+          </div>
+
+          {/* Scenario Stats Grid */}
+          <div className="p-4 border-b border-gray-800/50">
+            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <Target className="w-3.5 h-3.5" />
+              Estadísticas del Escenario
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                <Users className="w-4 h-4 text-purple-400 mx-auto mb-1" />
+                <p className="text-lg font-bold text-white">{steal.scenario?.participant_count || 0}</p>
+                <p className="text-xs text-gray-500">Participantes</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
+                <p className="text-lg font-bold text-white">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
+                <p className="text-xs text-gray-500">Pool Total</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
+                <p className="text-lg font-bold text-white">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
+                <p className="text-xs text-gray-500">Pool Sí</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                <TrendingUp className="w-4 h-4 text-red-400 mx-auto mb-1 rotate-180" />
+                <p className="text-lg font-bold text-white">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
+                <p className="text-xs text-gray-500">Pool No</p>
+              </div>
             </div>
           </div>
 
           {/* Action Links */}
-          <div className="flex flex-col sm:flex-row gap-3 p-4 pt-0">
-            {/* Victim Link */}
+          <div className="flex flex-col sm:flex-row gap-3 p-4">
+            {/* Victim Profile Link */}
             {steal.victim && (
               <Link
                 href={`/perfil/${steal.victim.username}`}
@@ -220,7 +265,7 @@ function AccordionItem({
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-gray-500 mb-0.5 flex items-center gap-1">
                     <Skull className="w-3 h-3 text-red-400" />
-                    Víctima del robo
+                    Ver perfil de la víctima
                   </p>
                   <p className="font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
                     @{steal.victim.username}
@@ -241,9 +286,9 @@ function AccordionItem({
                   <Eye className="w-5 h-5 text-red-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500 mb-0.5">Ver escenario</p>
+                  <p className="text-xs text-gray-500 mb-0.5">Ver escenario completo</p>
                   <p className="font-semibold text-white truncate group-hover:text-red-400 transition-colors">
-                    Ir al escenario completo
+                    Ir al escenario
                   </p>
                 </div>
                 <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-red-400 transition-colors" />
@@ -542,6 +587,9 @@ export default function EscenariosRobadosPage() {
                 index={index}
                 isExpanded={expandedItems.has(steal.id)}
                 onToggle={() => toggleItem(steal.id)}
+                isBiggestHeist={steal.steal_price === stats.biggestHeist}
+                totalVictims={stats.uniqueVictims}
+                totalValue={stats.totalValue}
               />
             ))}
           </div>
