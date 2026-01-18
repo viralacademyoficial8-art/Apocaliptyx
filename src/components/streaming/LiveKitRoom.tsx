@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   LiveKitRoom as LKRoom,
   VideoTrack,
@@ -96,11 +96,22 @@ function RoomContent({
 }) {
   const [showChat, setShowChat] = useState(true);
   const room = useRoomContext();
+  // Track if stream was ended intentionally to prevent duplicate callbacks
+  const intentionalEndRef = useRef(false);
 
-  // Handle room disconnect
+  // Handle intentional stream end (from controls)
+  const handleIntentionalEnd = useCallback(() => {
+    intentionalEndRef.current = true;
+    if (onStreamEnd) {
+      onStreamEnd();
+    }
+  }, [onStreamEnd]);
+
+  // Handle room disconnect (only for unexpected disconnects)
   useEffect(() => {
     const handleDisconnect = () => {
-      if (onStreamEnd) {
+      // Only call onStreamEnd if it wasn't an intentional end
+      if (!intentionalEndRef.current && onStreamEnd) {
         onStreamEnd();
       }
     };
@@ -148,7 +159,7 @@ function RoomContent({
         {/* Host Controls */}
         {isHost && (
           <div className="mt-4">
-            <StreamControls streamId={streamId} onEndStream={onStreamEnd} />
+            <StreamControls streamId={streamId} onEndStream={handleIntentionalEnd} />
           </div>
         )}
       </div>
