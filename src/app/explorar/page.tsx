@@ -117,6 +117,7 @@ export default function ExplorarPage() {
     scenariosCreated: 0,
     scenariosStolen: 0,
   });
+  const [userCreatedAt, setUserCreatedAt] = useState<Date | null>(null);
 
   // Filtros
   const [searchQuery, setSearchQuery] = useState('');
@@ -143,10 +144,10 @@ export default function ExplorarPage() {
       const supabase = getSupabaseClient();
 
       try {
-        // Obtener AP Coins del usuario
+        // Obtener AP Coins y fecha de creación del usuario
         const { data: userData } = await supabase
           .from('users')
-          .select('ap_coins')
+          .select('ap_coins, created_at')
           .eq('id', currentUser.id)
           .single();
 
@@ -175,6 +176,12 @@ export default function ExplorarPage() {
           scenariosCreated: scenariosCreated || 0,
           scenariosStolen: scenariosStolen || 0,
         });
+
+        // Establecer la fecha de creación real del usuario
+        const createdAt = (userData as { created_at?: string } | null)?.created_at;
+        if (createdAt) {
+          setUserCreatedAt(new Date(createdAt));
+        }
       } catch (err) {
         console.error('Error loading user stats:', err);
       }
@@ -361,7 +368,7 @@ export default function ExplorarPage() {
                   {currentUser.displayName || currentUser.username}
                 </h1>
                 <p className="text-xs text-zinc-500 mt-1">
-                  {t('dashboard.memberSince')} {formatDate(new Date(currentUser.createdAt))}
+                  {t('dashboard.memberSince')} {formatDate(userCreatedAt || new Date(currentUser.createdAt))}
                 </p>
               </section>
 
