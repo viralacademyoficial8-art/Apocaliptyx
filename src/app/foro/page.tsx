@@ -350,8 +350,17 @@ function ForoContent() {
   const [communitiesFilter, setCommunitiesFilter] = useState<'all' | 'joined' | 'popular'>('all');
   const [communitiesLoading, setCommunitiesLoading] = useState(false);
   const [communitySearch, setCommunitySearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [openCommunityMenu, setOpenCommunityMenu] = useState<string | null>(null);
   const communityMenuRef = useRef<HTMLDivElement>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(communitySearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [communitySearch]);
 
   // Close community menu when clicking outside
   useEffect(() => {
@@ -589,6 +598,7 @@ function ForoContent() {
       const params = new URLSearchParams();
       if (communitiesFilter === 'popular') params.set('sort', 'popular');
       if (communitiesFilter === 'joined') params.set('filter', 'joined');
+      if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim());
 
       const response = await fetch(`/api/communities?${params.toString()}`);
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -602,7 +612,7 @@ function ForoContent() {
     } finally {
       setCommunitiesLoading(false);
     }
-  }, [communitiesFilter]);
+  }, [communitiesFilter, debouncedSearch, t]);
 
   // Communities handlers
   const handleJoinCommunity = async (communityId: string) => {
@@ -729,12 +739,8 @@ function ForoContent() {
     }
   };
 
-  const filteredCommunities = communities.filter((community) => {
-    if (communitySearch && !community.name.toLowerCase().includes(communitySearch.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  // Communities are now filtered server-side, so just use them directly
+  const filteredCommunities = communities;
 
   // Cargar categorías
   const loadCategories = useCallback(async () => {
