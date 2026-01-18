@@ -61,6 +61,10 @@ import {
   Globe,
   Search,
   MoreVertical,
+  Link2,
+  Flag,
+  ExternalLink,
+  LogOut,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow, type Locale } from 'date-fns';
@@ -346,6 +350,19 @@ function ForoContent() {
   const [communitiesFilter, setCommunitiesFilter] = useState<'all' | 'joined' | 'popular'>('all');
   const [communitiesLoading, setCommunitiesLoading] = useState(false);
   const [communitySearch, setCommunitySearch] = useState('');
+  const [openCommunityMenu, setOpenCommunityMenu] = useState<string | null>(null);
+  const communityMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close community menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (communityMenuRef.current && !communityMenuRef.current.contains(event.target as Node)) {
+        setOpenCommunityMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Lives/Streams state
   const [streams, setStreams] = useState<{
@@ -1984,12 +2001,112 @@ function ForoContent() {
                           Privada
                         </span>
                       )}
-                      <button
-                        type="button"
-                        className="w-7 h-7 rounded-full bg-gray-900/80 backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+                      <div className="relative" ref={openCommunityMenu === community.id ? communityMenuRef : null}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setOpenCommunityMenu(openCommunityMenu === community.id ? null : community.id);
+                          }}
+                          className="w-7 h-7 rounded-full bg-gray-900/80 backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {openCommunityMenu === community.id && (
+                          <div className="absolute right-0 top-9 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl py-1 z-50">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const url = `${window.location.origin}/foro/comunidad/${community.slug}`;
+                                navigator.clipboard.writeText(url);
+                                toast.success('Enlace copiado');
+                                setOpenCommunityMenu(null);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                            >
+                              <Link2 className="w-4 h-4" />
+                              Copiar enlace
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(`/foro/comunidad/${community.slug}`, '_blank');
+                                setOpenCommunityMenu(null);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Abrir en nueva pestaña
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const url = `${window.location.origin}/foro/comunidad/${community.slug}`;
+                                if (navigator.share) {
+                                  navigator.share({
+                                    title: community.name,
+                                    text: community.description || `Únete a ${community.name}`,
+                                    url: url,
+                                  });
+                                } else {
+                                  navigator.clipboard.writeText(url);
+                                  toast.success('Enlace copiado');
+                                }
+                                setOpenCommunityMenu(null);
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                            >
+                              <Share2 className="w-4 h-4" />
+                              Compartir
+                            </button>
+                            {community.isMember && (
+                              <>
+                                <div className="border-t border-gray-700 my-1" />
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleLeaveCommunity(community.id);
+                                    setOpenCommunityMenu(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-800 flex items-center gap-2"
+                                >
+                                  <LogOut className="w-4 h-4" />
+                                  Salir de la comunidad
+                                </button>
+                              </>
+                            )}
+                            {isLoggedIn && !community.isMember && (
+                              <>
+                                <div className="border-t border-gray-700 my-1" />
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    toast.success('Gracias por tu reporte. Lo revisaremos pronto.');
+                                    setOpenCommunityMenu(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-sm text-orange-400 hover:bg-gray-800 flex items-center gap-2"
+                                >
+                                  <Flag className="w-4 h-4" />
+                                  Reportar comunidad
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <Link href={`/foro/comunidad/${community.slug}`}>
