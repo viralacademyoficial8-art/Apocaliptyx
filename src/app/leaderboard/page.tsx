@@ -297,148 +297,270 @@ export default function LeaderboardPage() {
           </div>
         </section>
 
-        {/* Leaderboard Table */}
-        <section className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-800/50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    {t('rankings.position')}
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    {t('leaderboard.prophet')}
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    {t('leaderboard.sortBy.level')}
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    {t('leaderboard.sortBy.apCoins')}
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    {t('leaderboard.sortBy.accuracy')}
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    {t('rankings.metrics.winRate')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {sortedUsers.map((u, index) => {
-                  const position = index + 1;
-                  const winRate = u.total_predictions > 0 
-                    ? ((u.correct_predictions / u.total_predictions) * 100).toFixed(1)
-                    : '0.0';
-                  const isCurrentUser = user?.id === u.id;
+        {/* Leaderboard Cards */}
+        <section className="space-y-3">
+          {/* Header Row */}
+          <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <div className="col-span-1">{t('rankings.position')}</div>
+            <div className="col-span-4">{t('leaderboard.prophet')}</div>
+            <div className="col-span-2 text-center">{t('leaderboard.sortBy.level')}</div>
+            <div className="col-span-2 text-center">{t('leaderboard.sortBy.apCoins')}</div>
+            <div className="col-span-1 text-center">{t('leaderboard.sortBy.accuracy')}</div>
+            <div className="col-span-2 text-center">{t('rankings.metrics.winRate')}</div>
+          </div>
 
-                  return (
-                    <tr 
-                      key={u.id}
-                      onClick={() => router.push(`/perfil/${u.username}`)}
-                      className={`
-                        cursor-pointer transition-colors
-                        ${isCurrentUser 
-                          ? 'bg-yellow-500/10 hover:bg-yellow-500/20' 
-                          : 'hover:bg-gray-800/50'
-                        }
-                      `}
-                    >
-                      {/* Position */}
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          {position === 1 && (
-                            <Medal className="w-5 h-5 text-yellow-400" />
-                          )}
-                          {position === 2 && (
-                            <Medal className="w-5 h-5 text-gray-400" />
-                          )}
-                          {position === 3 && (
-                            <Medal className="w-5 h-5 text-amber-600" />
-                          )}
-                          <span className={`font-bold ${
-                            position <= 3 ? 'text-yellow-400' : 'text-gray-400'
-                          }`}>
-                            #{position}
-                          </span>
+          {/* User Cards */}
+          <div className="space-y-2">
+            {sortedUsers.map((u, index) => {
+              const position = index + 1;
+              const winRate = u.total_predictions > 0
+                ? ((u.correct_predictions / u.total_predictions) * 100).toFixed(1)
+                : '0.0';
+              const isCurrentUser = user?.id === u.id;
+              const isTop3 = position <= 3;
+
+              // Estilos especiales para top 3
+              const getPositionStyles = () => {
+                if (position === 1) return {
+                  bg: 'bg-gradient-to-r from-yellow-500/20 via-amber-500/10 to-yellow-500/20',
+                  border: 'border-yellow-500/50',
+                  ring: 'ring-2 ring-yellow-500/30',
+                  glow: 'shadow-lg shadow-yellow-500/20',
+                  avatar: 'ring-4 ring-yellow-400',
+                  badge: 'bg-gradient-to-r from-yellow-400 to-amber-500 text-black',
+                };
+                if (position === 2) return {
+                  bg: 'bg-gradient-to-r from-gray-400/15 via-slate-400/10 to-gray-400/15',
+                  border: 'border-gray-400/40',
+                  ring: 'ring-2 ring-gray-400/20',
+                  glow: 'shadow-md shadow-gray-400/10',
+                  avatar: 'ring-4 ring-gray-400',
+                  badge: 'bg-gradient-to-r from-gray-300 to-gray-400 text-black',
+                };
+                if (position === 3) return {
+                  bg: 'bg-gradient-to-r from-amber-600/15 via-orange-600/10 to-amber-600/15',
+                  border: 'border-amber-600/40',
+                  ring: 'ring-2 ring-amber-600/20',
+                  glow: 'shadow-md shadow-amber-600/10',
+                  avatar: 'ring-4 ring-amber-600',
+                  badge: 'bg-gradient-to-r from-amber-600 to-orange-600 text-white',
+                };
+                return {
+                  bg: 'bg-gray-900/50',
+                  border: 'border-gray-800',
+                  ring: '',
+                  glow: '',
+                  avatar: 'ring-2 ring-gray-700',
+                  badge: 'bg-gray-800 text-gray-300',
+                };
+              };
+
+              const styles = getPositionStyles();
+
+              return (
+                <div
+                  key={u.id}
+                  onClick={() => router.push(`/perfil/${u.username}`)}
+                  className={`
+                    relative overflow-hidden rounded-xl border cursor-pointer
+                    transition-all duration-300 ease-out
+                    hover:scale-[1.01] hover:-translate-y-0.5
+                    ${styles.bg} ${styles.border} ${styles.ring} ${styles.glow}
+                    ${isCurrentUser ? 'ring-2 ring-purple-500/50' : ''}
+                  `}
+                >
+                  {/* Efecto de brillo para top 3 */}
+                  {isTop3 && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-1000" />
+                  )}
+
+                  <div className="relative p-4">
+                    {/* Mobile Layout */}
+                    <div className="md:hidden space-y-3">
+                      <div className="flex items-center gap-3">
+                        {/* Position Badge */}
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm ${styles.badge}`}>
+                          {position === 1 && <Crown className="w-5 h-5" />}
+                          {position === 2 && <Medal className="w-5 h-5" />}
+                          {position === 3 && <Medal className="w-5 h-5" />}
+                          {position > 3 && `#${position}`}
                         </div>
-                      </td>
 
-                      {/* User info */}
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
+                        {/* Avatar */}
+                        <div className={`relative rounded-full ${styles.avatar}`}>
                           {u.avatar_url ? (
                             <Image
                               src={u.avatar_url}
                               alt={u.display_name || u.username}
-                              width={40}
-                              height={40}
-                              className="w-10 h-10 rounded-full object-cover"
+                              width={48}
+                              height={48}
+                              className="w-12 h-12 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
                               {(u.display_name || u.username).charAt(0).toUpperCase()}
                             </div>
                           )}
-                          <div>
-                            <div className="font-medium text-white flex items-center gap-2">
-                              {u.display_name || u.username}
-                              {u.is_verified && (
-                                <span className="text-blue-400 text-xs">✓</span>
-                              )}
-                              {u.is_premium && (
-                                <span className="text-yellow-400 text-xs">★</span>
-                              )}
-                            </div>
-                            <div className="text-sm text-gray-500">@{u.username}</div>
-                          </div>
                         </div>
-                      </td>
+
+                        {/* User Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-white truncate">
+                              {u.display_name || u.username}
+                            </span>
+                            {u.is_verified && (
+                              <span className="flex-shrink-0 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span className="text-[10px] text-white">✓</span>
+                              </span>
+                            )}
+                            {u.is_premium && (
+                              <span className="flex-shrink-0 text-yellow-400 text-sm">★</span>
+                            )}
+                          </div>
+                          <div className="text-sm text-gray-500">@{u.username}</div>
+                        </div>
+
+                        {/* Level Badge */}
+                        <div className="px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-lg">
+                          <span className="text-purple-400 font-bold text-sm">Lvl {u.level}</span>
+                        </div>
+                      </div>
+
+                      {/* Stats Grid Mobile */}
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-800/50">
+                        <div className="text-center p-2 rounded-lg bg-gray-800/30">
+                          <div className="text-yellow-400 font-bold">{u.ap_coins.toLocaleString()}</div>
+                          <div className="text-[10px] text-gray-500 uppercase">AP Coins</div>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-gray-800/30">
+                          <div className="text-green-400 font-bold">{u.correct_predictions}/{u.total_predictions}</div>
+                          <div className="text-[10px] text-gray-500 uppercase">Aciertos</div>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-gray-800/30">
+                          <div className={`font-bold ${
+                            parseFloat(winRate) >= 60 ? 'text-green-400' :
+                            parseFloat(winRate) >= 40 ? 'text-yellow-400' : 'text-red-400'
+                          }`}>
+                            {winRate}%
+                          </div>
+                          <div className="text-[10px] text-gray-500 uppercase">Win Rate</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Desktop Layout */}
+                    <div className="hidden md:grid md:grid-cols-12 gap-4 items-center">
+                      {/* Position */}
+                      <div className="col-span-1">
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm ${styles.badge}`}>
+                          {position === 1 && <Crown className="w-5 h-5" />}
+                          {position === 2 && <Medal className="w-5 h-5" />}
+                          {position === 3 && <Medal className="w-5 h-5" />}
+                          {position > 3 && `#${position}`}
+                        </div>
+                      </div>
+
+                      {/* User Info */}
+                      <div className="col-span-4 flex items-center gap-3">
+                        <div className={`relative rounded-full ${styles.avatar}`}>
+                          {u.avatar_url ? (
+                            <Image
+                              src={u.avatar_url}
+                              alt={u.display_name || u.username}
+                              width={48}
+                              height={48}
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg">
+                              {(u.display_name || u.username).charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-white truncate">
+                              {u.display_name || u.username}
+                            </span>
+                            {u.is_verified && (
+                              <span className="flex-shrink-0 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                                <span className="text-[10px] text-white">✓</span>
+                              </span>
+                            )}
+                            {u.is_premium && (
+                              <span className="flex-shrink-0 text-yellow-400 text-sm">★</span>
+                            )}
+                          </div>
+                          <div className="text-sm text-gray-500">@{u.username}</div>
+                        </div>
+                      </div>
 
                       {/* Level */}
-                      <td className="px-4 py-4 text-center">
-                        <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-sm font-medium">
-                          Lvl {u.level}
-                        </span>
-                      </td>
+                      <div className="col-span-2 flex justify-center">
+                        <div className="px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-xl">
+                          <span className="text-purple-400 font-bold">Lvl {u.level}</span>
+                        </div>
+                      </div>
 
                       {/* AP Coins */}
-                      <td className="px-4 py-4 text-center">
-                        <span className="text-yellow-400 font-semibold">
-                          {u.ap_coins.toLocaleString()}
-                        </span>
-                      </td>
+                      <div className="col-span-2 text-center">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                          <Award className="w-4 h-4 text-yellow-400" />
+                          <span className="text-yellow-400 font-bold">{u.ap_coins.toLocaleString()}</span>
+                        </div>
+                      </div>
 
-                      {/* Correct Predictions */}
-                      <td className="px-4 py-4 text-center">
-                        <span className="text-green-400">
-                          {u.correct_predictions}/{u.total_predictions}
-                        </span>
-                      </td>
+                      {/* Predictions */}
+                      <div className="col-span-1 text-center">
+                        <div className="inline-flex items-center gap-1 px-3 py-2 bg-green-500/10 border border-green-500/20 rounded-xl">
+                          <Target className="w-4 h-4 text-green-400" />
+                          <span className="text-green-400 font-semibold text-sm">
+                            {u.correct_predictions}/{u.total_predictions}
+                          </span>
+                        </div>
+                      </div>
 
                       {/* Win Rate */}
-                      <td className="px-4 py-4 text-center">
-                        <span className={`font-medium ${
-                          parseFloat(winRate) >= 60 
-                            ? 'text-green-400' 
-                            : parseFloat(winRate) >= 40 
-                              ? 'text-yellow-400' 
-                              : 'text-red-400'
+                      <div className="col-span-2 flex justify-center">
+                        <div className={`relative px-4 py-2 rounded-xl border ${
+                          parseFloat(winRate) >= 60
+                            ? 'bg-green-500/10 border-green-500/30'
+                            : parseFloat(winRate) >= 40
+                              ? 'bg-yellow-500/10 border-yellow-500/30'
+                              : 'bg-red-500/10 border-red-500/30'
                         }`}>
-                          {winRate}%
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-
-            {sortedUsers.length === 0 && (
-              <div className="text-center py-12 text-gray-500">
-                {t('leaderboard.noProphets')}
-              </div>
-            )}
+                          <span className={`font-bold text-lg ${
+                            parseFloat(winRate) >= 60 ? 'text-green-400' :
+                            parseFloat(winRate) >= 40 ? 'text-yellow-400' : 'text-red-400'
+                          }`}>
+                            {winRate}%
+                          </span>
+                          {/* Mini progress bar */}
+                          <div className="absolute bottom-1 left-2 right-2 h-0.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                parseFloat(winRate) >= 60 ? 'bg-green-400' :
+                                parseFloat(winRate) >= 40 ? 'bg-yellow-400' : 'bg-red-400'
+                              }`}
+                              style={{ width: `${Math.min(parseFloat(winRate), 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+
+          {sortedUsers.length === 0 && (
+            <div className="text-center py-12 bg-gray-900/50 rounded-xl border border-gray-800">
+              <Trophy className="w-12 h-12 text-gray-700 mx-auto mb-3" />
+              <p className="text-gray-500">{t('leaderboard.noProphets')}</p>
+            </div>
+          )}
         </section>
 
         {/* Info Footer */}
