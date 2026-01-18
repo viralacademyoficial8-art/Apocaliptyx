@@ -6,6 +6,7 @@ import { Radio, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LiveKitRoom } from '@/components/streaming/LiveKitRoom';
 import { useAuthStore } from '@/lib/stores';
+import { useSession } from 'next-auth/react';
 import toast from 'react-hot-toast';
 
 interface StreamInfo {
@@ -28,6 +29,10 @@ export default function LiveStreamPage() {
   const searchParams = useSearchParams();
   const params = useParams();
   const { user } = useAuthStore();
+  const { data: session, status } = useSession();
+
+  // Get current user ID from NextAuth session or Zustand
+  const currentUserId = user?.id || session?.user?.id;
 
   // Get streamId from params
   const streamId = params.id as string;
@@ -69,9 +74,9 @@ export default function LiveStreamPage() {
         }
 
         // Get LiveKit token - owner is always host regardless of URL param
-        const isOwner = user?.id === infoData.stream.userId;
+        const isOwner = currentUserId === infoData.stream.userId;
         const wantsToHost = isOwner; // Owner is automatically host
-        console.log('Token request:', { streamId, hostParam, userId: user?.id, streamUserId: infoData.stream.userId, isOwner, wantsToHost });
+        console.log('Token request:', { streamId, hostParam, userId: currentUserId, streamUserId: infoData.stream.userId, isOwner, wantsToHost });
 
         const tokenResponse = await fetch('/api/livekit/token', {
           method: 'POST',
@@ -106,7 +111,7 @@ export default function LiveStreamPage() {
     };
 
     loadStream();
-  }, [streamId, hostParam, user?.id]);
+  }, [streamId, hostParam, currentUserId]);
 
   const handleStreamEnd = () => {
     toast.success('Stream finalizado');
