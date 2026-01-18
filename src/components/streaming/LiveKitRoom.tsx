@@ -96,31 +96,29 @@ function RoomContent({
 }) {
   const [showChat, setShowChat] = useState(true);
   const room = useRoomContext();
-  // Track if stream was ended intentionally to prevent duplicate callbacks
-  const intentionalEndRef = useRef(false);
+  // Track if onStreamEnd has been called to prevent duplicates
+  const endCalledRef = useRef(false);
 
-  // Handle intentional stream end (from controls)
-  const handleIntentionalEnd = useCallback(() => {
-    intentionalEndRef.current = true;
-    if (onStreamEnd) {
+  // Handle stream end - only call once (deduplicates multiple triggers)
+  const handleStreamEndOnce = useCallback(() => {
+    if (!endCalledRef.current && onStreamEnd) {
+      endCalledRef.current = true;
       onStreamEnd();
     }
   }, [onStreamEnd]);
 
-  // Handle room disconnect (only for unexpected disconnects)
+  // Handle room disconnect
   useEffect(() => {
     const handleDisconnect = () => {
-      // Only call onStreamEnd if it wasn't an intentional end
-      if (!intentionalEndRef.current && onStreamEnd) {
-        onStreamEnd();
-      }
+      // Always call handleStreamEndOnce - it will deduplicate internally
+      handleStreamEndOnce();
     };
 
     room.on(RoomEvent.Disconnected, handleDisconnect);
     return () => {
       room.off(RoomEvent.Disconnected, handleDisconnect);
     };
-  }, [room, onStreamEnd]);
+  }, [room, handleStreamEndOnce]);
 
   return (
     <div className="flex flex-col lg:flex-row h-full gap-4">
@@ -159,7 +157,7 @@ function RoomContent({
         {/* Host Controls */}
         {isHost && (
           <div className="mt-4">
-            <StreamControls streamId={streamId} onEndStream={handleIntentionalEnd} />
+            <StreamControls streamId={streamId} onEndStream={handleStreamEndOnce} />
           </div>
         )}
       </div>
