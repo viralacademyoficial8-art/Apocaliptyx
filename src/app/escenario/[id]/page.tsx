@@ -606,7 +606,7 @@ export default function EscenarioPage() {
             )}
           </div>
 
-          {!user && scenario.status === "ACTIVE" && (
+          {!isLoggedIn && scenario.status === "ACTIVE" && (
             <p className="text-center text-gray-500 text-sm mt-4">
               <button
                 type="button"
