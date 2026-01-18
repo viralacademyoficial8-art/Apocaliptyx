@@ -328,13 +328,57 @@ export function Footer() {
   const { language } = useLanguage();
   const t = useMemo(() => getDict(language), [language]);
   const currentYear = new Date().getFullYear();
-  
+
   const [stats, setStats] = useState<PublicStats>({
     users: { value: "...", raw: 0 },
     totalPool: { value: "...", raw: 0 },
     scenarios: { value: "...", raw: 0 },
     predictions: { value: "...", raw: 0 },
   });
+
+  // Newsletter state
+  const [email, setEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !email.includes('@')) {
+      setNewsletterStatus('error');
+      setNewsletterMessage(language === 'es' ? 'Por favor ingresa un email válido' : 'Please enter a valid email');
+      return;
+    }
+
+    setNewsletterStatus('loading');
+
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setNewsletterStatus('success');
+        setNewsletterMessage(language === 'es' ? '¡Gracias por suscribirte!' : 'Thanks for subscribing!');
+        setEmail('');
+      } else {
+        const data = await res.json();
+        setNewsletterStatus('error');
+        setNewsletterMessage(data.error || (language === 'es' ? 'Error al suscribirse' : 'Subscription error'));
+      }
+    } catch {
+      setNewsletterStatus('error');
+      setNewsletterMessage(language === 'es' ? 'Error de conexión' : 'Connection error');
+    }
+
+    // Reset status after 5 seconds
+    setTimeout(() => {
+      setNewsletterStatus('idle');
+      setNewsletterMessage('');
+    }, 5000);
+  };
 
   useEffect(() => {
     async function fetchStats() {
@@ -511,16 +555,30 @@ export function Footer() {
               <p className="text-gray-400 text-sm">{t.labels.newsletterSubtitle}</p>
             </div>
 
-            <div className="flex w-full md:w-auto gap-2">
-              <input
-                type="email"
-                placeholder={t.labels.newsletterPlaceholder}
-                className="flex-1 md:w-64 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-              <button className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap">
-                {t.labels.newsletterButton}
-              </button>
-            </div>
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col w-full md:w-auto gap-2">
+              <div className="flex w-full md:w-auto gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t.labels.newsletterPlaceholder}
+                  disabled={newsletterStatus === 'loading'}
+                  className="flex-1 md:w-64 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={newsletterStatus === 'loading'}
+                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors whitespace-nowrap"
+                >
+                  {newsletterStatus === 'loading' ? '...' : t.labels.newsletterButton}
+                </button>
+              </div>
+              {newsletterMessage && (
+                <p className={`text-sm ${newsletterStatus === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  {newsletterMessage}
+                </p>
+              )}
+            </form>
           </div>
         </div>
       </div>

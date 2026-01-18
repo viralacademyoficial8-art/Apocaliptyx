@@ -27,14 +27,14 @@ export async function GET() {
       console.error("Error fetching scenarios:", scenariosError);
     }
 
-    // Obtener suma total de AP Coins (total_p de scenarios como proxy)
+    // Obtener suma total de AP Coins (total_pool de scenarios)
     const { data: poolData, error: poolError } = await supabase()
       .from("scenarios")
-      .select("total_p");
+      .select("total_pool");
 
     let totalPool = 0;
     if (!poolError && poolData) {
-      totalPool = poolData.reduce((sum, s) => sum + (s.total_p || 0), 0);
+      totalPool = poolData.reduce((sum, s) => sum + (s.total_pool || 0), 0);
     }
 
     // Obtener conteo de predicciones (scenario_predictions si existe)
