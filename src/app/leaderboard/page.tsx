@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useAuthStore } from '@/lib/stores';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -365,9 +366,19 @@ export default function LeaderboardPage() {
                       {/* User info */}
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                            {(u.display_name || u.username).charAt(0).toUpperCase()}
-                          </div>
+                          {u.avatar_url ? (
+                            <Image
+                              src={u.avatar_url}
+                              alt={u.display_name || u.username}
+                              width={40}
+                              height={40}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                              {(u.display_name || u.username).charAt(0).toUpperCase()}
+                            </div>
+                          )}
                           <div>
                             <div className="font-medium text-white flex items-center gap-2">
                               {u.display_name || u.username}
