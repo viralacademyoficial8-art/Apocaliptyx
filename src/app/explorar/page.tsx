@@ -7,12 +7,13 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { scenariosService } from '@/services';
 import { useTranslation } from '@/hooks/useTranslation';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useAuthStore } from '@/lib/stores';
 import { formatDate } from '@/lib/utils';
 import { getSupabaseClient } from '@/lib/supabase/client';
 import {
   Search, Filter, Flame, Users, Clock, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Swords, User, Crown
+  Loader2, AlertCircle, ChevronDown, X, Trophy, ShoppingBag, ArrowRight, Swords, User, Crown, Infinity
 } from 'lucide-react';
 import {
   FadeInView,
@@ -60,6 +61,7 @@ export default function ExplorarPage() {
   const { t } = useTranslation();
   const { data: session, status } = useSession();
   const { user, isAuthenticated, refreshBalance } = useAuthStore();
+  const { hasInfiniteCoins } = usePermissions();
 
   // Verificar autenticación usando session de NextAuth (más confiable)
   const isLoggedIn = status === "authenticated" && !!session?.user;
@@ -368,14 +370,25 @@ export default function ExplorarPage() {
                 <StaggerItem>
                   <div
                     onClick={() => router.push('/tienda')}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-orange-500/50 hover:bg-zinc-900 transition-all"
+                    className={`rounded-xl border p-4 flex items-center gap-3 cursor-pointer transition-all ${
+                      hasInfiniteCoins
+                        ? 'border-yellow-500/50 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20'
+                        : 'border-zinc-800 bg-zinc-900/60 hover:border-orange-500/50 hover:bg-zinc-900'
+                    }`}
                   >
                     <Flame className="w-6 h-6 text-orange-400" />
                     <div>
                       <p className="text-xs text-zinc-400">{t('dashboard.apCoins')}</p>
-                      <p className="text-xl font-bold">
-                        {userStats.apCoins.toLocaleString()}
-                      </p>
+                      {hasInfiniteCoins ? (
+                        <div className="flex items-center gap-1">
+                          <Infinity className="w-6 h-6 text-yellow-400" />
+                          <span className="text-xs text-yellow-500/70">∞</span>
+                        </div>
+                      ) : (
+                        <p className="text-xl font-bold">
+                          {userStats.apCoins.toLocaleString()}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </StaggerItem>

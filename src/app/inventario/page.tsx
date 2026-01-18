@@ -28,9 +28,11 @@ import {
   Sparkles,
   Gift,
   Box,
+  Infinity,
 } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import Link from "next/link";
+import { usePermissions } from "@/hooks/usePermissions";
 
 // Iconos por tipo de item
 const typeIcons: Record<string, React.ElementType> = {
@@ -60,6 +62,7 @@ const rarityTextColors: Record<string, string> = {
 export default function PerfilPage() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { hasInfiniteCoins } = usePermissions();
 
   const [profile, setProfile] = useState<UserProfileFromDB | null>(null);
   const [stats, setStats] = useState<UserStatsFromDB | null>(null);
@@ -240,9 +243,19 @@ export default function PerfilPage() {
 
         {/* Stats cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-            <Coins className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{profile.ap_coins.toLocaleString()}</p>
+          <div className={`rounded-xl p-4 text-center ${
+            hasInfiniteCoins
+              ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30'
+              : 'bg-gray-900 border border-gray-800'
+          }`}>
+            {hasInfiniteCoins ? (
+              <Infinity className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
+            ) : (
+              <Coins className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+            )}
+            <p className="text-2xl font-bold">
+              {hasInfiniteCoins ? '∞' : profile.ap_coins.toLocaleString()}
+            </p>
             <p className="text-sm text-gray-400">AP Coins</p>
           </div>
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">

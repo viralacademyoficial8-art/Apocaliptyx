@@ -8,14 +8,17 @@ import {
   Zap,
   Flame,
   Calendar,
+  Infinity,
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { hasInfiniteCoins as checkInfiniteCoins, UserRole } from '@/types/roles';
 
 interface ProfileStatsProps {
   user: User;
 }
 
 export function ProfileStats({ user: profileUser }: ProfileStatsProps) {
+  const hasInfiniteCoins = checkInfiniteCoins(profileUser.role as UserRole || 'USER');
   const totalScenarios = profileUser.scenariosCreated;
   const wonScenarios = profileUser.scenariosWon;
   const lostScenarios = totalScenarios - wonScenarios;
@@ -55,12 +58,12 @@ export function ProfileStats({ user: profileUser }: ProfileStatsProps) {
       borderColor: 'border-red-500/20',
     },
     {
-      icon: Flame,
+      icon: hasInfiniteCoins ? Infinity : Flame,
       label: 'AP Coins',
-      value: profileUser.apCoins.toLocaleString(),
-      color: 'text-orange-400',
-      bgColor: 'bg-orange-500/10',
-      borderColor: 'border-orange-500/20',
+      value: hasInfiniteCoins ? '∞' : profileUser.apCoins.toLocaleString(),
+      color: hasInfiniteCoins ? 'text-yellow-400' : 'text-orange-400',
+      bgColor: hasInfiniteCoins ? 'bg-yellow-500/10' : 'bg-orange-500/10',
+      borderColor: hasInfiniteCoins ? 'border-yellow-500/20' : 'border-orange-500/20',
     },
     {
       icon: Calendar,

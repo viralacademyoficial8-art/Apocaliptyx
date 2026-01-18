@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { scenarioStealingService, SHIELD_TYPES } from '@/services/scenarioStealing.service';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { hasInfiniteCoins, UserRole } from '@/types/roles';
 
 const supabase = () => getSupabaseAdmin();
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     // Obtener el ID del usuario desde la base de datos
     const { data: userData, error: userError } = await supabase()
       .from('users')
-      .select('id, ap_coins')
+      .select('id, ap_coins, role')
       .eq('email', session.user.email)
       .single();
 
@@ -56,6 +57,10 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Verificar si el usuario tiene coins infinitas
+    const userHasInfiniteCoins = hasInfiniteCoins(userData.role as UserRole || 'USER');
+    const originalBalance = userData.ap_coins;
 
     // Verificar que sea el holder del escenario
     const { data: scenario } = await supabase()
@@ -94,6 +99,14 @@ export async function POST(request: NextRequest) {
         { error: result.error },
         { status: 400 }
       );
+    }
+
+    // Si el usuario tiene coins infinitas, restaurar su balance
+    if (userHasInfiniteCoins) {
+      await supabase()
+        .from('users')
+        .update({ ap_coins: originalBalance })
+        .eq('id', userData.id);
     }
 
     return NextResponse.json({
