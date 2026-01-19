@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, isPublic, requiresApproval, categories, themeColor } = body;
+    const { name, description, isPublic, requiresApproval, categories, themeColor, iconUrl, bannerUrl } = body;
 
     if (!name) {
       return NextResponse.json({ error: 'Nombre requerido' }, { status: 400 });
@@ -154,6 +154,8 @@ export async function POST(request: NextRequest) {
         name,
         slug,
         description,
+        icon_url: iconUrl || null,
+        banner_url: bannerUrl || null,
         is_public: isPublic !== false,
         requires_approval: requiresApproval || false,
         categories: categories || [],
