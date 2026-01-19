@@ -74,17 +74,15 @@ export default function EscenarioPage() {
 
   // Sincronizar sesión de NextAuth con Zustand
   useEffect(() => {
-    if (status === 'authenticated' && session?.user && !user) {
+    if (status === 'authenticated' && session?.user) {
+      // Always refresh balance when authenticated to ensure we have latest apCoins
       refreshBalance();
     }
-  }, [status, session, user, refreshBalance]);
+  }, [status, session, refreshBalance]);
 
-  // Usar datos de Zustand si existen, sino de la session
-  const currentUser = user || (session?.user ? {
-    id: session.user.id || "",
-    username: (session.user as any).username || session.user.email?.split("@")[0] || "user",
-    apCoins: 0,
-  } : null);
+  // Usar datos de Zustand si existen, sino esperar a que se carguen
+  const currentUser = user;
+  const isBalanceLoading = status === 'authenticated' && !user;
 
   const isLoggedIn = status === "authenticated" && !!session?.user;
 
@@ -279,6 +277,7 @@ export default function EscenarioPage() {
 
   const canSteal = () => {
     if (!isLoggedIn || !currentUser) return false;
+    if (isBalanceLoading) return false; // Wait for balance to load
     if (isOwner) return false;
     if (scenario?.status !== "ACTIVE") return false;
     if (isProtected) return false;
@@ -286,10 +285,29 @@ export default function EscenarioPage() {
     return true;
   };
 
+  const getStealButtonText = () => {
+    if (!isLoggedIn) return "Inicia sesión para robar";
+    if (isBalanceLoading) return "Cargando...";
+    if ((currentUser?.apCoins || 0) < currentPrice) {
+      return `Necesitas ${currentPrice} AP (tienes ${currentUser?.apCoins || 0})`;
+    }
+    return `Robar por ${currentPrice} AP`;
+  };
+
   const handleSteal = async () => {
     if (!isLoggedIn || !currentUser) {
-      toast.error("Debes iniciar sesión");
+      toast.error("Debes iniciar sesión para robar");
       router.push("/login");
+      return;
+    }
+
+    if (isBalanceLoading) {
+      toast.error("Espera a que se cargue tu balance");
+      return;
+    }
+
+    if ((currentUser?.apCoins || 0) < currentPrice) {
+      toast.error(`No tienes suficientes AP. Necesitas ${currentPrice} AP, tienes ${currentUser?.apCoins || 0}`);
       return;
     }
 
@@ -304,7 +322,9 @@ export default function EscenarioPage() {
 
       if (result.success) {
         toast.success(`¡Escenario robado! Pagaste ${result.stealPrice} AP`);
-        // Recargar la página para ver los cambios
+        // Refresh balance after steal
+        refreshBalance();
+        // Reload page to see changes
         setTimeout(() => {
           window.location.reload();
         }, 1500);
@@ -312,6 +332,7 @@ export default function EscenarioPage() {
         toast.error(result.error || "Error al robar escenario");
       }
     } catch (error: any) {
+      console.error("Steal error:", error);
       toast.error(error?.message || "Error al robar escenario");
     } finally {
       setIsStealing(false);
@@ -562,7 +583,7 @@ export default function EscenarioPage() {
                   <button
                     type="button"
                     onClick={handleSteal}
-                    disabled={!canSteal() || isStealing}
+                    disabled={!canSteal() || isStealing || isBalanceLoading}
                     className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors"
                   >
                     {isStealing ? (
@@ -570,10 +591,15 @@ export default function EscenarioPage() {
                         <Loader2 className="w-5 h-5 animate-spin" />
                         Robando...
                       </>
+                    ) : isBalanceLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Cargando...
+                      </>
                     ) : (
                       <>
                         <Zap className="w-5 h-5" />
-                        Robar por {currentPrice} AP
+                        {getStealButtonText()}
                       </>
                     )}
                   </button>
