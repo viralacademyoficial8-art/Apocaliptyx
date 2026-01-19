@@ -637,7 +637,7 @@ export default function EscenarioPage() {
                   <button
                     type="button"
                     onClick={(balanceLoadError || !currentUser) && !isBalanceLoading ? handleRetryLoadBalance : handleSteal}
-                    disabled={isStealing || isBalanceLoading || (!canSteal() && !balanceLoadError && currentUser)}
+                    disabled={isStealing || isBalanceLoading || (!canSteal() && !balanceLoadError && !!currentUser)}
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 ${
                       balanceLoadError || (!currentUser && balanceLoadAttempted)
                         ? 'bg-yellow-600 hover:bg-yellow-700'
