@@ -31,11 +31,6 @@ export function usePermissions() {
     const zustandRole = user?.role as UserRole | undefined;
     const sessionRole = session?.user?.role as UserRole | undefined;
 
-    // Debug: mostrar qué roles tenemos
-    if (typeof window !== 'undefined') {
-      console.log('[usePermissions] Zustand role:', zustandRole, '| Session role:', sessionRole);
-    }
-
     // Prioridad:
     // 1) Si la session tiene un rol admin, usarlo (viene del login más reciente)
     // 2) Si Zustand tiene un rol admin, usarlo (puede venir de /api/me)
