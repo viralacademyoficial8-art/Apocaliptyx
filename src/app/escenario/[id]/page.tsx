@@ -74,25 +74,63 @@ export default function EscenarioPage() {
 
   // Estado para tracking de carga del balance
   const [balanceLoadAttempted, setBalanceLoadAttempted] = useState(false);
+  const [balanceLoadError, setBalanceLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Función para cargar el balance con reintentos
+  const loadUserBalance = async (attempt = 0): Promise<boolean> => {
+    try {
+      setBalanceLoadError(false);
+      await refreshBalance();
+      // Verificar si el usuario se cargó correctamente después de refreshBalance
+      const currentState = useAuthStore.getState();
+      if (currentState.user) {
+        return true;
+      }
+      throw new Error('User not loaded');
+    } catch (error) {
+      console.error(`Balance load attempt ${attempt + 1} failed:`, error);
+      if (attempt < 2) {
+        // Reintentar hasta 3 veces con delay exponencial
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        return loadUserBalance(attempt + 1);
+      }
+      setBalanceLoadError(true);
+      return false;
+    }
+  };
 
   // Sincronizar sesión de NextAuth con Zustand
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       // Always refresh balance when authenticated to ensure we have latest apCoins
-      refreshBalance().finally(() => {
+      loadUserBalance().finally(() => {
         setBalanceLoadAttempted(true);
       });
 
-      // Fallback: si después de 5 segundos no se carga, marcar como intentado
+      // Fallback: si después de 8 segundos no se carga, marcar como intentado
       const timeout = setTimeout(() => {
         setBalanceLoadAttempted(true);
-      }, 5000);
+      }, 8000);
 
       return () => clearTimeout(timeout);
     } else if (status === 'unauthenticated') {
       setBalanceLoadAttempted(true);
+      setBalanceLoadError(false);
     }
-  }, [status, session, refreshBalance]);
+  }, [status, session]);
+
+  // Función para reintentar manualmente
+  const handleRetryLoadBalance = async () => {
+    setBalanceLoadAttempted(false);
+    setBalanceLoadError(false);
+    setRetryCount(prev => prev + 1);
+    const success = await loadUserBalance();
+    setBalanceLoadAttempted(true);
+    if (!success) {
+      toast.error('No se pudo cargar tu información. Intenta recargar la página.');
+    }
+  };
 
   // Usar datos de Zustand si existen
   const currentUser = user;
@@ -303,7 +341,7 @@ export default function EscenarioPage() {
   const getStealButtonText = () => {
     if (!isLoggedIn) return "Inicia sesión para robar";
     if (isBalanceLoading) return "Cargando...";
-    if (!currentUser) return "Error al cargar datos";
+    if (balanceLoadError || !currentUser) return "Reintentar carga";
     if ((currentUser?.apCoins || 0) < currentPrice) {
       return `Necesitas ${currentPrice} AP (tienes ${currentUser?.apCoins || 0})`;
     }
@@ -598,9 +636,13 @@ export default function EscenarioPage() {
                 {!isOwner && scenario.status === "ACTIVE" && (
                   <button
                     type="button"
-                    onClick={handleSteal}
-                    disabled={!canSteal() || isStealing || isBalanceLoading}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors"
+                    onClick={(balanceLoadError || !currentUser) && !isBalanceLoading ? handleRetryLoadBalance : handleSteal}
+                    disabled={isStealing || isBalanceLoading || (!canSteal() && !balanceLoadError && currentUser)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 ${
+                      balanceLoadError || (!currentUser && balanceLoadAttempted)
+                        ? 'bg-yellow-600 hover:bg-yellow-700'
+                        : 'bg-red-600 hover:bg-red-700 disabled:bg-gray-700'
+                    } disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors`}
                   >
                     {isStealing ? (
                       <>
@@ -611,6 +653,11 @@ export default function EscenarioPage() {
                       <>
                         <Loader2 className="w-5 h-5 animate-spin" />
                         Cargando...
+                      </>
+                    ) : balanceLoadError || (!currentUser && balanceLoadAttempted) ? (
+                      <>
+                        <AlertCircle className="w-5 h-5" />
+                        {getStealButtonText()}
                       </>
                     ) : (
                       <>
