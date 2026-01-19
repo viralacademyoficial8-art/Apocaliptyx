@@ -62,10 +62,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtener el ID del usuario desde la base de datos
+    // Usar ilike para búsqueda case-insensitive del email
+    const normalizedEmail = session.user.email.toLowerCase().trim();
     const { data: userData, error: userError } = await supabase()
       .from('users')
       .select('id, ap_coins, role')
-      .eq('email', session.user.email)
+      .ilike('email', normalizedEmail)
       .single();
 
     if (userError || !userData) {

@@ -24,10 +24,12 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
 
     // Obtener el ID del usuario desde la base de datos
+    // Usar ilike para búsqueda case-insensitive del email
+    const normalizedEmail = session.user.email.toLowerCase().trim();
     const { data: userData, error: userError } = await supabase()
       .from('users')
       .select('id')
-      .eq('email', session.user.email)
+      .ilike('email', normalizedEmail)
       .single();
 
     if (userError || !userData) {
