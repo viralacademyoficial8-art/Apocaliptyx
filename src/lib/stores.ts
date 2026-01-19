@@ -97,48 +97,58 @@ export const useAuthStore = create<AuthState>()(
       refreshBalance: async () => {
         try {
           const response = await fetch('/api/me');
-          if (response.ok) {
-            const data = await response.json();
-            const currentUser = get().user;
+          const data = await response.json();
 
-            if (currentUser) {
-              // Actualizar usuario existente con los datos frescos de la BD
-              // Incluye role, apCoins, createdAt y otros datos importantes
-              set({
-                user: {
-                  ...currentUser,
-                  apCoins: data.apCoins ?? currentUser.apCoins,
-                  role: data.role ?? currentUser.role,
-                  displayName: data.displayName ?? currentUser.displayName,
-                  avatarUrl: data.avatarUrl ?? currentUser.avatarUrl,
-                  username: data.username ?? currentUser.username,
-                  createdAt: data.createdAt ? new Date(data.createdAt) : currentUser.createdAt,
-                },
-                isAuthenticated: true
-              });
-            } else if (data.id) {
-              // Si no hay usuario en Zustand pero la API devolvió datos, crear el usuario
-              set({
-                user: {
-                  id: data.id,
-                  email: data.email || '',
-                  username: data.username || '',
-                  displayName: data.displayName || data.username || '',
-                  avatarUrl: data.avatarUrl || '',
-                  prophetLevel: 'vidente',
-                  reputationScore: 0,
-                  apCoins: data.apCoins ?? 1000,
-                  scenariosCreated: 0,
-                  scenariosWon: 0,
-                  winRate: 0,
-                  followers: 0,
-                  following: 0,
-                  createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
-                  role: data.role || 'USER',
-                },
-                isAuthenticated: true,
-              });
-            }
+          if (!response.ok) {
+            console.error('Error from /api/me:', data.error || response.status);
+            return;
+          }
+
+          if (!data || !data.id) {
+            console.error('Invalid response from /api/me:', data);
+            return;
+          }
+
+          const currentUser = get().user;
+
+          if (currentUser) {
+            // Actualizar usuario existente con los datos frescos de la BD
+            // Incluye role, apCoins, createdAt y otros datos importantes
+            set({
+              user: {
+                ...currentUser,
+                id: data.id,
+                apCoins: data.apCoins ?? currentUser.apCoins,
+                role: data.role ?? currentUser.role,
+                displayName: data.displayName ?? currentUser.displayName,
+                avatarUrl: data.avatarUrl ?? currentUser.avatarUrl,
+                username: data.username ?? currentUser.username,
+                createdAt: data.createdAt ? new Date(data.createdAt) : currentUser.createdAt,
+              },
+              isAuthenticated: true
+            });
+          } else {
+            // Si no hay usuario en Zustand pero la API devolvió datos, crear el usuario
+            set({
+              user: {
+                id: data.id,
+                email: data.email || '',
+                username: data.username || '',
+                displayName: data.displayName || data.username || '',
+                avatarUrl: data.avatarUrl || '',
+                prophetLevel: 'vidente',
+                reputationScore: 0,
+                apCoins: data.apCoins ?? 1000,
+                scenariosCreated: 0,
+                scenariosWon: 0,
+                winRate: 0,
+                followers: 0,
+                following: 0,
+                createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
+                role: data.role || 'USER',
+              },
+              isAuthenticated: true,
+            });
           }
         } catch (error) {
           console.error('Error refreshing balance:', error);

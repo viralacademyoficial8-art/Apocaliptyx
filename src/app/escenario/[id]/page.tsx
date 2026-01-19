@@ -72,17 +72,32 @@ export default function EscenarioPage() {
   const { data: session, status } = useSession();
   const { user, refreshBalance } = useAuthStore();
 
+  // Estado para tracking de carga del balance
+  const [balanceLoadAttempted, setBalanceLoadAttempted] = useState(false);
+
   // Sincronizar sesión de NextAuth con Zustand
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       // Always refresh balance when authenticated to ensure we have latest apCoins
-      refreshBalance();
+      refreshBalance().finally(() => {
+        setBalanceLoadAttempted(true);
+      });
+
+      // Fallback: si después de 5 segundos no se carga, marcar como intentado
+      const timeout = setTimeout(() => {
+        setBalanceLoadAttempted(true);
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    } else if (status === 'unauthenticated') {
+      setBalanceLoadAttempted(true);
     }
   }, [status, session, refreshBalance]);
 
-  // Usar datos de Zustand si existen, sino esperar a que se carguen
+  // Usar datos de Zustand si existen
   const currentUser = user;
-  const isBalanceLoading = status === 'authenticated' && !user;
+  // Solo mostrar loading si está autenticado, no hay user, y no se ha intentado cargar
+  const isBalanceLoading = status === 'authenticated' && !user && !balanceLoadAttempted;
 
   const isLoggedIn = status === "authenticated" && !!session?.user;
 
@@ -288,6 +303,7 @@ export default function EscenarioPage() {
   const getStealButtonText = () => {
     if (!isLoggedIn) return "Inicia sesión para robar";
     if (isBalanceLoading) return "Cargando...";
+    if (!currentUser) return "Error al cargar datos";
     if ((currentUser?.apCoins || 0) < currentPrice) {
       return `Necesitas ${currentPrice} AP (tienes ${currentUser?.apCoins || 0})`;
     }
