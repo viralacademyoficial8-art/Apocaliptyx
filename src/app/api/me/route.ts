@@ -43,6 +43,7 @@ export async function GET() {
       });
     }
 
+    // Intentar buscar usuario - primero con búsqueda exacta, luego case-insensitive
     let { data: user, error } = await supabase
       .from('users')
       .select(`
@@ -61,6 +62,33 @@ export async function GET() {
       `)
       .ilike('email', normalizedEmail)
       .single();
+
+    // Si no se encuentra con ilike, intentar con el email original (por si hay caracteres especiales)
+    if ((error?.code === 'PGRST116' || !user) && session.user.email !== normalizedEmail) {
+      const retryResult = await supabase
+        .from('users')
+        .select(`
+          id,
+          username,
+          email,
+          display_name,
+          avatar_url,
+          role,
+          ap_coins,
+          level,
+          experience,
+          is_verified,
+          is_premium,
+          created_at
+        `)
+        .eq('email', session.user.email)
+        .single();
+
+      if (retryResult.data) {
+        user = retryResult.data;
+        error = null;
+      }
+    }
 
     // Si el usuario no existe en la tabla users, crearlo automáticamente
     // Esto puede pasar si hubo un error durante el registro OAuth
@@ -152,11 +180,53 @@ export async function GET() {
             user = existingUser;
           } else {
             console.error('Error fetching user after race condition:', fetchError);
-            return NextResponse.json({ error: 'Error al crear perfil de usuario' }, { status: 500 });
+            // Fallback: devolver datos de sesión para no bloquear la UI
+            return NextResponse.json({
+              id: session.user.id || 'temp-user',
+              email: session.user.email,
+              username: session.user.username || session.user.email?.split('@')[0] || 'user',
+              displayName: session.user.name || session.user.username || 'Usuario',
+              avatarUrl: session.user.image || '',
+              role: 'USER',
+              apCoins: 1000,
+              level: 1,
+              experience: 0,
+              isVerified: false,
+              isPremium: false,
+              createdAt: new Date().toISOString(),
+              _fallback: true,
+              _error: 'race_condition_fetch_failed'
+            });
           }
         } else {
-          console.error('Error creating user profile in /api/me:', insertError);
-          return NextResponse.json({ error: 'Error al crear perfil de usuario' }, { status: 500 });
+          // Log detallado del error para debugging
+          console.error('Error creating user profile in /api/me:', {
+            code: insertError?.code,
+            message: insertError?.message,
+            details: insertError?.details,
+            hint: insertError?.hint,
+            email: normalizedEmail,
+            username: username
+          });
+
+          // Fallback: devolver datos de sesión para no bloquear la UI
+          return NextResponse.json({
+            id: session.user.id || 'temp-user',
+            email: session.user.email,
+            username: session.user.username || session.user.email?.split('@')[0] || 'user',
+            displayName: session.user.name || session.user.username || 'Usuario',
+            avatarUrl: session.user.image || '',
+            role: 'USER',
+            apCoins: 1000,
+            level: 1,
+            experience: 0,
+            isVerified: false,
+            isPremium: false,
+            createdAt: new Date().toISOString(),
+            _fallback: true,
+            _error: insertError?.code || 'insert_failed',
+            _errorMessage: insertError?.message
+          });
         }
       } else {
         // Usuario creado exitosamente, crear notificación de bienvenida
