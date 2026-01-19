@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,8 @@ import {
   Check,
   Ban,
   Clock,
+  Upload,
+  ImageIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -121,6 +123,17 @@ export function CommunitySettingsModal({
   const [rules, setRules] = useState<string[]>(community.rules || []);
   const [newRule, setNewRule] = useState('');
 
+  // Image states
+  const [iconUrl, setIconUrl] = useState(community.iconUrl || '');
+  const [bannerUrl, setBannerUrl] = useState(community.bannerUrl || '');
+  const [iconPreview, setIconPreview] = useState<string | null>(community.iconUrl || null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(community.bannerUrl || null);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
+
+  const iconInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
+
   // Requests state
   const [requests, setRequests] = useState<JoinRequest[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
@@ -176,6 +189,115 @@ export function CommunitySettingsModal({
       toast.error('Error al cargar miembros');
     } finally {
       setLoadingMembers(false);
+    }
+  };
+
+  const uploadImage = async (file: File, type: 'icon' | 'banner'): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+      formData.append('communityId', community.id);
+
+      const response = await fetch('/api/communities/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        toast.error(data.error);
+        return null;
+      }
+
+      return data.url;
+    } catch {
+      toast.error(`Error al subir ${type === 'icon' ? 'el logo' : 'el banner'}`);
+      return null;
+    }
+  };
+
+  const handleIconChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('El logo no puede superar 5MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten imagenes');
+      return;
+    }
+
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setIconPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload immediately
+    setUploadingIcon(true);
+    const url = await uploadImage(file, 'icon');
+    if (url) {
+      setIconUrl(url);
+      toast.success('Logo subido correctamente');
+    } else {
+      // Revert preview on failure
+      setIconPreview(community.iconUrl || null);
+    }
+    setUploadingIcon(false);
+  };
+
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('El banner no puede superar 10MB');
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Solo se permiten imagenes');
+      return;
+    }
+
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBannerPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload immediately
+    setUploadingBanner(true);
+    const url = await uploadImage(file, 'banner');
+    if (url) {
+      setBannerUrl(url);
+      toast.success('Banner subido correctamente');
+    } else {
+      // Revert preview on failure
+      setBannerPreview(community.bannerUrl || null);
+    }
+    setUploadingBanner(false);
+  };
+
+  const removeIcon = () => {
+    setIconUrl('');
+    setIconPreview(null);
+    if (iconInputRef.current) {
+      iconInputRef.current.value = '';
+    }
+  };
+
+  const removeBanner = () => {
+    setBannerUrl('');
+    setBannerPreview(null);
+    if (bannerInputRef.current) {
+      bannerInputRef.current.value = '';
     }
   };
 
@@ -260,6 +382,8 @@ export function CommunitySettingsModal({
         isPublic,
         requiresApproval,
         rules,
+        iconUrl: iconUrl || undefined,
+        bannerUrl: bannerUrl || undefined,
       };
 
       const response = await fetch(`/api/communities/${community.id}`, {
@@ -439,6 +563,98 @@ export function CommunitySettingsModal({
           <div className="flex-1 overflow-y-auto pr-2">
             {activeSection === 'general' && (
               <div className="space-y-4">
+                {/* Banner and Icon Upload */}
+                <div>
+                  <Label>Banner e icono</Label>
+                  <div
+                    className="relative h-32 rounded-lg overflow-hidden cursor-pointer group mt-2"
+                    onClick={() => !saving && bannerInputRef.current?.click()}
+                    style={{
+                      background: bannerPreview
+                        ? `url(${bannerPreview}) center/cover`
+                        : `linear-gradient(135deg, ${themeColor}60, ${themeColor}20)`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      {uploadingBanner ? (
+                        <Loader2 className="w-8 h-8 animate-spin text-white" />
+                      ) : (
+                        <div className="text-center">
+                          <Upload className="w-8 h-8 text-white mx-auto mb-1" />
+                          <span className="text-white text-sm">Cambiar banner</span>
+                        </div>
+                      )}
+                    </div>
+                    {bannerPreview && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeBanner();
+                        }}
+                        className="absolute top-2 right-2 p-1 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    )}
+                    {/* Icon overlay */}
+                    <div className="absolute bottom-3 left-3">
+                      <div
+                        className="w-14 h-14 rounded-xl flex items-center justify-center text-xl font-bold border-2 border-gray-900 cursor-pointer group/icon overflow-hidden relative"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          !saving && iconInputRef.current?.click();
+                        }}
+                        style={{
+                          background: iconPreview
+                            ? `url(${iconPreview}) center/cover`
+                            : themeColor,
+                        }}
+                      >
+                        {!iconPreview && (name.charAt(0) || '?')}
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover/icon:opacity-100 transition-opacity">
+                          {uploadingIcon ? (
+                            <Loader2 className="w-5 h-5 animate-spin text-white" />
+                          ) : (
+                            <ImageIcon className="w-5 h-5 text-white" />
+                          )}
+                        </div>
+                        {iconPreview && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeIcon();
+                            }}
+                            className="absolute -top-1 -right-1 p-0.5 bg-red-500 rounded-full opacity-0 group-hover/icon:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3 text-white" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <input
+                    ref={bannerInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBannerChange}
+                    className="hidden"
+                    disabled={saving || uploadingBanner}
+                  />
+                  <input
+                    ref={iconInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleIconChange}
+                    className="hidden"
+                    disabled={saving || uploadingIcon}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Banner: max 10MB | Logo: max 5MB (click en el icono para cambiar)
+                  </p>
+                </div>
+
                 <div>
                   <Label htmlFor="name">Nombre de la comunidad</Label>
                   <Input

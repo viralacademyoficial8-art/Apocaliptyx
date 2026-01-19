@@ -709,6 +709,8 @@ function ForoContent() {
     requiresApproval: boolean;
     categories: string[];
     themeColor: string;
+    iconUrl?: string;
+    bannerUrl?: string;
   }): Promise<boolean> => {
     if (!isLoggedIn) {
       toast.error(t('forum.communities.loginToCreate'));
@@ -1937,6 +1939,8 @@ function ForoContent() {
                     requiresApproval: data.requiresApproval,
                     categories: data.categories,
                     themeColor: data.themeColor,
+                    iconUrl: data.iconUrl,
+                    bannerUrl: data.bannerUrl,
                   })}
                 />
               )}
