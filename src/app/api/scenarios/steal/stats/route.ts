@@ -30,10 +30,12 @@ export async function GET(request: NextRequest) {
       userId = targetUserId;
     } else {
       // Ver stats propias
+      // Usar ilike para búsqueda case-insensitive del email
+      const normalizedEmail = session.user.email.toLowerCase().trim();
       const { data: userData, error: userError } = await supabase()
         .from('users')
         .select('id')
-        .eq('email', session.user.email)
+        .ilike('email', normalizedEmail)
         .single();
 
       if (userError || !userData) {

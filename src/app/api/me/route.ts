@@ -125,21 +125,52 @@ export async function GET() {
         .single();
 
       if (insertError || !newUser) {
-        console.error('Error creating user profile in /api/me:', insertError);
-        return NextResponse.json({ error: 'Error al crear perfil de usuario' }, { status: 500 });
+        // Si el error es por duplicado (race condition), intentar buscar el usuario de nuevo
+        if (insertError?.code === '23505' || insertError?.message?.includes('duplicate')) {
+          console.log('Race condition detected, fetching existing user for:', normalizedEmail);
+
+          const { data: existingUser, error: fetchError } = await supabase
+            .from('users')
+            .select(`
+              id,
+              username,
+              email,
+              display_name,
+              avatar_url,
+              role,
+              ap_coins,
+              level,
+              experience,
+              is_verified,
+              is_premium,
+              created_at
+            `)
+            .ilike('email', normalizedEmail)
+            .single();
+
+          if (existingUser) {
+            user = existingUser;
+          } else {
+            console.error('Error fetching user after race condition:', fetchError);
+            return NextResponse.json({ error: 'Error al crear perfil de usuario' }, { status: 500 });
+          }
+        } else {
+          console.error('Error creating user profile in /api/me:', insertError);
+          return NextResponse.json({ error: 'Error al crear perfil de usuario' }, { status: 500 });
+        }
+      } else {
+        // Usuario creado exitosamente, crear notificación de bienvenida
+        await supabase.from('notifications').insert({
+          user_id: newUser.id,
+          type: 'welcome',
+          title: '¡Bienvenido a Apocaliptyx! 🎉',
+          message: `Hola @${username}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
+          link_url: '/explorar',
+          is_read: false,
+        });
+
+        user = newUser;
       }
-
-      // Crear notificación de bienvenida
-      await supabase.from('notifications').insert({
-        user_id: newUser.id,
-        type: 'welcome',
-        title: '¡Bienvenido a Apocaliptyx! 🎉',
-        message: `Hola @${username}, has recibido 1,000 AP Coins de regalo. ¡Comienza a predecir el futuro!`,
-        link_url: '/explorar',
-        is_read: false,
-      });
-
-      user = newUser;
     } else if (error) {
       console.error('Supabase error in /api/me:', error);
       return NextResponse.json({ error: 'Error de base de datos' }, { status: 500 });
