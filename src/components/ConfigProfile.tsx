@@ -201,6 +201,16 @@ export function ConfigProfile() {
       return;
     }
 
+    if (formData.username.length > 20) {
+      toast.error('El username no puede tener más de 20 caracteres');
+      return;
+    }
+
+    if (formData.bio.length > 200) {
+      toast.error('La biografía no puede tener más de 200 caracteres');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -235,16 +245,23 @@ export function ConfigProfile() {
 
       if (error) {
         console.error('Update error:', error);
-        toast.error('Error al actualizar el perfil');
+        // Manejar error de username duplicado (race condition)
+        if (error.code === '23505' || error.message?.includes('duplicate') || error.message?.includes('unique')) {
+          toast.error('Este nombre de usuario ya está en uso');
+        } else {
+          toast.error('Error al actualizar el perfil');
+        }
         return;
       }
 
-      // Actualizar en Zustand
+      // Actualizar en Zustand (incluir todos los campos)
       updateProfile({
         displayName: formData.displayName,
         username: formData.username.toLowerCase(),
         avatarUrl: formData.avatarUrl,
-      });
+        bio: formData.bio,
+        bannerUrl: formData.bannerUrl,
+      } as any);
 
       toast.success('¡Perfil actualizado correctamente!');
     } catch (error) {

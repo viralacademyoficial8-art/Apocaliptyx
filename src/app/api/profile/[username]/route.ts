@@ -271,14 +271,31 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
+    // Validación de campos
+    if (body.bio !== undefined && body.bio.length > 200) {
+      return NextResponse.json({ error: 'La biografía no puede tener más de 200 caracteres' }, { status: 400 });
+    }
+
+    if (body.displayName !== undefined && !body.displayName.trim()) {
+      return NextResponse.json({ error: 'El nombre no puede estar vacío' }, { status: 400 });
+    }
+
+    if (body.displayName !== undefined && body.displayName.length > 50) {
+      return NextResponse.json({ error: 'El nombre no puede tener más de 50 caracteres' }, { status: 400 });
+    }
+
     const allowedFields = ['display_name', 'bio', 'avatar_url', 'banner_url'];
     const updates: Record<string, any> = {};
-    
+
     for (const field of allowedFields) {
       const camelField = field.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
       if (body[camelField] !== undefined) {
         updates[field] = body[camelField];
       }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No hay cambios para guardar' }, { status: 400 });
     }
 
     const { error } = await getSupabaseAdmin()
