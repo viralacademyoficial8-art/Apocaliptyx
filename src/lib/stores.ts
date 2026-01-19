@@ -96,17 +96,24 @@ export const useAuthStore = create<AuthState>()(
 
       refreshBalance: async () => {
         try {
-          const response = await fetch('/api/me');
-          const data = await response.json();
+          const response = await fetch('/api/me', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache',
+            },
+          });
 
           if (!response.ok) {
-            console.error('Error from /api/me:', data.error || response.status);
-            return;
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Error from /api/me:', errorData.error || response.status);
+            throw new Error(errorData.error || `HTTP ${response.status}`);
           }
+
+          const data = await response.json();
 
           if (!data || !data.id) {
             console.error('Invalid response from /api/me:', data);
-            return;
+            throw new Error('Invalid user data received');
           }
 
           const currentUser = get().user;
@@ -152,6 +159,7 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           console.error('Error refreshing balance:', error);
+          throw error; // Re-throw to allow callers to handle the error
         }
       },
     }),
