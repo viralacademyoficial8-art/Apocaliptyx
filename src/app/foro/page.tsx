@@ -1411,7 +1411,7 @@ function ForoContent() {
             }`}
           >
             <MessageCircle className="w-4 h-4" />
-            Feed
+            Para ti
           </button>
           <button
             type="button"
