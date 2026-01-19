@@ -19,6 +19,30 @@ export async function GET() {
     const normalizedEmail = session.user.email.toLowerCase().trim();
 
     const supabase = getSupabaseAdmin();
+
+    // Verificar que las variables de entorno están configuradas
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceKey) {
+      console.error('[/api/me] Missing Supabase env vars - URL:', !!supabaseUrl, 'Key:', !!serviceKey);
+      // Fallback: devolver datos básicos de la sesión
+      return NextResponse.json({
+        id: session.user.id || 'session-user',
+        email: session.user.email,
+        username: session.user.username || session.user.email?.split('@')[0] || 'user',
+        displayName: session.user.name || session.user.username || 'Usuario',
+        avatarUrl: session.user.image || '',
+        role: (session.user.role || 'USER').toUpperCase(),
+        apCoins: session.user.apCoins ?? 1000,
+        level: session.user.level ?? 1,
+        experience: 0,
+        isVerified: session.user.isVerified ?? false,
+        isPremium: session.user.isPremium ?? false,
+        createdAt: session.user.createdAt || new Date().toISOString(),
+      });
+    }
+
     let { data: user, error } = await supabase
       .from('users')
       .select(`
