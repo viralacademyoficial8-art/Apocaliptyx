@@ -78,6 +78,14 @@ export interface Notification {
   message: string;
   image_url?: string | null;
   link_url?: string | null;
+  data?: {
+    scenario_id?: string;
+    post_id?: string;
+    user_id?: string;
+    community_id?: string;
+    conversation_id?: string;
+    [key: string]: unknown;
+  } | null;
   is_read: boolean;
   created_at: string;
 }
