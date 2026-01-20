@@ -276,7 +276,7 @@ export function ConfigProfile() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Información del Perfil</h2>
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Actualiza tu información personal y cómo te ven otros profetas
         </p>
       </div>
@@ -286,10 +286,10 @@ export function ConfigProfile() {
         <div className="space-y-3">
           <Label>Banner del Perfil</Label>
           <div className="relative">
-            <div 
+            <div
               className={`
                 relative h-32 rounded-lg overflow-hidden border-2 border-dashed
-                ${formData.bannerUrl ? 'border-transparent' : 'border-gray-700 hover:border-purple-500'}
+                ${formData.bannerUrl ? 'border-transparent' : 'border-border hover:border-accent'}
                 transition-colors cursor-pointer
               `}
               onClick={() => bannerInputRef.current?.click()}
@@ -306,14 +306,14 @@ export function ConfigProfile() {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                   {uploadingBanner ? (
                     <Loader2 className="w-8 h-8 animate-spin" />
                   ) : (
                     <>
                       <ImageIcon className="w-8 h-8 mb-2" />
                       <span className="text-sm">Click para subir banner</span>
-                      <span className="text-xs text-gray-600">Recomendado: 1500x500px</span>
+                      <span className="text-xs text-muted-foreground/70">Recomendado: 1500x500px</span>
                     </>
                   )}
                 </div>
@@ -340,7 +340,7 @@ export function ConfigProfile() {
             onChange={handleBannerSelect}
             className="hidden"
           />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Formato: JPG, PNG o GIF. Máximo 5MB.
           </p>
         </div>
@@ -350,7 +350,7 @@ export function ConfigProfile() {
           <Label>Foto de Perfil</Label>
           <div className="flex items-center gap-6">
             <div className="relative">
-              <Avatar className="w-24 h-24 border-4 border-gray-700">
+              <Avatar className="w-24 h-24 border-4 border-border">
                 <AvatarImage src={formData.avatarUrl} alt={formData.username} />
                 <AvatarFallback className="text-2xl bg-gradient-to-br from-purple-600 to-pink-600">
                   {formData.username?.substring(0, 2).toUpperCase() || 'U'}
@@ -371,7 +371,7 @@ export function ConfigProfile() {
             </div>
             <div className="space-y-2">
               <h3 className="font-semibold">Foto de Perfil</h3>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Sube una imagen o genera un avatar aleatorio
               </p>
               <div className="flex gap-2">
@@ -381,7 +381,7 @@ export function ConfigProfile() {
                   size="sm"
                   onClick={() => avatarInputRef.current?.click()}
                   disabled={uploadingAvatar}
-                  className="border-gray-700"
+                  className="border-border"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Subir Foto
@@ -391,7 +391,7 @@ export function ConfigProfile() {
                   variant="outline"
                   size="sm"
                   onClick={handleGenerateAvatar}
-                  className="border-gray-700"
+                  className="border-border"
                 >
                   Generar Avatar
                 </Button>
@@ -417,9 +417,9 @@ export function ConfigProfile() {
               setFormData({ ...formData, displayName: e.target.value })
             }
             placeholder="Tu nombre público"
-            className="bg-gray-800 border-gray-700 focus:border-purple-500"
+            className="bg-input border-border focus:border-accent"
           />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Este es el nombre que verán otros profetas
           </p>
         </div>
@@ -428,7 +428,7 @@ export function ConfigProfile() {
         <div className="space-y-2">
           <Label htmlFor="username">Nombre de usuario</Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               @
             </span>
             <Input
@@ -441,11 +441,11 @@ export function ConfigProfile() {
                 })
               }
               placeholder="tu_username"
-              className="pl-8 bg-gray-800 border-gray-700 focus:border-purple-500"
+              className="pl-8 bg-input border-border focus:border-accent"
               minLength={3}
             />
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Solo letras, números y guiones bajos. Mínimo 3 caracteres.
           </p>
         </div>
@@ -458,9 +458,9 @@ export function ConfigProfile() {
             type="email"
             value={formData.email}
             disabled
-            className="bg-gray-800/50 border-gray-700 text-gray-500 cursor-not-allowed"
+            className="bg-input/50 border-border text-muted-foreground cursor-not-allowed"
           />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             El email no se puede cambiar desde aquí
           </p>
         </div>
@@ -475,10 +475,10 @@ export function ConfigProfile() {
               setFormData({ ...formData, bio: e.target.value })
             }
             placeholder="Cuéntanos sobre ti y tus predicciones favoritas..."
-            className="bg-gray-800 border-gray-700 focus:border-purple-500 min-h-[100px]"
+            className="bg-input border-border focus:border-accent min-h-[100px]"
             maxLength={200}
           />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             {formData.bio.length}/200 caracteres
           </p>
         </div>
