@@ -201,11 +201,10 @@ export async function POST(
       .insert({
         user_id: storyData.user_id,
         type: 'story_reply',
-        title: 'Respuesta a tu story',
+        title: '💬 Respuesta a tu story',
         message: `${replier?.display_name || replier?.username || 'Alguien'} respondió a tu story`,
-        reference_type: 'conversation',
-        reference_id: conversation.id,
-        actor_id: user.id,
+        link_url: `/mensajes?conv=${conversation.id}`,
+        is_read: false,
       } as never);
 
     return NextResponse.json({

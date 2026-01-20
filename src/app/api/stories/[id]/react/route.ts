@@ -83,11 +83,10 @@ export async function POST(
         .insert({
           user_id: story.user_id,
           type: 'story_reaction',
-          title: 'Nueva reacción',
+          title: `${reaction} Nueva reacción a tu story`,
           message: `${reactor?.display_name || reactor?.username || 'Alguien'} reaccionó ${reaction} a tu story`,
-          reference_type: 'story',
-          reference_id: storyId,
-          actor_id: user.id,
+          link_url: '/foro?tab=stories',
+          is_read: false,
         } as never);
     }
 
