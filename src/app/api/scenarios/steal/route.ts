@@ -7,6 +7,7 @@ import { auth } from '@/lib/auth';
 import { scenarioStealingService } from '@/services/scenarioStealing.service';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
 import { hasInfiniteCoins, UserRole } from '@/types/roles';
+import { notificationsService } from '@/services/notifications.service';
 
 const supabase = () => getSupabaseAdmin();
 
@@ -83,6 +84,19 @@ export async function POST(request: NextRequest) {
     const userHasInfiniteCoins = hasInfiniteCoins(userData.role as UserRole || 'USER');
     const originalBalance = userData.ap_coins;
 
+    // IMPORTANTE: Obtener info del escenario ANTES del robo para la notificación
+    const scenarioInfo = await scenarioStealingService.getScenarioStealInfo(scenarioId);
+    const originalHolderId = scenarioInfo?.currentHolderId;
+    const scenarioTitle = scenarioInfo?.title || 'Escenario';
+
+    // Obtener username del ladrón para la notificación
+    const { data: thiefData } = await supabase()
+      .from('users')
+      .select('username, display_name')
+      .eq('id', userData.id)
+      .single();
+    const thiefUsername = thiefData?.display_name || thiefData?.username || 'Usuario';
+
     // Ejecutar el robo
     const result = await scenarioStealingService.stealScenario(scenarioId, userData.id);
 
@@ -99,6 +113,21 @@ export async function POST(request: NextRequest) {
         .from('users')
         .update({ ap_coins: originalBalance })
         .eq('id', userData.id);
+    }
+
+    // NOTIFICACIÓN: Avisar al propietario original que le robaron el escenario
+    if (originalHolderId && originalHolderId !== userData.id) {
+      try {
+        await notificationsService.notifyScenarioStolen(
+          originalHolderId,
+          scenarioTitle,
+          thiefUsername,
+          scenarioId
+        );
+      } catch (notifError) {
+        // No fallar el robo si la notificación falla
+        console.error('Error sending steal notification:', notifError);
+      }
     }
 
     return NextResponse.json({
