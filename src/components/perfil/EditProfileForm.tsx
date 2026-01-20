@@ -2,35 +2,60 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   User, Mail, FileText, Link as LinkIcon, Twitter,
   Save, X, AlertCircle, Check, Eye, EyeOff,
-  Globe, Lock, Users,
+  Globe, Lock, Users, Loader2,
 } from 'lucide-react';
 import { useProfileStore } from '@/stores/profileStore';
 import { AvatarUploader } from './AvatarUploader';
 import { TitleSelector } from './TitleSelector';
 import { useRouter } from 'next/navigation';
 
-// Mock titles - en producción vendrían del inventario
-const mockTitles = [
-  { id: '1', name: 'Profeta Novato', rarity: 'COMMON' as const, isOwned: true },
-  { id: '2', name: 'Vidente Experto', rarity: 'RARE' as const, isOwned: true },
-  { id: '3', name: 'Oráculo Maestro', rarity: 'EPIC' as const, isOwned: true },
-  { id: '4', name: 'Profeta Supremo', rarity: 'LEGENDARY' as const, isOwned: true },
-  { id: '5', name: 'El Elegido', rarity: 'LEGENDARY' as const, isOwned: false },
-];
+interface Title {
+  id: string;
+  name: string;
+  description?: string;
+  rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
+  icon?: string;
+  isOwned: boolean;
+}
 
 type PrivacySetting = 'PUBLIC' | 'FOLLOWERS' | 'PRIVATE';
 
 export function EditProfileForm() {
   const router = useRouter();
   const { currentProfile, updateProfile } = useProfileStore();
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [titles, setTitles] = useState<Title[]>([]);
+  const [isLoadingTitles, setIsLoadingTitles] = useState(true);
+
+  // Cargar títulos del usuario desde la API
+  useEffect(() => {
+    const loadTitles = async () => {
+      try {
+        const response = await fetch('/api/profile/titles');
+        const data = await response.json();
+
+        if (data.titles) {
+          setTitles(data.titles);
+        }
+        if (data.activeTitle) {
+          setFormData(prev => ({ ...prev, activeTitle: data.activeTitle }));
+        }
+      } catch (error) {
+        console.error('Error loading titles:', error);
+      } finally {
+        setIsLoadingTitles(false);
+      }
+    };
+
+    loadTitles();
+  }, []);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -251,16 +276,27 @@ export function EditProfileForm() {
       </section>
 
       {/* Section: Title */}
-      <section className="bg-gray-900 rounded-xl border border-gray-800 p-6">
-        <h2 className="text-lg font-bold text-white mb-2">Título</h2>
-        <p className="text-gray-400 text-sm mb-4">
+      <section className="bg-card rounded-xl border border-border p-6">
+        <h2 className="text-lg font-bold text-foreground mb-2">Título</h2>
+        <p className="text-muted-foreground text-sm mb-4">
           Elige un título para mostrar en tu perfil. Los títulos se desbloquean en la tienda.
         </p>
-        <TitleSelector
-          titles={mockTitles}
-          selectedTitle={formData.activeTitle}
-          onSelect={(id) => setFormData((prev) => ({ ...prev, activeTitle: id }))}
-        />
+        {isLoadingTitles ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : titles.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>No tienes títulos disponibles.</p>
+            <p className="text-sm mt-1">Visita la tienda para desbloquear títulos.</p>
+          </div>
+        ) : (
+          <TitleSelector
+            titles={titles}
+            selectedTitle={formData.activeTitle}
+            onSelect={(id) => setFormData((prev) => ({ ...prev, activeTitle: id }))}
+          />
+        )}
       </section>
 
       {/* Section: Social Links */}

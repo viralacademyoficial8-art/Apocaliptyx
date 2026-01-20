@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ScenarioTransfer } from "@/types";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Flame, Plus, Repeat, Shield } from "lucide-react";
+import { ArrowRight, Flame, Plus, Repeat, Shield, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useRouter } from "next/navigation";
@@ -21,71 +21,86 @@ export function ScenarioHistory({
   scenarioId,
   creatorUsername,
   creatorAvatar,
-  currentPrice,
+  currentPrice: initialPrice,
   createdAt,
 }: ScenarioHistoryProps) {
   const router = useRouter();
   const [transfers, setTransfers] = useState<ScenarioTransfer[]>([]);
+  const [currentPrice, setCurrentPrice] = useState(initialPrice ?? 20);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Cargar historial desde la API
+  const loadHistory = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/scenarios/${scenarioId}/history`);
+      const data = await response.json();
+
+      if (data.transfers && data.transfers.length > 0) {
+        setTransfers(
+          data.transfers.map((t: any) => ({
+            ...t,
+            timestamp: new Date(t.timestamp),
+          }))
+        );
+        if (data.currentPrice) {
+          setCurrentPrice(data.currentPrice);
+        }
+      } else {
+        // Si no hay datos de la API, mostrar al menos la creación
+        const baseUsername = creatorUsername ?? "creador_desconocido";
+        const baseAvatar =
+          creatorAvatar ??
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${baseUsername}`;
+        const createdAtDate = createdAt ? new Date(createdAt as any) : new Date();
+
+        setTransfers([
+          {
+            id: "transfer_1",
+            scenarioId,
+            fromUserId: "system",
+            fromUsername: "Sistema",
+            fromAvatar: "",
+            toUserId: "user_creator",
+            toUsername: baseUsername,
+            toAvatar: baseAvatar,
+            price: 20,
+            timestamp: createdAtDate,
+            type: "creation",
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error loading history:", error);
+      // Fallback a datos básicos en caso de error
+      const baseUsername = creatorUsername ?? "creador_desconocido";
+      const baseAvatar =
+        creatorAvatar ??
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${baseUsername}`;
+      const createdAtDate = createdAt ? new Date(createdAt as any) : new Date();
+
+      setTransfers([
+        {
+          id: "transfer_1",
+          scenarioId,
+          fromUserId: "system",
+          fromUsername: "Sistema",
+          fromAvatar: "",
+          toUserId: "user_creator",
+          toUsername: baseUsername,
+          toAvatar: baseAvatar,
+          price: 20,
+          timestamp: createdAtDate,
+          type: "creation",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [scenarioId, creatorUsername, creatorAvatar, createdAt]);
 
   useEffect(() => {
-    const baseUsername = creatorUsername ?? "creador_desconocido";
-    const baseAvatar =
-      creatorAvatar ??
-      `https://api.dicebear.com/7.x/avataaars/svg?seed=${baseUsername}`;
-    const createdAtDate = createdAt
-      ? new Date(createdAt as any)
-      : new Date();
-
-    const mockTransfers: ScenarioTransfer[] = [
-      {
-        id: "transfer_1",
-        scenarioId,
-        fromUserId: "system",
-        fromUsername: "Sistema",
-        fromAvatar: "",
-        toUserId: "user_creator",
-        toUsername: baseUsername,
-        toAvatar: baseAvatar,
-        price: 20,
-        timestamp: createdAtDate,
-        type: "creation",
-      },
-    ];
-
-    const basePrice = 20;
-    const price = currentPrice ?? basePrice;
-
-    if (price > basePrice) {
-      const stealCount = Math.floor((price - basePrice) / 5);
-      const usernames = [
-        "prophet_maria",
-        "oracle_carlos",
-        "tech_prophet",
-        "future_seer",
-      ];
-
-      for (let i = 0; i < Math.min(stealCount, 4); i++) {
-        const fromUsername = i === 0 ? baseUsername : usernames[i - 1];
-        mockTransfers.push({
-          id: `transfer_${i + 2}`,
-          scenarioId,
-          fromUserId: `user_${i}`,
-          fromUsername,
-          fromAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${fromUsername}`,
-          toUserId: `user_${i + 1}`,
-          toUsername: usernames[i],
-          toAvatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${usernames[i]}`,
-          price: basePrice + (i + 1) * 5,
-          timestamp: new Date(
-            Date.now() - (stealCount - i) * 24 * 60 * 60 * 1000
-          ),
-          type: "steal",
-        });
-      }
-    }
-
-    setTransfers(mockTransfers);
-  }, [scenarioId, creatorUsername, creatorAvatar, currentPrice, createdAt]);
+    loadHistory();
+  }, [loadHistory]);
 
   const getTransferIcon = (type: string) => {
     switch (type) {
@@ -126,15 +141,29 @@ export function ScenarioHistory({
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Repeat className="w-5 h-5 text-purple-400" />
+          Historial de Transferencias
+        </h3>
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+    <div className="bg-card border border-border rounded-xl p-6">
       <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
         <Repeat className="w-5 h-5 text-purple-400" />
         Historial de Transferencias
       </h3>
 
       {transfers.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           <Repeat className="w-12 h-12 mx-auto mb-2 opacity-50" />
           <p>No hay transferencias aún</p>
         </div>
@@ -143,14 +172,14 @@ export function ScenarioHistory({
           {transfers.map((transfer) => (
             <div
               key={transfer.id}
-              className="relative pl-8 pb-4 border-l-2 border-gray-700 last:border-l-0 last:pb-0"
+              className="relative pl-8 pb-4 border-l-2 border-border last:border-l-0 last:pb-0"
             >
               {/* Timeline dot */}
-              <div className="absolute left-[-9px] top-0 w-4 h-4 bg-gray-900 border-2 border-gray-700 rounded-full flex items-center justify-center">
+              <div className="absolute left-[-9px] top-0 w-4 h-4 bg-background border-2 border-border rounded-full flex items-center justify-center">
                 {getTransferIcon(transfer.type)}
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+              <div className="bg-muted/50 rounded-lg p-4 border border-border">
                 <div className="flex items-center justify-between mb-2">
                   <Badge
                     variant="outline"
@@ -158,7 +187,7 @@ export function ScenarioHistory({
                   >
                     {getTransferLabel(transfer.type)}
                   </Badge>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {format(
                       new Date(transfer.timestamp),
                       "dd MMM yyyy HH:mm",
@@ -178,7 +207,7 @@ export function ScenarioHistory({
                       >
                         <Avatar className="w-6 h-6">
                           <AvatarImage src={transfer.fromAvatar} />
-                          <AvatarFallback className="text-xs bg-gray-600">
+                          <AvatarFallback className="text-xs bg-muted">
                             {transfer.fromUsername
                               .substring(0, 2)
                               .toUpperCase()}
@@ -188,7 +217,7 @@ export function ScenarioHistory({
                           @{transfer.fromUsername}
                         </span>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-gray-500" />
+                      <ArrowRight className="w-4 h-4 text-muted-foreground" />
                     </>
                   )}
 
@@ -223,15 +252,15 @@ export function ScenarioHistory({
       )}
 
       {/* Summary */}
-      <div className="mt-6 pt-4 border-t border-gray-700">
+      <div className="mt-6 pt-4 border-t border-border">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">Total de transferencias:</span>
+          <span className="text-muted-foreground">Total de transferencias:</span>
           <span className="font-semibold">{transfers.length}</span>
         </div>
         <div className="flex justify-between text-sm mt-1">
-          <span className="text-gray-400">Precio inicial → actual:</span>
+          <span className="text-muted-foreground">Precio inicial → actual:</span>
           <span className="font-semibold text-yellow-400">
-            20 AP → {currentPrice ?? 20} AP
+            20 AP → {currentPrice} AP
           </span>
         </div>
       </div>
