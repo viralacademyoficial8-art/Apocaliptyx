@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 // Configuración de umbrales para auto-feature
 const THRESHOLDS = {
@@ -28,6 +23,8 @@ const THRESHOLDS = {
 
 export async function POST(request: Request) {
   try {
+    const supabase = getSupabaseAdmin();
+
     // Verificar API key para seguridad (opcional)
     const authHeader = request.headers.get('authorization');
     const apiKey = process.env.AUTO_FEATURE_API_KEY;
@@ -163,6 +160,7 @@ export async function POST(request: Request) {
 // GET para verificar el estado actual
 export async function GET() {
   try {
+    const supabase = getSupabaseAdmin();
     const { data: scenarios, error } = await supabase
       .from('scenarios')
       .select('id, title, steal_count, participant_count, total_pool, is_featured, is_hot')
