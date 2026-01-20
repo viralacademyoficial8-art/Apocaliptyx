@@ -1,6 +1,7 @@
 // src/services/notifications.service.ts
 
 import { getSupabaseClient } from '@/lib/supabase';
+import { sendNotificationEmail } from '@/lib/email';
 
 // ============================================
 // TIPOS DE NOTIFICACIÓN (32 tipos)
@@ -213,7 +214,7 @@ export const notificationsService = {
 
   async create(input: CreateNotificationInput): Promise<Notification | null> {
     const supabase = getSupabaseClient();
-    
+
     const insertData = {
       user_id: input.userId,
       type: input.type,
@@ -223,7 +224,7 @@ export const notificationsService = {
       link_url: input.linkUrl || null,
       is_read: false,
     };
-    
+
     const { data, error } = await supabase
       .from('notifications')
       .insert(insertData as never)
@@ -234,6 +235,81 @@ export const notificationsService = {
       console.error('Error creating notification:', error);
       return null;
     }
+
+    // ========================================
+    // ENVIAR EMAIL SI EL USUARIO LO TIENE HABILITADO
+    // ========================================
+    try {
+      // Obtener datos del usuario: email, username y preferencias de notificación
+      const { data: userDataRaw } = await supabase
+        .from('users')
+        .select('email, username, display_name, notification_settings')
+        .eq('id', input.userId)
+        .single();
+
+      const userData = userDataRaw as {
+        email?: string;
+        username?: string;
+        display_name?: string;
+        notification_settings?: Record<string, boolean>;
+      } | null;
+
+      if (userData?.email) {
+        // Verificar si el usuario tiene habilitadas las notificaciones por email
+        // notification_settings es un JSONB con la estructura de ConfigNotifications
+        const settings = userData.notification_settings as {
+          emailNotifications?: boolean;
+          // Configuraciones específicas por tipo
+          scenarioStolen?: boolean;
+          scenarioWon?: boolean;
+          scenarioLost?: boolean;
+          newFollower?: boolean;
+          comments?: boolean;
+        } | null;
+
+        // Por defecto, enviar emails si no hay configuración (opt-in por defecto)
+        const emailEnabled = settings?.emailNotifications !== false;
+
+        // Verificar configuración específica por tipo de notificación
+        let typeEnabled = true;
+        if (settings) {
+          switch (input.type) {
+            case 'scenario_stolen':
+              typeEnabled = settings.scenarioStolen !== false;
+              break;
+            case 'prediction_won':
+              typeEnabled = settings.scenarioWon !== false;
+              break;
+            case 'prediction_lost':
+              typeEnabled = settings.scenarioLost !== false;
+              break;
+            case 'new_follower':
+              typeEnabled = settings.newFollower !== false;
+              break;
+            case 'comment_received':
+            case 'comment_reply':
+              typeEnabled = settings.comments !== false;
+              break;
+          }
+        }
+
+        // Enviar email si ambas condiciones se cumplen
+        if (emailEnabled && typeEnabled) {
+          await sendNotificationEmail(userData.email, {
+            type: input.type,
+            title: input.title,
+            message: input.message,
+            username: userData.display_name || userData.username || 'Usuario',
+            linkUrl: input.linkUrl,
+            imageUrl: input.imageUrl,
+          });
+        }
+      }
+    } catch (emailError) {
+      // No fallar la notificación si el email falla
+      console.error('Error sending notification email:', emailError);
+    }
+
     return data as Notification;
   },
 

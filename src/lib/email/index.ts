@@ -5,6 +5,8 @@ export { getWelcomeEmailHtml, getWelcomeEmailText } from './templates/welcome';
 export { getResetPasswordEmailHtml, getResetPasswordEmailText } from './templates/reset-password';
 export { getPredictionWonEmailHtml, getPredictionWonEmailText } from './templates/prediction-won';
 export { getPurchaseReceiptEmailHtml, getPurchaseReceiptEmailText } from './templates/purchase-receipt';
+export { getNotificationEmailHtml, getNotificationEmailText } from './templates/notification';
+export type { NotificationEmailData } from './templates/notification';
 
 // Funciones de alto nivel para enviar emails específicos
 import { sendEmail } from './resend';
@@ -12,6 +14,7 @@ import { getWelcomeEmailHtml, getWelcomeEmailText } from './templates/welcome';
 import { getResetPasswordEmailHtml, getResetPasswordEmailText } from './templates/reset-password';
 import { getPredictionWonEmailHtml, getPredictionWonEmailText } from './templates/prediction-won';
 import { getPurchaseReceiptEmailHtml, getPurchaseReceiptEmailText } from './templates/purchase-receipt';
+import { getNotificationEmailHtml, getNotificationEmailText, NotificationEmailData } from './templates/notification';
 
 export async function sendWelcomeEmail(to: string, username: string) {
   return sendEmail({
@@ -65,5 +68,15 @@ export async function sendPurchaseReceiptEmail(
     subject: '🛒 Recibo de compra - Apocaliptyx',
     html: getPurchaseReceiptEmailHtml(data),
     text: getPurchaseReceiptEmailText(data),
+  });
+}
+
+// Función genérica para enviar notificaciones por email
+export async function sendNotificationEmail(to: string, data: NotificationEmailData) {
+  return sendEmail({
+    to,
+    subject: `🔔 ${data.title} - Apocaliptyx`,
+    html: getNotificationEmailHtml(data),
+    text: getNotificationEmailText(data),
   });
 }
