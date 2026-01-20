@@ -5,6 +5,7 @@ import './globals.css';
 import { PWAProvider } from '@/components/pwa';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { SessionProvider } from '@/components/providers/SessionProvider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import CookieConsent from '@/components/CookieConsent';
 import { Toaster } from 'react-hot-toast';
 import { BottomNavigation } from '@/components/BottomNavigation';
@@ -46,37 +47,39 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <SessionProvider>
-          <LanguageProvider>
-            <PWAProvider>
-              {children}
-              <BottomNavigation />
-              <CookieConsent />
-              <Toaster
-                position="top-center"
-                containerClassName="!top-16 md:!top-4"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: '#1f2937',
-                    color: '#fff',
-                    border: '1px solid #374151',
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: '#10b981',
-                      secondary: '#fff',
+          <ThemeProvider defaultTheme="dark" storageKey="apocaliptyx-theme">
+            <LanguageProvider>
+              <PWAProvider>
+                {children}
+                <BottomNavigation />
+                <CookieConsent />
+                <Toaster
+                  position="top-center"
+                  containerClassName="!top-16 md:!top-4"
+                  toastOptions={{
+                    duration: 3000,
+                    style: {
+                      background: '#1f2937',
+                      color: '#fff',
+                      border: '1px solid #374151',
                     },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: '#ef4444',
-                      secondary: '#fff',
+                    success: {
+                      iconTheme: {
+                        primary: '#10b981',
+                        secondary: '#fff',
+                      },
                     },
-                  },
-                }}
-              />
-            </PWAProvider>
-          </LanguageProvider>
+                    error: {
+                      iconTheme: {
+                        primary: '#ef4444',
+                        secondary: '#fff',
+                      },
+                    },
+                  }}
+                />
+              </PWAProvider>
+            </LanguageProvider>
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>
