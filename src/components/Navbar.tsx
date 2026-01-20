@@ -20,8 +20,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, Mail } from "lucide-react";
+import { Skull, Menu, Flame, User, Settings, LogOut, ChevronDown, Shield, Infinity, HelpCircle, MessageCircle, Users, Film, Radio, Trophy, Sparkles, Mail, Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useTheme } from "@/components/ThemeProvider";
 
 export function Navbar() {
   const router = useRouter();
@@ -31,6 +32,12 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
   const { hasInfiniteCoins, isAdmin, roleName, roleIcon, roleColor } = usePermissions();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
 
   // Determinar si está autenticado (priorizar session de NextAuth)
   const isLoggedIn = status === "authenticated" && !!session?.user;
@@ -151,6 +158,20 @@ export function Navbar() {
 
             {/* Zona derecha */}
             <div className="flex items-center gap-2 sm:gap-3">
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="relative p-2 rounded-lg hover:bg-muted transition-colors group"
+                aria-label={resolvedTheme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                title={resolvedTheme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+              >
+                {resolvedTheme === 'dark' ? (
+                  <Moon className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                ) : (
+                  <Sun className="w-5 h-5 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
+                )}
+              </button>
+
               {/* Selector de idioma (siempre visible) */}
               <LanguageSelector variant="default" />
 
