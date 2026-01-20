@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="dark" suppressHydrationWarning>
+    <html lang="es" className="dark" data-accent="red" suppressHydrationWarning>
       <head>
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
