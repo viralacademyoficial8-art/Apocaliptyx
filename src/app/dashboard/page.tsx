@@ -13,7 +13,7 @@ export default function DashboardPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <div className="flex items-center gap-3">
         <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
         <span className="text-gray-400">Redirigiendo...</span>

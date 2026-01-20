@@ -174,7 +174,7 @@ export default function AyudaPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       
       <main className="container mx-auto px-4 py-12 max-w-6xl">

@@ -161,7 +161,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 h-full bg-gray-950/95 backdrop-blur-md border-r border-gray-800/50 z-40',
+          'fixed left-0 top-0 h-full bg-background/95 backdrop-blur-md border-r border-gray-800/50 z-40',
           'flex flex-col py-6 transition-all duration-300',
           isExpanded ? 'w-64' : 'w-20',
           'lg:translate-x-0',

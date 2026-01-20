@@ -221,7 +221,7 @@ export default function StreamingPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white pb-20">
+    <div className="min-h-screen bg-background text-foreground pb-20">
       <Navbar />
 
       {/* Start Stream Modal */}

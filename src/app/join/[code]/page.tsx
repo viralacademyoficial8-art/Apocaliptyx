@@ -68,7 +68,7 @@ export default function JoinGroupPage() {
   // Pantalla de carga
   if (status === 'loading' || joining) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-purple-500 mx-auto mb-4" />
           <p className="text-gray-400">Procesando invitación...</p>
@@ -80,7 +80,7 @@ export default function JoinGroupPage() {
   // Usuario no autenticado
   if (status === 'unauthenticated') {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <Users className="w-10 h-10 text-white" />
@@ -113,7 +113,7 @@ export default function JoinGroupPage() {
   // Resultado de unirse
   if (result) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 max-w-md w-full text-center">
           {result.success ? (
             <>

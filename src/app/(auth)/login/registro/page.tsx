@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function RegistroPage() {
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header simple */}
       <header className="p-4">
         <Link href="/" className="flex items-center gap-2 w-fit">

@@ -40,8 +40,8 @@ export default function ConfiguracionPage() {
   // Mostrar loading mientras se verifica la sesión
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
       </div>
     );
   }
@@ -49,8 +49,8 @@ export default function ConfiguracionPage() {
   // Si no hay sesión, mostrar loading (mientras redirige)
   if (!session) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ export default function ConfiguracionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
@@ -107,19 +107,19 @@ export default function ConfiguracionPage() {
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="mb-4 text-gray-400 hover:text-white"
+            className="mb-4 text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver
           </Button>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-500/20 rounded-lg">
-              <Settings className="w-8 h-8 text-purple-400" />
+            <div className="p-3 bg-accent-primary/20 rounded-lg">
+              <Settings className="w-8 h-8 text-accent" />
             </div>
             <div>
               <h1 className="text-3xl font-bold">Configuración</h1>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 Gestiona tu cuenta y preferencias
               </p>
             </div>
@@ -130,11 +130,11 @@ export default function ConfiguracionPage() {
         <div className="md:hidden mb-6">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="w-full flex items-center justify-between p-4 bg-gray-900 border border-gray-800 rounded-lg"
+            className="w-full flex items-center justify-between p-4 bg-card border border-border rounded-lg"
           >
             <div className="flex items-center gap-3">
               {sections.find((s) => s.id === activeSection)?.icon && (
-                <div className="text-purple-400">
+                <div className="text-accent">
                   {(() => {
                     const Icon =
                       sections.find((s) => s.id === activeSection)!.icon;
@@ -154,7 +154,7 @@ export default function ConfiguracionPage() {
           </button>
 
           {isMobileMenuOpen && (
-            <div className="mt-2 bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+            <div className="mt-2 bg-card border border-border rounded-lg overflow-hidden">
               {sections.map((section) => {
                 const Icon = section.icon;
                 return (
@@ -168,15 +168,15 @@ export default function ConfiguracionPage() {
                       w-full flex items-center gap-3 p-4 text-left transition-colors
                       ${
                         activeSection === section.id
-                          ? 'bg-purple-500/20 text-purple-400'
-                          : 'hover:bg-gray-800'
+                          ? 'bg-accent-primary/20 text-accent'
+                          : 'hover:bg-muted'
                       }
                     `}
                   >
                     <Icon className="w-5 h-5" />
                     <div>
                       <div className="font-medium">{section.label}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">
                         {section.description}
                       </div>
                     </div>
@@ -202,15 +202,15 @@ export default function ConfiguracionPage() {
                       w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all
                       ${
                         activeSection === section.id
-                          ? 'bg-purple-500/20 text-purple-400 border-l-4 border-purple-500'
-                          : 'hover:bg-gray-800/50 text-gray-300'
+                          ? 'bg-accent-primary/20 text-accent border-l-4 border-accent'
+                          : 'hover:bg-muted text-muted-foreground'
                       }
                     `}
                   >
                     <Icon className="w-5 h-5" />
                     <div>
                       <div className="font-medium">{section.label}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-muted-foreground">
                         {section.description}
                       </div>
                     </div>
@@ -222,7 +222,7 @@ export default function ConfiguracionPage() {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6 md:p-8">
+            <div className="bg-card/50 border border-border rounded-lg p-6 md:p-8">
               {renderContent()}
             </div>
           </div>

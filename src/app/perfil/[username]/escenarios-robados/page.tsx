@@ -420,7 +420,7 @@ export default function EscenariosRobadosPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-red-500" />
@@ -434,7 +434,7 @@ export default function EscenariosRobadosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       {/* Hero Section */}

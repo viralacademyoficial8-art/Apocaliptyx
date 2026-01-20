@@ -16,7 +16,7 @@ export default function ComunidadesRedirectPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+    <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500 mx-auto mb-4" />
         <p className="text-gray-400">Redirigiendo a comunidades...</p>

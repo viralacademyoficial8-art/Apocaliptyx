@@ -37,7 +37,7 @@ export function PageLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-white">
       {isAuthenticated ? <Navbar /> : <LandingNavbar />}
 
       <ResponsiveContainer size={containerSize} as="main">

@@ -30,7 +30,7 @@ export function LandingNavbar() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 safe-area-top ${
           scrolled
-            ? "bg-gray-950/80 backdrop-blur-xl border-b border-zinc-800/50 shadow-lg shadow-purple-500/5"
+            ? "bg-background/80 backdrop-blur-xl border-b border-zinc-800/50 shadow-lg shadow-purple-500/5"
             : "bg-transparent"
         }`}
       >

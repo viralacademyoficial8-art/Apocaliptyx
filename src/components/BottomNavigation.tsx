@@ -104,7 +104,7 @@ export function BottomNavigation() {
       <div className="h-16 md:hidden" />
 
       {/* Bottom Navigation - Solo visible en móvil y tablets pequeñas */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-gray-900/95 backdrop-blur-lg border-t border-gray-800 safe-area-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-lg border-t border-border safe-area-bottom">
         <div className="flex items-center justify-around h-16 px-2">
           {displayItems.map((item) => {
             const Icon = item.icon;
@@ -118,13 +118,13 @@ export function BottomNavigation() {
                 href={item.href}
                 className={`relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-colors ${
                   isActive
-                    ? 'text-purple-400'
-                    : 'text-gray-400 hover:text-gray-200'
+                    ? 'text-accent'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {/* Indicador activo */}
                 {isActive && (
-                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-purple-500 rounded-b-full" />
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-accent-primary rounded-b-full" />
                 )}
 
                 {/* Icono con badge */}
@@ -144,7 +144,7 @@ export function BottomNavigation() {
 
                 {/* Label */}
                 <span className={`text-[10px] mt-1 font-medium ${
-                  isActive ? 'text-purple-400' : 'text-gray-500'
+                  isActive ? 'text-accent' : 'text-muted-foreground'
                 }`}>
                   {item.label}
                 </span>
