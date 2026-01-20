@@ -26,7 +26,7 @@ export default function TiendaPage() {
   }, [loadItems]);
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       {/* Floating Cart Button */}

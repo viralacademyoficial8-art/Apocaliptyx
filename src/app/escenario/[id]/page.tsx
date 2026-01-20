@@ -448,7 +448,7 @@ export default function EscenarioPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -460,7 +460,7 @@ export default function EscenarioPage() {
 
   if (error || !scenario) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex flex-col items-center justify-center py-32">
           <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
@@ -489,7 +489,7 @@ export default function EscenarioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">

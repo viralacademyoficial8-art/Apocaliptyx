@@ -130,7 +130,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
       <LandingNavbar />
 
       {/* HERO SECTION - Glassmorphism Style */}

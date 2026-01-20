@@ -148,7 +148,7 @@ export default function ReelsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-8 pt-20">
         {/* Header */}

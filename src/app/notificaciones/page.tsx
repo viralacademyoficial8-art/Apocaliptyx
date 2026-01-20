@@ -273,7 +273,7 @@ export default function NotificacionesPage() {
 
   if (!hydrated || loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -284,7 +284,7 @@ export default function NotificacionesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       <main className="container mx-auto px-3 sm:px-4 py-3 sm:py-8 max-w-3xl pb-20 md:pb-8">

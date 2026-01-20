@@ -181,7 +181,7 @@ export default function RegistroPage() {
   // Pantalla de exito
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-4 relative overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/4 -left-20 w-80 h-80 bg-green-600/20 rounded-full blur-3xl animate-pulse" />
@@ -214,7 +214,7 @@ export default function RegistroPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Gradient Orbs */}

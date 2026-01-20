@@ -422,7 +422,7 @@ export default function CommunityPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center h-[80vh]">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -433,7 +433,7 @@ export default function CommunityPage() {
 
   if (!community) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex flex-col items-center justify-center h-[80vh]">
           <h1 className="text-2xl font-bold mb-4">Comunidad no encontrada</h1>
@@ -447,7 +447,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       {/* Community Header */}

@@ -125,7 +125,7 @@ export default function ComunidadPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center px-4 py-16">
           <div className="text-center">
@@ -139,7 +139,7 @@ export default function ComunidadPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex flex-col items-center justify-center px-4 py-16">
           <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -156,7 +156,7 @@ export default function ComunidadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">

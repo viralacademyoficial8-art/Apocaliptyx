@@ -121,7 +121,7 @@ export default function LiveStreamPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-purple-500 mx-auto mb-4" />
           <p className="text-gray-400">Conectando al stream...</p>
@@ -133,7 +133,7 @@ export default function LiveStreamPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">Error</h2>
@@ -150,7 +150,7 @@ export default function LiveStreamPage() {
   // Not configured state
   if (!token || !serverUrl) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <Radio className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">LiveKit no configurado</h2>
@@ -175,7 +175,7 @@ export default function LiveStreamPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

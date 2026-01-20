@@ -51,7 +51,7 @@ export function AdminGuard({
   // Mostrar loading mientras se carga la session
   if (isLoading || !hydrated) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
       </div>
     );
@@ -62,7 +62,7 @@ export function AdminGuard({
     console.log('[AdminGuard] Not authenticated, redirecting to login');
     router.push('/login');
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
       </div>
     );
@@ -74,7 +74,7 @@ export function AdminGuard({
     if (fallback) return <>{fallback}</>;
     
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <ShieldOff className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h1>
@@ -105,7 +105,7 @@ export function AdminGuard({
       if (fallback) return <>{fallback}</>;
 
       return (
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center">
             <ShieldOff className="w-16 h-16 text-orange-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white mb-2">Permisos Insuficientes</h1>

@@ -373,9 +373,9 @@ export function Navbar() {
                     aria-label={t("common.open")}
                   >
                     {/* Glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
-                    <div className="relative p-1 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 rounded-lg group-hover:border-purple-500/30 transition-colors">
-                      <Menu className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" />
+                    <div className="absolute inset-0 bg-accent-primary/20 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                    <div className="relative p-1 bg-card border border-border rounded-lg group-hover:border-accent transition-colors">
+                      <Menu className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                     </div>
                   </button>
                 </>
@@ -402,26 +402,26 @@ export function Navbar() {
                   <div className="flex sm:hidden items-center gap-2">
                     {/* Login button with gradient border */}
                     <Link href="/login" className="relative group">
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600/50 to-pink-600/50 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                      <div className="absolute -inset-0.5 bg-accent-primary/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
                       <Button
                         variant="outline"
                         size="sm"
-                        className="relative border-zinc-700/50 bg-zinc-900/50 text-zinc-300 hover:text-white hover:border-purple-500/30 hover:bg-zinc-800/50 transition-all"
+                        className="relative border-border bg-card/50 text-muted-foreground hover:text-foreground hover:border-accent/30 hover:bg-muted/50 transition-all"
                       >
                         {t("nav.login")}
                       </Button>
                     </Link>
 
-                    {/* Gradient menu button */}
+                    {/* Menu button */}
                     <button
                       onClick={() => setMobileMenuOpen(true)}
                       className="relative group p-2 rounded-xl transition-all hover:scale-105 active:scale-95"
                       aria-label={t("common.open")}
                     >
                       {/* Glow effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
-                      <div className="relative p-1 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 rounded-lg group-hover:border-purple-500/30 transition-colors">
-                        <Menu className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" />
+                      <div className="absolute inset-0 bg-accent-primary/20 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                      <div className="relative p-1 bg-card border border-border rounded-lg group-hover:border-accent transition-colors">
+                        <Menu className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
                       </div>
                     </button>
                   </div>

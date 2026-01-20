@@ -8,7 +8,7 @@ import { Footer } from '@/components/Footer';
 
 export default function HistorialPage() {
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">

@@ -1025,7 +1025,7 @@ function MensajesContent() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -2023,7 +2023,7 @@ export default function MensajesPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
         </div>
       }

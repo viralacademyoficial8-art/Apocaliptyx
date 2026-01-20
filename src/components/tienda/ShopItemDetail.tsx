@@ -18,7 +18,7 @@ export function ShopItemDetail({ item }: { item: ShopItem }) {
   const { addToCart, setPurchaseModalOpen, setSelectedItem } = useShopStore();
 
   return (
-    <div className="min-h-screen bg-gray-950">
+    <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/tienda" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" /> Volver a tienda

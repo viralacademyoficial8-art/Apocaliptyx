@@ -195,7 +195,7 @@ export default function SoportePage() {
 
   if (!session?.user) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white">
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <main className="container mx-auto px-4 py-12 max-w-2xl text-center">
           <MessageCircle className="w-16 h-16 text-purple-400 mx-auto mb-4" />
@@ -216,7 +216,7 @@ export default function SoportePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8 max-w-6xl">
