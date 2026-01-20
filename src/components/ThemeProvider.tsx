@@ -133,10 +133,21 @@ export function ThemeProvider({
   );
 }
 
+// Default values for SSR and when context is not available
+const defaultThemeContext: ThemeContextType = {
+  theme: 'dark',
+  setTheme: () => {},
+  resolvedTheme: 'dark',
+  accentColor: 'red',
+  setAccentColor: () => {},
+};
+
 export function useTheme() {
   const ctx = useContext(ThemeContext);
+  // Return default values during SSR or when outside ThemeProvider
+  // This prevents build errors during static generation
   if (!ctx) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    return defaultThemeContext;
   }
   return ctx;
 }
