@@ -64,7 +64,7 @@ export function ConfigNotifications() {
     checked: boolean;
     onToggle: () => void;
   }) => (
-    <div className="flex items-center justify-between py-4 border-b border-gray-800 last:border-0">
+    <div className="flex items-center justify-between py-4 border-b border-border last:border-0">
       <div className="space-y-1">
         <Label
           htmlFor={id}
@@ -72,7 +72,7 @@ export function ConfigNotifications() {
         >
           {label}
         </Label>
-        <p className="text-sm text-gray-400">{description}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <Switch
         id={id}
@@ -87,13 +87,13 @@ export function ConfigNotifications() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Notificaciones</h2>
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Controla cómo y cuándo recibes notificaciones
         </p>
       </div>
 
       {/* General Notifications */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
+      <div className="bg-card/50 border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Bell className="w-5 h-5 text-purple-400" />
           Canales de Notificación
@@ -118,7 +118,7 @@ export function ConfigNotifications() {
       </div>
 
       {/* Activity Notifications */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
+      <div className="bg-card/50 border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Smartphone className="w-5 h-5 text-blue-400" />
           Actividad
@@ -164,7 +164,7 @@ export function ConfigNotifications() {
       </div>
 
       {/* Email Digest */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
+      <div className="bg-card/50 border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Mail className="w-5 h-5 text-green-400" />
           Resumen Semanal

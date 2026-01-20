@@ -89,13 +89,13 @@ export function ConfigSecurity() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Seguridad</h2>
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Gestiona tu contraseña y la seguridad de tu cuenta
         </p>
       </div>
 
       {/* Change Password */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
+      <div className="bg-card/50 border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Key className="w-5 h-5 text-yellow-400" />
           Cambiar Contraseña
@@ -117,12 +117,12 @@ export function ConfigSecurity() {
                   })
                 }
                 placeholder="••••••••"
-                className="bg-gray-800 border-gray-700 focus:border-yellow-500 pr-10"
+                className="bg-input border-border focus:border-yellow-500 pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -147,10 +147,10 @@ export function ConfigSecurity() {
                 })
               }
               placeholder="••••••••"
-              className="bg-gray-800 border-gray-700 focus:border-yellow-500"
+              className="bg-input border-border focus:border-yellow-500"
               minLength={6}
             />
-            <p className="text-xs text-gray-500">Mínimo 6 caracteres</p>
+            <p className="text-xs text-muted-foreground">Mínimo 6 caracteres</p>
           </div>
 
           {/* Confirm New Password */}
@@ -169,7 +169,7 @@ export function ConfigSecurity() {
                 })
               }
               placeholder="••••••••"
-              className="bg-gray-800 border-gray-700 focus:border-yellow-500"
+              className="bg-input border-border focus:border-yellow-500"
             />
           </div>
 
@@ -194,17 +194,17 @@ export function ConfigSecurity() {
       </div>
 
       {/* Active Sessions */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
+      <div className="bg-card/50 border border-border rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Shield className="w-5 h-5 text-green-400" />
           Sesiones Activas
         </h3>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-card/50 rounded-lg">
             <div>
               <div className="font-medium">Este dispositivo</div>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-muted-foreground">
                 Última actividad: Ahora mismo
               </div>
             </div>
@@ -215,7 +215,7 @@ export function ConfigSecurity() {
 
           <Button
             variant="outline"
-            className="border-gray-700 text-gray-300"
+            className="border-border text-foreground"
           >
             Cerrar todas las otras sesiones
           </Button>
@@ -229,7 +229,7 @@ export function ConfigSecurity() {
           Zona de Peligro
         </h3>
 
-        <p className="text-gray-300 mb-4">
+        <p className="text-muted-foreground mb-4">
           Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, estás
           seguro.
         </p>
@@ -280,7 +280,7 @@ export function ConfigSecurity() {
                   setShowDeleteConfirm(false);
                   setDeleteConfirmText('');
                 }}
-                className="border-gray-700"
+                className="border-border"
               >
                 Cancelar
               </Button>
