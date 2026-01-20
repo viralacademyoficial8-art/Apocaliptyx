@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
             type: 'repost',
             title: '🔁 Compartieron tu Post',
             message: `@${(reposter as any).username} compartió tu publicación "${postTitle}"`,
-            link: '/foro',
+            link_url: `/foro?post=${originalPostId}`,
             image_url: (reposter as any).avatar_url,
             is_read: false,
           });
