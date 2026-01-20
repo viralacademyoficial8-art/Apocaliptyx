@@ -99,8 +99,15 @@ export async function GET(request: NextRequest) {
       const likes = likesRaw as ReelLike[] | null;
       likedReelIds = likes?.map(l => l.reel_id) || [];
 
-      // For bookmarks, we'd need a bookmarks table - using a placeholder for now
-      bookmarkedReelIds = [];
+      // Obtener bookmarks del usuario
+      const { data: bookmarksRaw } = await supabase
+        .from('reel_bookmarks')
+        .select('reel_id')
+        .eq('user_id', user.id)
+        .in('reel_id', reelIds);
+
+      const bookmarks = bookmarksRaw as { reel_id: string }[] | null;
+      bookmarkedReelIds = bookmarks?.map(b => b.reel_id) || [];
     }
 
     const formattedReels = reels?.map(reel => ({
