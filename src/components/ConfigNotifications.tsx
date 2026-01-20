@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -18,18 +18,51 @@ interface NotificationSettings {
   weeklyDigest: boolean;
 }
 
+const DEFAULT_SETTINGS: NotificationSettings = {
+  emailNotifications: true,
+  pushNotifications: true,
+  scenarioStolen: true,
+  scenarioWon: true,
+  scenarioLost: true,
+  newFollower: true,
+  comments: true,
+  weeklyDigest: false,
+};
+
 export function ConfigNotifications() {
   const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState<NotificationSettings>({
-    emailNotifications: true,
-    pushNotifications: true,
-    scenarioStolen: true,
-    scenarioWon: true,
-    scenarioLost: true,
-    newFollower: true,
-    comments: true,
-    weeklyDigest: false,
-  });
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+  const [settings, setSettings] = useState<NotificationSettings>(DEFAULT_SETTINGS);
+
+  // Load settings from database on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/settings/notifications');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.settings) {
+            setSettings(data.settings);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading notification settings:', error);
+        // Fall back to localStorage if API fails
+        const saved = localStorage.getItem('notificationSettings');
+        if (saved) {
+          try {
+            setSettings(JSON.parse(saved));
+          } catch {
+            // Use defaults
+          }
+        }
+      } finally {
+        setIsLoadingSettings(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
 
   const handleToggle = (key: keyof NotificationSettings) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -39,13 +72,36 @@ export function ConfigNotifications() {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      if (typeof window !== 'undefined') {
+      const response = await fetch('/api/settings/notifications', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // If database column doesn't exist, show hint
+        if (data.sqlHint) {
+          console.error('SQL hint:', data.sqlHint);
+          toast.error('Necesitas agregar la columna notification_settings a la base de datos');
+          // Still save to localStorage as fallback
+          localStorage.setItem('notificationSettings', JSON.stringify(settings));
+        } else {
+          throw new Error(data.error || 'Error al guardar');
+        }
+      } else {
+        // Also save to localStorage as backup
         localStorage.setItem('notificationSettings', JSON.stringify(settings));
+        toast.success('Preferencias de notificación guardadas');
       }
-      toast.success('Preferencias de notificación guardadas');
     } catch (error) {
-      toast.error('Error al guardar preferencias');
+      console.error('Error saving notification settings:', error);
+      // Fallback to localStorage
+      localStorage.setItem('notificationSettings', JSON.stringify(settings));
+      toast.success('Preferencias guardadas localmente');
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +135,26 @@ export function ConfigNotifications() {
         checked={checked}
         onCheckedChange={onToggle}
         className="data-[state=checked]:bg-purple-600"
+        disabled={isLoadingSettings}
       />
     </div>
   );
+
+  if (isLoadingSettings) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Notificaciones</h2>
+          <p className="text-muted-foreground">
+            Controla cómo y cuándo recibes notificaciones
+          </p>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
