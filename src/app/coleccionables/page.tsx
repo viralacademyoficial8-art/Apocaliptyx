@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useState, useEffect } from 'react';
 import { Package, ShoppingBag, Sparkles, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';

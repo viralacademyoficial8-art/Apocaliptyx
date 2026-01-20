@@ -8,7 +8,7 @@ import { Footer } from "@/components/Footer";
 import { useAuthStore } from "@/lib/stores";
 import { scenariosService } from "@/services/scenarios.service";
 import { predictionsService, Prediction } from "@/services/predictions.service";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 import {
   Loader2, ArrowLeft, Clock, Users, Flame,
   TrendingUp, TrendingDown, AlertCircle, Share2, Flag, X,
@@ -17,10 +17,6 @@ import {
 import { useScenarioStealing } from "@/hooks/useScenarioStealing";
 import { toast } from "@/components/ui/toast";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // Razones de reporte para escenarios
 const REPORT_REASONS = [
@@ -259,6 +255,7 @@ export default function EscenarioPage() {
     }
 
     setReportLoading(true);
+    const supabase = getSupabaseBrowser();
     try {
       // Guardar el reporte
       const { data: reportData } = await supabase

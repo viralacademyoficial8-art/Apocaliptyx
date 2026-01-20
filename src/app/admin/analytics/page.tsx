@@ -1,8 +1,11 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import { AdminHeader } from '@/components/admin';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { 
   Users, 
   FileText, 
@@ -15,10 +18,6 @@ import {
   Coins
 } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface AnalyticsData {
   totalUsers: number;
@@ -49,6 +48,7 @@ function BarRow({ label, value, max, color = 'bg-purple-600' }: { label: string;
 }
 
 export default function AdminAnalyticsPage() {
+  const supabase = getSupabaseBrowser();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 

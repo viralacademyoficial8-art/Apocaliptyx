@@ -11,16 +11,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Bell, Settings, LogOut, ChevronDown, Loader2 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { usePermissions } from '@/hooks/usePermissions';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AdminSearchBar } from './AdminSearchBar';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface AdminHeaderProps {
   title: string;
@@ -37,6 +32,7 @@ interface Notification {
 }
 
 export function AdminHeader({ title, subtitle }: AdminHeaderProps) {
+  const supabase = getSupabaseBrowser();
   const router = useRouter();
   const { roleName, roleIcon } = usePermissions();
   const [user, setUser] = useState<any>(null);

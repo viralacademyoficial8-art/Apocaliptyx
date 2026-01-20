@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import Link from 'next/link';
 import { ArrowLeft, Trophy } from 'lucide-react';
 import { ProfileAchievements } from '@/components/perfil';

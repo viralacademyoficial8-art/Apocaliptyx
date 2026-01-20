@@ -1,12 +1,7 @@
 // src/services/gamification.service.ts
 // Gamification Service - Ranks, Missions, Achievements, Streaks
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 // ==================== TYPES ====================
 
@@ -136,7 +131,7 @@ export const gamificationService = {
   // ============================================
 
   async getAllRanks(): Promise<UserRank[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_ranks')
       .select('*')
       .order('min_level');
@@ -146,7 +141,7 @@ export const gamificationService = {
   },
 
   async getRankForLevel(level: number): Promise<UserRank | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_ranks')
       .select('*')
       .lte('min_level', level)
@@ -158,7 +153,7 @@ export const gamificationService = {
   },
 
   async getUserRank(userId: string): Promise<UserRank | null> {
-    const { data: user } = await supabase
+    const { data: user } = await getSupabaseBrowser()
       .from('users')
       .select('level')
       .eq('id', userId)
@@ -173,7 +168,7 @@ export const gamificationService = {
   // ============================================
 
   async getAllTitles(): Promise<TitleDefinition[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('title_definitions')
       .select('*')
       .order('rarity');
@@ -183,7 +178,7 @@ export const gamificationService = {
   },
 
   async getUserTitles(userId: string): Promise<UserTitle[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_titles')
       .select('*, title:title_definitions(*)')
       .eq('user_id', userId)
@@ -195,19 +190,19 @@ export const gamificationService = {
 
   async setActiveTitle(userId: string, titleId: string | null): Promise<boolean> {
     // Unset current active
-    await supabase
+    await getSupabaseBrowser()
       .from('user_titles')
       .update({ is_active: false })
       .eq('user_id', userId);
 
     // Update user
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ active_title_id: titleId })
       .eq('id', userId);
 
     if (!error && titleId) {
-      await supabase
+      await getSupabaseBrowser()
         .from('user_titles')
         .update({ is_active: true })
         .eq('user_id', userId)
@@ -218,7 +213,7 @@ export const gamificationService = {
   },
 
   async unlockTitle(userId: string, titleId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_titles')
       .insert({ user_id: userId, title_id: titleId })
       .single();
@@ -231,7 +226,7 @@ export const gamificationService = {
   // ============================================
 
   async getUserStreak(userId: string): Promise<UserStreak | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_streaks')
       .select('*')
       .eq('user_id', userId)
@@ -242,7 +237,7 @@ export const gamificationService = {
   },
 
   async updateLoginStreak(userId: string): Promise<{ current_streak: number; longest_streak: number; total_days: number } | null> {
-    const { data, error } = await supabase.rpc('update_login_streak', {
+    const { data, error } = await getSupabaseBrowser().rpc('update_login_streak', {
       p_user_id: userId
     });
 
@@ -254,7 +249,7 @@ export const gamificationService = {
     const today = new Date().toISOString().split('T')[0];
 
     // Get current streak
-    let { data: streak } = await supabase
+    let { data: streak } = await getSupabaseBrowser()
       .from('user_streaks')
       .select('*')
       .eq('user_id', userId)
@@ -262,7 +257,7 @@ export const gamificationService = {
 
     if (!streak) {
       // Create if doesn't exist
-      const { data: newStreak } = await supabase
+      const { data: newStreak } = await getSupabaseBrowser()
         .from('user_streaks')
         .insert({ user_id: userId })
         .select()
@@ -275,7 +270,7 @@ export const gamificationService = {
     const newPredictionStreak = streak.current_prediction_streak + 1;
     const newCorrectStreak = isCorrect ? streak.current_correct_streak + 1 : 0;
 
-    await supabase
+    await getSupabaseBrowser()
       .from('user_streaks')
       .update({
         current_prediction_streak: newPredictionStreak,
@@ -294,9 +289,9 @@ export const gamificationService = {
 
   async getDailyMissions(userId: string): Promise<UserMission[]> {
     // First assign daily missions if needed
-    await supabase.rpc('assign_daily_missions', { p_user_id: userId });
+    await getSupabaseBrowser().rpc('assign_daily_missions', { p_user_id: userId });
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_missions')
       .select('*, mission:mission_definitions(*)')
       .eq('user_id', userId)
@@ -309,7 +304,7 @@ export const gamificationService = {
   },
 
   async getWeeklyMissions(userId: string): Promise<UserMission[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_missions')
       .select('*, mission:mission_definitions!inner(*)')
       .eq('user_id', userId)
@@ -325,7 +320,7 @@ export const gamificationService = {
     missionId: string,
     progress: Record<string, any>
   ): Promise<boolean> {
-    const { data: userMission } = await supabase
+    const { data: userMission } = await getSupabaseBrowser()
       .from('user_missions')
       .select('*, mission:mission_definitions(*)')
       .eq('user_id', userId)
@@ -346,7 +341,7 @@ export const gamificationService = {
       }
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_missions')
       .update({
         progress: currentProgress,
@@ -359,7 +354,7 @@ export const gamificationService = {
   },
 
   async claimMissionReward(userId: string, userMissionId: string): Promise<{ success: boolean; rewards?: any; error?: string }> {
-    const { data: userMission } = await supabase
+    const { data: userMission } = await getSupabaseBrowser()
       .from('user_missions')
       .select('*, mission:mission_definitions(*)')
       .eq('id', userMissionId)
@@ -382,7 +377,7 @@ export const gamificationService = {
 
     // Apply rewards
     if (rewards.ap_coins) {
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: userId,
         p_amount: rewards.ap_coins,
         p_type: 'mission',
@@ -392,14 +387,14 @@ export const gamificationService = {
     }
 
     if (rewards.xp) {
-      await supabase
+      await getSupabaseBrowser()
         .from('users')
-        .update({ experience: supabase.rpc('increment_value', { x: rewards.xp }) })
+        .update({ experience: getSupabaseBrowser().rpc('increment_value', { x: rewards.xp }) })
         .eq('id', userId);
     }
 
     // Mark as claimed
-    await supabase
+    await getSupabaseBrowser()
       .from('user_missions')
       .update({ claimed_at: new Date().toISOString() })
       .eq('id', userMissionId);
@@ -412,7 +407,7 @@ export const gamificationService = {
   // ============================================
 
   async getAllAchievements(): Promise<Achievement[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('achievement_definitions')
       .select('*')
       .order('category')
@@ -423,7 +418,7 @@ export const gamificationService = {
   },
 
   async getUserAchievements(userId: string): Promise<UserAchievement[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_achievements')
       .select('*, achievement:achievement_definitions(*)')
       .eq('user_id', userId)
@@ -435,7 +430,7 @@ export const gamificationService = {
   },
 
   async getUnlockedAchievements(userId: string): Promise<UserAchievement[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_achievements')
       .select('*, achievement:achievement_definitions(*)')
       .eq('user_id', userId)
@@ -451,7 +446,7 @@ export const gamificationService = {
     achievementId: string,
     progress: number
   ): Promise<{ unlocked: boolean }> {
-    const { data: achievement } = await supabase
+    const { data: achievement } = await getSupabaseBrowser()
       .from('achievement_definitions')
       .select('*')
       .eq('id', achievementId)
@@ -460,7 +455,7 @@ export const gamificationService = {
     if (!achievement) return { unlocked: false };
 
     // Get or create user achievement
-    let { data: userAchievement } = await supabase
+    let { data: userAchievement } = await getSupabaseBrowser()
       .from('user_achievements')
       .select('*')
       .eq('user_id', userId)
@@ -468,7 +463,7 @@ export const gamificationService = {
       .single();
 
     if (!userAchievement) {
-      const { data: newAchievement } = await supabase
+      const { data: newAchievement } = await getSupabaseBrowser()
         .from('user_achievements')
         .insert({
           user_id: userId,
@@ -488,7 +483,7 @@ export const gamificationService = {
     const newProgress = Math.min(progress, userAchievement.progress_max);
     const isUnlocked = newProgress >= userAchievement.progress_max;
 
-    await supabase
+    await getSupabaseBrowser()
       .from('user_achievements')
       .update({
         progress: newProgress,
@@ -499,10 +494,10 @@ export const gamificationService = {
 
     if (isUnlocked) {
       // Add achievement points
-      await supabase
+      await getSupabaseBrowser()
         .from('users')
         .update({
-          achievement_points: supabase.rpc('increment_value', { x: achievement.points })
+          achievement_points: getSupabaseBrowser().rpc('increment_value', { x: achievement.points })
         })
         .eq('id', userId);
     }
@@ -511,7 +506,7 @@ export const gamificationService = {
   },
 
   async claimAchievementReward(userId: string, userAchievementId: string): Promise<{ success: boolean; rewards?: any; error?: string }> {
-    const { data: userAchievement } = await supabase
+    const { data: userAchievement } = await getSupabaseBrowser()
       .from('user_achievements')
       .select('*, achievement:achievement_definitions(*)')
       .eq('id', userAchievementId)
@@ -533,7 +528,7 @@ export const gamificationService = {
     const rewards = (userAchievement.achievement as Achievement).rewards;
 
     if (rewards.ap_coins) {
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: userId,
         p_amount: rewards.ap_coins,
         p_type: 'achievement',
@@ -542,7 +537,7 @@ export const gamificationService = {
       });
     }
 
-    await supabase
+    await getSupabaseBrowser()
       .from('user_achievements')
       .update({ is_claimed: true, claimed_at: new Date().toISOString() })
       .eq('id', userAchievementId);
@@ -555,7 +550,7 @@ export const gamificationService = {
   // ============================================
 
   async getUserExpertise(userId: string): Promise<CategoryExpertise[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_category_expertise')
       .select('*, category:prediction_categories(*)')
       .eq('user_id', userId)
@@ -566,7 +561,7 @@ export const gamificationService = {
   },
 
   async getTopExpertise(userId: string, limit: number = 3): Promise<CategoryExpertise[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_category_expertise')
       .select('*, category:prediction_categories(*)')
       .eq('user_id', userId)
@@ -583,7 +578,7 @@ export const gamificationService = {
     isCorrect: boolean
   ): Promise<void> {
     // Get or create expertise record
-    let { data: expertise } = await supabase
+    let { data: expertise } = await getSupabaseBrowser()
       .from('user_category_expertise')
       .select('*')
       .eq('user_id', userId)
@@ -591,7 +586,7 @@ export const gamificationService = {
       .single();
 
     if (!expertise) {
-      const { data: newExpertise } = await supabase
+      const { data: newExpertise } = await getSupabaseBrowser()
         .from('user_category_expertise')
         .insert({
           user_id: userId,
@@ -616,7 +611,7 @@ export const gamificationService = {
     if (accuracy >= 80 && totalPredictions >= 100) expertiseLevel = Math.max(expertiseLevel, 8);
     if (accuracy >= 85 && totalPredictions >= 200) expertiseLevel = 10;
 
-    await supabase
+    await getSupabaseBrowser()
       .from('user_category_expertise')
       .update({
         total_predictions: totalPredictions,
@@ -634,7 +629,7 @@ export const gamificationService = {
   // ============================================
 
   async getLeaderboard(type: 'level' | 'accuracy' | 'achievements' | 'streak', limit: number = 10): Promise<any[]> {
-    let query = supabase.from('users').select('id, username, avatar_url, level, ap_coins, achievement_points');
+    let query = getSupabaseBrowser().from('users').select('id, username, avatar_url, level, ap_coins, achievement_points');
 
     switch (type) {
       case 'level':
@@ -648,7 +643,7 @@ export const gamificationService = {
         break;
       case 'streak':
         // Need to join with streaks table
-        const { data } = await supabase
+        const { data } = await getSupabaseBrowser()
           .from('user_streaks')
           .select('user_id, current_login_streak, users(id, username, avatar_url, level)')
           .order('current_login_streak', { ascending: false })
@@ -665,7 +660,7 @@ export const gamificationService = {
   // ============================================
 
   async addXP(userId: string, amount: number, reason: string): Promise<{ newXP: number; newLevel: number; leveledUp: boolean }> {
-    const { data: user } = await supabase
+    const { data: user } = await getSupabaseBrowser()
       .from('users')
       .select('experience, level')
       .eq('id', userId)
@@ -681,7 +676,7 @@ export const gamificationService = {
     const newLevel = leveledUp ? user.level + 1 : user.level;
     const remainingXP = leveledUp ? newXP - xpForNextLevel : newXP;
 
-    await supabase
+    await getSupabaseBrowser()
       .from('users')
       .update({
         experience: remainingXP,

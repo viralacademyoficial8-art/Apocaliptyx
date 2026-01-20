@@ -5,16 +5,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { useAuthStore } from '@/lib/stores';
 import { notificationsService, type Notification, type NotificationType } from '@/services/notifications.service';
 import toast from 'react-hot-toast';
-
-// Supabase client for realtime notifications
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 import {
   Bell,
   BellRing,
@@ -174,6 +168,7 @@ const notificationConfig: Record<NotificationType, {
 };
 
 export function NotificationCenter() {
+  const supabase = getSupabaseBrowser();
   const router = useRouter();
   const { data: session, status } = useSession();
   const { user, refreshBalance } = useAuthStore();

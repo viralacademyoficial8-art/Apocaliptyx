@@ -1,12 +1,7 @@
 // src/services/community.service.ts
 // Community Service - Groups, Events, Tournaments
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 // ==================== TYPES ====================
 
@@ -128,7 +123,7 @@ export const communityService = {
     limit?: number;
     offset?: number;
   } = {}): Promise<Community[]> {
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('communities')
       .select('*, creator:users!communities_creator_id_fkey(id, username, avatar_url)')
       .eq('is_public', true);
@@ -168,7 +163,7 @@ export const communityService = {
   },
 
   async getCommunityBySlug(slug: string): Promise<Community | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('communities')
       .select('*, creator:users!communities_creator_id_fkey(id, username, avatar_url)')
       .eq('slug', slug)
@@ -179,7 +174,7 @@ export const communityService = {
   },
 
   async getCommunityById(id: string): Promise<Community | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('communities')
       .select('*, creator:users!communities_creator_id_fkey(id, username, avatar_url)')
       .eq('id', id)
@@ -205,7 +200,7 @@ export const communityService = {
       .replace(/^-|-$/g, '');
 
     // Check if slug exists
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabaseBrowser()
       .from('communities')
       .select('id')
       .eq('slug', slug)
@@ -215,7 +210,7 @@ export const communityService = {
       return { success: false, error: 'Community name already taken' };
     }
 
-    const { data: community, error } = await supabase
+    const { data: community, error } = await getSupabaseBrowser()
       .from('communities')
       .insert({
         name: data.name,
@@ -235,7 +230,7 @@ export const communityService = {
     }
 
     // Add creator as owner
-    await supabase
+    await getSupabaseBrowser()
       .from('community_members')
       .insert({
         community_id: community.id,
@@ -260,7 +255,7 @@ export const communityService = {
       categories: string[];
     }>
   ): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('communities')
       .update({ ...data, updated_at: new Date().toISOString() })
       .eq('id', communityId);
@@ -269,7 +264,7 @@ export const communityService = {
   },
 
   async deleteCommunity(communityId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('communities')
       .delete()
       .eq('id', communityId);
@@ -282,7 +277,7 @@ export const communityService = {
   // ============================================
 
   async joinCommunity(communityId: string, userId: string): Promise<{ success: boolean; error?: string }> {
-    const { data: community } = await supabase
+    const { data: community } = await getSupabaseBrowser()
       .from('communities')
       .select('requires_approval')
       .eq('id', communityId)
@@ -293,7 +288,7 @@ export const communityService = {
     }
 
     // Check if already member
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabaseBrowser()
       .from('community_members')
       .select('id, is_banned')
       .eq('community_id', communityId)
@@ -307,7 +302,7 @@ export const communityService = {
       return { success: false, error: 'Already a member' };
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('community_members')
       .insert({
         community_id: communityId,
@@ -321,7 +316,7 @@ export const communityService = {
 
     // Increment members count
     try {
-      await supabase.rpc('increment', {
+      await getSupabaseBrowser().rpc('increment', {
         row_id: communityId,
         table_name: 'communities',
         column_name: 'members_count'
@@ -335,7 +330,7 @@ export const communityService = {
 
   async leaveCommunity(communityId: string, userId: string): Promise<boolean> {
     // Check if owner - owners can't leave
-    const { data: member } = await supabase
+    const { data: member } = await getSupabaseBrowser()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
@@ -346,7 +341,7 @@ export const communityService = {
       return false; // Owner must transfer ownership first
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('community_members')
       .delete()
       .eq('community_id', communityId)
@@ -355,7 +350,7 @@ export const communityService = {
     if (!error) {
       // Decrement members count
       try {
-        await supabase.rpc('decrement', {
+        await getSupabaseBrowser().rpc('decrement', {
           row_id: communityId,
           table_name: 'communities',
           column_name: 'members_count'
@@ -369,7 +364,7 @@ export const communityService = {
   },
 
   async getCommunityMembers(communityId: string, limit: number = 50): Promise<CommunityMember[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('community_members')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('community_id', communityId)
@@ -383,7 +378,7 @@ export const communityService = {
   },
 
   async getUserCommunities(userId: string): Promise<Community[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('community_members')
       .select('community:communities(*)')
       .eq('user_id', userId)
@@ -394,7 +389,7 @@ export const communityService = {
   },
 
   async getMemberRole(communityId: string, userId: string): Promise<CommunityRole | null> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('community_members')
       .select('role')
       .eq('community_id', communityId)
@@ -409,7 +404,7 @@ export const communityService = {
     userId: string,
     newRole: CommunityRole
   ): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('community_members')
       .update({ role: newRole })
       .eq('community_id', communityId)
@@ -424,7 +419,7 @@ export const communityService = {
     reason: string,
     until?: Date
   ): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('community_members')
       .update({
         is_banned: true,
@@ -438,7 +433,7 @@ export const communityService = {
   },
 
   async unbanMember(communityId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('community_members')
       .update({
         is_banned: false,
@@ -456,7 +451,7 @@ export const communityService = {
   // ============================================
 
   async getCommunityEvents(communityId: string): Promise<CommunityEvent[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('community_events')
       .select('*, creator:users!community_events_creator_id_fkey(id, username, avatar_url)')
       .eq('community_id', communityId)
@@ -469,7 +464,7 @@ export const communityService = {
   },
 
   async getUpcomingEvents(limit: number = 10): Promise<CommunityEvent[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('community_events')
       .select('*, creator:users!community_events_creator_id_fkey(id, username, avatar_url), community:communities(name, slug)')
       .eq('is_cancelled', false)
@@ -493,7 +488,7 @@ export const communityService = {
     location?: string;
     maxParticipants?: number;
   }): Promise<{ success: boolean; event?: CommunityEvent; error?: string }> {
-    const { data: event, error } = await supabase
+    const { data: event, error } = await getSupabaseBrowser()
       .from('community_events')
       .insert({
         community_id: data.communityId,
@@ -518,7 +513,7 @@ export const communityService = {
   },
 
   async joinEvent(eventId: string, userId: string): Promise<{ success: boolean; error?: string }> {
-    const { data: event } = await supabase
+    const { data: event } = await getSupabaseBrowser()
       .from('community_events')
       .select('max_participants, participants_count')
       .eq('id', eventId)
@@ -532,7 +527,7 @@ export const communityService = {
       return { success: false, error: 'Event is full' };
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('event_participants')
       .upsert({
         event_id: eventId,
@@ -545,7 +540,7 @@ export const communityService = {
     }
 
     // Increment participants
-    await supabase
+    await getSupabaseBrowser()
       .from('community_events')
       .update({ participants_count: event.participants_count + 1 })
       .eq('id', eventId);
@@ -554,7 +549,7 @@ export const communityService = {
   },
 
   async leaveEvent(eventId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('event_participants')
       .delete()
       .eq('event_id', eventId)
@@ -572,7 +567,7 @@ export const communityService = {
     communityId?: string;
     limit?: number;
   } = {}): Promise<Tournament[]> {
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('prediction_tournaments')
       .select('*');
 
@@ -597,7 +592,7 @@ export const communityService = {
   },
 
   async getTournamentById(id: string): Promise<Tournament | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('prediction_tournaments')
       .select('*')
       .eq('id', id)
@@ -608,7 +603,7 @@ export const communityService = {
   },
 
   async getTournamentLeaderboard(tournamentId: string): Promise<TournamentParticipant[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('tournament_participants')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('tournament_id', tournamentId)
@@ -620,7 +615,7 @@ export const communityService = {
   },
 
   async joinTournament(tournamentId: string, userId: string): Promise<{ success: boolean; error?: string }> {
-    const { data: tournament } = await supabase
+    const { data: tournament } = await getSupabaseBrowser()
       .from('prediction_tournaments')
       .select('*')
       .eq('id', tournamentId)
@@ -640,7 +635,7 @@ export const communityService = {
 
     // Check entry fee
     if (tournament.entry_fee > 0) {
-      const { data: user } = await supabase
+      const { data: user } = await getSupabaseBrowser()
         .from('users')
         .select('ap_coins')
         .eq('id', userId)
@@ -651,7 +646,7 @@ export const communityService = {
       }
 
       // Deduct entry fee
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: userId,
         p_amount: -tournament.entry_fee,
         p_type: 'tournament_entry',
@@ -660,13 +655,13 @@ export const communityService = {
       });
 
       // Add to prize pool
-      await supabase
+      await getSupabaseBrowser()
         .from('prediction_tournaments')
         .update({ prize_pool: tournament.prize_pool + tournament.entry_fee })
         .eq('id', tournamentId);
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('tournament_participants')
       .insert({
         tournament_id: tournamentId,
@@ -678,7 +673,7 @@ export const communityService = {
     }
 
     // Increment participants
-    await supabase
+    await getSupabaseBrowser()
       .from('prediction_tournaments')
       .update({ participants_count: tournament.participants_count + 1 })
       .eq('id', tournamentId);
@@ -687,7 +682,7 @@ export const communityService = {
   },
 
   async getUserTournaments(userId: string): Promise<Tournament[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('tournament_participants')
       .select('tournament:prediction_tournaments(*)')
       .eq('user_id', userId)
@@ -698,7 +693,7 @@ export const communityService = {
   },
 
   async getUserTournamentStats(tournamentId: string, userId: string): Promise<TournamentParticipant | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('tournament_participants')
       .select('*')
       .eq('tournament_id', tournamentId)

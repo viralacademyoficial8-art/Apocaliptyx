@@ -1,11 +1,6 @@
 // src/services/duplicateDetection.service.ts
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 export interface SimilarScenario {
   id: string;
@@ -106,7 +101,7 @@ class DuplicateDetectionService {
     const normalizedTitle = this.normalizeText(title);
     
     // 1. Buscar coincidencia exacta por hash
-    let exactMatchQuery = supabase
+    let exactMatchQuery = getSupabaseBrowser()
       .from('scenarios')
       .select('id, title, description, status, created_at')
       .eq('content_hash', contentHash);
@@ -131,7 +126,7 @@ class DuplicateDetectionService {
 
     // 2. Buscar escenarios similares por título
     // Query simplificada sin joins para evitar errores de foreign key
-    let similarQuery = supabase
+    let similarQuery = getSupabaseBrowser()
       .from('scenarios')
       .select('id, title, description, status, created_at, current_price, current_holder_id')
       .neq('status', 'CANCELLED');
@@ -158,7 +153,7 @@ class DuplicateDetectionService {
 
     let holderMap: Record<string, string> = {};
     if (holderIds.length > 0) {
-      const { data: holders } = await supabase
+      const { data: holders } = await getSupabaseBrowser()
         .from('users')
         .select('id, username')
         .in('id', holderIds);
@@ -233,7 +228,7 @@ class DuplicateDetectionService {
   async updateContentHash(scenarioId: string, title: string, description: string): Promise<void> {
     const contentHash = this.generateContentHash(title, description);
     
-    await supabase
+    await getSupabaseBrowser()
       .from('scenarios')
       .update({ 
         content_hash: contentHash,
@@ -244,7 +239,7 @@ class DuplicateDetectionService {
 
   // Marcar un escenario como duplicado
   async markAsDuplicate(scenarioId: string, originalId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('scenarios')
       .update({ 
         duplicate_of: originalId,
@@ -257,7 +252,7 @@ class DuplicateDetectionService {
   async getSuggestions(partialTitle: string): Promise<SimilarScenario[]> {
     if (partialTitle.length < 5) return [];
 
-    const { data: scenarios } = await supabase
+    const { data: scenarios } = await getSupabaseBrowser()
       .from('scenarios')
       .select('id, title, description, status, created_at')
       .neq('status', 'CANCELLED')
@@ -290,7 +285,7 @@ class DuplicateDetectionService {
 
   // Actualizar hashes de todos los escenarios existentes (para migración)
   async updateAllHashes(): Promise<number> {
-    const { data: scenarios } = await supabase
+    const { data: scenarios } = await getSupabaseBrowser()
       .from('scenarios')
       .select('id, title, description')
       .is('content_hash', null);

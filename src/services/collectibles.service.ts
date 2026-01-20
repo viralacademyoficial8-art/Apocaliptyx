@@ -1,12 +1,7 @@
 // src/services/collectibles.service.ts
 // Collectibles Service - Items, Trading, Inventory
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 // ==================== TYPES ====================
 
@@ -84,7 +79,7 @@ export const collectiblesService = {
     purchasable?: boolean;
     available?: boolean;
   } = {}): Promise<Collectible[]> {
-    let query = supabase.from('collectibles').select('*');
+    let query = getSupabaseBrowser().from('collectibles').select('*');
 
     if (options.type) {
       query = query.eq('type', options.type);
@@ -114,7 +109,7 @@ export const collectiblesService = {
   },
 
   async getCollectibleById(id: string): Promise<Collectible | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('collectibles')
       .select('*')
       .eq('id', id)
@@ -125,7 +120,7 @@ export const collectiblesService = {
   },
 
   async getCollectiblesByType(type: CollectibleType): Promise<Collectible[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('collectibles')
       .select('*')
       .eq('type', type)
@@ -137,7 +132,7 @@ export const collectiblesService = {
   },
 
   async getLimitedCollectibles(): Promise<Collectible[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('collectibles')
       .select('*')
       .eq('is_limited', true)
@@ -148,7 +143,7 @@ export const collectiblesService = {
   },
 
   async getSeasonalCollectibles(season: string): Promise<Collectible[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('collectibles')
       .select('*')
       .eq('season', season)
@@ -163,7 +158,7 @@ export const collectiblesService = {
   // ============================================
 
   async getUserInventory(userId: string): Promise<UserCollectible[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_collectibles')
       .select('*, collectible:collectibles(*)')
       .eq('user_id', userId)
@@ -174,7 +169,7 @@ export const collectiblesService = {
   },
 
   async getUserCollectiblesByType(userId: string, type: CollectibleType): Promise<UserCollectible[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_collectibles')
       .select('*, collectible:collectibles!inner(*)')
       .eq('user_id', userId)
@@ -186,7 +181,7 @@ export const collectiblesService = {
   },
 
   async hasCollectible(userId: string, collectibleId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('user_collectibles')
       .select('id')
       .eq('user_id', userId)
@@ -197,7 +192,7 @@ export const collectiblesService = {
   },
 
   async getEquippedItems(userId: string): Promise<{ frame?: Collectible; effect?: Collectible; background?: Collectible }> {
-    const { data: user } = await supabase
+    const { data: user } = await getSupabaseBrowser()
       .from('users')
       .select('equipped_frame, equipped_effect, equipped_background')
       .eq('id', userId)
@@ -227,7 +222,7 @@ export const collectiblesService = {
   // ============================================
 
   async purchaseCollectible(userId: string, collectibleId: string): Promise<{ success: boolean; error?: string; serialNumber?: number }> {
-    const { data, error } = await supabase.rpc('purchase_collectible', {
+    const { data, error } = await getSupabaseBrowser().rpc('purchase_collectible', {
       p_user_id: userId,
       p_collectible_id: collectibleId
     });
@@ -245,7 +240,7 @@ export const collectiblesService = {
 
   async equipCollectible(userId: string, collectibleId: string): Promise<{ success: boolean; error?: string }> {
     // Get collectible type
-    const { data: collectible } = await supabase
+    const { data: collectible } = await getSupabaseBrowser()
       .from('collectibles')
       .select('type')
       .eq('id', collectibleId)
@@ -274,7 +269,7 @@ export const collectiblesService = {
     }
 
     // Unequip current item of same type
-    const { data: user } = await supabase
+    const { data: user } = await getSupabaseBrowser()
       .from('users')
       .select(slot)
       .eq('id', userId)
@@ -282,7 +277,7 @@ export const collectiblesService = {
 
     const userData = user as Record<string, any> | null;
     if (userData && userData[slot]) {
-      await supabase
+      await getSupabaseBrowser()
         .from('user_collectibles')
         .update({ is_equipped: false })
         .eq('user_id', userId)
@@ -290,7 +285,7 @@ export const collectiblesService = {
     }
 
     // Equip new item
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ [slot]: collectibleId })
       .eq('id', userId);
@@ -300,7 +295,7 @@ export const collectiblesService = {
     }
 
     // Mark as equipped in inventory
-    await supabase
+    await getSupabaseBrowser()
       .from('user_collectibles')
       .update({ is_equipped: true })
       .eq('user_id', userId)
@@ -313,7 +308,7 @@ export const collectiblesService = {
     const slotColumn = `equipped_${slot}`;
 
     // Get current equipped item
-    const { data: user } = await supabase
+    const { data: user } = await getSupabaseBrowser()
       .from('users')
       .select(slotColumn)
       .eq('id', userId)
@@ -323,14 +318,14 @@ export const collectiblesService = {
     if (!userData || !userData[slotColumn]) return true;
 
     // Unequip
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ [slotColumn]: null })
       .eq('id', userId);
 
     if (!error) {
       // Mark as unequipped in inventory
-      await supabase
+      await getSupabaseBrowser()
         .from('user_collectibles')
         .update({ is_equipped: false })
         .eq('user_id', userId)
@@ -361,7 +356,7 @@ export const collectiblesService = {
       }
 
       // Check if item is tradeable
-      const { data: collectible } = await supabase
+      const { data: collectible } = await getSupabaseBrowser()
         .from('collectibles')
         .select('is_tradeable')
         .eq('id', itemId)
@@ -374,7 +369,7 @@ export const collectiblesService = {
 
     // Check sender has enough AP coins
     if (data.senderApCoins && data.senderApCoins > 0) {
-      const { data: user } = await supabase
+      const { data: user } = await getSupabaseBrowser()
         .from('users')
         .select('ap_coins')
         .eq('id', data.senderId)
@@ -385,7 +380,7 @@ export const collectiblesService = {
       }
     }
 
-    const { data: trade, error } = await supabase
+    const { data: trade, error } = await getSupabaseBrowser()
       .from('collectible_trades')
       .insert({
         sender_id: data.senderId,
@@ -407,7 +402,7 @@ export const collectiblesService = {
   },
 
   async respondToTrade(tradeId: string, userId: string, accept: boolean): Promise<{ success: boolean; error?: string }> {
-    const { data: trade } = await supabase
+    const { data: trade } = await getSupabaseBrowser()
       .from('collectible_trades')
       .select('*')
       .eq('id', tradeId)
@@ -426,7 +421,7 @@ export const collectiblesService = {
     }
 
     if (!accept) {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from('collectible_trades')
         .update({
           status: 'rejected',
@@ -447,7 +442,7 @@ export const collectiblesService = {
 
     // Check receiver has enough AP coins
     if (trade.receiver_ap_coins > 0) {
-      const { data: user } = await supabase
+      const { data: user } = await getSupabaseBrowser()
         .from('users')
         .select('ap_coins')
         .eq('id', userId)
@@ -461,7 +456,7 @@ export const collectiblesService = {
     // Execute trade
     // Transfer items from sender to receiver
     for (const itemId of trade.sender_items) {
-      await supabase
+      await getSupabaseBrowser()
         .from('user_collectibles')
         .update({
           user_id: trade.receiver_id,
@@ -475,7 +470,7 @@ export const collectiblesService = {
 
     // Transfer items from receiver to sender
     for (const itemId of trade.receiver_items) {
-      await supabase
+      await getSupabaseBrowser()
         .from('user_collectibles')
         .update({
           user_id: trade.sender_id,
@@ -489,7 +484,7 @@ export const collectiblesService = {
 
     // Transfer AP coins
     if (trade.sender_ap_coins > 0) {
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: trade.sender_id,
         p_amount: -trade.sender_ap_coins,
         p_type: 'trade',
@@ -497,7 +492,7 @@ export const collectiblesService = {
         p_reference_id: tradeId
       });
 
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: trade.receiver_id,
         p_amount: trade.sender_ap_coins,
         p_type: 'trade',
@@ -507,7 +502,7 @@ export const collectiblesService = {
     }
 
     if (trade.receiver_ap_coins > 0) {
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: trade.receiver_id,
         p_amount: -trade.receiver_ap_coins,
         p_type: 'trade',
@@ -515,7 +510,7 @@ export const collectiblesService = {
         p_reference_id: tradeId
       });
 
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: trade.sender_id,
         p_amount: trade.receiver_ap_coins,
         p_type: 'trade',
@@ -525,7 +520,7 @@ export const collectiblesService = {
     }
 
     // Update trade status
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('collectible_trades')
       .update({
         status: 'completed',
@@ -538,7 +533,7 @@ export const collectiblesService = {
   },
 
   async cancelTrade(tradeId: string, userId: string): Promise<boolean> {
-    const { data: trade } = await supabase
+    const { data: trade } = await getSupabaseBrowser()
       .from('collectible_trades')
       .select('sender_id, status')
       .eq('id', tradeId)
@@ -548,7 +543,7 @@ export const collectiblesService = {
       return false;
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('collectible_trades')
       .update({ status: 'cancelled' })
       .eq('id', tradeId);
@@ -557,7 +552,7 @@ export const collectiblesService = {
   },
 
   async getUserTrades(userId: string, status?: TradeStatus): Promise<CollectibleTrade[]> {
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('collectible_trades')
       .select(`
         *,
@@ -579,7 +574,7 @@ export const collectiblesService = {
   },
 
   async getPendingTradesCount(userId: string): Promise<number> {
-    const { count } = await supabase
+    const { count } = await getSupabaseBrowser()
       .from('collectible_trades')
       .select('id', { count: 'exact', head: true })
       .eq('receiver_id', userId)

@@ -1,11 +1,6 @@
 // src/services/publicProfile.service.ts
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 export interface PublicProfile {
   id: string;
@@ -44,7 +39,7 @@ export interface UserFollow {
 class PublicProfileService {
   // Obtener perfil por username
   async getByUsername(username: string): Promise<PublicProfile | null> {
-    const { data: user, error } = await supabase
+    const { data: user, error } = await getSupabaseBrowser()
       .from('users')
       .select('*')
       .eq('username', username.toLowerCase())
@@ -57,11 +52,11 @@ class PublicProfileService {
 
     // Obtener contadores de seguidores
     const [followersResult, followingResult, rankResult] = await Promise.all([
-      supabase
+      getSupabaseBrowser()
         .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('following_id', user.id),
-      supabase
+      getSupabaseBrowser()
         .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('follower_id', user.id),
@@ -83,7 +78,7 @@ class PublicProfileService {
 
   // Obtener perfil por ID
   async getById(userId: string): Promise<PublicProfile | null> {
-    const { data: user, error } = await supabase
+    const { data: user, error } = await getSupabaseBrowser()
       .from('users')
       .select('*')
       .eq('id', userId)
@@ -94,11 +89,11 @@ class PublicProfileService {
     }
 
     const [followersResult, followingResult, rankResult] = await Promise.all([
-      supabase
+      getSupabaseBrowser()
         .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('following_id', user.id),
-      supabase
+      getSupabaseBrowser()
         .from('follows')
         .select('id', { count: 'exact', head: true })
         .eq('follower_id', user.id),
@@ -120,7 +115,7 @@ class PublicProfileService {
 
   // Obtener ranking del usuario
   async getUserRank(userId: string): Promise<number> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('users')
       .select('id')
       .order('ap_coins', { ascending: false });
@@ -133,7 +128,7 @@ class PublicProfileService {
 
   // Verificar si un usuario sigue a otro
   async isFollowing(followerId: string, followingId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('follows')
       .select('id')
       .eq('follower_id', followerId)
@@ -147,7 +142,7 @@ class PublicProfileService {
   async follow(followerId: string, followingId: string): Promise<boolean> {
     if (followerId === followingId) return false;
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('follows')
       .insert({
         follower_id: followerId,
@@ -160,7 +155,7 @@ class PublicProfileService {
     }
 
     // Crear notificación
-    await supabase.from('notifications').insert({
+    await getSupabaseBrowser().from('notifications').insert({
       user_id: followingId,
       type: 'new_follower',
       title: '¡Nuevo seguidor!',
@@ -174,7 +169,7 @@ class PublicProfileService {
 
   // Dejar de seguir
   async unfollow(followerId: string, followingId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('follows')
       .delete()
       .eq('follower_id', followerId)
@@ -190,7 +185,7 @@ class PublicProfileService {
 
   // Obtener seguidores de un usuario
   async getFollowers(userId: string, limit = 50): Promise<PublicProfile[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('follows')
       .select(`
         follower:users!follows_follower_id_fkey(
@@ -207,7 +202,7 @@ class PublicProfileService {
 
   // Obtener usuarios que sigue
   async getFollowing(userId: string, limit = 50): Promise<PublicProfile[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('follows')
       .select(`
         following:users!follows_following_id_fkey(
@@ -224,7 +219,7 @@ class PublicProfileService {
 
   // Obtener predicciones del usuario
   async getPredictions(userId: string, limit = 20): Promise<any[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('predictions')
       .select(`
         *,
@@ -244,7 +239,7 @@ class PublicProfileService {
 
   // Obtener escenarios creados por el usuario
   async getCreatedScenarios(userId: string, limit = 20): Promise<any[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('scenarios')
       .select('*')
       .eq('creator_id', userId)
@@ -261,7 +256,7 @@ class PublicProfileService {
 
   // Obtener logros del usuario
   async getAchievements(userId: string): Promise<any[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_achievements')
       .select(`
         *,

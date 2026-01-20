@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
@@ -7,7 +10,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { publicProfileService, PublicProfile } from '@/services/publicProfile.service';
 import { chatService } from '@/services/chat.service';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
@@ -61,10 +64,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { ForumPost } from '@/services/forum.service';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // Razones de reporte
 const REPORT_REASONS = [
@@ -84,6 +83,7 @@ export default function PublicProfilePage() {
   const searchParams = useSearchParams();
   const username = params.username as string;
   const { user: currentUser } = useAuthStore();
+  const supabase = getSupabaseBrowser();
 
   // Leer tab desde URL params
   const tabFromUrl = searchParams.get('tab') as TabType | null;

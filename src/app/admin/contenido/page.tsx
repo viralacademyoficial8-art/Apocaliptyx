@@ -1,10 +1,13 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   Film,
   Mic,
@@ -31,10 +34,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface Reel {
   id: string;
@@ -93,6 +92,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AdminContenidoPage() {
+  const supabase = getSupabaseBrowser();
   const [reels, setReels] = useState<Reel[]>([]);
   const [audioPosts, setAudioPosts] = useState<AudioPost[]>([]);
   const [liveStreams, setLiveStreams] = useState<LiveStream[]>([]);

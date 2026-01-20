@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/cookies/page.tsx
 
 import { Navbar } from "@/components/Navbar";

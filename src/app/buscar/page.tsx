@@ -1,11 +1,14 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
 import { LandingNavbar } from '@/components/LandingNavbar';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   Search,
   Loader2,
@@ -22,10 +25,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface Scenario {
   id: string;
@@ -77,6 +76,7 @@ const SORT_OPTIONS = [
 ];
 
 function SearchContent() {
+  const supabase = getSupabaseBrowser();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { status } = useSession();

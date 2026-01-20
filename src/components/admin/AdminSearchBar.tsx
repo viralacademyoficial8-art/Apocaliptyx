@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import {
@@ -18,11 +18,6 @@ import {
   TrendingUp,
   Flame
 } from 'lucide-react';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface UserResult {
   id: string;
@@ -62,6 +57,7 @@ interface ForumPostResult {
 }
 
 export function AdminSearchBar() {
+  const supabase = getSupabaseBrowser();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);

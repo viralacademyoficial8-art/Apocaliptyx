@@ -1,9 +1,12 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { useAuthStore } from '@/lib/stores';
 import { 
   Search,
@@ -24,10 +27,6 @@ import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // Razones de reporte
 const REPORT_REASONS: Record<string, { label: string; color: string }> = {
@@ -70,6 +69,7 @@ interface ScenarioReport {
 }
 
 export default function AdminReportesPage() {
+  const supabase = getSupabaseBrowser();
   const { user } = useAuthStore();
   const [reports, setReports] = useState<ScenarioReport[]>([]);
   const [loading, setLoading] = useState(true);

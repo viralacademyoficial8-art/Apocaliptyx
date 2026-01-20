@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -70,14 +73,10 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow, type Locale } from 'date-fns';
 import { es, enUS, pt, fr, de, ru } from 'date-fns/locale';
 import toast from 'react-hot-toast';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // Supabase client for image uploads
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories';
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
@@ -120,6 +119,7 @@ export default function ForoPage() {
 }
 
 function ForoContent() {
+  const supabase = getSupabaseBrowser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();

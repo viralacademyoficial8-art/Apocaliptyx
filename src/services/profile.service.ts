@@ -1,11 +1,6 @@
 // src/services/profile.service.ts
 
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 
 export interface UserProfileFromDB {
   id: string;
@@ -44,7 +39,7 @@ class ProfileService {
    */
   async getById(userId: string): Promise<UserProfileFromDB | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("users")
         .select("*")
         .eq("id", userId)
@@ -67,7 +62,7 @@ class ProfileService {
    */
   async getByUsername(username: string): Promise<UserProfileFromDB | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("users")
         .select("*")
         .eq("username", username.toLowerCase())
@@ -97,7 +92,7 @@ class ProfileService {
     }>
   ): Promise<boolean> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("users")
         .update({
           ...data,
@@ -123,26 +118,26 @@ class ProfileService {
   async getStats(userId: string): Promise<UserStatsFromDB> {
     try {
       // Obtener datos básicos del usuario
-      const { data: user } = await supabase
+      const { data: user } = await getSupabaseBrowser()
         .from("users")
         .select("total_predictions, correct_predictions, total_earnings")
         .eq("id", userId)
         .single();
 
       // Contar escenarios creados
-      const { count: scenariosCreated } = await supabase
+      const { count: scenariosCreated } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*", { count: "exact", head: true })
         .eq("creator_id", userId);
 
       // Contar seguidores
-      const { count: followersCount } = await supabase
+      const { count: followersCount } = await getSupabaseBrowser()
         .from("follows")
         .select("*", { count: "exact", head: true })
         .eq("following_id", userId);
 
       // Contar siguiendo
-      const { count: followingCount } = await supabase
+      const { count: followingCount } = await getSupabaseBrowser()
         .from("follows")
         .select("*", { count: "exact", head: true })
         .eq("follower_id", userId);
@@ -181,7 +176,7 @@ class ProfileService {
    */
   async getPredictionHistory(userId: string, limit = 20): Promise<any[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("predictions")
         .select(`
           id,
@@ -217,7 +212,7 @@ class ProfileService {
    */
   async getCreatedScenarios(userId: string, limit = 20): Promise<any[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("creator_id", userId)
@@ -241,7 +236,7 @@ class ProfileService {
    */
   async isFollowing(followerId: string, followingId: string): Promise<boolean> {
     try {
-      const { data } = await supabase
+      const { data } = await getSupabaseBrowser()
         .from("follows")
         .select("id")
         .eq("follower_id", followerId)
@@ -259,7 +254,7 @@ class ProfileService {
    */
   async follow(followerId: string, followingId: string): Promise<boolean> {
     try {
-      const { error } = await supabase.from("follows").insert({
+      const { error } = await getSupabaseBrowser().from("follows").insert({
         follower_id: followerId,
         following_id: followingId,
       });
@@ -281,7 +276,7 @@ class ProfileService {
    */
   async unfollow(followerId: string, followingId: string): Promise<boolean> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("follows")
         .delete()
         .eq("follower_id", followerId)
@@ -304,7 +299,7 @@ class ProfileService {
    */
   async getFollowers(userId: string, limit = 50): Promise<UserProfileFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("follows")
         .select(`
           follower:users!follows_follower_id_fkey (
@@ -336,7 +331,7 @@ class ProfileService {
    */
   async getFollowing(userId: string, limit = 50): Promise<UserProfileFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("follows")
         .select(`
           following:users!follows_following_id_fkey (
@@ -421,7 +416,7 @@ class ExtendedProfileService extends ProfileService {
   // ============================================
 
   async getCompleteProfile(username: string): Promise<any> {
-    const { data, error } = await supabase.rpc('get_complete_user_profile', {
+    const { data, error } = await getSupabaseBrowser().rpc('get_complete_user_profile', {
       p_username: username
     });
 
@@ -434,7 +429,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async updateBanner(userId: string, bannerUrl: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ banner_url: bannerUrl })
       .eq('id', userId);
@@ -448,7 +443,7 @@ class ExtendedProfileService extends ProfileService {
     title: string,
     artist: string
   ): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({
         profile_music_url: musicUrl,
@@ -461,7 +456,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async removeProfileMusic(userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({
         profile_music_url: null,
@@ -474,7 +469,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async updateTheme(userId: string, theme: ProfileTheme): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({
         theme_primary_color: theme.primary_color,
@@ -491,7 +486,7 @@ class ExtendedProfileService extends ProfileService {
     showOnline: boolean,
     showActivity: boolean
   ): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({
         show_online_status: showOnline,
@@ -507,7 +502,7 @@ class ExtendedProfileService extends ProfileService {
   // ============================================
 
   async getSocialLinks(userId: string): Promise<SocialLink[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_social_links')
       .select('*')
       .eq('user_id', userId)
@@ -518,7 +513,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async addSocialLink(userId: string, platform: string, url: string): Promise<SocialLink | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_social_links')
       .upsert({ user_id: userId, platform, url }, { onConflict: 'user_id,platform' })
       .select()
@@ -529,7 +524,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async removeSocialLink(userId: string, platform: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_social_links')
       .delete()
       .eq('user_id', userId)
@@ -543,7 +538,7 @@ class ExtendedProfileService extends ProfileService {
   // ============================================
 
   async getPinnedPosts(userId: string): Promise<PinnedPost[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_pinned_posts')
       .select('*, post:forum_posts(*)')
       .eq('user_id', userId)
@@ -554,7 +549,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async pinPost(userId: string, postId: string): Promise<{ success: boolean; error?: string }> {
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabaseBrowser()
       .from('user_pinned_posts')
       .select('id')
       .eq('user_id', userId);
@@ -563,7 +558,7 @@ class ExtendedProfileService extends ProfileService {
       return { success: false, error: 'Maximum 3 pinned posts allowed' };
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_pinned_posts')
       .insert({ user_id: userId, post_id: postId, pin_order: existing?.length || 0 });
 
@@ -575,7 +570,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async unpinPost(userId: string, postId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_pinned_posts')
       .delete()
       .eq('user_id', userId)
@@ -592,7 +587,7 @@ class ExtendedProfileService extends ProfileService {
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_activity_log')
       .select('activity_date, activity_count, activity_type')
       .eq('user_id', userId)
@@ -607,7 +602,7 @@ class ExtendedProfileService extends ProfileService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_stats_history')
       .select('*')
       .eq('user_id', userId)
@@ -619,7 +614,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async getAPTransactions(userId: string, limit: number = 50): Promise<APTransaction[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('ap_coins_transactions')
       .select('*')
       .eq('user_id', userId)
@@ -633,7 +628,7 @@ class ExtendedProfileService extends ProfileService {
   async logActivity(userId: string, activityType: string): Promise<void> {
     const today = new Date().toISOString().split('T')[0];
 
-    await supabase
+    await getSupabaseBrowser()
       .from('user_activity_log')
       .upsert({
         user_id: userId,
@@ -644,7 +639,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async updateLoginStreak(userId: string): Promise<any> {
-    const { data, error } = await supabase.rpc('update_login_streak', { p_user_id: userId });
+    const { data, error } = await getSupabaseBrowser().rpc('update_login_streak', { p_user_id: userId });
     if (error) return null;
     return data;
   }
@@ -654,7 +649,7 @@ class ExtendedProfileService extends ProfileService {
   // ============================================
 
   async equipCollectible(userId: string, collectibleId: string, slot: 'frame' | 'effect' | 'background'): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ [`equipped_${slot}`]: collectibleId })
       .eq('id', userId);
@@ -663,7 +658,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async unequipCollectible(userId: string, slot: 'frame' | 'effect' | 'background'): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ [`equipped_${slot}`]: null })
       .eq('id', userId);
@@ -676,18 +671,18 @@ class ExtendedProfileService extends ProfileService {
   // ============================================
 
   async setActiveTitle(userId: string, titleId: string | null): Promise<boolean> {
-    await supabase
+    await getSupabaseBrowser()
       .from('user_titles')
       .update({ is_active: false })
       .eq('user_id', userId);
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('users')
       .update({ active_title_id: titleId })
       .eq('id', userId);
 
     if (!error && titleId) {
-      await supabase
+      await getSupabaseBrowser()
         .from('user_titles')
         .update({ is_active: true })
         .eq('user_id', userId)
@@ -698,7 +693,7 @@ class ExtendedProfileService extends ProfileService {
   }
 
   async getUnlockedTitles(userId: string): Promise<any[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_titles')
       .select('*, title:title_definitions(*)')
       .eq('user_id', userId)

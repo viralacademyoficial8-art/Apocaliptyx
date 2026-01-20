@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/api/support/tickets/[ticketId]/route.ts
 
 import { NextRequest, NextResponse } from "next/server";

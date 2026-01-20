@@ -10,16 +10,12 @@ import {
   Download,
   Bell,
 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export function QuickActions() {
+  const supabase = getSupabaseBrowser();
   const router = useRouter();
   const [exporting, setExporting] = useState(false);
 

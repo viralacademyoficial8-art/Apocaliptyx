@@ -7,14 +7,10 @@ import {
   MessageCircle, Send, Clock, CheckCircle, AlertCircle, 
   Loader2, User, Bot, X, Filter, ChevronDown
 } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface Ticket {
   id: string;
@@ -68,6 +64,7 @@ const priorityConfig: Record<string, { label: string; color: string }> = {
 };
 
 export default function AdminSoportePage() {
+  const supabase = getSupabaseBrowser();
   const { status } = useSession();
   
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -153,7 +150,7 @@ export default function AdminSoportePage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [selectedTicket]);
+  }, [selectedTicket, supabase]);
 
   // Realtime para nuevos tickets
   useEffect(() => {
@@ -175,7 +172,7 @@ export default function AdminSoportePage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchTickets]);
+  }, [fetchTickets, supabase]);
 
   // Enviar mensaje
   const handleSendMessage = async () => {

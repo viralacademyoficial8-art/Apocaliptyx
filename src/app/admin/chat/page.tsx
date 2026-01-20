@@ -1,10 +1,13 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   MessageCircle,
   Users,
@@ -30,10 +33,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface Conversation {
   id: string;
@@ -71,6 +70,7 @@ interface UserBlock {
 }
 
 export default function AdminChatPage() {
+  const supabase = getSupabaseBrowser();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [groups, setGroups] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);

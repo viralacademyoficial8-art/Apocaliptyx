@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/ayuda/niveles-xp/page.tsx
 
 import { Navbar } from "@/components/Navbar";

@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { notFound } from 'next/navigation';
 import { useShopStore } from '@/stores/shopStore';
 import { ShopItemDetail, PurchaseModal } from '@/components/tienda';

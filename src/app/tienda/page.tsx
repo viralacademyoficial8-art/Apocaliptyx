@@ -1,5 +1,8 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useShopStore } from "@/stores/shopStore";

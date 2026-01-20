@@ -1,11 +1,14 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   Mail,
   Lock,
@@ -18,13 +21,10 @@ import {
   Gift,
 } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function RegistroPage() {
   const router = useRouter();
+  const supabase = getSupabaseBrowser();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -99,7 +99,7 @@ export default function RegistroPage() {
       }
 
       // 1. Crear usuario en Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await getSupabaseBrowser().auth.signUp({
         email: formData.email.toLowerCase(),
         password: formData.password,
         options: {
@@ -128,7 +128,7 @@ export default function RegistroPage() {
       }
 
       // 2. Crear perfil en tabla users
-      const { error: profileError } = await supabase.from('users').insert({
+      const { error: profileError } = await getSupabaseBrowser().from('users').insert({
         id: authData.user.id,
         email: formData.email.toLowerCase(),
         username: formData.username.toLowerCase(),
@@ -154,7 +154,7 @@ export default function RegistroPage() {
       }
 
       // 3. Crear notificacion de bienvenida
-      await supabase.from('notifications').insert({
+      await getSupabaseBrowser().from('notifications').insert({
         user_id: authData.user.id,
         type: 'welcome',
         title: 'Bienvenido a Apocaliptyx!',

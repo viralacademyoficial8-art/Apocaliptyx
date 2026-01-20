@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   Loader2,
   Target,
@@ -27,12 +27,6 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
-
-// Supabase client for realtime
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface FeedUser {
   id: string;
@@ -298,6 +292,7 @@ function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
 }
 
 export function ActivityFeed() {
+  const supabase = getSupabaseBrowser();
   const router = useRouter();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);

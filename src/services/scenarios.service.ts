@@ -1,12 +1,7 @@
 // src/services/scenarios.service.ts
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 import type { ScenarioCategory } from "@/types";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export interface CreateScenarioInput {
   title: string;
@@ -64,7 +59,7 @@ class ScenariosService {
         ? input.category.toUpperCase()
         : input.category;
 
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .insert({
           creator_id: input.creatorId,
@@ -105,7 +100,7 @@ class ScenariosService {
    */
   async getAll(): Promise<ScenarioFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .order("created_at", { ascending: false });
@@ -127,7 +122,7 @@ class ScenariosService {
    */
   async getActive(limit?: number): Promise<ScenarioFromDB[]> {
     try {
-      let query = supabase
+      let query = getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("status", "ACTIVE")
@@ -157,7 +152,7 @@ class ScenariosService {
       });
 
       // Obtener usernames en una sola consulta
-      const { data: usersData } = await supabase
+      const { data: usersData } = await getSupabaseBrowser()
         .from("users")
         .select("id, username")
         .in("id", Array.from(userIds));
@@ -187,7 +182,7 @@ class ScenariosService {
    */
   async getById(id: string): Promise<ScenarioFromDB | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("id", id)
@@ -203,7 +198,7 @@ class ScenariosService {
       let creatorUsername: string | undefined;
 
       if (data.current_holder_id) {
-        const { data: holderData } = await supabase
+        const { data: holderData } = await getSupabaseBrowser()
           .from("users")
           .select("username")
           .eq("id", data.current_holder_id)
@@ -212,7 +207,7 @@ class ScenariosService {
       }
 
       if (data.creator_id) {
-        const { data: creatorData } = await supabase
+        const { data: creatorData } = await getSupabaseBrowser()
           .from("users")
           .select("username")
           .eq("id", data.creator_id)
@@ -236,7 +231,7 @@ class ScenariosService {
    */
   async getByCategory(category: string): Promise<ScenarioFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("category", category)
@@ -260,7 +255,7 @@ class ScenariosService {
    */
   async getByCreator(creatorId: string): Promise<ScenarioFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("creator_id", creatorId)
@@ -283,7 +278,7 @@ class ScenariosService {
    */
   async getByHolder(holderId: string): Promise<ScenarioFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("current_holder_id", holderId)
@@ -306,7 +301,7 @@ class ScenariosService {
    */
   async getFeatured(): Promise<ScenarioFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*")
         .eq("is_featured", true)
@@ -336,7 +331,7 @@ class ScenariosService {
     participantCount: number
   ): Promise<boolean> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("scenarios")
         .update({
           yes_pool: yesPool,
@@ -364,7 +359,7 @@ class ScenariosService {
    */
   async resolve(scenarioId: string, result: "YES" | "NO"): Promise<boolean> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("scenarios")
         .update({
           status: "COMPLETED",
