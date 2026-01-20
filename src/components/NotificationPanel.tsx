@@ -20,6 +20,14 @@ interface Notification {
   type: string;
   is_read: boolean;
   link_url: string | null;
+  data?: {
+    scenario_id?: string;
+    post_id?: string;
+    user_id?: string;
+    community_id?: string;
+    conversation_id?: string;
+    [key: string]: unknown;
+  } | null;
   created_at: string;
 }
 
@@ -52,7 +60,7 @@ export function NotificationPanel() {
     try {
       const { data, error } = await supabase
         .from('notifications')
-        .select('*')
+        .select('id, title, message, type, is_read, link_url, data, created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(20);
@@ -146,13 +154,48 @@ export function NotificationPanel() {
     }
   };
 
+  // Construir link de navegación (con fallback a data si link_url es null)
+  const getNotificationLink = (notification: Notification): string | null => {
+    if (notification.link_url) return notification.link_url;
+
+    // Fallback: construir link desde data para notificaciones antiguas
+    const data = notification.data;
+    if (!data) return null;
+
+    switch (notification.type) {
+      case 'scenario_stolen':
+      case 'scenario_created':
+      case 'scenario_recovered':
+      case 'prediction_won':
+      case 'prediction_lost':
+      case 'scenario_resolved':
+      case 'scenario_vote':
+        if (data.scenario_id) return `/escenario/${data.scenario_id}`;
+        break;
+      case 'new_follower':
+        if (data.user_id) return `/perfil/${data.user_id}`;
+        break;
+      case 'community_post':
+      case 'community_comment':
+      case 'community_like':
+        if (data.community_id) return `/foro/comunidad/${data.community_id}`;
+        break;
+      case 'message_received':
+      case 'message_reaction':
+        if (data.conversation_id) return `/mensajes?conv=${data.conversation_id}`;
+        break;
+    }
+    return null;
+  };
+
   // Click en notificación
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) {
       markAsRead(notification.id);
     }
-    if (notification.link_url) {
-      router.push(notification.link_url);
+    const link = getNotificationLink(notification);
+    if (link) {
+      router.push(link);
       setIsOpen(false);
     }
   };

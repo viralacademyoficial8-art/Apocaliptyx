@@ -258,10 +258,45 @@ export default function NotificacionesPage() {
     setNotifications([]);
   };
 
+  // Construir link de navegación (con fallback a data si link_url es null)
+  const getNotificationLink = (notification: Notification): string | null => {
+    if (notification.link_url) return notification.link_url;
+
+    // Fallback: construir link desde data para notificaciones antiguas
+    const data = notification.data;
+    if (!data) return null;
+
+    switch (notification.type) {
+      case 'scenario_stolen':
+      case 'scenario_created':
+      case 'scenario_recovered':
+      case 'prediction_won':
+      case 'prediction_lost':
+      case 'scenario_resolved':
+      case 'scenario_vote':
+        if (data.scenario_id) return `/escenario/${data.scenario_id}`;
+        break;
+      case 'new_follower':
+        if (data.user_id) return `/perfil/${data.user_id}`;
+        break;
+      case 'community_post':
+      case 'community_comment':
+      case 'community_like':
+        if (data.community_id) return `/foro/comunidad/${data.community_id}`;
+        break;
+      case 'message_received':
+      case 'message_reaction':
+        if (data.conversation_id) return `/mensajes?conv=${data.conversation_id}`;
+        break;
+    }
+    return null;
+  };
+
   const handleNotificationClick = (notification: Notification) => {
     handleMarkAsRead(notification);
-    if (notification.link_url) {
-      router.push(notification.link_url);
+    const link = getNotificationLink(notification);
+    if (link) {
+      router.push(link);
     }
   };
 
