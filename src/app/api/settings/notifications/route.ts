@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { auth } from '@/lib/auth';
+import { getSupabaseAdmin } from '@/lib/supabase-server';
 
 interface NotificationSettings {
   emailNotifications: boolean;
@@ -33,7 +27,7 @@ const DEFAULT_SETTINGS: NotificationSettings = {
 // GET - Load notification settings for current user
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -41,6 +35,8 @@ export async function GET() {
         { status: 401 }
       );
     }
+
+    const supabase = getSupabaseAdmin();
 
     // Get user
     const { data: user, error: userError } = await supabase
@@ -72,7 +68,7 @@ export async function GET() {
 // PUT - Save notification settings for current user
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user?.email) {
       return NextResponse.json(
@@ -80,6 +76,8 @@ export async function PUT(request: Request) {
         { status: 401 }
       );
     }
+
+    const supabase = getSupabaseAdmin();
 
     const body = await request.json();
     const settings: NotificationSettings = {
