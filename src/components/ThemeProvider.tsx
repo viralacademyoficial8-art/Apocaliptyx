@@ -10,11 +10,14 @@ import {
 } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
+type AccentColor = 'red' | 'purple' | 'blue' | 'green' | 'yellow' | 'orange';
 
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   resolvedTheme: 'dark' | 'light';
+  accentColor: AccentColor;
+  setAccentColor: (color: AccentColor) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -22,30 +25,40 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 interface ThemeProviderProps {
   children: ReactNode;
   defaultTheme?: Theme;
+  defaultAccent?: AccentColor;
   storageKey?: string;
+  accentStorageKey?: string;
 }
 
 export function ThemeProvider({
   children,
   defaultTheme = 'dark',
+  defaultAccent = 'red',
   storageKey = 'apocaliptyx-theme',
+  accentStorageKey = 'apocaliptyx-accent',
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('dark');
+  const [accentColor, setAccentColorState] = useState<AccentColor>(defaultAccent);
   const [mounted, setMounted] = useState(false);
 
-  // Cargar tema guardado
+  // Cargar tema y color de acento guardados
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem(storageKey) as Theme | null;
       if (savedTheme && ['dark', 'light', 'system'].includes(savedTheme)) {
         setThemeState(savedTheme);
       }
+
+      const savedAccent = localStorage.getItem(accentStorageKey) as AccentColor | null;
+      if (savedAccent && ['red', 'purple', 'blue', 'green', 'yellow', 'orange'].includes(savedAccent)) {
+        setAccentColorState(savedAccent);
+      }
     } catch {
       // ignore
     }
     setMounted(true);
-  }, [storageKey]);
+  }, [storageKey, accentStorageKey]);
 
   // Resolver tema actual y aplicar clase a <html>
   useEffect(() => {
@@ -84,10 +97,25 @@ export function ThemeProvider({
     }
   }, [theme]);
 
+  // Aplicar color de acento a <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-accent', accentColor);
+  }, [accentColor]);
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     try {
       localStorage.setItem(storageKey, newTheme);
+    } catch {
+      // ignore
+    }
+  };
+
+  const setAccentColor = (newColor: AccentColor) => {
+    setAccentColorState(newColor);
+    try {
+      localStorage.setItem(accentStorageKey, newColor);
     } catch {
       // ignore
     }
@@ -99,7 +127,7 @@ export function ThemeProvider({
   }
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme, accentColor, setAccentColor }}>
       {children}
     </ThemeContext.Provider>
   );

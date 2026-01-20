@@ -31,6 +31,11 @@
     --input: 214 31% 91%;
     --ring: 346 77% 49%;
 
+    /* Colores de acento dinámicos */
+    --accent-primary: 0 84% 60%;
+    --accent-primary-hover: 0 84% 50%;
+    --accent-primary-foreground: 0 0% 100%;
+
     /* Charts (mantengo los tuyos) */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -71,6 +76,11 @@
     --input: 240 3.7% 15.9%;
     --ring: 346 77% 49%;
 
+    /* Colores de acento dinámicos (se sobreescriben con JS) */
+    --accent-primary: 0 84% 60%;
+    --accent-primary-hover: 0 84% 50%;
+    --accent-primary-foreground: 0 0% 100%;
+
     /* Charts en dark (mantengo los tuyos) */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -85,6 +95,55 @@
     --apocalypse-border: 240 3.7% 15.9%;
     --apocalypse-text: 0 0% 98%;
     --apocalypse-text-muted: 240 5% 64.9%;
+  }
+
+  /* ========== COLORES DE ACENTO ========== */
+  /* Rojo Apocalíptico */
+  [data-accent="red"] {
+    --accent-primary: 0 84% 60%;
+    --accent-primary-hover: 0 84% 50%;
+    --accent-primary-foreground: 0 0% 100%;
+    --ring: 0 84% 60%;
+  }
+
+  /* Púrpura Místico */
+  [data-accent="purple"] {
+    --accent-primary: 271 81% 56%;
+    --accent-primary-hover: 271 81% 46%;
+    --accent-primary-foreground: 0 0% 100%;
+    --ring: 271 81% 56%;
+  }
+
+  /* Azul Profético */
+  [data-accent="blue"] {
+    --accent-primary: 217 91% 60%;
+    --accent-primary-hover: 217 91% 50%;
+    --accent-primary-foreground: 0 0% 100%;
+    --ring: 217 91% 60%;
+  }
+
+  /* Verde Esperanza */
+  [data-accent="green"] {
+    --accent-primary: 142 71% 45%;
+    --accent-primary-hover: 142 71% 35%;
+    --accent-primary-foreground: 0 0% 100%;
+    --ring: 142 71% 45%;
+  }
+
+  /* Dorado Nostradamus */
+  [data-accent="yellow"] {
+    --accent-primary: 45 93% 47%;
+    --accent-primary-hover: 45 93% 37%;
+    --accent-primary-foreground: 0 0% 0%;
+    --ring: 45 93% 47%;
+  }
+
+  /* Naranja Fuego */
+  [data-accent="orange"] {
+    --accent-primary: 25 95% 53%;
+    --accent-primary-hover: 25 95% 43%;
+    --accent-primary-foreground: 0 0% 100%;
+    --ring: 25 95% 53%;
   }
 
   /* ========== TEMA CLARO EXPLÍCITO (.light) ========== */
@@ -340,4 +399,86 @@
 
 .animate-bottom-sheet {
   animation: bottom-sheet-up 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ===========================
+   BOTONES CON COLOR DE ACENTO
+   =========================== */
+.btn-accent {
+  background-color: hsl(var(--accent-primary));
+  color: hsl(var(--accent-primary-foreground));
+  transition: background-color 0.2s ease;
+}
+
+.btn-accent:hover {
+  background-color: hsl(var(--accent-primary-hover));
+}
+
+.btn-accent:focus-visible {
+  outline: 2px solid hsl(var(--accent-primary));
+  outline-offset: 2px;
+}
+
+/* Variante outline */
+.btn-accent-outline {
+  border: 2px solid hsl(var(--accent-primary));
+  color: hsl(var(--accent-primary));
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.btn-accent-outline:hover {
+  background-color: hsl(var(--accent-primary) / 0.1);
+}
+
+/* Texto con color de acento */
+.text-accent {
+  color: hsl(var(--accent-primary));
+}
+
+/* Fondo con color de acento */
+.bg-accent-primary {
+  background-color: hsl(var(--accent-primary));
+}
+
+.bg-accent-primary\/10 {
+  background-color: hsl(var(--accent-primary) / 0.1);
+}
+
+.bg-accent-primary\/20 {
+  background-color: hsl(var(--accent-primary) / 0.2);
+}
+
+/* Border con color de acento */
+.border-accent {
+  border-color: hsl(var(--accent-primary));
+}
+
+/* Ring con color de acento */
+.ring-accent {
+  --tw-ring-color: hsl(var(--accent-primary));
+}
+
+/* Gradient con color de acento */
+.from-accent {
+  --tw-gradient-from: hsl(var(--accent-primary));
+}
+
+.to-accent {
+  --tw-gradient-to: hsl(var(--accent-primary));
+}
+
+/* ===========================
+   SCROLLBARS TEMA CLARO
+   =========================== */
+.light ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
 }
