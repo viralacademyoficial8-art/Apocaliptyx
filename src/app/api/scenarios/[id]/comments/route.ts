@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { notificationsService } from '@/services/notifications.service';
 
 // GET - Obtener comentarios de un escenario
 export async function GET(
@@ -129,10 +130,10 @@ export async function POST(
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
     }
 
-    // Verificar que el escenario existe
+    // Verificar que el escenario existe y obtener el creador
     const { data: scenario, error: scenarioError } = await supabase
       .from('scenarios')
-      .select('id')
+      .select('id, title, creator_id')
       .eq('id', scenarioId)
       .single();
 
@@ -175,6 +176,23 @@ export async function POST(
       likes: [],
       createdAt: comment.created_at,
     };
+
+    // NOTIFICACIÓN: Avisar al creador del escenario (si no es el mismo que comenta)
+    if (scenario.creator_id && scenario.creator_id !== user.id) {
+      try {
+        await notificationsService.create({
+          userId: scenario.creator_id,
+          type: 'comment_received',
+          title: 'Nuevo comentario en tu escenario 💬',
+          message: `@${user.display_name || user.username} comentó en "${scenario.title}"`,
+          linkUrl: `/escenario/${scenarioId}`,
+          imageUrl: user.avatar_url || undefined,
+        });
+      } catch (notifError) {
+        // No fallar si la notificación falla
+        console.error('Error sending comment notification:', notifError);
+      }
+    }
 
     return NextResponse.json({ comment: formattedComment });
   } catch (error) {

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { notificationsService } from '@/services/notifications.service';
 
 // POST - Toggle like en un comentario
 export async function POST(
@@ -23,10 +24,12 @@ export async function POST(
       return NextResponse.json({ error: 'ID de comentario requerido' }, { status: 400 });
     }
 
-    // Obtener usuario
+    const scenarioId = params.id;
+
+    // Obtener usuario con info para notificación
     const { data: user } = await supabase
       .from('users')
-      .select('id')
+      .select('id, username, display_name, avatar_url')
       .eq('email', session.user.email.toLowerCase())
       .single();
 
@@ -59,6 +62,34 @@ export async function POST(
           comment_id: commentId,
           user_id: user.id,
         });
+
+      // Obtener info del comentario y su autor para la notificación
+      const { data: comment } = await supabase
+        .from('scenario_comments')
+        .select('author_id, content')
+        .eq('id', commentId)
+        .single();
+
+      // NOTIFICACIÓN: Avisar al autor del comentario (si no es el mismo que da like)
+      if (comment && comment.author_id !== user.id) {
+        try {
+          const contentPreview = comment.content?.length > 30
+            ? comment.content.substring(0, 30) + '...'
+            : comment.content;
+
+          await notificationsService.create({
+            userId: comment.author_id,
+            type: 'like_received',
+            title: 'Le gustó tu comentario ❤️',
+            message: `A @${user.display_name || user.username} le gustó tu comentario: "${contentPreview}"`,
+            linkUrl: `/escenario/${scenarioId}`,
+            imageUrl: user.avatar_url || undefined,
+          });
+        } catch (notifError) {
+          // No fallar si la notificación falla
+          console.error('Error sending like notification:', notifError);
+        }
+      }
 
       return NextResponse.json({ liked: true });
     }
