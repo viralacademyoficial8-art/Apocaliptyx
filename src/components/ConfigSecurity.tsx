@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
+import { signOut } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +22,7 @@ export function ConfigSecurity() {
   const router = useRouter();
   const { logout } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -32,11 +34,6 @@ export function ConfigSecurity() {
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!passwordData.currentPassword) {
-      toast.error('Ingresa tu contraseña actual');
-      return;
-    }
 
     if (passwordData.newPassword.length < 6) {
       toast.error('La nueva contraseña debe tener al menos 6 caracteres');
@@ -51,7 +48,23 @@ export function ConfigSecurity() {
     setIsLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch('/api/settings/security/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al cambiar la contraseña');
+      }
+
       toast.success('Contraseña actualizada correctamente');
       setPasswordData({
         currentPassword: '',
@@ -59,7 +72,8 @@ export function ConfigSecurity() {
         confirmPassword: '',
       });
     } catch (error) {
-      toast.error('Error al cambiar la contraseña');
+      console.error('Error changing password:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al cambiar la contraseña');
     } finally {
       setIsLoading(false);
     }
@@ -71,17 +85,49 @@ export function ConfigSecurity() {
       return;
     }
 
-    setIsLoading(true);
+    setIsDeleting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      logout();
+      const response = await fetch('/api/settings/security/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          confirmText: deleteConfirmText,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al eliminar la cuenta');
+      }
+
       toast.success('Cuenta eliminada. ¡Hasta pronto, profeta!');
+
+      // Clear local state and sign out
+      logout();
+      await signOut({ redirect: false });
       router.push('/');
     } catch (error) {
-      toast.error('Error al eliminar la cuenta');
+      console.error('Error deleting account:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al eliminar la cuenta');
     } finally {
-      setIsLoading(false);
+      setIsDeleting(false);
+    }
+  };
+
+  const handleLogoutAllSessions = async () => {
+    try {
+      // Sign out from NextAuth (this will invalidate the current session)
+      await signOut({ redirect: false });
+      logout();
+      toast.success('Sesiones cerradas correctamente');
+      router.push('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast.error('Error al cerrar sesiones');
     }
   };
 
@@ -131,6 +177,9 @@ export function ConfigSecurity() {
                 )}
               </button>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Déjalo vacío si te registraste con Google u otra red social
+            </p>
           </div>
 
           {/* New Password */}
@@ -216,8 +265,9 @@ export function ConfigSecurity() {
           <Button
             variant="outline"
             className="border-border text-foreground"
+            onClick={handleLogoutAllSessions}
           >
-            Cerrar todas las otras sesiones
+            Cerrar todas las sesiones
           </Button>
         </div>
       </div>
@@ -230,7 +280,8 @@ export function ConfigSecurity() {
         </h3>
 
         <p className="text-muted-foreground mb-4">
-          Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor, estás
+          Una vez que elimines tu cuenta, no hay vuelta atrás. Se eliminarán todos
+          tus datos, escenarios, comentarios y participaciones. Por favor, estás
           seguro.
         </p>
 
@@ -254,15 +305,15 @@ export function ConfigSecurity() {
                 setDeleteConfirmText(e.target.value.toUpperCase())
               }
               placeholder="ELIMINAR"
-              className="bg-gray-800 border-red-500/50 focus:border-red-500"
+              className="bg-input border-red-500/50 focus:border-red-500"
             />
             <div className="flex gap-3">
               <Button
                 onClick={handleDeleteAccount}
-                disabled={isLoading || deleteConfirmText !== 'ELIMINAR'}
+                disabled={isDeleting || deleteConfirmText !== 'ELIMINAR'}
                 className="bg-red-600 hover:bg-red-700"
               >
-                {isLoading ? (
+                {isDeleting ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     Eliminando...
