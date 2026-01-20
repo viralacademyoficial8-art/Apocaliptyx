@@ -1,11 +1,14 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -30,10 +33,6 @@ import {
 } from 'lucide-react';
 
 // Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface StolenScenario {
   id: string;
@@ -305,6 +304,7 @@ export default function EscenariosRobadosPage() {
   const params = useParams();
   const router = useRouter();
   const username = params.username as string;
+  const supabase = getSupabaseBrowser();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stolenScenarios, setStolenScenarios] = useState<StolenScenario[]>([]);

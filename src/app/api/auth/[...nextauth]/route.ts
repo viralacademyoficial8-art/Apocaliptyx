@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/api/auth/[...nextauth]/route.ts
 
 import { GET, POST } from "@/lib/auth";

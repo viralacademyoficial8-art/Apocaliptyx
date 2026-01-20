@@ -1,8 +1,11 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import { AdminHeader } from '@/components/admin';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   Trophy,
   Loader2,
@@ -13,10 +16,6 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface LeaderboardUser {
   id: string;
@@ -32,6 +31,7 @@ interface LeaderboardUser {
 }
 
 export default function AdminLeaderboardsPage() {
+  const supabase = getSupabaseBrowser();
   const [leaderboardLevel, setLeaderboardLevel] = useState<LeaderboardUser[]>([]);
   const [leaderboardCoins, setLeaderboardCoins] = useState<LeaderboardUser[]>([]);
   const [leaderboardAccuracy, setLeaderboardAccuracy] = useState<LeaderboardUser[]>([]);

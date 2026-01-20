@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import Link from 'next/link';
 import { ArrowLeft, Package } from 'lucide-react';
 import { ProfileInventory } from '@/components/perfil';

@@ -1,11 +1,6 @@
 // src/services/admin.service.ts
 
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 
 export interface PlatformStats {
   totalUsers: number;
@@ -85,64 +80,64 @@ class AdminService {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
       // Usuarios totales
-      const { count: totalUsers } = await supabase
+      const { count: totalUsers } = await getSupabaseBrowser()
         .from("users")
         .select("*", { count: "exact", head: true });
 
       // Usuarios nuevos hoy
-      const { count: newUsersToday } = await supabase
+      const { count: newUsersToday } = await getSupabaseBrowser()
         .from("users")
         .select("*", { count: "exact", head: true })
         .gte("created_at", todayStart);
 
       // Usuarios nuevos esta semana
-      const { count: newUsersThisWeek } = await supabase
+      const { count: newUsersThisWeek } = await getSupabaseBrowser()
         .from("users")
         .select("*", { count: "exact", head: true })
         .gte("created_at", weekAgo);
 
       // Usuarios activos (no baneados)
-      const { count: activeUsers } = await supabase
+      const { count: activeUsers } = await getSupabaseBrowser()
         .from("users")
         .select("*", { count: "exact", head: true })
         .eq("is_banned", false);
 
       // Escenarios totales
-      const { count: totalScenarios } = await supabase
+      const { count: totalScenarios } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*", { count: "exact", head: true });
 
       // Escenarios activos (ACTIVE en mayúsculas)
-      const { count: activeScenarios } = await supabase
+      const { count: activeScenarios } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*", { count: "exact", head: true })
         .eq("status", "ACTIVE");
 
       // Escenarios completados (RESOLVED en mayúsculas)
-      const { count: completedScenarios } = await supabase
+      const { count: completedScenarios } = await getSupabaseBrowser()
         .from("scenarios")
         .select("*", { count: "exact", head: true })
         .eq("status", "RESOLVED");
 
       // Volumen total (suma de total_pool)
-      const { data: volumeData } = await supabase
+      const { data: volumeData } = await getSupabaseBrowser()
         .from("scenarios")
         .select("total_pool");
       const totalVolume = volumeData?.reduce((sum, s) => sum + (s.total_pool || 0), 0) || 0;
 
       // Transacciones (compras)
-      const { count: totalTransactions } = await supabase
+      const { count: totalTransactions } = await getSupabaseBrowser()
         .from("user_purchases")
         .select("*", { count: "exact", head: true });
 
       // Items de tienda
-      const { count: totalShopItems } = await supabase
+      const { count: totalShopItems } = await getSupabaseBrowser()
         .from("shop_items")
         .select("*", { count: "exact", head: true })
         .eq("is_active", true);
 
       // Notificaciones
-      const { count: totalNotifications } = await supabase
+      const { count: totalNotifications } = await getSupabaseBrowser()
         .from("notifications")
         .select("*", { count: "exact", head: true });
 
@@ -194,7 +189,7 @@ class AdminService {
     try {
       const { limit = 20, offset = 0, search, role, orderBy = "created_at", order = "desc" } = options || {};
 
-      let query = supabase
+      let query = getSupabaseBrowser()
         .from("users")
         .select("*", { count: "exact" });
 
@@ -225,7 +220,7 @@ class AdminService {
 
   async getUserById(userId: string): Promise<UserData | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("users")
         .select("*")
         .eq("id", userId)
@@ -245,7 +240,7 @@ class AdminService {
 
   async updateUser(userId: string, updates: Partial<UserData>): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("users")
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq("id", userId);
@@ -272,7 +267,7 @@ class AdminService {
 
   async adjustUserCoins(userId: string, amount: number): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data: user } = await supabase
+      const { data: user } = await getSupabaseBrowser()
         .from("users")
         .select("ap_coins")
         .eq("id", userId)
@@ -284,7 +279,7 @@ class AdminService {
 
       const newBalance = Math.max(0, user.ap_coins + amount);
 
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("users")
         .update({ ap_coins: newBalance, updated_at: new Date().toISOString() })
         .eq("id", userId);
@@ -315,7 +310,7 @@ class AdminService {
       const { limit = 20, offset = 0, search, status, category } = options || {};
 
       // Consulta simple sin join
-      let query = supabase
+      let query = getSupabaseBrowser()
         .from("scenarios")
         .select("*", { count: "exact" });
 
@@ -350,7 +345,7 @@ class AdminService {
 
   async updateScenario(scenarioId: string, updates: Partial<ScenarioData>): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("scenarios")
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq("id", scenarioId);
@@ -368,7 +363,7 @@ class AdminService {
 
   async deleteScenario(scenarioId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("scenarios")
         .delete()
         .eq("id", scenarioId);
@@ -393,7 +388,7 @@ class AdminService {
       const activities: RecentActivity[] = [];
 
       // Usuarios recientes
-      const { data: recentUsers } = await supabase
+      const { data: recentUsers } = await getSupabaseBrowser()
         .from("users")
         .select("id, username, avatar_url, created_at")
         .order("created_at", { ascending: false })
@@ -416,7 +411,7 @@ class AdminService {
       }
 
       // Escenarios recientes (sin join)
-      const { data: recentScenarios } = await supabase
+      const { data: recentScenarios } = await getSupabaseBrowser()
         .from("scenarios")
         .select("id, title, created_at, creator_id")
         .order("created_at", { ascending: false })
@@ -435,7 +430,7 @@ class AdminService {
       }
 
       // Compras recientes (sin join)
-      const { data: recentPurchases } = await supabase
+      const { data: recentPurchases } = await getSupabaseBrowser()
         .from("user_purchases")
         .select("id, quantity, price_paid, created_at")
         .order("created_at", { ascending: false })
@@ -469,7 +464,7 @@ class AdminService {
 
   async getShopItems(): Promise<any[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("shop_items")
         .select("*")
         .order("created_at", { ascending: false });
@@ -488,7 +483,7 @@ class AdminService {
 
   async createShopItem(item: any): Promise<{ success: boolean; error?: string; id?: string }> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("shop_items")
         .insert(item)
         .select()
@@ -507,7 +502,7 @@ class AdminService {
 
   async updateShopItem(itemId: string, updates: any): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("shop_items")
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq("id", itemId);
@@ -525,7 +520,7 @@ class AdminService {
 
   async deleteShopItem(itemId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from("shop_items")
         .delete()
         .eq("id", itemId);

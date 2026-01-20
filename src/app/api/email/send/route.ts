@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/api/email/send/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';

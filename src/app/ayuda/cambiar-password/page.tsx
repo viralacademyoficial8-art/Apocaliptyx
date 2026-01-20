@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/ayuda/cambiar-password/page.tsx
 
 import { Navbar } from "@/components/Navbar";

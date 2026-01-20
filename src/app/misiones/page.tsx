@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useState, useEffect } from 'react';
 import { Target, Trophy, Flame, Clock, Calendar, Gift, Loader2 } from 'lucide-react';
 import { MissionsPanel } from '@/components/gamification/MissionsPanel';

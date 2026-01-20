@@ -1,12 +1,7 @@
 // src/services/content.service.ts
 // Content Service - Reels, Audio Posts, Live Streams
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 // ==================== TYPES ====================
 
@@ -137,7 +132,7 @@ export const contentService = {
     limit?: number;
     offset?: number;
   } = {}): Promise<Reel[]> {
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('user_reels')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('is_published', true);
@@ -152,7 +147,7 @@ export const contentService = {
 
     if (options.following && options.currentUserId) {
       // Get followed users
-      const { data: follows } = await supabase
+      const { data: follows } = await getSupabaseBrowser()
         .from('follows')
         .select('following_id')
         .eq('follower_id', options.currentUserId);
@@ -178,7 +173,7 @@ export const contentService = {
     // Check if current user liked each reel
     if (options.currentUserId && data) {
       const reelIds = data.map(r => r.id);
-      const { data: likes } = await supabase
+      const { data: likes } = await getSupabaseBrowser()
         .from('reel_likes')
         .select('reel_id')
         .eq('user_id', options.currentUserId)
@@ -196,7 +191,7 @@ export const contentService = {
   },
 
   async getReelById(reelId: string, currentUserId?: string): Promise<Reel | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_reels')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('id', reelId)
@@ -205,7 +200,7 @@ export const contentService = {
     if (error) return null;
 
     if (currentUserId) {
-      const { data: like } = await supabase
+      const { data: like } = await getSupabaseBrowser()
         .from('reel_likes')
         .select('id')
         .eq('reel_id', reelId)
@@ -228,7 +223,7 @@ export const contentService = {
     height?: number;
     tags?: string[];
   }): Promise<{ success: boolean; reel?: Reel; error?: string }> {
-    const { data: reel, error } = await supabase
+    const { data: reel, error } = await getSupabaseBrowser()
       .from('user_reels')
       .insert({
         user_id: data.userId,
@@ -251,7 +246,7 @@ export const contentService = {
   },
 
   async deleteReel(reelId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_reels')
       .delete()
       .eq('id', reelId)
@@ -261,14 +256,14 @@ export const contentService = {
   },
 
   async likeReel(reelId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('reel_likes')
       .insert({ reel_id: reelId, user_id: userId });
 
     if (!error) {
       // Increment likes count
       try {
-        await supabase.rpc('increment', {
+        await getSupabaseBrowser().rpc('increment', {
           row_id: reelId,
           table_name: 'user_reels',
           column_name: 'likes_count'
@@ -282,7 +277,7 @@ export const contentService = {
   },
 
   async unlikeReel(reelId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('reel_likes')
       .delete()
       .eq('reel_id', reelId)
@@ -291,7 +286,7 @@ export const contentService = {
     if (!error) {
       // Decrement likes count
       try {
-        await supabase.rpc('decrement', {
+        await getSupabaseBrowser().rpc('decrement', {
           row_id: reelId,
           table_name: 'user_reels',
           column_name: 'likes_count'
@@ -306,7 +301,7 @@ export const contentService = {
 
   async incrementReelViews(reelId: string): Promise<void> {
     try {
-      await supabase.rpc('increment', {
+      await getSupabaseBrowser().rpc('increment', {
         row_id: reelId,
         table_name: 'user_reels',
         column_name: 'views_count'
@@ -317,7 +312,7 @@ export const contentService = {
   },
 
   async getReelComments(reelId: string): Promise<ReelComment[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('reel_comments')
       .select('*, user:users(id, username, avatar_url)')
       .eq('reel_id', reelId)
@@ -329,7 +324,7 @@ export const contentService = {
     // Get replies for each comment
     const commentsWithReplies = await Promise.all(
       (data || []).map(async (comment) => {
-        const { data: replies } = await supabase
+        const { data: replies } = await getSupabaseBrowser()
           .from('reel_comments')
           .select('*, user:users(id, username, avatar_url)')
           .eq('parent_id', comment.id)
@@ -343,7 +338,7 @@ export const contentService = {
   },
 
   async addReelComment(reelId: string, userId: string, content: string, parentId?: string): Promise<ReelComment | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('reel_comments')
       .insert({
         reel_id: reelId,
@@ -357,7 +352,7 @@ export const contentService = {
     if (!error) {
       // Increment comments count
       try {
-        await supabase.rpc('increment', {
+        await getSupabaseBrowser().rpc('increment', {
           row_id: reelId,
           table_name: 'user_reels',
           column_name: 'comments_count'
@@ -380,7 +375,7 @@ export const contentService = {
     limit?: number;
     offset?: number;
   } = {}): Promise<AudioPost[]> {
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('user_audio_posts')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('is_published', true);
@@ -408,7 +403,7 @@ export const contentService = {
   },
 
   async getAudioPostById(audioId: string): Promise<AudioPost | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('user_audio_posts')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('id', audioId)
@@ -427,7 +422,7 @@ export const contentService = {
     waveformData?: number[];
     tags?: string[];
   }): Promise<{ success: boolean; audioPost?: AudioPost; error?: string }> {
-    const { data: audioPost, error } = await supabase
+    const { data: audioPost, error } = await getSupabaseBrowser()
       .from('user_audio_posts')
       .insert({
         user_id: data.userId,
@@ -449,7 +444,7 @@ export const contentService = {
   },
 
   async deleteAudioPost(audioId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_audio_posts')
       .delete()
       .eq('id', audioId)
@@ -460,7 +455,7 @@ export const contentService = {
 
   async incrementAudioPlays(audioId: string): Promise<void> {
     try {
-      await supabase.rpc('increment', {
+      await getSupabaseBrowser().rpc('increment', {
         row_id: audioId,
         table_name: 'user_audio_posts',
         column_name: 'plays_count'
@@ -480,7 +475,7 @@ export const contentService = {
     userId?: string;
     limit?: number;
   } = {}): Promise<LiveStream[]> {
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('live_streams')
       .select('*, user:users(id, username, avatar_url, level)');
 
@@ -513,7 +508,7 @@ export const contentService = {
   },
 
   async getStreamById(streamId: string): Promise<LiveStream | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('live_streams')
       .select('*, user:users(id, username, avatar_url, level)')
       .eq('id', streamId)
@@ -535,7 +530,7 @@ export const contentService = {
     // Generate stream key
     const streamKey = `sk_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    const { data: stream, error } = await supabase
+    const { data: stream, error } = await getSupabaseBrowser()
       .from('live_streams')
       .insert({
         user_id: data.userId,
@@ -558,7 +553,7 @@ export const contentService = {
   },
 
   async startStream(streamId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('live_streams')
       .update({
         status: 'live',
@@ -571,7 +566,7 @@ export const contentService = {
   },
 
   async endStream(streamId: string, userId: string): Promise<boolean> {
-    const { data: stream } = await supabase
+    const { data: stream } = await getSupabaseBrowser()
       .from('live_streams')
       .select('started_at')
       .eq('id', streamId)
@@ -581,7 +576,7 @@ export const contentService = {
       ? Math.floor((Date.now() - new Date(stream.started_at).getTime()) / 1000)
       : 0;
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('live_streams')
       .update({
         status: 'ended',
@@ -596,7 +591,7 @@ export const contentService = {
 
   async joinStream(streamId: string, userId: string): Promise<void> {
     // Record viewer
-    await supabase
+    await getSupabaseBrowser()
       .from('stream_viewers')
       .upsert({
         stream_id: streamId,
@@ -606,7 +601,7 @@ export const contentService = {
 
     // Increment viewers
     try {
-      await supabase.rpc('increment', {
+      await getSupabaseBrowser().rpc('increment', {
         row_id: streamId,
         table_name: 'live_streams',
         column_name: 'viewers_count'
@@ -618,7 +613,7 @@ export const contentService = {
 
   async leaveStream(streamId: string, userId: string): Promise<void> {
     // Update watch time
-    const { data: viewer } = await supabase
+    const { data: viewer } = await getSupabaseBrowser()
       .from('stream_viewers')
       .select('joined_at')
       .eq('stream_id', streamId)
@@ -628,7 +623,7 @@ export const contentService = {
     if (viewer) {
       const watchTime = Math.floor((Date.now() - new Date(viewer.joined_at).getTime()) / 1000);
 
-      await supabase
+      await getSupabaseBrowser()
         .from('stream_viewers')
         .update({
           left_at: new Date().toISOString(),
@@ -640,7 +635,7 @@ export const contentService = {
 
     // Decrement viewers
     try {
-      await supabase.rpc('decrement', {
+      await getSupabaseBrowser().rpc('decrement', {
         row_id: streamId,
         table_name: 'live_streams',
         column_name: 'viewers_count'
@@ -651,7 +646,7 @@ export const contentService = {
   },
 
   async getStreamChat(streamId: string, limit: number = 100): Promise<StreamChatMessage[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('stream_chat_messages')
       .select('*, user:users(id, username, avatar_url)')
       .eq('stream_id', streamId)
@@ -668,7 +663,7 @@ export const contentService = {
     content: string,
     highlightAmount?: number
   ): Promise<StreamChatMessage | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('stream_chat_messages')
       .insert({
         stream_id: streamId,
@@ -684,7 +679,7 @@ export const contentService = {
 
     // If highlighted, deduct AP coins
     if (highlightAmount && highlightAmount > 0) {
-      await supabase.rpc('log_ap_transaction', {
+      await getSupabaseBrowser().rpc('log_ap_transaction', {
         p_user_id: userId,
         p_amount: -highlightAmount,
         p_type: 'stream_highlight',
@@ -698,7 +693,7 @@ export const contentService = {
 
   async pinStreamMessage(messageId: string, streamOwnerId: string): Promise<boolean> {
     // Verify stream owner
-    const { data: message } = await supabase
+    const { data: message } = await getSupabaseBrowser()
       .from('stream_chat_messages')
       .select('stream_id, live_streams!inner(user_id)')
       .eq('id', messageId)
@@ -708,7 +703,7 @@ export const contentService = {
       return false;
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('stream_chat_messages')
       .update({ is_pinned: true })
       .eq('id', messageId);
@@ -725,7 +720,7 @@ export const contentService = {
     let data: any[] = [];
 
     if (contentType === 'reels' || contentType === 'all') {
-      const { data: reels } = await supabase
+      const { data: reels } = await getSupabaseBrowser()
         .from('user_reels')
         .select('tags')
         .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
@@ -734,7 +729,7 @@ export const contentService = {
     }
 
     if (contentType === 'audio' || contentType === 'all') {
-      const { data: audio } = await supabase
+      const { data: audio } = await getSupabaseBrowser()
         .from('user_audio_posts')
         .select('tags')
         .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/(auth)/login/page.tsx
 
 import { Suspense } from "react";

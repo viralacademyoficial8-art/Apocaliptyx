@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/ayuda/comprar-coins/page.tsx
 
 import { Navbar } from "@/components/Navbar";

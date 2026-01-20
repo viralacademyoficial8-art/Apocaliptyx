@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // src/app/ayuda/resolucion-escenarios/page.tsx
 
 import { Navbar } from "@/components/Navbar";

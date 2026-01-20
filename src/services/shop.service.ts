@@ -1,12 +1,6 @@
 // src/services/shop.service.ts
 
-import { createClient } from "@supabase/supabase-js";
-
-// Cliente sin tipos estrictos
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 
 // Roles con AP Coins infinitas
 const INFINITE_COINS_ROLES = ['SUPER_ADMIN', 'STAFF', 'MODERATOR'];
@@ -48,7 +42,7 @@ export interface PurchaseResult {
 class ShopService {
   async getItems(): Promise<ShopItemFromDB[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("shop_items")
         .select("*")
         .eq("is_active", true)
@@ -68,7 +62,7 @@ class ShopService {
 
   async getItemById(itemId: string): Promise<ShopItemFromDB | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("shop_items")
         .select("*")
         .eq("id", itemId)
@@ -93,7 +87,7 @@ class ShopService {
   ): Promise<PurchaseResult> {
     try {
       // 1. Obtener el item
-      const { data: item, error: itemError } = await supabase
+      const { data: item, error: itemError } = await getSupabaseBrowser()
         .from("shop_items")
         .select("*")
         .eq("id", itemId)
@@ -109,7 +103,7 @@ class ShopService {
       }
 
       // 3. Obtener usuario con su rol
-      const { data: user, error: userError } = await supabase
+      const { data: user, error: userError } = await getSupabaseBrowser()
         .from("users")
         .select("ap_coins, role")
         .eq("id", userId)
@@ -133,7 +127,7 @@ class ShopService {
 
       // 7. Verificar límite por usuario (aplica para todos)
       if (item.max_per_user !== null) {
-        const { data: existing } = await supabase
+        const { data: existing } = await getSupabaseBrowser()
           .from("user_inventory")
           .select("quantity")
           .eq("user_id", userId)
@@ -154,7 +148,7 @@ class ShopService {
       
       if (!hasInfiniteCoins) {
         newBalance = user.ap_coins - totalPrice;
-        const { error: updateError } = await supabase
+        const { error: updateError } = await getSupabaseBrowser()
           .from("users")
           .update({ ap_coins: newBalance, updated_at: new Date().toISOString() })
           .eq("id", userId);
@@ -166,7 +160,7 @@ class ShopService {
       }
 
       // 9. Registrar compra (con precio 0 si es gratis)
-      const { error: purchaseError } = await supabase
+      const { error: purchaseError } = await getSupabaseBrowser()
         .from("user_purchases")
         .insert({
           user_id: userId,
@@ -179,7 +173,7 @@ class ShopService {
         console.error("Error recording purchase:", purchaseError);
         // Revertir el balance si falla (solo si se descontó)
         if (!hasInfiniteCoins) {
-          await supabase
+          await getSupabaseBrowser()
             .from("users")
             .update({ ap_coins: user.ap_coins })
             .eq("id", userId);
@@ -188,7 +182,7 @@ class ShopService {
       }
 
       // 10. Añadir al inventario
-      const { data: existingItem } = await supabase
+      const { data: existingItem } = await getSupabaseBrowser()
         .from("user_inventory")
         .select("id, quantity")
         .eq("user_id", userId)
@@ -196,12 +190,12 @@ class ShopService {
         .maybeSingle();
 
       if (existingItem) {
-        await supabase
+        await getSupabaseBrowser()
           .from("user_inventory")
           .update({ quantity: existingItem.quantity + quantity })
           .eq("id", existingItem.id);
       } else {
-        await supabase.from("user_inventory").insert({
+        await getSupabaseBrowser().from("user_inventory").insert({
           user_id: userId,
           item_id: itemId,
           quantity: quantity,
@@ -210,7 +204,7 @@ class ShopService {
 
       // 11. Actualizar stock (aplica para todos)
       if (item.stock !== null) {
-        await supabase
+        await getSupabaseBrowser()
           .from("shop_items")
           .update({ stock: item.stock - quantity })
           .eq("id", itemId);
@@ -229,7 +223,7 @@ class ShopService {
 
   async getUserInventory(userId: string): Promise<UserInventoryItem[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("user_inventory")
         .select("*, item:shop_items(*)")
         .eq("user_id", userId)
@@ -250,7 +244,7 @@ class ShopService {
 
   async getPurchaseHistory(userId: string): Promise<any[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseBrowser()
         .from("user_purchases")
         .select("*, item:shop_items(name, type, rarity, icon)")
         .eq("user_id", userId)
@@ -271,7 +265,7 @@ class ShopService {
 
   async useItem(userId: string, itemId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { data: inventoryItem, error } = await supabase
+      const { data: inventoryItem, error } = await getSupabaseBrowser()
         .from("user_inventory")
         .select("id, quantity")
         .eq("user_id", userId)
@@ -289,12 +283,12 @@ class ShopService {
       const newQuantity = inventoryItem.quantity - 1;
       
       if (newQuantity === 0) {
-        await supabase
+        await getSupabaseBrowser()
           .from("user_inventory")
           .delete()
           .eq("id", inventoryItem.id);
       } else {
-        await supabase
+        await getSupabaseBrowser()
           .from("user_inventory")
           .update({ quantity: newQuantity })
           .eq("id", inventoryItem.id);
@@ -312,7 +306,7 @@ class ShopService {
     itemId: string
   ): Promise<{ success: boolean; isEquipped?: boolean; error?: string }> {
     try {
-      const { data: inventoryItem, error } = await supabase
+      const { data: inventoryItem, error } = await getSupabaseBrowser()
         .from("user_inventory")
         .select("id, is_equipped")
         .eq("user_id", userId)
@@ -325,7 +319,7 @@ class ShopService {
 
       const newEquipped = !inventoryItem.is_equipped;
 
-      await supabase
+      await getSupabaseBrowser()
         .from("user_inventory")
         .update({ is_equipped: newEquipped })
         .eq("id", inventoryItem.id);

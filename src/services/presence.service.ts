@@ -1,11 +1,7 @@
 // src/services/presence.service.ts
 
-import { createClient, RealtimeChannel } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 export type UserStatus = 'online' | 'away' | 'offline';
 
@@ -68,7 +64,7 @@ class PresenceService {
     }
 
     if (this.realtimeChannel) {
-      supabase.removeChannel(this.realtimeChannel);
+      getSupabaseBrowser().removeChannel(this.realtimeChannel);
       this.realtimeChannel = null;
     }
 
@@ -143,7 +139,7 @@ class PresenceService {
 
   // Marcar usuario como online
   async setOnline(userId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('users')
       .update({ 
         is_online: true, 
@@ -154,7 +150,7 @@ class PresenceService {
 
   // Marcar usuario como away (inactivo)
   async setAway(userId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('users')
       .update({ 
         is_online: true, // Sigue "conectado" pero inactivo
@@ -165,7 +161,7 @@ class PresenceService {
 
   // Marcar usuario como offline
   async setOffline(userId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('users')
       .update({ 
         is_online: false, 
@@ -176,7 +172,7 @@ class PresenceService {
 
   // Actualizar last_seen
   async updateLastSeen(userId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('users')
       .update({ last_seen: new Date().toISOString() })
       .eq('id', userId);
@@ -184,7 +180,7 @@ class PresenceService {
 
   // Obtener estado de un usuario
   async getUserStatus(userId: string): Promise<UserPresence> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('users')
       .select('id, is_online, last_seen')
       .eq('id', userId)
@@ -224,7 +220,7 @@ class PresenceService {
     userId: string, 
     onStatusChange: (presence: UserPresence) => void
   ): () => void {
-    const channel = supabase
+    const channel = getSupabaseBrowser()
       .channel(`presence:${userId}`)
       .on(
         'postgres_changes',
@@ -247,7 +243,7 @@ class PresenceService {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      getSupabaseBrowser().removeChannel(channel);
     };
   }
 

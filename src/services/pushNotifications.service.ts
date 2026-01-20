@@ -1,11 +1,6 @@
 // src/services/pushNotifications.service.ts
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
 
@@ -95,7 +90,7 @@ class PushNotificationsService {
       // 4. Guardar suscripción en la base de datos
       const subscriptionJSON = subscription.toJSON();
       
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from('push_subscriptions')
         .upsert({
           user_id: userId,
@@ -132,7 +127,7 @@ class PushNotificationsService {
         await subscription.unsubscribe();
 
         // Eliminar de la base de datos
-        await supabase
+        await getSupabaseBrowser()
           .from('push_subscriptions')
           .delete()
           .eq('user_id', userId)
@@ -149,7 +144,7 @@ class PushNotificationsService {
   // Verificar si el usuario está suscrito
   async isSubscribed(userId: string): Promise<boolean> {
     try {
-      const { data } = await supabase
+      const { data } = await getSupabaseBrowser()
         .from('push_subscriptions')
         .select('id')
         .eq('user_id', userId)

@@ -9,15 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Camera, Save, Loader2, Upload, X, ImageIcon } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import toast from 'react-hot-toast';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export function ConfigProfile() {
+  const supabase = getSupabaseBrowser();
   const { data: session } = useSession();
   const { user, updateProfile } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);

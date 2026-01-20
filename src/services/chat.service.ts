@@ -1,12 +1,8 @@
 // src/services/chat.service.ts
 // Sistema de Chat Completo estilo WhatsApp con Grupos, Invitaciones, Estados y más
 
-import { createClient, RealtimeChannel } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 
 // ============================================
 // TIPOS E INTERFACES
@@ -180,7 +176,7 @@ class ChatService {
 
   async getOrCreateConversation(userId1: string, userId2: string): Promise<Conversation | null> {
     // Buscar conversación directa existente
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabaseBrowser()
       .from('conversations')
       .select('*')
       .eq('type', 'direct')
@@ -195,7 +191,7 @@ class ChatService {
     if (conversation) return conversation;
 
     // Crear nueva conversación
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('conversations')
       .insert({
         type: 'direct',
@@ -219,7 +215,7 @@ class ChatService {
 
   async getConversations(userId: string, filter: ChatFilter = 'all'): Promise<Conversation[]> {
     // Obtener preferencias del usuario para las conversaciones
-    const { data: userPrefs } = await supabase
+    const { data: userPrefs } = await getSupabaseBrowser()
       .from('conversation_preferences')
       .select('*')
       .eq('user_id', userId);
@@ -227,7 +223,7 @@ class ChatService {
     const prefsMap = new Map(userPrefs?.map(p => [p.conversation_id, p]) || []);
 
     // Obtener conversaciones directas
-    let query = supabase
+    let query = getSupabaseBrowser()
       .from('conversations')
       .select('*')
       .or(`participant_1.eq.${userId},participant_2.eq.${userId}`)
@@ -241,7 +237,7 @@ class ChatService {
     }
 
     // Obtener conversaciones de grupo donde el usuario es miembro
-    const { data: groupMemberships } = await supabase
+    const { data: groupMemberships } = await getSupabaseBrowser()
       .from('group_members')
       .select('conversation_id')
       .eq('user_id', userId);
@@ -249,7 +245,7 @@ class ChatService {
     let groupConvs: any[] = [];
     if (groupMemberships && groupMemberships.length > 0) {
       const groupIds = groupMemberships.map(g => g.conversation_id);
-      const { data: groups } = await supabase
+      const { data: groups } = await getSupabaseBrowser()
         .from('conversations')
         .select('*')
         .in('id', groupIds)
@@ -284,7 +280,7 @@ class ChatService {
 
         if (conv.type === 'direct') {
           const otherUserId = conv.participant_1 === userId ? conv.participant_2 : conv.participant_1;
-          const { data: otherUser } = await supabase
+          const { data: otherUser } = await getSupabaseBrowser()
             .from('users')
             .select('id, username, display_name, avatar_url, is_verified, is_premium')
             .eq('id', otherUserId)
@@ -292,7 +288,7 @@ class ChatService {
           enriched.other_user = otherUser || undefined;
         } else {
           // Obtener miembros del grupo
-          const { data: members } = await supabase
+          const { data: members } = await getSupabaseBrowser()
             .from('group_members')
             .select(`
               user_id, role, joined_at,
@@ -306,7 +302,7 @@ class ChatService {
         }
 
         // Último mensaje (incluir story fields explícitamente)
-        const { data: lastMessages } = await supabase
+        const { data: lastMessages } = await getSupabaseBrowser()
           .from('messages')
           .select('id, conversation_id, sender_id, content, is_read, is_deleted, created_at, file_url, file_type, file_name, reply_to_id, story_id, story_preview')
           .eq('conversation_id', conv.id)
@@ -315,7 +311,7 @@ class ChatService {
         enriched.last_message = lastMessages?.[0] || undefined;
 
         // Contar no leídos
-        const { count } = await supabase
+        const { count } = await getSupabaseBrowser()
           .from('messages')
           .select('*', { count: 'exact', head: true })
           .eq('conversation_id', conv.id)
@@ -348,7 +344,7 @@ class ChatService {
     avatarUrl?: string
   ): Promise<Conversation | null> {
     // Crear conversación de tipo grupo
-    const { data: conv, error: convError } = await supabase
+    const { data: conv, error: convError } = await getSupabaseBrowser()
       .from('conversations')
       .insert({
         type: 'group',
@@ -371,14 +367,14 @@ class ChatService {
       ...memberIds.map(id => ({ conversation_id: conv.id, user_id: id, role: 'member' }))
     ];
 
-    const { error: membersError } = await supabase
+    const { error: membersError } = await getSupabaseBrowser()
       .from('group_members')
       .insert(members);
 
     if (membersError) {
       console.error('Error adding group members:', membersError);
       // Eliminar el grupo si falla agregar miembros
-      await supabase.from('conversations').delete().eq('id', conv.id);
+      await getSupabaseBrowser().from('conversations').delete().eq('id', conv.id);
       return null;
     }
 
@@ -390,7 +386,7 @@ class ChatService {
 
   async addGroupMember(conversationId: string, userId: string, addedBy: string): Promise<boolean> {
     // Verificar que quien agrega es admin o moderador
-    const { data: adder } = await supabase
+    const { data: adder } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -401,7 +397,7 @@ class ChatService {
       return false;
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('group_members')
       .insert({ conversation_id: conversationId, user_id: userId, role: 'member' });
 
@@ -411,7 +407,7 @@ class ChatService {
     }
 
     // Obtener info del usuario para el mensaje
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await getSupabaseBrowser()
       .from('users')
       .select('display_name')
       .eq('id', userId)
@@ -423,7 +419,7 @@ class ChatService {
 
   async removeGroupMember(conversationId: string, userId: string, removedBy: string): Promise<boolean> {
     // Verificar permisos
-    const { data: remover } = await supabase
+    const { data: remover } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -434,13 +430,13 @@ class ChatService {
       return false;
     }
 
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await getSupabaseBrowser()
       .from('users')
       .select('display_name')
       .eq('id', userId)
       .single();
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('group_members')
       .delete()
       .eq('conversation_id', conversationId)
@@ -453,13 +449,13 @@ class ChatService {
   }
 
   async leaveGroup(conversationId: string, userId: string): Promise<boolean> {
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await getSupabaseBrowser()
       .from('users')
       .select('display_name')
       .eq('id', userId)
       .single();
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('group_members')
       .delete()
       .eq('conversation_id', conversationId)
@@ -477,7 +473,7 @@ class ChatService {
     updates: { name?: string; description?: string; avatar?: string }
   ): Promise<boolean> {
     // Verificar que es admin
-    const { data: member } = await supabase
+    const { data: member } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -491,7 +487,7 @@ class ChatService {
     if (updates.description !== undefined) updateData.group_description = updates.description;
     if (updates.avatar !== undefined) updateData.group_avatar = updates.avatar;
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('conversations')
       .update(updateData)
       .eq('id', conversationId);
@@ -506,7 +502,7 @@ class ChatService {
   async toggleFavorite(conversationId: string, userId: string): Promise<boolean> {
     try {
       // Verificar si existe preferencia
-      const { data: existing, error: selectError } = await supabase
+      const { data: existing, error: selectError } = await getSupabaseBrowser()
         .from('conversation_preferences')
         .select('*')
         .eq('conversation_id', conversationId)
@@ -518,14 +514,14 @@ class ChatService {
       }
 
       if (existing) {
-        const { error } = await supabase
+        const { error } = await getSupabaseBrowser()
           .from('conversation_preferences')
           .update({ is_favorite: !existing.is_favorite, updated_at: new Date().toISOString() })
           .eq('id', existing.id);
         if (error) console.error('Error updating favorite:', error);
         return !error;
       } else {
-        const { error } = await supabase
+        const { error } = await getSupabaseBrowser()
           .from('conversation_preferences')
           .insert({ conversation_id: conversationId, user_id: userId, is_favorite: true });
         if (error) console.error('Error inserting favorite:', error);
@@ -539,7 +535,7 @@ class ChatService {
 
   async toggleArchive(conversationId: string, userId: string): Promise<boolean> {
     try {
-      const { data: existing, error: selectError } = await supabase
+      const { data: existing, error: selectError } = await getSupabaseBrowser()
         .from('conversation_preferences')
         .select('*')
         .eq('conversation_id', conversationId)
@@ -551,14 +547,14 @@ class ChatService {
       }
 
       if (existing) {
-        const { error } = await supabase
+        const { error } = await getSupabaseBrowser()
           .from('conversation_preferences')
           .update({ is_archived: !existing.is_archived, updated_at: new Date().toISOString() })
           .eq('id', existing.id);
         if (error) console.error('Error updating archive:', error);
         return !error;
       } else {
-        const { error } = await supabase
+        const { error } = await getSupabaseBrowser()
           .from('conversation_preferences')
           .insert({ conversation_id: conversationId, user_id: userId, is_archived: true });
         if (error) console.error('Error inserting archive:', error);
@@ -572,7 +568,7 @@ class ChatService {
 
   async toggleMute(conversationId: string, userId: string): Promise<boolean> {
     try {
-      const { data: existing, error: selectError } = await supabase
+      const { data: existing, error: selectError } = await getSupabaseBrowser()
         .from('conversation_preferences')
         .select('*')
         .eq('conversation_id', conversationId)
@@ -584,14 +580,14 @@ class ChatService {
       }
 
       if (existing) {
-        const { error } = await supabase
+        const { error } = await getSupabaseBrowser()
           .from('conversation_preferences')
           .update({ is_muted: !existing.is_muted, updated_at: new Date().toISOString() })
           .eq('id', existing.id);
         if (error) console.error('Error updating mute:', error);
         return !error;
       } else {
-        const { error } = await supabase
+        const { error } = await getSupabaseBrowser()
           .from('conversation_preferences')
           .insert({ conversation_id: conversationId, user_id: userId, is_muted: true });
         if (error) console.error('Error inserting mute:', error);
@@ -608,7 +604,7 @@ class ChatService {
   // ============================================
 
   async getMessages(conversationId: string, limit = 50): Promise<Message[]> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('messages')
       .select(`
         id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
@@ -627,7 +623,7 @@ class ChatService {
     // Obtener reacciones
     const messageIds = data?.map(m => m.id) || [];
     if (messageIds.length > 0) {
-      const { data: reactions } = await supabase
+      const { data: reactions } = await getSupabaseBrowser()
         .from('message_reactions')
         .select(`
           *,
@@ -664,7 +660,7 @@ class ChatService {
       replyToId?: string;
     }
   ): Promise<Message | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('messages')
       .insert({
         conversation_id: conversationId,
@@ -689,7 +685,7 @@ class ChatService {
     }
 
     // Actualizar last_message_at
-    await supabase
+    await getSupabaseBrowser()
       .from('conversations')
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversationId);
@@ -707,7 +703,7 @@ class ChatService {
   }
 
   async sendSystemMessage(conversationId: string, content: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('messages')
       .insert({
         conversation_id: conversationId,
@@ -717,7 +713,7 @@ class ChatService {
         is_system: true,
       });
 
-    await supabase
+    await getSupabaseBrowser()
       .from('conversations')
       .update({ last_message_at: new Date().toISOString() })
       .eq('id', conversationId);
@@ -730,7 +726,7 @@ class ChatService {
     file?: { url: string; type: string; name: string }
   ): Promise<void> {
     try {
-      const { data: conv } = await supabase
+      const { data: conv } = await getSupabaseBrowser()
         .from('conversations')
         .select('type, participant_1, participant_2, group_name')
         .eq('id', conversationId)
@@ -738,7 +734,7 @@ class ChatService {
 
       if (!conv) return;
 
-      const { data: senderInfo } = await supabase
+      const { data: senderInfo } = await getSupabaseBrowser()
         .from('users')
         .select('username, avatar_url')
         .eq('id', senderId)
@@ -751,7 +747,7 @@ class ChatService {
         if (receiverId) recipientIds = [receiverId];
       } else {
         // Grupo: obtener todos los miembros excepto el sender
-        const { data: members } = await supabase
+        const { data: members } = await getSupabaseBrowser()
           .from('group_members')
           .select('user_id')
           .eq('conversation_id', conversationId)
@@ -760,7 +756,7 @@ class ChatService {
       }
 
       // Filtrar usuarios que tienen silenciado el chat
-      const { data: mutedPrefs } = await supabase
+      const { data: mutedPrefs } = await getSupabaseBrowser()
         .from('conversation_preferences')
         .select('user_id')
         .eq('conversation_id', conversationId)
@@ -787,7 +783,7 @@ class ChatService {
       }));
 
       if (notifications.length > 0) {
-        await supabase.from('notifications').insert(notifications);
+        await getSupabaseBrowser().from('notifications').insert(notifications);
       }
     } catch (error) {
       console.error('Error sending message notifications:', error);
@@ -800,7 +796,7 @@ class ChatService {
 
   async addReaction(messageId: string, userId: string, emoji: string): Promise<boolean> {
     // Verificar si ya existe esta reacción del usuario
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabaseBrowser()
       .from('message_reactions')
       .select('id')
       .eq('message_id', messageId)
@@ -810,14 +806,14 @@ class ChatService {
 
     if (existing) {
       // Eliminar reacción existente (toggle)
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from('message_reactions')
         .delete()
         .eq('id', existing.id);
       return !error;
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('message_reactions')
       .insert({ message_id: messageId, user_id: userId, emoji });
 
@@ -832,7 +828,7 @@ class ChatService {
   private async sendReactionNotification(messageId: string, reactorId: string, emoji: string): Promise<void> {
     try {
       // Get message info
-      const { data: message } = await supabase
+      const { data: message } = await getSupabaseBrowser()
         .from('messages')
         .select('sender_id, conversation_id')
         .eq('id', messageId)
@@ -841,14 +837,14 @@ class ChatService {
       if (!message || message.sender_id === reactorId) return; // Don't notify self
 
       // Get reactor info
-      const { data: reactorInfo } = await supabase
+      const { data: reactorInfo } = await getSupabaseBrowser()
         .from('users')
         .select('username, avatar_url')
         .eq('id', reactorId)
         .single();
 
       // Check if message owner has muted this conversation
-      const { data: prefs } = await supabase
+      const { data: prefs } = await getSupabaseBrowser()
         .from('conversation_preferences')
         .select('is_muted')
         .eq('conversation_id', message.conversation_id)
@@ -858,7 +854,7 @@ class ChatService {
       if (prefs?.is_muted) return; // Don't notify if muted
 
       // Create notification
-      await supabase.from('notifications').insert({
+      await getSupabaseBrowser().from('notifications').insert({
         user_id: message.sender_id,
         type: 'message_reaction',
         title: `${emoji} Reacción a tu mensaje`,
@@ -873,7 +869,7 @@ class ChatService {
   }
 
   async getReactions(messageId: string): Promise<MessageReaction[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('message_reactions')
       .select(`
         *,
@@ -892,7 +888,7 @@ class ChatService {
   // ============================================
 
   startTyping(conversationId: string, userId: string, username: string): void {
-    const channel = supabase.channel(`typing:${conversationId}`);
+    const channel = getSupabaseBrowser().channel(`typing:${conversationId}`);
 
     channel.send({
       type: 'broadcast',
@@ -913,7 +909,7 @@ class ChatService {
       this.typingTimeout = null;
     }
 
-    const channel = supabase.channel(`typing:${conversationId}`);
+    const channel = getSupabaseBrowser().channel(`typing:${conversationId}`);
     channel.send({
       type: 'broadcast',
       event: 'typing',
@@ -928,7 +924,7 @@ class ChatService {
     const typingUsers = new Map<string, TypingUser>();
     const timeouts = new Map<string, NodeJS.Timeout>();
 
-    this.typingChannel = supabase
+    this.typingChannel = getSupabaseBrowser()
       .channel(`typing:${conversationId}`)
       .on('broadcast', { event: 'typing' }, (payload) => {
         const { user_id, username, is_typing } = payload.payload;
@@ -955,7 +951,7 @@ class ChatService {
 
     return () => {
       if (this.typingChannel) {
-        supabase.removeChannel(this.typingChannel);
+        getSupabaseBrowser().removeChannel(this.typingChannel);
         this.typingChannel = null;
       }
       timeouts.forEach(t => clearTimeout(t));
@@ -967,7 +963,7 @@ class ChatService {
   // ============================================
 
   async markAsRead(conversationId: string, userId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('messages')
       .update({ is_read: true })
       .eq('conversation_id', conversationId)
@@ -979,7 +975,7 @@ class ChatService {
     conversationId: string,
     onNewMessage: (message: Message) => void
   ): () => void {
-    this.realtimeChannel = supabase
+    this.realtimeChannel = getSupabaseBrowser()
       .channel(`messages:${conversationId}`)
       .on(
         'postgres_changes',
@@ -990,7 +986,7 @@ class ChatService {
           filter: `conversation_id=eq.${conversationId}`,
         },
         async (payload) => {
-          const { data } = await supabase
+          const { data } = await getSupabaseBrowser()
             .from('messages')
             .select(`
               id, conversation_id, sender_id, content, is_read, is_deleted, created_at,
@@ -1014,14 +1010,14 @@ class ChatService {
 
     return () => {
       if (this.realtimeChannel) {
-        supabase.removeChannel(this.realtimeChannel);
+        getSupabaseBrowser().removeChannel(this.realtimeChannel);
         this.realtimeChannel = null;
       }
     };
   }
 
   subscribeToUserConversations(userId: string, onUpdate: () => void): () => void {
-    const channel = supabase
+    const channel = getSupabaseBrowser()
       .channel(`user_conversations:${userId}`)
       .on(
         'postgres_changes',
@@ -1030,18 +1026,18 @@ class ChatService {
       )
       .subscribe();
 
-    return () => supabase.removeChannel(channel);
+    return () => getSupabaseBrowser().removeChannel(channel);
   }
 
   async getUnreadCount(userId: string): Promise<number> {
-    const { data: conversations } = await supabase
+    const { data: conversations } = await getSupabaseBrowser()
       .from('conversations')
       .select('id')
       .or(`participant_1.eq.${userId},participant_2.eq.${userId}`);
 
     if (!conversations?.length) return 0;
 
-    const { count } = await supabase
+    const { count } = await getSupabaseBrowser()
       .from('messages')
       .select('*', { count: 'exact', head: true })
       .in('conversation_id', conversations.map(c => c.id))
@@ -1052,7 +1048,7 @@ class ChatService {
   }
 
   async deleteConversation(conversationId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('conversations')
       .delete()
       .eq('id', conversationId);
@@ -1074,7 +1070,7 @@ class ChatService {
     const fileName = `${senderId}-${Date.now()}.${fileExt}`;
 
     try {
-      const { error } = await supabase.storage
+      const { error } = await getSupabaseBrowser().storage
         .from('chat-files')
         .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
@@ -1083,7 +1079,7 @@ class ChatService {
         return null;
       }
 
-      const { data: urlData } = supabase.storage.from('chat-files').getPublicUrl(fileName);
+      const { data: urlData } = getSupabaseBrowser().storage.from('chat-files').getPublicUrl(fileName);
 
       return { url: urlData.publicUrl, type: fileType, name: file.name };
     } catch (error) {
@@ -1093,7 +1089,7 @@ class ChatService {
   }
 
   async deleteMessage(messageId: string, userId: string): Promise<{ success: boolean; error?: string }> {
-    const { data: message } = await supabase
+    const { data: message } = await getSupabaseBrowser()
       .from('messages')
       .select('*')
       .eq('id', messageId)
@@ -1109,7 +1105,7 @@ class ChatService {
       return { success: false, error: 'Solo puedes eliminar mensajes dentro de los primeros 5 minutos' };
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('messages')
       .update({
         is_deleted: true,
@@ -1138,7 +1134,7 @@ class ChatService {
   // ============================================
 
   async searchMessages(conversationId: string, query: string): Promise<Message[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('messages')
       .select(`
         id, conversation_id, sender_id, content, is_read, is_deleted, deleted_at, created_at,
@@ -1185,7 +1181,7 @@ class ChatService {
   // ============================================
 
   async getFollowers(userId: string): Promise<UserInfo[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('follows')
       .select(`
         follower:users!follows_follower_id_fkey(id, username, display_name, avatar_url, is_verified)
@@ -1196,7 +1192,7 @@ class ChatService {
   }
 
   async getFollowing(userId: string): Promise<UserInfo[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('follows')
       .select(`
         following:users!follows_following_id_fkey(id, username, display_name, avatar_url, is_verified)
@@ -1213,7 +1209,7 @@ class ChatService {
     message?: string
   ): Promise<{ success: boolean; error?: string }> {
     // Verificar que el invitador es miembro del grupo
-    const { data: member } = await supabase
+    const { data: member } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -1225,7 +1221,7 @@ class ChatService {
     }
 
     // Verificar que el usuario no es ya miembro
-    const { data: existingMember } = await supabase
+    const { data: existingMember } = await getSupabaseBrowser()
       .from('group_members')
       .select('id')
       .eq('conversation_id', conversationId)
@@ -1237,7 +1233,7 @@ class ChatService {
     }
 
     // Verificar invitación pendiente
-    const { data: existingInvite } = await supabase
+    const { data: existingInvite } = await getSupabaseBrowser()
       .from('group_invitations')
       .select('id')
       .eq('conversation_id', conversationId)
@@ -1250,7 +1246,7 @@ class ChatService {
     }
 
     // Crear invitación
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('group_invitations')
       .insert({
         conversation_id: conversationId,
@@ -1267,20 +1263,20 @@ class ChatService {
     }
 
     // Obtener info del grupo y del invitador para la notificación
-    const { data: groupInfo } = await supabase
+    const { data: groupInfo } = await getSupabaseBrowser()
       .from('conversations')
       .select('group_name')
       .eq('id', conversationId)
       .single();
 
-    const { data: inviterInfo } = await supabase
+    const { data: inviterInfo } = await getSupabaseBrowser()
       .from('users')
       .select('username, display_name')
       .eq('id', invitedBy)
       .single();
 
     // Crear notificación
-    await supabase.from('notifications').insert({
+    await getSupabaseBrowser().from('notifications').insert({
       user_id: invitedUserId,
       type: 'group_invitation',
       title: '👥 Invitación a grupo',
@@ -1293,7 +1289,7 @@ class ChatService {
   }
 
   async getPendingInvitations(userId: string): Promise<GroupInvitation[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('group_invitations')
       .select(`
         *,
@@ -1307,7 +1303,7 @@ class ChatService {
 
     // Obtener cantidad de miembros de cada grupo
     const invitations = await Promise.all((data || []).map(async (inv) => {
-      const { count } = await supabase
+      const { count } = await getSupabaseBrowser()
         .from('group_members')
         .select('*', { count: 'exact', head: true })
         .eq('conversation_id', inv.conversation_id);
@@ -1330,7 +1326,7 @@ class ChatService {
     userId: string,
     accept: boolean
   ): Promise<{ success: boolean; conversationId?: string; error?: string }> {
-    const { data: invitation } = await supabase
+    const { data: invitation } = await getSupabaseBrowser()
       .from('group_invitations')
       .select('*')
       .eq('id', invitationId)
@@ -1343,7 +1339,7 @@ class ChatService {
     }
 
     // Actualizar estado de la invitación
-    await supabase
+    await getSupabaseBrowser()
       .from('group_invitations')
       .update({
         status: accept ? 'accepted' : 'declined',
@@ -1353,7 +1349,7 @@ class ChatService {
 
     if (accept) {
       // Agregar al grupo
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from('group_members')
         .insert({
           conversation_id: invitation.conversation_id,
@@ -1366,7 +1362,7 @@ class ChatService {
       }
 
       // Obtener info del usuario para el mensaje
-      const { data: userInfo } = await supabase
+      const { data: userInfo } = await getSupabaseBrowser()
         .from('users')
         .select('display_name')
         .eq('id', userId)
@@ -1389,7 +1385,7 @@ class ChatService {
 
   async getInviteLink(conversationId: string, userId: string): Promise<string | null> {
     // Verificar que es admin del grupo
-    const { data: member } = await supabase
+    const { data: member } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -1399,7 +1395,7 @@ class ChatService {
     if (!member || member.role !== 'admin') return null;
 
     // Obtener o generar código
-    const { data: conv } = await supabase
+    const { data: conv } = await getSupabaseBrowser()
       .from('conversations')
       .select('invite_code, invite_enabled')
       .eq('id', conversationId)
@@ -1413,7 +1409,7 @@ class ChatService {
     if (!inviteCode) {
       // Generar nuevo código
       inviteCode = this.generateInviteCode();
-      await supabase
+      await getSupabaseBrowser()
         .from('conversations')
         .update({ invite_code: inviteCode })
         .eq('id', conversationId);
@@ -1425,7 +1421,7 @@ class ChatService {
   }
 
   async regenerateInviteLink(conversationId: string, userId: string): Promise<string | null> {
-    const { data: member } = await supabase
+    const { data: member } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -1435,7 +1431,7 @@ class ChatService {
     if (!member || member.role !== 'admin') return null;
 
     const newCode = this.generateInviteCode();
-    await supabase
+    await getSupabaseBrowser()
       .from('conversations')
       .update({ invite_code: newCode })
       .eq('id', conversationId);
@@ -1445,7 +1441,7 @@ class ChatService {
   }
 
   async toggleInviteLink(conversationId: string, userId: string, enabled: boolean): Promise<boolean> {
-    const { data: member } = await supabase
+    const { data: member } = await getSupabaseBrowser()
       .from('group_members')
       .select('role')
       .eq('conversation_id', conversationId)
@@ -1454,7 +1450,7 @@ class ChatService {
 
     if (!member || member.role !== 'admin') return false;
 
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('conversations')
       .update({ invite_enabled: enabled })
       .eq('id', conversationId);
@@ -1463,7 +1459,7 @@ class ChatService {
   }
 
   async joinViaInviteCode(inviteCode: string, userId: string): Promise<{ success: boolean; conversationId?: string; error?: string }> {
-    const { data: conv } = await supabase
+    const { data: conv } = await getSupabaseBrowser()
       .from('conversations')
       .select('id, group_name, invite_enabled, max_members')
       .eq('invite_code', inviteCode.toUpperCase())
@@ -1479,7 +1475,7 @@ class ChatService {
     }
 
     // Verificar si ya es miembro
-    const { data: existingMember } = await supabase
+    const { data: existingMember } = await getSupabaseBrowser()
       .from('group_members')
       .select('id')
       .eq('conversation_id', conv.id)
@@ -1492,7 +1488,7 @@ class ChatService {
 
     // Verificar límite de miembros (si existe)
     if (conv.max_members) {
-      const { count } = await supabase
+      const { count } = await getSupabaseBrowser()
         .from('group_members')
         .select('*', { count: 'exact', head: true })
         .eq('conversation_id', conv.id);
@@ -1503,7 +1499,7 @@ class ChatService {
     }
 
     // Unirse al grupo
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('group_members')
       .insert({
         conversation_id: conv.id,
@@ -1515,7 +1511,7 @@ class ChatService {
       return { success: false, error: 'Error al unirse al grupo' };
     }
 
-    const { data: userInfo } = await supabase
+    const { data: userInfo } = await getSupabaseBrowser()
       .from('users')
       .select('display_name')
       .eq('id', userId)
@@ -1540,7 +1536,7 @@ class ChatService {
   // ============================================
 
   async updateOnlineStatus(userId: string, isOnline: boolean): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('users')
       .update({
         is_online: isOnline,
@@ -1550,7 +1546,7 @@ class ChatService {
   }
 
   async getUserOnlineStatus(userId: string): Promise<{ isOnline: boolean; lastSeen: string | null }> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('users')
       .select('is_online, last_seen_at')
       .eq('id', userId)
@@ -1567,7 +1563,7 @@ class ChatService {
   // ============================================
 
   async markAsDelivered(messageIds: string[]): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('messages')
       .update({ delivered_at: new Date().toISOString() })
       .in('id', messageIds)
@@ -1575,7 +1571,7 @@ class ChatService {
   }
 
   async markAsReadWithTimestamp(conversationId: string, userId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('messages')
       .update({
         is_read: true,
@@ -1591,7 +1587,7 @@ class ChatService {
   // ============================================
 
   async pinMessage(conversationId: string, messageId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('pinned_messages')
       .insert({
         conversation_id: conversationId,
@@ -1603,7 +1599,7 @@ class ChatService {
   }
 
   async unpinMessage(conversationId: string, messageId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('pinned_messages')
       .delete()
       .eq('conversation_id', conversationId)
@@ -1613,7 +1609,7 @@ class ChatService {
   }
 
   async getPinnedMessages(conversationId: string): Promise<Message[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('pinned_messages')
       .select(`
         message:messages(
@@ -1633,7 +1629,7 @@ class ChatService {
   // ============================================
 
   async saveMessage(userId: string, messageId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('saved_messages')
       .insert({ user_id: userId, message_id: messageId });
 
@@ -1641,7 +1637,7 @@ class ChatService {
   }
 
   async unsaveMessage(userId: string, messageId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('saved_messages')
       .delete()
       .eq('user_id', userId)
@@ -1651,7 +1647,7 @@ class ChatService {
   }
 
   async getSavedMessages(userId: string): Promise<Message[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('saved_messages')
       .select(`
         message:messages(
@@ -1671,7 +1667,7 @@ class ChatService {
   // ============================================
 
   async blockUser(blockerId: string, blockedId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('blocked_users')
       .insert({ blocker_id: blockerId, blocked_id: blockedId });
 
@@ -1679,7 +1675,7 @@ class ChatService {
   }
 
   async unblockUser(blockerId: string, blockedId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('blocked_users')
       .delete()
       .eq('blocker_id', blockerId)
@@ -1689,7 +1685,7 @@ class ChatService {
   }
 
   async getBlockedUsers(userId: string): Promise<UserInfo[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('blocked_users')
       .select(`
         blocked:users!blocked_users_blocked_id_fkey(id, username, display_name, avatar_url)
@@ -1700,7 +1696,7 @@ class ChatService {
   }
 
   async isBlocked(userId: string, otherUserId: string): Promise<boolean> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('blocked_users')
       .select('id')
       .or(`blocker_id.eq.${userId},blocker_id.eq.${otherUserId}`)
@@ -1715,7 +1711,7 @@ class ChatService {
   // ============================================
 
   async getPrivacySettings(userId: string): Promise<ChatPrivacySettings> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('chat_privacy_settings')
       .select('*')
       .eq('user_id', userId)
@@ -1731,20 +1727,20 @@ class ChatService {
   }
 
   async updatePrivacySettings(userId: string, settings: Partial<ChatPrivacySettings>): Promise<boolean> {
-    const { data: existing } = await supabase
+    const { data: existing } = await getSupabaseBrowser()
       .from('chat_privacy_settings')
       .select('id')
       .eq('user_id', userId)
       .single();
 
     if (existing) {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from('chat_privacy_settings')
         .update(settings)
         .eq('user_id', userId);
       return !error;
     } else {
-      const { error } = await supabase
+      const { error } = await getSupabaseBrowser()
         .from('chat_privacy_settings')
         .insert({ user_id: userId, ...settings });
       return !error;
@@ -1759,7 +1755,7 @@ class ChatService {
     userId: string,
     data: { content?: string; mediaUrl?: string; mediaType?: 'image' | 'video' | 'text'; backgroundColor?: string }
   ): Promise<UserStatus | null> {
-    const { data: status, error } = await supabase
+    const { data: status, error } = await getSupabaseBrowser()
       .from('user_status')
       .insert({
         user_id: userId,
@@ -1786,7 +1782,7 @@ class ChatService {
     const followingIds = following.map(f => f.id);
 
     // Obtener estados de los usuarios que sigo
-    const { data: statuses } = await supabase
+    const { data: statuses } = await getSupabaseBrowser()
       .from('user_status')
       .select(`
         *,
@@ -1798,7 +1794,7 @@ class ChatService {
 
     // Verificar cuáles ya vi
     const statusIds = statuses?.map(s => s.id) || [];
-    const { data: myViews } = await supabase
+    const { data: myViews } = await getSupabaseBrowser()
       .from('status_views')
       .select('status_id')
       .eq('viewer_id', userId)
@@ -1827,17 +1823,17 @@ class ChatService {
   }
 
   async viewStatus(statusId: string, viewerId: string): Promise<void> {
-    await supabase
+    await getSupabaseBrowser()
       .from('status_views')
       .insert({ status_id: statusId, viewer_id: viewerId })
       .single();
 
     // Incrementar contador
-    await supabase.rpc('increment_status_views', { status_id: statusId });
+    await getSupabaseBrowser().rpc('increment_status_views', { status_id: statusId });
   }
 
   async deleteStatus(statusId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('user_status')
       .delete()
       .eq('id', statusId)
@@ -1847,7 +1843,7 @@ class ChatService {
   }
 
   async getMyStatuses(userId: string): Promise<UserStatus[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('user_status')
       .select('*')
       .eq('user_id', userId)
@@ -1862,7 +1858,7 @@ class ChatService {
   // ============================================
 
   async createLabel(userId: string, name: string, color: string): Promise<ConversationLabel | null> {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseBrowser()
       .from('conversation_labels')
       .insert({ user_id: userId, name, color })
       .select()
@@ -1872,7 +1868,7 @@ class ChatService {
   }
 
   async getLabels(userId: string): Promise<ConversationLabel[]> {
-    const { data } = await supabase
+    const { data } = await getSupabaseBrowser()
       .from('conversation_labels')
       .select('*')
       .eq('user_id', userId)
@@ -1882,7 +1878,7 @@ class ChatService {
   }
 
   async assignLabel(conversationId: string, labelId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('conversation_label_assignments')
       .insert({ conversation_id: conversationId, label_id: labelId, user_id: userId });
 
@@ -1890,7 +1886,7 @@ class ChatService {
   }
 
   async removeLabel(conversationId: string, labelId: string, userId: string): Promise<boolean> {
-    const { error } = await supabase
+    const { error } = await getSupabaseBrowser()
       .from('conversation_label_assignments')
       .delete()
       .eq('conversation_id', conversationId)
@@ -1909,7 +1905,7 @@ class ChatService {
     toConversationIds: string[],
     senderId: string
   ): Promise<{ success: boolean; sentCount: number }> {
-    const { data: originalMessage } = await supabase
+    const { data: originalMessage } = await getSupabaseBrowser()
       .from('messages')
       .select('content, file_url, file_type, file_name')
       .eq('id', messageId)

@@ -1,6 +1,9 @@
 // src/app/soporte/page.tsx
 "use client";
 
+export const dynamic = 'force-dynamic';
+
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Navbar } from "@/components/Navbar";
@@ -10,14 +13,10 @@ import {
   AlertCircle, Loader2, User, Bot, X
 } from "lucide-react";
 import Link from "next/link";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseBrowser } from "@/lib/supabase-client";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface Ticket {
   id: string;
@@ -52,7 +51,8 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
 
 export default function SoportePage() {
   const { data: session } = useSession();
-  
+  const supabase = getSupabaseBrowser();
+
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -137,7 +137,7 @@ export default function SoportePage() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      getSupabaseBrowser().removeChannel(channel);
     };
   }, [selectedTicket]);
 

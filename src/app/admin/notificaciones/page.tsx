@@ -1,10 +1,13 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
+
 import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { AdminHeader } from '@/components/admin';
 import { PermissionGate } from '@/components/admin/AdminGuard';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseBrowser } from '@/lib/supabase-client';
 import {
   Bell,
   Send,
@@ -15,10 +18,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface NotificationLog {
   id: string;
@@ -32,6 +31,7 @@ interface NotificationLog {
 }
 
 export default function AdminNotificacionesPage() {
+  const supabase = getSupabaseBrowser();
   const [logs, setLogs] = useState<NotificationLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
