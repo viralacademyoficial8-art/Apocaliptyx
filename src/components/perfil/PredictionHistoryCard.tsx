@@ -43,7 +43,7 @@ export function PredictionHistoryCard({ prediction }: PredictionHistoryCardProps
 
           {/* Title */}
           <Link
-            href={`/escenarios/${prediction.scenarioId}`}
+            href={`/escenario/${prediction.scenarioId}`}
             className="block text-white font-medium hover:text-purple-400 transition-colors line-clamp-2 mb-2"
           >
             {prediction.scenarioTitle}
