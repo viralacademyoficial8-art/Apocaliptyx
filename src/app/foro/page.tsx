@@ -2431,20 +2431,26 @@ function ForoContent() {
                   <ImageIcon className="w-5 h-5" />
                   {t('forum.createModal.image')}
                 </button>
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
-                >
-                  GIF
-                </button>
-                <button
-                  type="button"
-                  onClick={triggerMention}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
-                >
-                  <AtSign className="w-5 h-5" />
-                  {t('forum.createModal.mention')}
-                </button>
+                {/* GIF - OCULTO TEMPORALMENTE PARA MVP */}
+                {false && (
+                  <button
+                    type="button"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                  >
+                    GIF
+                  </button>
+                )}
+                {/* Mención - OCULTO TEMPORALMENTE PARA MVP */}
+                {false && (
+                  <button
+                    type="button"
+                    onClick={triggerMention}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                  >
+                    <AtSign className="w-5 h-5" />
+                    {t('forum.createModal.mention')}
+                  </button>
+                )}
               </div>
             </>
           )}
