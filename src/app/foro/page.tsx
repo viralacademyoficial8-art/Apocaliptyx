@@ -299,7 +299,8 @@ function ForoContent() {
   }, [searchParams, posts]);
 
   // Function to change tab and update URL + localStorage
-  const changeTab = useCallback((tab: 'feed' | 'reels' | 'lives' | 'comunidades') => {
+  // COMUNIDADES removido del tipo para MVP
+  const changeTab = useCallback((tab: 'feed' | 'reels' | 'lives') => {
     setActiveTab(tab);
     localStorage.setItem('foro_active_tab', tab);
     const params = new URLSearchParams(searchParams.toString());
