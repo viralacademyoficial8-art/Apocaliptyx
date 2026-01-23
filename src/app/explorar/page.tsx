@@ -479,13 +479,7 @@ export default function ExplorarPage() {
                         {t('common.filter')}
                       </button>
                       <button
-                        onClick={() => {
-                          setSelectedCategory('Todos');
-                          setSortBy('popular');
-                          setTimeout(() => {
-                            document.getElementById('explorar-escenarios')?.scrollIntoView({ behavior: 'smooth' });
-                          }, 100);
-                        }}
+                        onClick={() => setShowAllFeatured(true)}
                         className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
                       >
                         {t('common.viewAll')} <ArrowRight className="w-4 h-4" />
