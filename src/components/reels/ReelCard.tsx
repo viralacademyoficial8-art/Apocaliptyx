@@ -128,7 +128,7 @@ export function ReelCard({
 
         {/* Caption */}
         {reel.caption && (
-          <p className="text-sm text-white mb-2 line-clamp-2">{reel.caption}</p>
+          <p className="text-sm text-foreground mb-2 line-clamp-2">{reel.caption}</p>
         )}
 
         {/* Tags */}

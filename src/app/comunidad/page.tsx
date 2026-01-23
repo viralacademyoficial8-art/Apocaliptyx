@@ -417,7 +417,7 @@ export default function ComunidadPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white truncate">
+                      <span className="font-semibold text-foreground truncate">
                         {user.display_name || user.username}
                       </span>
                       {user.is_verified && (

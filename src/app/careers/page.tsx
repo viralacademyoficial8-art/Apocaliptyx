@@ -152,7 +152,7 @@ export default function CareersPage() {
                   <div key={position.id} className="p-6 bg-card/50 border border-border rounded-xl hover:border-purple-500/50 transition-colors">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <h3 className="text-xl font-bold text-white mb-2">{position.title}</h3>
+                        <h3 className="text-xl font-bold text-foreground mb-2">{position.title}</h3>
                         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
                           <span className="flex items-center gap-1">
                             <Briefcase className="w-4 h-4" />

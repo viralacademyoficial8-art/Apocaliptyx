@@ -245,7 +245,7 @@ export default function MisionesPage() {
         </h3>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
           <div>
-            <h4 className="font-medium text-white mb-2">Misiones Diarias</h4>
+            <h4 className="font-medium text-foreground mb-2">Misiones Diarias</h4>
             <ul className="space-y-1">
               <li>- Se renuevan cada día a medianoche</li>
               <li>- Completa acciones como votar, crear escenarios, etc.</li>
@@ -253,7 +253,7 @@ export default function MisionesPage() {
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-white mb-2">Misiones Semanales</h4>
+            <h4 className="font-medium text-foreground mb-2">Misiones Semanales</h4>
             <ul className="space-y-1">
               <li>- Se renuevan cada lunes</li>
               <li>- Requieren más esfuerzo pero dan mejores recompensas</li>

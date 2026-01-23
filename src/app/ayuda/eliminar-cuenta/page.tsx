@@ -73,7 +73,7 @@ export default function EliminarCuentaPage() {
           </ol>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">¿Solo quieres un descanso?</h3>
+            <h3 className="font-bold text-foreground mb-2">¿Solo quieres un descanso?</h3>
             <p className="text-muted-foreground">
               En lugar de eliminar tu cuenta, puedes simplemente cerrar sesión. Tu cuenta y AP Coins estarán aquí cuando vuelvas.
             </p>

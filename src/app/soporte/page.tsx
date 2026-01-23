@@ -274,7 +274,7 @@ export default function SoportePage() {
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
-                        <p className="font-medium text-white line-clamp-1">{ticket.subject}</p>
+                        <p className="font-medium text-foreground line-clamp-1">{ticket.subject}</p>
                         {ticket.unread_count > 0 && (
                           <span className="px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">
                             {ticket.unread_count}

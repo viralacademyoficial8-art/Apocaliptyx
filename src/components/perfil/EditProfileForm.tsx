@@ -360,7 +360,7 @@ export function EditProfileForm() {
 
       {/* Section: Privacy */}
       <section className="bg-card rounded-xl border border-border p-6">
-        <h2 className="text-lg font-bold text-white mb-2">Privacidad</h2>
+        <h2 className="text-lg font-bold text-foreground mb-2">Privacidad</h2>
         <p className="text-muted-foreground text-sm mb-4">
           Controla quién puede ver tu información
         </p>

@@ -141,7 +141,7 @@ function AccordionItem({
             </span>
             {getStatusBadge(steal.scenario?.status)}
           </div>
-          <h3 className="font-semibold text-white truncate">
+          <h3 className="font-semibold text-foreground truncate">
             {steal.scenario?.title || 'Escenario eliminado'}
           </h3>
           <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
@@ -197,7 +197,7 @@ function AccordionItem({
                   <User className="w-4 h-4 text-purple-400" />
                 )}
               </div>
-              <p className="text-sm font-bold text-white truncate group-hover:text-purple-400 transition-colors">
+              <p className="text-sm font-bold text-foreground truncate group-hover:text-purple-400 transition-colors">
                 @{steal.victim?.username || 'N/A'}
               </p>
               <p className="text-xs text-purple-400/80">Víctima</p>
@@ -266,7 +266,7 @@ function AccordionItem({
                     <Skull className="w-3 h-3 text-red-400" />
                     Ver perfil de la víctima
                   </p>
-                  <p className="font-semibold text-white truncate group-hover:text-purple-400 transition-colors">
+                  <p className="font-semibold text-foreground truncate group-hover:text-purple-400 transition-colors">
                     @{steal.victim.username}
                   </p>
                 </div>
@@ -286,7 +286,7 @@ function AccordionItem({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground mb-0.5">Ver escenario completo</p>
-                  <p className="font-semibold text-white truncate group-hover:text-red-400 transition-colors">
+                  <p className="font-semibold text-foreground truncate group-hover:text-red-400 transition-colors">
                     Ir al escenario
                   </p>
                 </div>

@@ -125,7 +125,7 @@ export function ProfileBanner({
           <div className="flex items-center gap-2">
             <Music className="w-4 h-4 text-purple-400" />
             <div className="text-sm">
-              <p className="font-medium text-white truncate max-w-[150px]">
+              <p className="font-medium text-foreground truncate max-w-[150px]">
                 {musicTitle || 'Profile Music'}
               </p>
               {musicArtist && (

@@ -56,7 +56,7 @@ export default function PremiumPage() {
           </div>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">¿Cómo obtener Premium?</h3>
+            <h3 className="font-bold text-foreground mb-2">¿Cómo obtener Premium?</h3>
             <p className="text-muted-foreground mb-4">
               Puedes adquirir una suscripción Premium en la tienda. Los planes están disponibles mensual y anualmente.
             </p>

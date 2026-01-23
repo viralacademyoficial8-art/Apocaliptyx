@@ -139,7 +139,7 @@ export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
 
         {/* Title */}
         {preview.title && (
-          <h3 className="font-semibold text-white line-clamp-2 mb-1">
+          <h3 className="font-semibold text-foreground line-clamp-2 mb-1">
             {preview.title}
           </h3>
         )}
