@@ -399,30 +399,14 @@ export default function PublicProfilePage() {
     try {
       const { data, error } = await supabase
         .from('scenarios')
-        .select(`
-          id,
-          title,
-          description,
-          category,
-          total_pool,
-          participant_count,
-          status,
-          creator_id,
-          current_holder_id,
-          steal_count,
-          created_at,
-          resolution_date,
-          creator:users!scenarios_creator_id_fkey (
-            username,
-            display_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('current_holder_id', userId)
         .eq('status', 'ACTIVE')
         .order('created_at', { ascending: false });
 
-      if (!error && data) {
+      if (error) {
+        console.error('Error loading scenarios held:', error);
+      } else if (data) {
         setScenariosHeld(data);
       }
     } catch (error) {
