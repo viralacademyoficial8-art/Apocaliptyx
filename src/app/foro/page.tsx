@@ -3235,66 +3235,66 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
   const isYesVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'YES';
   const isNoVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'NO';
 
-  // Estilos según el tipo de actividad
-  const getActivityStyles = () => {
-    if (isYesVote) return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400', accent: 'text-emerald-400' };
-    if (isNoVote) return { bg: 'bg-red-500/10', border: 'border-red-500/30', iconBg: 'bg-red-500/20 text-red-400', accent: 'text-red-400' };
+  // Estilos del badge según el tipo de actividad
+  const getActivityBadgeStyles = () => {
+    if (isYesVote) return { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' };
+    if (isNoVote) return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
 
     switch (item.type) {
       case 'scenario_created':
-        return { bg: 'bg-blue-500/10', border: 'border-blue-500/30', iconBg: 'bg-blue-500/20 text-blue-400', accent: 'text-blue-400' };
+        return { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' };
       case 'scenario_stolen':
-        return { bg: 'bg-orange-500/10', border: 'border-orange-500/30', iconBg: 'bg-orange-500/20 text-orange-400', accent: 'text-orange-400' };
+        return { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/30' };
       case 'scenario_protected':
-        return { bg: 'bg-green-500/10', border: 'border-green-500/30', iconBg: 'bg-green-500/20 text-green-400', accent: 'text-green-400' };
+        return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
       case 'scenario_resolved':
-        return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400', accent: 'text-emerald-400' };
+        return { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' };
       case 'scenario_closed':
-        return { bg: 'bg-gray-500/10', border: 'border-gray-500/30', iconBg: 'bg-gray-500/20 text-muted-foreground', accent: 'text-muted-foreground' };
+        return { bg: 'bg-gray-500/20', text: 'text-muted-foreground', border: 'border-gray-500/30' };
       case 'live_stream':
-        return { bg: 'bg-red-500/10', border: 'border-red-500/30', iconBg: 'bg-red-500/20 text-red-400', accent: 'text-red-400' };
+        return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
       case 'achievement':
-        return { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', iconBg: 'bg-yellow-500/20 text-yellow-400', accent: 'text-yellow-400' };
+        return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
       default:
-        return { bg: 'bg-purple-500/10', border: 'border-purple-500/30', iconBg: 'bg-purple-500/20 text-purple-400', accent: 'text-purple-400' };
+        return { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' };
     }
   };
 
   // Icono según el tipo de actividad
   const getActivityIcon = () => {
-    if (isYesVote) return <ThumbsUp className="w-5 h-5" />;
-    if (isNoVote) return <ThumbsDown className="w-5 h-5" />;
+    if (isYesVote) return <ThumbsUp className="w-4 h-4" />;
+    if (isNoVote) return <ThumbsDown className="w-4 h-4" />;
 
     switch (item.type) {
-      case 'scenario_created': return <Target className="w-5 h-5" />;
-      case 'scenario_stolen': return <Swords className="w-5 h-5" />;
-      case 'scenario_protected': return <Shield className="w-5 h-5" />;
-      case 'scenario_resolved': return <CheckCircle className="w-5 h-5" />;
-      case 'scenario_closed': return <Lock className="w-5 h-5" />;
-      case 'live_stream': return <Radio className="w-5 h-5" />;
-      case 'achievement': return <Trophy className="w-5 h-5" />;
-      default: return <Target className="w-5 h-5" />;
+      case 'scenario_created': return <Target className="w-4 h-4" />;
+      case 'scenario_stolen': return <Swords className="w-4 h-4" />;
+      case 'scenario_protected': return <Shield className="w-4 h-4" />;
+      case 'scenario_resolved': return <CheckCircle className="w-4 h-4" />;
+      case 'scenario_closed': return <Lock className="w-4 h-4" />;
+      case 'live_stream': return <Radio className="w-4 h-4" />;
+      case 'achievement': return <Trophy className="w-4 h-4" />;
+      default: return <Target className="w-4 h-4" />;
     }
   };
 
   // Texto de la acción
   const getActionText = () => {
-    if (isYesVote) return 'votó SÍ en';
-    if (isNoVote) return 'votó NO en';
+    if (isYesVote) return 'Me gusta';
+    if (isNoVote) return 'No me gusta';
 
     switch (item.type) {
-      case 'scenario_created': return 'creó el escenario';
-      case 'scenario_stolen': return 'robó el escenario';
-      case 'scenario_protected': return 'protegió el escenario';
-      case 'scenario_resolved': return 'acertó en';
-      case 'scenario_closed': return 'cerró el escenario';
-      case 'live_stream': return 'está en vivo';
-      case 'achievement': return 'desbloqueó un logro';
+      case 'scenario_created': return 'Escenario creado';
+      case 'scenario_stolen': return 'Escenario robado';
+      case 'scenario_protected': return 'Escenario protegido';
+      case 'scenario_resolved': return 'Escenario cumplido';
+      case 'scenario_closed': return 'Escenario cerrado';
+      case 'live_stream': return 'En vivo';
+      case 'achievement': return 'Logro desbloqueado';
       default: return item.title;
     }
   };
 
-  const styles = getActivityStyles();
+  const badgeStyles = getActivityBadgeStyles();
 
   const handleClick = () => {
     if (item.type === 'live_stream' && item.metadata?.streamId) {
@@ -3311,67 +3311,86 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
 
   return (
     <div
-      className={`${styles.bg} border ${styles.border} rounded-xl p-5 hover:bg-muted/50 transition-all cursor-pointer`}
+      className="bg-card/50 border border-border rounded-xl p-5 hover:border-border transition-all cursor-pointer"
       onClick={handleClick}
     >
-      {/* Header */}
-      <div className="flex items-start gap-3">
-        {/* Avatar */}
-        <button type="button" onClick={handleUserClick} className="flex-shrink-0">
-          <div
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
-            style={item.user.avatarUrl ? { background: `url(${item.user.avatarUrl}) center/cover` } : undefined}
-          >
-            {!item.user.avatarUrl && (item.user.displayName || item.user.username || 'U')[0].toUpperCase()}
-          </div>
-        </button>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <button type="button" onClick={handleUserClick} className="font-semibold text-white hover:text-purple-400 transition-colors">
-              {item.user.displayName || item.user.username}
-            </button>
-            {item.user.level && (
-              <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded">
-                Lvl {item.user.level}
-              </span>
-            )}
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${styles.iconBg}`}>
-              {getActivityIcon()}
-              <span className="hidden sm:inline">{getActionText()}</span>
-            </span>
-          </div>
-
-          <p className="text-sm text-muted-foreground mb-2">
-            @{item.user.username} • {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: dateLocale })}
-          </p>
-
-          {/* Descripción/Título del escenario */}
-          <p className="text-gray-200 text-sm sm:text-base">
-            {item.type === 'live_stream' ? (
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                {item.description || 'Transmitiendo en vivo'}
-              </span>
-            ) : (
-              item.description || item.metadata?.scenarioTitle || item.title
-            )}
-          </p>
-
-          {/* Amount si existe */}
-          {item.metadata?.amount && item.metadata.amount > 0 && (
-            <div className="mt-2 flex items-center gap-1 text-yellow-500">
-              <Flame className="w-4 h-4" />
-              <span className="text-sm font-medium">{item.metadata.amount.toLocaleString()} AP</span>
+      {/* Header - mismo estilo que PostCard */}
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          <button type="button" onClick={handleUserClick} className="flex-shrink-0">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold hover:ring-2 hover:ring-purple-500 transition-all">
+              {item.user.avatarUrl ? (
+                <img src={item.user.avatarUrl} alt={item.user.username} className="w-full h-full object-cover" />
+              ) : (
+                (item.user.displayName || item.user.username || 'U')[0].toUpperCase()
+              )}
             </div>
-          )}
+          </button>
+
+          <div>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={handleUserClick} className="font-semibold text-white hover:text-purple-400 transition-colors">
+                {item.user.displayName || item.user.username}
+              </button>
+              {item.user.level && (
+                <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded">
+                  Lvl {item.user.level}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <button type="button" onClick={handleUserClick} className="hover:text-purple-400 transition-colors">
+                @{item.user.username}
+              </button>
+              <span>•</span>
+              <span>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: dateLocale })}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Icono principal a la derecha */}
-        <div className={`p-2 rounded-lg ${styles.iconBg}`}>
+        {/* Badge de tipo de actividad */}
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${badgeStyles.bg} ${badgeStyles.text} ${badgeStyles.border}`}>
           {getActivityIcon()}
-        </div>
+          <span className="hidden sm:inline">{getActionText()}</span>
+        </span>
+      </div>
+
+      {/* Contenido principal */}
+      <div className="mb-3">
+        {item.type === 'live_stream' ? (
+          <div className="flex items-center gap-2 text-foreground">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <span className="font-medium">{item.description || 'Transmitiendo en vivo'}</span>
+          </div>
+        ) : (
+          <p className="text-foreground whitespace-pre-wrap break-words">
+            {item.description || item.metadata?.scenarioTitle || item.title}
+          </p>
+        )}
+      </div>
+
+      {/* Footer con información adicional */}
+      <div className="flex items-center justify-between pt-3 border-t border-border">
+        {/* Amount si existe */}
+        {item.metadata?.amount && item.metadata.amount > 0 ? (
+          <div className="flex items-center gap-1.5 text-yellow-500">
+            <Flame className="w-4 h-4" />
+            <span className="text-sm font-medium">{item.metadata.amount.toLocaleString()} AP</span>
+          </div>
+        ) : (
+          <div></div>
+        )}
+
+        {/* Botón para ver más */}
+        <button
+          type="button"
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${badgeStyles.bg} ${badgeStyles.text} hover:opacity-80`}
+          onClick={handleClick}
+        >
+          {item.type === 'live_stream' ? 'Ver transmisión' : 'Ver escenario'}
+          <ExternalLink className="w-3 h-3" />
+        </button>
       </div>
     </div>
   );

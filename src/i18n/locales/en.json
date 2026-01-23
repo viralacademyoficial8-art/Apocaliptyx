@@ -545,8 +545,8 @@
     "inMinutes": "in {{count}} minutes"
   },
   "forum": {
-    "title": "Community",
-    "subtitle": "Share predictions, debates and strategies with other prophets",
+    "title": "Feed",
+    "subtitle": "Your activity and other prophets' in real time",
     "newPost": "New Post",
     "tabs": {
       "feed": "Feed",
