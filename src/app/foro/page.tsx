@@ -1926,7 +1926,7 @@ function ForoContent() {
         )}
 
         {/* COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP */}
-        {false && activeTab === 'comunidades' && (
+        {false && (
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
