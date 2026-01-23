@@ -49,6 +49,7 @@ import {
   Bookmark,
   Heart,
   MessageSquare,
+  ChevronDown,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -105,6 +106,8 @@ export default function PublicProfilePage() {
   const [scenariosHeldCount, setScenariosHeldCount] = useState(0);
   const [scenariosHeld, setScenariosHeld] = useState<any[]>([]);
   const [scenariosHeldLoading, setScenariosHeldLoading] = useState(false);
+  const [holderExpanded, setHolderExpanded] = useState(false);
+  const HOLDER_INITIAL_SHOW = 6; // Mostrar 6 escenarios inicialmente
 
   // Estados para modales de seguidores/siguiendo
   const [showFollowersModal, setShowFollowersModal] = useState(false);
@@ -1082,50 +1085,66 @@ export default function PublicProfilePage() {
                   <p className="text-sm mt-2">Crea o roba escenarios para verlos aquí</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {scenariosHeld.map((scenario) => (
-                    <Link
-                      key={scenario.id}
-                      href={`/escenario/${scenario.id}`}
-                      className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {(holderExpanded ? scenariosHeld : scenariosHeld.slice(0, HOLDER_INITIAL_SHOW)).map((scenario) => (
+                      <Link
+                        key={scenario.id}
+                        href={`/escenario/${scenario.id}`}
+                        className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">
+                            {scenario.category}
+                          </span>
+                          {scenario.creator_id !== scenario.current_holder_id && (
+                            <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full flex items-center gap-1">
+                              <Skull className="w-3 h-3" />
+                              Robado
+                            </span>
+                          )}
+                          {scenario.creator_id === scenario.current_holder_id && (
+                            <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full flex items-center gap-1">
+                              <Zap className="w-3 h-3" />
+                              Creado
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-semibold text-white mb-2 line-clamp-2">{scenario.title}</h4>
+                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                          <span className="flex items-center gap-1">
+                            <Flame className="w-4 h-4 text-yellow-400" />
+                            {scenario.total_pool?.toLocaleString() || 0} AP
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            {scenario.participant_count || 0}
+                          </span>
+                          {scenario.steal_count > 0 && (
+                            <span className="flex items-center gap-1 text-red-400">
+                              <Skull className="w-4 h-4" />
+                              {scenario.steal_count}x robado
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Botón Ver más */}
+                  {scenariosHeld.length > HOLDER_INITIAL_SHOW && (
+                    <button
+                      onClick={() => setHolderExpanded(!holderExpanded)}
+                      className="w-full py-3 mt-4 bg-gray-900/50 border border-gray-700 hover:border-red-500/50 rounded-xl text-purple-400 hover:text-red-400 transition-all flex items-center justify-center gap-2"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">
-                          {scenario.category}
-                        </span>
-                        {scenario.creator_id !== scenario.current_holder_id && (
-                          <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full flex items-center gap-1">
-                            <Skull className="w-3 h-3" />
-                            Robado
-                          </span>
-                        )}
-                        {scenario.creator_id === scenario.current_holder_id && (
-                          <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full flex items-center gap-1">
-                            <Zap className="w-3 h-3" />
-                            Creado
-                          </span>
-                        )}
-                      </div>
-                      <h4 className="font-semibold text-white mb-2 line-clamp-2">{scenario.title}</h4>
-                      <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <span className="flex items-center gap-1">
-                          <Flame className="w-4 h-4 text-yellow-400" />
-                          {scenario.total_pool?.toLocaleString() || 0} AP
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          {scenario.participant_count || 0}
-                        </span>
-                        {scenario.steal_count > 0 && (
-                          <span className="flex items-center gap-1 text-red-400">
-                            <Skull className="w-4 h-4" />
-                            {scenario.steal_count}x robado
-                          </span>
-                        )}
-                      </div>
-                    </Link>
-                  ))}
-                </div>
+                      <ChevronDown className={`w-5 h-5 transition-transform ${holderExpanded ? 'rotate-180' : ''}`} />
+                      {holderExpanded
+                        ? 'Ver menos'
+                        : `Ver ${scenariosHeld.length - HOLDER_INITIAL_SHOW} más`
+                      }
+                    </button>
+                  )}
+                </>
               )}
             </div>
           )}
