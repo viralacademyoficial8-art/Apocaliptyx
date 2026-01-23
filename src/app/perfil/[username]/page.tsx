@@ -75,7 +75,7 @@ const REPORT_REASONS = [
   { id: 'other', label: 'Otro motivo' },
 ];
 
-type TabType = 'general' | 'stolen' | 'scenarios' | 'activity' | 'guardados';
+type TabType = 'general' | 'stolen' | 'scenarios' | 'activity' | 'guardados' | 'holder';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -103,6 +103,8 @@ export default function PublicProfilePage() {
 
   // Estado para escenarios en posesión (Holder Actual)
   const [scenariosHeldCount, setScenariosHeldCount] = useState(0);
+  const [scenariosHeld, setScenariosHeld] = useState<any[]>([]);
+  const [scenariosHeldLoading, setScenariosHeldLoading] = useState(false);
 
   // Estados para modales de seguidores/siguiendo
   const [showFollowersModal, setShowFollowersModal] = useState(false);
@@ -391,6 +393,45 @@ export default function PublicProfilePage() {
     }
   }, [supabase]);
 
+  // Cargar lista de escenarios en posesión (para tab Holder Actual)
+  const loadScenariosHeld = useCallback(async (userId: string) => {
+    setScenariosHeldLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('scenarios')
+        .select(`
+          id,
+          title,
+          description,
+          category,
+          total_pool,
+          participant_count,
+          status,
+          creator_id,
+          current_holder_id,
+          steal_count,
+          created_at,
+          resolution_date,
+          creator:users!scenarios_creator_id_fkey (
+            username,
+            display_name,
+            avatar_url
+          )
+        `)
+        .eq('current_holder_id', userId)
+        .eq('status', 'ACTIVE')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setScenariosHeld(data);
+      }
+    } catch (error) {
+      console.error('Error loading scenarios held:', error);
+    } finally {
+      setScenariosHeldLoading(false);
+    }
+  }, [supabase]);
+
   // Efecto para cargar el conteo cuando se carga el perfil
   useEffect(() => {
     if (profile?.id) {
@@ -438,7 +479,10 @@ export default function PublicProfilePage() {
       const data = await publicProfileService.getActivity(profile.id);
       setActivity(data);
     }
-  }, [profile?.id, activeTab, stolenScenarios.length, scenarios.length, activity.length]);
+    if (activeTab === 'holder' && scenariosHeld.length === 0) {
+      loadScenariosHeld(profile.id);
+    }
+  }, [profile?.id, activeTab, stolenScenarios.length, scenarios.length, activity.length, scenariosHeld.length, loadScenariosHeld]);
 
   useEffect(() => {
     loadProfile();
@@ -845,6 +889,7 @@ export default function PublicProfilePage() {
               { id: 'general', label: 'General', icon: User },
               { id: 'stolen', label: 'Escenarios Robados', icon: Skull },
               { id: 'scenarios', label: 'Escenarios', icon: Zap },
+              { id: 'holder', label: 'Holder Actual', icon: Crown },
               { id: 'activity', label: 'Actividad', icon: Eye },
               ...(isOwnProfile ? [{ id: 'guardados', label: 'Guardados', icon: Bookmark }] : []),
             ].map((tab) => {
@@ -1029,6 +1074,72 @@ export default function PublicProfilePage() {
                         {formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: es })}
                       </span>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'holder' && (
+            <div className="space-y-4">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Crown className="w-5 h-5 text-red-400" />
+                Escenarios en Posesión
+                <span className="text-sm text-red-400">({scenariosHeldCount})</span>
+              </h3>
+              {scenariosHeldLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-red-400" />
+                </div>
+              ) : scenariosHeld.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  <Crown className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No posee ningún escenario actualmente</p>
+                  <p className="text-sm mt-2">Crea o roba escenarios para verlos aquí</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {scenariosHeld.map((scenario) => (
+                    <Link
+                      key={scenario.id}
+                      href={`/escenario/${scenario.id}`}
+                      className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">
+                          {scenario.category}
+                        </span>
+                        {scenario.creator_id !== scenario.current_holder_id && (
+                          <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full flex items-center gap-1">
+                            <Skull className="w-3 h-3" />
+                            Robado
+                          </span>
+                        )}
+                        {scenario.creator_id === scenario.current_holder_id && (
+                          <span className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full flex items-center gap-1">
+                            <Zap className="w-3 h-3" />
+                            Creado
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="font-semibold text-white mb-2 line-clamp-2">{scenario.title}</h4>
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <span className="flex items-center gap-1">
+                          <Flame className="w-4 h-4 text-yellow-400" />
+                          {scenario.total_pool?.toLocaleString() || 0} AP
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Users className="w-4 h-4" />
+                          {scenario.participant_count || 0}
+                        </span>
+                        {scenario.steal_count > 0 && (
+                          <span className="flex items-center gap-1 text-red-400">
+                            <Skull className="w-4 h-4" />
+                            {scenario.steal_count}x robado
+                          </span>
+                        )}
+                      </div>
+                    </Link>
                   ))}
                 </div>
               )}
