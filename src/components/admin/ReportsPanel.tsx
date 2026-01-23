@@ -54,7 +54,7 @@ export function ReportsPanel() {
       render: (r: AdminReport) => (
         <div className="space-y-1">
           <div className="text-white font-medium">{r.reason}</div>
-          <div className="text-xs text-gray-500 line-clamp-1">{r.description}</div>
+          <div className="text-xs text-muted-foreground line-clamp-1">{r.description}</div>
         </div>
       ),
     },
@@ -68,7 +68,7 @@ export function ReportsPanel() {
             r.priority === 'CRITICAL' ? 'bg-red-500/10 text-red-300 border-red-700/40'
               : r.priority === 'HIGH' ? 'bg-orange-500/10 text-orange-300 border-orange-700/40'
               : r.priority === 'MEDIUM' ? 'bg-yellow-500/10 text-yellow-300 border-yellow-700/40'
-              : 'bg-gray-500/10 text-gray-300 border-gray-700/40',
+              : 'bg-gray-500/10 text-foreground border-border/40',
           ].join(' ')}
         >
           {r.priority}
@@ -85,7 +85,7 @@ export function ReportsPanel() {
             r.status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-300 border-yellow-700/40'
               : r.status === 'REVIEWED' ? 'bg-blue-500/10 text-blue-300 border-blue-700/40'
               : r.status === 'RESOLVED' ? 'bg-green-500/10 text-green-300 border-green-700/40'
-              : 'bg-gray-500/10 text-gray-300 border-gray-700/40',
+              : 'bg-gray-500/10 text-foreground border-border/40',
           ].join(' ')}
         >
           {r.status}
@@ -95,7 +95,7 @@ export function ReportsPanel() {
     {
       key: 'createdAt',
       header: 'Fecha',
-      render: (r: AdminReport) => <span className="text-gray-400 text-sm">{new Date(r.createdAt).toLocaleString()}</span>,
+      render: (r: AdminReport) => <span className="text-muted-foreground text-sm">{new Date(r.createdAt).toLocaleString()}</span>,
     },
   ] as const;
 
@@ -104,7 +104,7 @@ export function ReportsPanel() {
       <select
         value={reportFilters.type}
         onChange={(e) => setReportFilters({ type: e.target.value })}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+        className="px-3 py-2 bg-muted border border-border rounded-lg text-white"
       >
         <option value="all">Todos los tipos</option>
         <option value="USER">USER</option>
@@ -116,7 +116,7 @@ export function ReportsPanel() {
       <select
         value={reportFilters.status}
         onChange={(e) => setReportFilters({ status: e.target.value })}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+        className="px-3 py-2 bg-muted border border-border rounded-lg text-white"
       >
         <option value="all">Todos los estados</option>
         <option value="PENDING">PENDING</option>
@@ -128,7 +128,7 @@ export function ReportsPanel() {
       <select
         value={reportFilters.priority}
         onChange={(e) => setReportFilters({ priority: e.target.value })}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+        className="px-3 py-2 bg-muted border border-border rounded-lg text-white"
       >
         <option value="all">Todas las prioridades</option>
         <option value="LOW">LOW</option>
@@ -142,7 +142,7 @@ export function ReportsPanel() {
   // Loading state
   if (isLoading && reports.length === 0) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-gray-400 flex items-center gap-2">
+      <div className="bg-card border border-border rounded-xl p-6 text-muted-foreground flex items-center gap-2">
         <Loader2 className="w-5 h-5 animate-spin" />
         Cargando reportes...
       </div>
@@ -152,7 +152,7 @@ export function ReportsPanel() {
   // Error state
   if (error) {
     return (
-      <div className="bg-gray-900 border border-red-800 rounded-xl p-6 text-red-400">
+      <div className="bg-card border border-red-800 rounded-xl p-6 text-red-400">
         Error: {error}
       </div>
     );
@@ -181,7 +181,7 @@ export function ReportsPanel() {
                 setResolution(r.resolution || '');
                 setOpenDetails(true);
               }}
-              className="p-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+              className="p-2 rounded-lg bg-muted text-foreground hover:text-foreground hover:bg-muted"
               title="Ver"
             >
               <Eye className="w-4 h-4" />
@@ -224,7 +224,7 @@ export function ReportsPanel() {
             <>
               <button
                 onClick={() => setOpenDetails(false)}
-                className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700"
+                className="px-4 py-2 bg-muted text-gray-200 rounded-lg hover:bg-muted"
               >
                 Cerrar
               </button>
@@ -255,46 +255,46 @@ export function ReportsPanel() {
         }
       >
         {selected && (
-          <div className="space-y-4 text-gray-300">
+          <div className="space-y-4 text-foreground">
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Tipo</div>
+              <div className="bg-muted/60 border border-border rounded-lg p-3">
+                <div className="text-xs text-muted-foreground">Tipo</div>
                 <div className="text-white">{selected.type}</div>
               </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Prioridad</div>
+              <div className="bg-muted/60 border border-border rounded-lg p-3">
+                <div className="text-xs text-muted-foreground">Prioridad</div>
                 <div className="text-white">{selected.priority}</div>
               </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Estado</div>
+              <div className="bg-muted/60 border border-border rounded-lg p-3">
+                <div className="text-xs text-muted-foreground">Estado</div>
                 <div className="text-white">{selected.status}</div>
               </div>
-              <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-3">
-                <div className="text-xs text-gray-500">Fecha</div>
+              <div className="bg-muted/60 border border-border rounded-lg p-3">
+                <div className="text-xs text-muted-foreground">Fecha</div>
                 <div className="text-white">{new Date(selected.createdAt).toLocaleString()}</div>
               </div>
             </div>
 
-            <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-3">
-              <div className="text-xs text-gray-500 mb-1">Motivo</div>
+            <div className="bg-muted/40 border border-border rounded-lg p-3">
+              <div className="text-xs text-muted-foreground mb-1">Motivo</div>
               <div className="text-white font-medium">{selected.reason}</div>
-              <div className="text-gray-400 text-sm mt-1">{selected.description}</div>
+              <div className="text-muted-foreground text-sm mt-1">{selected.description}</div>
             </div>
 
-            <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-3">
-              <div className="text-xs text-gray-500 mb-1">Reportado</div>
+            <div className="bg-muted/40 border border-border rounded-lg p-3">
+              <div className="text-xs text-muted-foreground mb-1">Reportado</div>
               <div className="text-white">
                 {selected.reported.type} — {selected.reported.title || selected.reported.username || selected.reported.id}
               </div>
-              <div className="text-gray-500 text-sm mt-1">Reporter: {selected.reporter.username}</div>
+              <div className="text-muted-foreground text-sm mt-1">Reporter: {selected.reporter.username}</div>
             </div>
 
             <div>
-              <div className="text-xs text-gray-500 mb-2">Resolución</div>
+              <div className="text-xs text-muted-foreground mb-2">Resolución</div>
               <textarea
                 value={resolution}
                 onChange={(e) => setResolution(e.target.value)}
-                className="w-full min-h-[140px] px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full min-h-[140px] px-3 py-2 bg-muted border border-border rounded-lg text-white"
                 placeholder="Escribe la resolución..."
               />
             </div>

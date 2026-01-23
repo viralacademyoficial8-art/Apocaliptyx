@@ -31,7 +31,7 @@ export function ProfileHistory() {
           <History className="w-6 h-6 text-blue-400" />
           <div>
             <h2 className="text-xl font-bold text-white">Historial de Predicciones</h2>
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               {stats.total} predicciones • {stats.won} ganadas • {stats.lost} perdidas
             </p>
           </div>
@@ -41,7 +41,7 @@ export function ProfileHistory() {
         <select
           value={resultFilter}
           onChange={(e) => setResultFilter(e.target.value)}
-          className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-muted border border-border rounded-lg text-white text-sm"
         >
           <option value="all">Todos los resultados</option>
           <option value="WON">Ganadas</option>
@@ -60,8 +60,8 @@ export function ProfileHistory() {
 
       {filteredHistory.length === 0 && (
         <div className="text-center py-12">
-          <History className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No hay predicciones que mostrar</p>
+          <History className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">No hay predicciones que mostrar</p>
         </div>
       )}
     </div>

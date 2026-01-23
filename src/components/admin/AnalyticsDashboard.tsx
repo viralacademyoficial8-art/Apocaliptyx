@@ -9,11 +9,11 @@ function BarRow({ label, value, max }: { label: string; value: number; max: numb
   const pct = max === 0 ? 0 : Math.round((value / max) * 100);
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span className="truncate">{label}</span>
-        <span className="text-gray-300">{value.toLocaleString()}</span>
+        <span className="text-foreground">{value.toLocaleString()}</span>
       </div>
-      <div className="h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
+      <div className="h-2 bg-muted rounded-full overflow-hidden border border-border">
         <div className="h-full bg-purple-600/70" style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -35,7 +35,7 @@ export function AnalyticsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-gray-400 flex items-center gap-2">
+      <div className="bg-card border border-border rounded-xl p-6 text-muted-foreground flex items-center gap-2">
         <Loader2 className="w-5 h-5 animate-spin" />
         Cargando estadísticas...
       </div>
@@ -44,7 +44,7 @@ export function AnalyticsDashboard() {
 
   if (error) {
     return (
-      <div className="bg-gray-900 border border-red-800 rounded-xl p-6 text-red-400">
+      <div className="bg-card border border-red-800 rounded-xl p-6 text-red-400">
         Error: {error}
       </div>
     );
@@ -52,7 +52,7 @@ export function AnalyticsDashboard() {
 
   if (!data) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 text-gray-400">
+      <div className="bg-card border border-border rounded-xl p-6 text-muted-foreground">
         No hay datos disponibles.
       </div>
     );
@@ -68,7 +68,7 @@ export function AnalyticsDashboard() {
       </StatsGrid>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-purple-300" />
             <h3 className="text-white font-semibold">Crecimiento de usuarios</h3>
@@ -80,7 +80,7 @@ export function AnalyticsDashboard() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-purple-300" />
             <h3 className="text-white font-semibold">Transacciones diarias</h3>
@@ -92,7 +92,7 @@ export function AnalyticsDashboard() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-purple-300" />
             <h3 className="text-white font-semibold">Distribución por categorías</h3>
@@ -104,7 +104,7 @@ export function AnalyticsDashboard() {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <BarChart3 className="w-5 h-5 text-purple-300" />
             <h3 className="text-white font-semibold">Top escenarios por pool</h3>
@@ -112,7 +112,7 @@ export function AnalyticsDashboard() {
           <div className="space-y-3">
             {data.charts.topScenarios.map((x) => (
               <div key={x.title} className="flex items-center justify-between text-sm">
-                <span className="text-gray-300 truncate">{x.title}</span>
+                <span className="text-foreground truncate">{x.title}</span>
                 <span className="text-white font-medium">{x.pool.toLocaleString()}</span>
               </div>
             ))}
@@ -120,39 +120,39 @@ export function AnalyticsDashboard() {
         </div>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <div className="bg-card border border-border rounded-xl p-6">
         <h3 className="text-white font-semibold mb-4">Top usuarios</h3>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-gray-800/40 border border-gray-700 rounded-xl p-4">
-            <div className="text-sm text-gray-400 mb-3">Por ganancias</div>
+          <div className="bg-muted/40 border border-border rounded-xl p-4">
+            <div className="text-sm text-muted-foreground mb-3">Por ganancias</div>
             <div className="space-y-2">
               {data.topUsers.byEarnings.map(u => (
                 <div key={u.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300 truncate">{u.username}</span>
+                  <span className="text-foreground truncate">{u.username}</span>
                   <span className="text-white">{u.totalEarnings.toLocaleString()}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-gray-800/40 border border-gray-700 rounded-xl p-4">
-            <div className="text-sm text-gray-400 mb-3">Por predicciones</div>
+          <div className="bg-muted/40 border border-border rounded-xl p-4">
+            <div className="text-sm text-muted-foreground mb-3">Por predicciones</div>
             <div className="space-y-2">
               {data.topUsers.byPredictions.map(u => (
                 <div key={u.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300 truncate">{u.username}</span>
+                  <span className="text-foreground truncate">{u.username}</span>
                   <span className="text-white">{u.totalPredictions.toLocaleString()}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-gray-800/40 border border-gray-700 rounded-xl p-4">
-            <div className="text-sm text-gray-400 mb-3">Por nivel</div>
+          <div className="bg-muted/40 border border-border rounded-xl p-4">
+            <div className="text-sm text-muted-foreground mb-3">Por nivel</div>
             <div className="space-y-2">
               {data.topUsers.byLevel.map(u => (
                 <div key={u.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-300 truncate">{u.username}</span>
+                  <span className="text-foreground truncate">{u.username}</span>
                   <span className="text-white">Lv {u.level}</span>
                 </div>
               ))}

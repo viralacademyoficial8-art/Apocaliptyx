@@ -97,7 +97,7 @@ export function QuickActions() {
     {
       label: 'Configuración',
       icon: Settings,
-      color: 'bg-gray-500 hover:bg-gray-600',
+      color: 'bg-gray-500 hover:bg-muted',
       onClick: () => router.push('/admin/configuracion'),
     },
   ];

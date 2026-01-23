@@ -50,11 +50,11 @@ export function InstallPrompt() {
 
   return (
     <div className="fixed bottom-20 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-50 animate-slide-up">
-      <div className="bg-gray-900 border border-purple-500/30 rounded-2xl p-4 shadow-xl shadow-purple-500/10">
+      <div className="bg-card border border-purple-500/30 rounded-2xl p-4 shadow-xl shadow-purple-500/10">
         {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-3 right-3 p-1 text-gray-500 hover:text-white transition-colors"
+          className="absolute top-3 right-3 p-1 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -66,12 +66,12 @@ export function InstallPrompt() {
           </div>
           <div className="flex-1">
             <h3 className="text-white font-bold mb-1">Instala Apocaliptyx</h3>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-muted-foreground text-sm mb-4">
               Accede más rápido y recibe notificaciones de tus predicciones.
             </p>
 
             {/* Device icons */}
-            <div className="flex items-center gap-4 mb-4 text-gray-500 text-xs">
+            <div className="flex items-center gap-4 mb-4 text-muted-foreground text-xs">
               <span className="flex items-center gap-1">
                 <Smartphone className="w-4 h-4" /> Móvil
               </span>
@@ -91,7 +91,7 @@ export function InstallPrompt() {
               </button>
               <button
                 onClick={handleDismiss}
-                className="px-4 py-2.5 text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2.5 text-muted-foreground hover:text-foreground transition-colors"
               >
                 Ahora no
               </button>

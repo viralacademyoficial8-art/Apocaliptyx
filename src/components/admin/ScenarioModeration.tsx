@@ -35,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-500/20 text-yellow-400',
   completed: 'bg-blue-500/20 text-blue-400',
   failed: 'bg-red-500/20 text-red-400',
-  cancelled: 'bg-gray-500/20 text-gray-400',
+  cancelled: 'bg-gray-500/20 text-muted-foreground',
 };
 
 const STATUS_NAMES: Record<string, string> = {
@@ -362,7 +362,7 @@ export default function AdminEscenariosPage() {
                                 Marcar Completado
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'cancelled')}>
-                                <XCircle className="w-4 h-4 mr-2 text-gray-400" />
+                                <XCircle className="w-4 h-4 mr-2 text-muted-foreground" />
                                 Cancelar
                               </DropdownMenuItem>
                             </PermissionGate>

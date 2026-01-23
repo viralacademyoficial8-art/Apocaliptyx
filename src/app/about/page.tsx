@@ -67,7 +67,7 @@ export default function AboutPage() {
                 <span className="text-red-500">APOCAL</span>
                 <span className="text-yellow-500">IPTICS</span>
               </h1>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 La plataforma donde los profetas digitales demuestran quién puede ver el futuro.
               </p>
             </div>
@@ -75,20 +75,20 @@ export default function AboutPage() {
         </section>
 
         {/* Historia */}
-        <section className="py-16 bg-gray-900/30">
+        <section className="py-16 bg-card/30">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2 className="text-3xl font-bold mb-8 text-center">Nuestra Historia</h2>
             <div className="prose prose-invert max-w-none">
-              <p className="text-gray-400 text-lg leading-relaxed mb-6">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
                 Apocaliptyx nació de una idea simple: ¿y si pudiéramos convertir el arte de predecir 
                 el futuro en un juego competitivo y social?
               </p>
-              <p className="text-gray-400 text-lg leading-relaxed mb-6">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-6">
                 En 2024, un grupo de entusiastas de la tecnología y los mercados de predicción 
                 decidió crear una plataforma que combinara la emoción de las apuestas con la 
                 inteligencia del análisis predictivo, pero sin los riesgos del dinero real.
               </p>
-              <p className="text-gray-400 text-lg leading-relaxed">
+              <p className="text-muted-foreground text-lg leading-relaxed">
                 Hoy, Apocaliptyx es el hogar de miles de &quot;profetas digitales&quot; que compiten 
                 diariamente para demostrar su capacidad de anticipar eventos en deportes, 
                 economía, entretenimiento y más.
@@ -102,9 +102,9 @@ export default function AboutPage() {
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map((stat) => (
-                <div key={stat.label} className="text-center p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+                <div key={stat.label} className="text-center p-6 bg-card/50 border border-border rounded-xl">
                   <div className="text-3xl md:text-4xl font-bold text-purple-400 mb-2">{stat.value}</div>
-                  <div className="text-sm text-gray-500">{stat.label}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -112,12 +112,12 @@ export default function AboutPage() {
         </section>
 
         {/* Misión */}
-        <section className="py-16 bg-gray-900/30">
+        <section className="py-16 bg-card/30">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="p-8 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl">
                 <h2 className="text-2xl font-bold mb-4">Nuestra Misión</h2>
-                <p className="text-gray-300">
+                <p className="text-foreground">
                   Democratizar las predicciones y crear la comunidad más grande de analistas 
                   y visionarios digitales del mundo, donde cualquiera puede demostrar su 
                   capacidad de anticipar el futuro.
@@ -125,7 +125,7 @@ export default function AboutPage() {
               </div>
               <div className="p-8 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl">
                 <h2 className="text-2xl font-bold mb-4">Nuestra Visión</h2>
-                <p className="text-gray-300">
+                <p className="text-foreground">
                   Ser la plataforma de referencia global para predicciones, donde millones 
                   de personas compiten, aprenden y se divierten anticipando los eventos 
                   que moldean nuestro mundo.
@@ -143,14 +143,14 @@ export default function AboutPage() {
               {values.map((value) => {
                 const Icon = value.icon;
                 return (
-                  <div key={value.title} className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+                  <div key={value.title} className="p-6 bg-card/50 border border-border rounded-xl">
                     <div className="flex items-center gap-4 mb-4">
                       <div className={`p-3 ${value.bgColor} rounded-lg`}>
                         <Icon className={`w-6 h-6 ${value.color}`} />
                       </div>
                       <h3 className="text-xl font-bold text-white">{value.title}</h3>
                     </div>
-                    <p className="text-gray-400">{value.description}</p>
+                    <p className="text-muted-foreground">{value.description}</p>
                   </div>
                 );
               })}
@@ -159,24 +159,24 @@ export default function AboutPage() {
         </section>
 
         {/* Global */}
-        <section className="py-16 bg-gray-900/30">
+        <section className="py-16 bg-card/30">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6">
               <Globe className="w-8 h-8 text-green-400" />
             </div>
             <h2 className="text-3xl font-bold mb-4">Presencia Global</h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
               Operamos de forma 100% remota con un equipo distribuido alrededor del mundo. 
               Nuestros profetas digitales nos visitan desde más de 50 países.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-              <span className="px-3 py-1 bg-gray-800 rounded-full">🇲🇽 México</span>
-              <span className="px-3 py-1 bg-gray-800 rounded-full">🇺🇸 USA</span>
-              <span className="px-3 py-1 bg-gray-800 rounded-full">🇪🇸 España</span>
-              <span className="px-3 py-1 bg-gray-800 rounded-full">🇦🇷 Argentina</span>
-              <span className="px-3 py-1 bg-gray-800 rounded-full">🇨🇴 Colombia</span>
-              <span className="px-3 py-1 bg-gray-800 rounded-full">🇧🇷 Brasil</span>
-              <span className="px-3 py-1 bg-gray-800 rounded-full">+ 44 más</span>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+              <span className="px-3 py-1 bg-muted rounded-full">🇲🇽 México</span>
+              <span className="px-3 py-1 bg-muted rounded-full">🇺🇸 USA</span>
+              <span className="px-3 py-1 bg-muted rounded-full">🇪🇸 España</span>
+              <span className="px-3 py-1 bg-muted rounded-full">🇦🇷 Argentina</span>
+              <span className="px-3 py-1 bg-muted rounded-full">🇨🇴 Colombia</span>
+              <span className="px-3 py-1 bg-muted rounded-full">🇧🇷 Brasil</span>
+              <span className="px-3 py-1 bg-muted rounded-full">+ 44 más</span>
             </div>
           </div>
         </section>
@@ -185,7 +185,7 @@ export default function AboutPage() {
         <section className="py-16">
           <div className="container mx-auto px-4 max-w-2xl text-center">
             <h2 className="text-3xl font-bold mb-4">¿Listo para demostrar tu visión?</h2>
-            <p className="text-gray-400 mb-8">
+            <p className="text-muted-foreground mb-8">
               Únete a miles de profetas digitales y comienza a predecir el futuro hoy.
             </p>
             <a

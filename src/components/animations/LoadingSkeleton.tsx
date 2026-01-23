@@ -13,7 +13,7 @@ export function Skeleton({
   width,
   height,
 }: SkeletonProps) {
-  const baseClasses = 'bg-gray-800/60 animate-pulse';
+  const baseClasses = 'bg-muted/60 animate-pulse';
   const variantClasses: Record<'text' | 'circular' | 'rectangular', string> = {
     text: 'rounded',
     circular: 'rounded-full',
@@ -30,7 +30,7 @@ export function Skeleton({
 
 export function ScenarioCardSkeleton() {
   return (
-    <div className="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden">
+    <div className="bg-card/80 border border-border rounded-xl overflow-hidden">
       <div className="p-4 sm:p-5 space-y-4">
         <div className="flex items-start justify-between">
           <div className="space-y-2 flex-1">
@@ -82,7 +82,7 @@ export function ProfileSkeleton() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="bg-gray-900/80 border border-gray-800 rounded-lg p-4"
+            className="bg-card/80 border border-border rounded-lg p-4"
           >
             <Skeleton className="h-8 w-16 mb-2" />
             <Skeleton className="h-4 w-20" />
@@ -95,7 +95,7 @@ export function ProfileSkeleton() {
 
 export function ForumPostSkeleton() {
   return (
-    <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 sm:p-5 space-y-4">
+    <div className="bg-card/80 border border-border rounded-xl p-4 sm:p-5 space-y-4">
       <div className="flex items-center gap-3">
         <Skeleton variant="circular" className="w-10 h-10" />
         <div className="space-y-1">
@@ -125,7 +125,7 @@ export function LeaderboardSkeleton({ rows = 10 }: { rows?: number }) {
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center gap-4 p-3 bg-gray-900/80 border border-gray-800 rounded-lg"
+          className="flex items-center gap-4 p-3 bg-card/80 border border-border rounded-lg"
         >
           <Skeleton className="h-6 w-8" />
           <Skeleton variant="circular" className="w-10 h-10" />

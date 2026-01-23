@@ -133,7 +133,7 @@ export default function ComunidadPage() {
         <div className="flex items-center justify-center px-4 py-16">
           <div className="text-center">
             <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto mb-4" />
-            <p className="text-gray-400">Cargando comunidad...</p>
+            <p className="text-muted-foreground">Cargando comunidad...</p>
           </div>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function ComunidadPage() {
             </div>
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold">Comunidad</h1>
-              <p className="text-sm sm:text-base text-gray-400">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Conoce a todos los profetas de Apocaliptyx
               </p>
             </div>
@@ -188,34 +188,34 @@ export default function ComunidadPage() {
 
         {/* Stats Overview */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-5 h-5 text-blue-400" />
-              <span className="text-xs text-gray-400">Total Profetas</span>
+              <span className="text-xs text-muted-foreground">Total Profetas</span>
             </div>
             <div className="text-2xl font-bold">{totalUsers}</div>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-5 h-5 flex items-center justify-center text-blue-400">✓</span>
-              <span className="text-xs text-gray-400">Verificados</span>
+              <span className="text-xs text-muted-foreground">Verificados</span>
             </div>
             <div className="text-2xl font-bold text-blue-400">{verifiedUsers}</div>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-5 h-5 flex items-center justify-center text-yellow-400">★</span>
-              <span className="text-xs text-gray-400">Premium</span>
+              <span className="text-xs text-muted-foreground">Premium</span>
             </div>
             <div className="text-2xl font-bold text-yellow-400">{premiumUsers}</div>
           </div>
 
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+          <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <Flame className="w-5 h-5 text-orange-400" />
-              <span className="text-xs text-gray-400">Nivel Promedio</span>
+              <span className="text-xs text-muted-foreground">Nivel Promedio</span>
             </div>
             <div className="text-2xl font-bold text-orange-400">{avgLevel}</div>
           </div>
@@ -225,13 +225,13 @@ export default function ComunidadPage() {
         <section className="flex flex-col sm:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
               placeholder="Buscar por nombre o username..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:outline-none focus:border-blue-500/50 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl focus:outline-none focus:border-blue-500/50 transition-colors"
             />
           </div>
 
@@ -246,23 +246,23 @@ export default function ComunidadPage() {
                   onClick={() => setSortBy(option.id)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all whitespace-nowrap ${
                     isActive
-                      ? 'bg-gray-800 border-gray-700'
-                      : 'bg-gray-900 border-gray-800 hover:border-gray-700'
+                      ? 'bg-muted border-border'
+                      : 'bg-card border-border hover:border-border'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? option.color : 'text-gray-500'}`} />
-                  <span className={isActive ? 'text-white' : 'text-gray-400'}>{option.label}</span>
+                  <Icon className={`w-4 h-4 ${isActive ? option.color : 'text-muted-foreground'}`} />
+                  <span className={isActive ? 'text-white' : 'text-muted-foreground'}>{option.label}</span>
                 </button>
               );
             })}
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex gap-1 bg-gray-900 border border-gray-800 rounded-lg p-1">
+          <div className="flex gap-1 bg-card border border-border rounded-lg p-1">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-md transition-colors ${
-                viewMode === 'grid' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'
+                viewMode === 'grid' ? 'bg-muted text-white' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <LayoutGrid className="w-5 h-5" />
@@ -270,7 +270,7 @@ export default function ComunidadPage() {
             <button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-white'
+                viewMode === 'list' ? 'bg-muted text-white' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <List className="w-5 h-5" />
@@ -279,7 +279,7 @@ export default function ComunidadPage() {
         </section>
 
         {/* Results Count */}
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted-foreground">
           Mostrando {filteredUsers.length} de {totalUsers} profetas
         </div>
 
@@ -296,7 +296,7 @@ export default function ComunidadPage() {
                 <div
                   key={user.id}
                   onClick={() => router.push(`/perfil/${user.username}`)}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-700 hover:bg-gray-800/50 transition-all group"
+                  className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-border hover:bg-muted/50 transition-all group"
                 >
                   {/* Top Badge for Top 3 */}
                   {globalRank <= 3 && (
@@ -305,7 +305,7 @@ export default function ComunidadPage() {
                         globalRank === 1
                           ? 'bg-yellow-500/20 text-yellow-400'
                           : globalRank === 2
-                            ? 'bg-gray-400/20 text-gray-300'
+                            ? 'bg-gray-400/20 text-foreground'
                             : 'bg-amber-600/20 text-amber-500'
                       }`}>
                         {globalRank === 1 ? <Crown className="w-3 h-3" /> : <Medal className="w-3 h-3" />}
@@ -349,13 +349,13 @@ export default function ComunidadPage() {
                         <span className="text-yellow-400 text-sm">★</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500 mb-3">@{user.username}</div>
+                    <div className="text-sm text-muted-foreground mb-3">@{user.username}</div>
 
                     {/* Stats */}
-                    <div className="w-full grid grid-cols-2 gap-2 pt-3 border-t border-gray-800">
+                    <div className="w-full grid grid-cols-2 gap-2 pt-3 border-t border-border">
                       <div className="text-center">
                         <div className="text-yellow-400 font-bold text-sm">{user.ap_coins.toLocaleString()}</div>
-                        <div className="text-[10px] text-gray-500">AP Coins</div>
+                        <div className="text-[10px] text-muted-foreground">AP Coins</div>
                       </div>
                       <div className="text-center">
                         <div className={`font-bold text-sm ${
@@ -364,7 +364,7 @@ export default function ComunidadPage() {
                         }`}>
                           {winRate}%
                         </div>
-                        <div className="text-[10px] text-gray-500">Win Rate</div>
+                        <div className="text-[10px] text-muted-foreground">Win Rate</div>
                       </div>
                     </div>
                   </div>
@@ -384,17 +384,17 @@ export default function ComunidadPage() {
                 <div
                   key={user.id}
                   onClick={() => router.push(`/perfil/${user.username}`)}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-gray-700 hover:bg-gray-800/50 transition-all flex items-center gap-4"
+                  className="bg-card border border-border rounded-xl p-4 cursor-pointer hover:border-border hover:bg-muted/50 transition-all flex items-center gap-4"
                 >
                   {/* Rank */}
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm ${
                     globalRank === 1
                       ? 'bg-yellow-500/20 text-yellow-400'
                       : globalRank === 2
-                        ? 'bg-gray-400/20 text-gray-300'
+                        ? 'bg-gray-400/20 text-foreground'
                         : globalRank === 3
                           ? 'bg-amber-600/20 text-amber-500'
-                          : 'bg-gray-800 text-gray-400'
+                          : 'bg-muted text-muted-foreground'
                   }`}>
                     #{globalRank}
                   </div>
@@ -429,22 +429,22 @@ export default function ComunidadPage() {
                         <span className="text-yellow-400 text-sm">★</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500">@{user.username}</div>
+                    <div className="text-sm text-muted-foreground">@{user.username}</div>
                   </div>
 
                   {/* Stats */}
                   <div className="hidden sm:flex items-center gap-6">
                     <div className="text-center">
                       <div className="text-purple-400 font-bold">Lvl {user.level}</div>
-                      <div className="text-[10px] text-gray-500">Nivel</div>
+                      <div className="text-[10px] text-muted-foreground">Nivel</div>
                     </div>
                     <div className="text-center">
                       <div className="text-yellow-400 font-bold">{user.ap_coins.toLocaleString()}</div>
-                      <div className="text-[10px] text-gray-500">AP Coins</div>
+                      <div className="text-[10px] text-muted-foreground">AP Coins</div>
                     </div>
                     <div className="text-center">
                       <div className="text-green-400 font-bold">{user.correct_predictions}/{user.total_predictions}</div>
-                      <div className="text-[10px] text-gray-500">Aciertos</div>
+                      <div className="text-[10px] text-muted-foreground">Aciertos</div>
                     </div>
                     <div className="text-center">
                       <div className={`font-bold ${
@@ -453,12 +453,12 @@ export default function ComunidadPage() {
                       }`}>
                         {winRate}%
                       </div>
-                      <div className="text-[10px] text-gray-500">Win Rate</div>
+                      <div className="text-[10px] text-muted-foreground">Win Rate</div>
                     </div>
                   </div>
 
                   {/* Arrow */}
-                  <div className="text-gray-600">
+                  <div className="text-muted-foreground">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
@@ -471,9 +471,9 @@ export default function ComunidadPage() {
 
         {/* No Results */}
         {filteredUsers.length === 0 && (
-          <div className="text-center py-12 bg-gray-900/50 rounded-xl border border-gray-800">
+          <div className="text-center py-12 bg-card/50 rounded-xl border border-border">
             <Users className="w-12 h-12 text-gray-700 mx-auto mb-3" />
-            <p className="text-gray-500">No se encontraron profetas</p>
+            <p className="text-muted-foreground">No se encontraron profetas</p>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}

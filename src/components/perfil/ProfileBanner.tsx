@@ -101,7 +101,7 @@ export function ProfileBanner({
             onClick={() => fileInputRef.current?.click()}
             variant="outline"
             size="sm"
-            className="absolute top-4 right-4 bg-gray-900/80 border-gray-700 hover:bg-gray-800"
+            className="absolute top-4 right-4 bg-card/80 border-border hover:bg-muted"
           >
             <Camera className="w-4 h-4 mr-2" />
             Cambiar banner
@@ -111,7 +111,7 @@ export function ProfileBanner({
 
       {/* Profile Music Player */}
       {musicUrl && (
-        <div className="absolute bottom-4 left-4 flex items-center gap-3 bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-700">
+        <div className="absolute bottom-4 left-4 flex items-center gap-3 bg-card/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
           <button
             onClick={toggleMusic}
             className="w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors"
@@ -129,7 +129,7 @@ export function ProfileBanner({
                 {musicTitle || 'Profile Music'}
               </p>
               {musicArtist && (
-                <p className="text-xs text-gray-400 truncate max-w-[150px]">
+                <p className="text-xs text-muted-foreground truncate max-w-[150px]">
                   {musicArtist}
                 </p>
               )}

@@ -22,14 +22,14 @@ export default function ReglasPage() {
             <Shield className="w-8 h-8 text-purple-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Reglas de la Comunidad</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Estas reglas existen para mantener Apocaliptyx como un espacio seguro, divertido y justo para todos.
           </p>
         </div>
 
         <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 mb-8">
           <h2 className="text-xl font-bold mb-2">Nuestra filosofía</h2>
-          <p className="text-gray-300">
+          <p className="text-foreground">
             En Apocaliptyx creemos en la competencia justa, el respeto mutuo y la diversión. 
             Queremos que todos los profetas digitales tengan la mejor experiencia posible.
           </p>
@@ -37,12 +37,12 @@ export default function ReglasPage() {
 
         <div className="space-y-8">
           {/* Comportamiento permitido */}
-          <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <section className="bg-card/50 border border-border rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <CheckCircle className="w-6 h-6 text-green-400" />
               <h2 className="text-xl font-bold text-green-400">Lo que SÍ puedes hacer</h2>
             </div>
-            <ul className="space-y-3 text-gray-400">
+            <ul className="space-y-3 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-green-400">✓</span>
                 Crear escenarios sobre eventos verificables (deportes, economía, entretenimiento, etc.)
@@ -71,12 +71,12 @@ export default function ReglasPage() {
           </section>
 
           {/* Comportamiento prohibido */}
-          <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <section className="bg-card/50 border border-border rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <XCircle className="w-6 h-6 text-red-400" />
               <h2 className="text-xl font-bold text-red-400">Lo que NO puedes hacer</h2>
             </div>
-            <ul className="space-y-3 text-gray-400">
+            <ul className="space-y-3 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-red-400">✗</span>
                 Crear escenarios sobre muerte, violencia o tragedias
@@ -113,13 +113,13 @@ export default function ReglasPage() {
           </section>
 
           {/* Escenarios */}
-          <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <section className="bg-card/50 border border-border rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Reglas para escenarios</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
                 <h3 className="font-bold text-green-400 mb-2">Escenarios permitidos</h3>
-                <ul className="text-sm text-gray-400 space-y-1">
+                <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Deportes y competencias</li>
                   <li>• Economía y finanzas</li>
                   <li>• Entretenimiento (premios, estrenos)</li>
@@ -131,7 +131,7 @@ export default function ReglasPage() {
               
               <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                 <h3 className="font-bold text-red-400 mb-2">Escenarios prohibidos</h3>
-                <ul className="text-sm text-gray-400 space-y-1">
+                <ul className="text-sm text-muted-foreground space-y-1">
                   <li>• Muerte o enfermedad de personas</li>
                   <li>• Actos terroristas o violencia</li>
                   <li>• Contenido sexual o pornográfico</li>
@@ -144,42 +144,42 @@ export default function ReglasPage() {
           </section>
 
           {/* Consecuencias */}
-          <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <section className="bg-card/50 border border-border rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="w-6 h-6 text-yellow-400" />
               <h2 className="text-xl font-bold text-yellow-400">Consecuencias</h2>
             </div>
-            <p className="text-gray-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Las violaciones a estas reglas pueden resultar en:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-center">
                 <div className="text-2xl mb-2">⚠️</div>
                 <h3 className="font-bold text-yellow-400">Advertencia</h3>
-                <p className="text-xs text-gray-500">Primera infracción menor</p>
+                <p className="text-xs text-muted-foreground">Primera infracción menor</p>
               </div>
               <div className="p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg text-center">
                 <div className="text-2xl mb-2">🔇</div>
                 <h3 className="font-bold text-orange-400">Silenciamiento</h3>
-                <p className="text-xs text-gray-500">Restricción temporal</p>
+                <p className="text-xs text-muted-foreground">Restricción temporal</p>
               </div>
               <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
                 <div className="text-2xl mb-2">⏸️</div>
                 <h3 className="font-bold text-red-400">Suspensión</h3>
-                <p className="text-xs text-gray-500">1-30 días sin acceso</p>
+                <p className="text-xs text-muted-foreground">1-30 días sin acceso</p>
               </div>
               <div className="p-4 bg-gray-500/10 border border-gray-500/30 rounded-lg text-center">
                 <div className="text-2xl mb-2">🚫</div>
-                <h3 className="font-bold text-gray-400">Ban Permanente</h3>
-                <p className="text-xs text-gray-500">Expulsión definitiva</p>
+                <h3 className="font-bold text-muted-foreground">Ban Permanente</h3>
+                <p className="text-xs text-muted-foreground">Expulsión definitiva</p>
               </div>
             </div>
           </section>
 
           {/* Apelaciones */}
-          <section className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <section className="bg-card/50 border border-border rounded-xl p-6">
             <h2 className="text-xl font-bold text-white mb-4">Apelaciones</h2>
-            <p className="text-gray-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Si crees que fuiste sancionado injustamente, puedes apelar contactando a nuestro equipo de moderación:
             </p>
             <a
@@ -188,13 +188,13 @@ export default function ReglasPage() {
             >
               apelaciones@apocaliptyx.com
             </a>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
               Incluye tu nombre de usuario y una explicación detallada de la situación.
             </p>
           </section>
         </div>
 
-        <div className="mt-8 text-center text-gray-500 text-sm">
+        <div className="mt-8 text-center text-muted-foreground text-sm">
           <p>Estas reglas pueden actualizarse. Última revisión: Enero 2026</p>
         </div>
       </main>

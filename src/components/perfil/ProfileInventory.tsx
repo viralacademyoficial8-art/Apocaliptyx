@@ -33,7 +33,7 @@ export function ProfileInventory() {
           <Package className="w-6 h-6 text-purple-400" />
           <div>
             <h2 className="text-xl font-bold text-white">Inventario</h2>
-            <p className="text-gray-400 text-sm">{totalItems} items</p>
+            <p className="text-muted-foreground text-sm">{totalItems} items</p>
           </div>
         </div>
 
@@ -41,7 +41,7 @@ export function ProfileInventory() {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+          className="px-3 py-2 bg-muted border border-border rounded-lg text-white text-sm"
         >
           <option value="all">Todos los tipos</option>
           <option value="PROTECTION">Protección</option>
@@ -67,8 +67,8 @@ export function ProfileInventory() {
 
       {filteredInventory.length === 0 && (
         <div className="text-center py-12">
-          <Package className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No tienes items en tu inventario</p>
+          <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">No tienes items en tu inventario</p>
         </div>
       )}
     </div>

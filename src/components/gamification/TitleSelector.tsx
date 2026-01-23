@@ -64,7 +64,7 @@ export function TitleSelector({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 transition-colors">
+        <button className="flex items-center gap-2 px-3 py-1.5 bg-muted hover:bg-muted rounded-lg border border-border transition-colors">
           {activeTitle ? (
             <>
               <span>{activeTitle.icon}</span>
@@ -74,13 +74,13 @@ export function TitleSelector({
             </>
           ) : (
             <>
-              <Crown className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-400">Sin título</span>
+              <Crown className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Sin título</span>
             </>
           )}
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Crown className="w-5 h-5 text-yellow-400" />
@@ -95,17 +95,17 @@ export function TitleSelector({
             className={`w-full flex items-center justify-between p-3 rounded-lg border transition-colors ${
               !activeTitle
                 ? 'border-purple-500 bg-purple-500/10'
-                : 'border-gray-700 hover:border-gray-600'
+                : 'border-border hover:border-border'
             }`}
           >
-            <span className="text-gray-400">Sin título</span>
+            <span className="text-muted-foreground">Sin título</span>
             {!activeTitle && <Check className="w-5 h-5 text-purple-400" />}
           </button>
 
           {/* Unlocked titles */}
           {unlockedTitles.length > 0 && (
             <div>
-              <h4 className="text-sm text-gray-400 mb-2">
+              <h4 className="text-sm text-muted-foreground mb-2">
                 Títulos desbloqueados ({unlockedTitles.length})
               </h4>
               <div className="space-y-2">
@@ -116,7 +116,7 @@ export function TitleSelector({
                     className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-colors ${
                       title.isActive
                         ? `${rarityBorders[title.rarity]} bg-opacity-10`
-                        : 'border-gray-700 hover:border-gray-600'
+                        : 'border-border hover:border-border'
                     }`}
                     style={{
                       backgroundColor: title.isActive ? `${title.color}10` : undefined,
@@ -128,7 +128,7 @@ export function TitleSelector({
                         <p className="font-medium" style={{ color: title.color }}>
                           {title.nameEs}
                         </p>
-                        <p className="text-xs text-gray-400">{title.descriptionEs}</p>
+                        <p className="text-xs text-muted-foreground">{title.descriptionEs}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -150,20 +150,20 @@ export function TitleSelector({
           {/* Locked titles */}
           {lockedTitles.length > 0 && (
             <div>
-              <h4 className="text-sm text-gray-400 mb-2">
+              <h4 className="text-sm text-muted-foreground mb-2">
                 Títulos bloqueados ({lockedTitles.length})
               </h4>
               <div className="space-y-2">
                 {lockedTitles.map((title) => (
                   <div
                     key={title.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-gray-700 opacity-50"
+                    className="flex items-center justify-between p-3 rounded-lg border border-border opacity-50"
                   >
                     <div className="flex items-center gap-3">
-                      <Lock className="w-6 h-6 text-gray-500" />
+                      <Lock className="w-6 h-6 text-muted-foreground" />
                       <div className="text-left">
-                        <p className="font-medium text-gray-400">{title.nameEs}</p>
-                        <p className="text-xs text-gray-500">{title.descriptionEs}</p>
+                        <p className="font-medium text-muted-foreground">{title.nameEs}</p>
+                        <p className="text-xs text-muted-foreground">{title.descriptionEs}</p>
                       </div>
                     </div>
                     <span

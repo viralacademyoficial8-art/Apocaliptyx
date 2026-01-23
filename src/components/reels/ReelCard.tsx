@@ -106,7 +106,7 @@ export function ReelCard({
       )}
 
       {/* Progress Bar */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-muted">
         <div
           className="h-full bg-white transition-all duration-100"
           style={{ width: `${progress}%` }}
@@ -122,7 +122,7 @@ export function ReelCard({
           </Avatar>
           <div>
             <p className="font-semibold text-white text-sm">{reel.displayName}</p>
-            <p className="text-xs text-gray-300">@{reel.username}</p>
+            <p className="text-xs text-foreground">@{reel.username}</p>
           </div>
         </Link>
 

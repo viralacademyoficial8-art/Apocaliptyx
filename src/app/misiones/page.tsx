@@ -163,55 +163,55 @@ export default function MisionesPage() {
           <Target className="w-8 h-8 text-blue-400" />
           Misiones
         </h1>
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           Completa misiones para ganar AP coins y XP
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+        <div className="bg-muted/50 rounded-xl p-4 border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
             <Clock className="w-4 h-4" />
             Diarias
           </div>
           <div className="text-2xl font-bold text-blue-400">
             {completedDaily}/{totalDaily}
           </div>
-          <div className="text-xs text-gray-500">completadas</div>
+          <div className="text-xs text-muted-foreground">completadas</div>
         </div>
 
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+        <div className="bg-muted/50 rounded-xl p-4 border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
             <Calendar className="w-4 h-4" />
             Semanales
           </div>
           <div className="text-2xl font-bold text-purple-400">
             {completedWeekly}/{totalWeekly}
           </div>
-          <div className="text-xs text-gray-500">completadas</div>
+          <div className="text-xs text-muted-foreground">completadas</div>
         </div>
 
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+        <div className="bg-muted/50 rounded-xl p-4 border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
             <Gift className="w-4 h-4" />
             Por reclamar
           </div>
           <div className="text-2xl font-bold text-green-400">
             {pendingRewards}
           </div>
-          <div className="text-xs text-gray-500">recompensas</div>
+          <div className="text-xs text-muted-foreground">recompensas</div>
         </div>
 
-        <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+        <div className="bg-muted/50 rounded-xl p-4 border border-border">
+          <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
             <Flame className="w-4 h-4" />
             Tu balance
           </div>
           <div className="text-2xl font-bold text-yellow-400">
             {user?.apCoins || 0}
           </div>
-          <div className="text-xs text-gray-500">AP coins</div>
+          <div className="text-xs text-muted-foreground">AP coins</div>
         </div>
       </div>
 
@@ -238,12 +238,12 @@ export default function MisionesPage() {
       />
 
       {/* Info Section */}
-      <div className="mt-8 bg-gray-800/30 rounded-lg p-6 border border-gray-700">
+      <div className="mt-8 bg-muted/30 rounded-lg p-6 border border-border">
         <h3 className="font-semibold mb-4 flex items-center gap-2">
           <Trophy className="w-5 h-5 text-yellow-400" />
           ¿Cómo funcionan las misiones?
         </h3>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-400">
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
           <div>
             <h4 className="font-medium text-white mb-2">Misiones Diarias</h4>
             <ul className="space-y-1">

@@ -56,18 +56,18 @@ export function AdminDataTable<T>({
     data.length > 0 && data.every((item) => selectedIds.includes(getItemId(item)));
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-card rounded-xl border border-border overflow-hidden">
       {/* Toolbar */}
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-border">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
               onChange={handleSearch}
               placeholder={searchPlaceholder}
-              className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
@@ -78,7 +78,7 @@ export function AdminDataTable<T>({
                 className={`p-2 rounded-lg transition-colors ${
                   showFilters
                     ? 'bg-purple-600 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:text-white'
+                    : 'bg-muted text-muted-foreground hover:text-foreground'
                 }`}
                 title="Filtros"
               >
@@ -90,7 +90,7 @@ export function AdminDataTable<T>({
               <button
                 onClick={onRefresh}
                 disabled={isLoading}
-                className="p-2 bg-gray-800 text-gray-400 hover:text-white rounded-lg transition-colors disabled:opacity-50"
+                className="p-2 bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors disabled:opacity-50"
                 title="Refrescar"
               >
                 <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
@@ -100,12 +100,12 @@ export function AdminDataTable<T>({
         </div>
 
         {showFilters && filters && (
-          <div className="mt-4 pt-4 border-t border-gray-800">{filters}</div>
+          <div className="mt-4 pt-4 border-t border-border">{filters}</div>
         )}
 
         {selectedIds.length > 0 && bulkActions && (
-          <div className="mt-4 pt-4 border-t border-gray-800 flex items-center gap-4">
-            <span className="text-sm text-gray-400">
+          <div className="mt-4 pt-4 border-t border-border flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">
               {selectedIds.length} seleccionado(s)
             </span>
             {bulkActions}
@@ -117,7 +117,7 @@ export function AdminDataTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-800/50">
+            <tr className="bg-muted/50">
               {selectable && (
                 <th className="px-4 py-3 text-left w-12">
                   <button
@@ -125,7 +125,7 @@ export function AdminDataTable<T>({
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                       allSelected
                         ? 'bg-purple-600 border-purple-600'
-                        : 'border-gray-600 hover:border-gray-500'
+                        : 'border-border hover:border-gray-500'
                     }`}
                     aria-label="Seleccionar todo"
                   >
@@ -137,14 +137,14 @@ export function AdminDataTable<T>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >
                   {col.header}
                 </th>
               ))}
 
               {actions && (
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider w-24">
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider w-24">
                   Acciones
                 </th>
               )}
@@ -156,7 +156,7 @@ export function AdminDataTable<T>({
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)}
-                  className="px-4 py-12 text-center text-gray-500"
+                  className="px-4 py-12 text-center text-muted-foreground"
                 >
                   <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2" />
                   Cargando...
@@ -166,7 +166,7 @@ export function AdminDataTable<T>({
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)}
-                  className="px-4 py-12 text-center text-gray-500"
+                  className="px-4 py-12 text-center text-muted-foreground"
                 >
                   {emptyMessage}
                 </td>
@@ -180,7 +180,7 @@ export function AdminDataTable<T>({
                   <tr
                     key={id}
                     className={`transition-colors ${
-                      isSelected ? 'bg-purple-900/20' : 'hover:bg-gray-800/50'
+                      isSelected ? 'bg-purple-900/20' : 'hover:bg-muted/50'
                     }`}
                   >
                     {selectable && (
@@ -190,7 +190,7 @@ export function AdminDataTable<T>({
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                             isSelected
                               ? 'bg-purple-600 border-purple-600'
-                              : 'border-gray-600 hover:border-gray-500'
+                              : 'border-border hover:border-gray-500'
                           }`}
                           aria-label={`Seleccionar ${id}`}
                         >
@@ -200,7 +200,7 @@ export function AdminDataTable<T>({
                     )}
 
                     {columns.map((col) => (
-                      <td key={col.key} className="px-4 py-3 text-sm text-gray-300">
+                      <td key={col.key} className="px-4 py-3 text-sm text-foreground">
                         {col.render ? col.render(item) : (item as any)[col.key]}
                       </td>
                     ))}

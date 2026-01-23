@@ -424,7 +424,7 @@ export default function LeaderboardPage() {
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="text-[10px] text-muted-foreground">Top #1</div>
-                        <div className="text-xs font-medium truncate text-foreground hover:text-white transition-colors">
+                        <div className="text-xs font-medium truncate text-foreground hover:text-foreground transition-colors">
                           {topUser.display_name || topUser.username}
                         </div>
                       </div>

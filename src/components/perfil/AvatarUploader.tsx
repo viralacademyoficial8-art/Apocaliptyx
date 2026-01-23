@@ -71,7 +71,7 @@ export function AvatarUploader({
       {/* Avatar Preview */}
       <div
         className={`relative ${sizes[size]} rounded-full overflow-hidden border-4 ${
-          isDragging ? 'border-purple-500 scale-105' : 'border-gray-700'
+          isDragging ? 'border-purple-500 scale-105' : 'border-border'
         } transition-all cursor-pointer group`}
         onClick={() => inputRef.current?.click()}
         onDrop={handleDrop}
@@ -90,8 +90,8 @@ export function AvatarUploader({
   unoptimized
 />
         ) : (
-          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-            <User className="w-12 h-12 text-gray-600" />
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <User className="w-12 h-12 text-muted-foreground" />
           </div>
         )}
 
@@ -132,7 +132,7 @@ export function AvatarUploader({
       />
 
       {/* Help Text */}
-      <p className="text-gray-500 text-xs text-center">
+      <p className="text-muted-foreground text-xs text-center">
         JPG, PNG o GIF. Máximo 5MB.
       </p>
     </div>

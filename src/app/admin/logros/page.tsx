@@ -45,7 +45,7 @@ interface Achievement {
 }
 
 const RARITY_COLORS: Record<string, string> = {
-  COMMON: 'bg-gray-500/20 text-gray-400',
+  COMMON: 'bg-gray-500/20 text-muted-foreground',
   RARE: 'bg-blue-500/20 text-blue-400',
   EPIC: 'bg-purple-500/20 text-purple-400',
   LEGENDARY: 'bg-yellow-500/20 text-yellow-400',
@@ -306,7 +306,7 @@ export default function AdminLogrosPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${RARITY_COLORS[achievement.rarity] || 'bg-gray-500/20 text-gray-400'}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${RARITY_COLORS[achievement.rarity] || 'bg-gray-500/20 text-muted-foreground'}`}>
                           {achievement.rarity}
                         </span>
                       </td>
@@ -322,7 +322,7 @@ export default function AdminLogrosPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${achievement.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${achievement.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>
                           {achievement.is_active ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>

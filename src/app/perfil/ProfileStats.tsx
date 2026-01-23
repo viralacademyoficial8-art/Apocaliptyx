@@ -37,7 +37,7 @@ export function ProfileStats({ stats }: ProfileStatsProps) {
         return (
           <div
             key={index}
-            className="bg-gray-900 rounded-xl border border-gray-800 p-4 hover:border-gray-700 transition-colors"
+            className="bg-card rounded-xl border border-border p-4 hover:border-border transition-colors"
           >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${stat.bg}`}>
@@ -45,7 +45,7 @@ export function ProfileStats({ stats }: ProfileStatsProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold text-white">{stat.value}</p>
-                <p className="text-xs text-gray-400">{stat.label}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
               </div>
             </div>
           </div>

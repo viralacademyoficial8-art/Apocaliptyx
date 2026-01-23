@@ -68,7 +68,7 @@ export function LandingNavbar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-2 px-5 py-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800/50 transition-all duration-200"
+                    className="flex items-center gap-2 px-5 py-2 text-zinc-400 hover:text-foreground rounded-full hover:bg-zinc-800/50 transition-all duration-200"
                   >
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.label}</span>
@@ -112,7 +112,7 @@ export function LandingNavbar() {
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-xl px-5"
+                    className="text-zinc-400 hover:text-foreground hover:bg-zinc-800/50 rounded-xl px-5"
                   >
                     Iniciar Sesion
                   </Button>
@@ -149,7 +149,7 @@ export function LandingNavbar() {
                   {/* Glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-pink-600/30 rounded-xl opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
                   <div className="relative p-1 bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700/50 rounded-lg group-hover:border-purple-500/30 transition-colors">
-                    <Menu className="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" />
+                    <Menu className="w-5 h-5 text-zinc-300 group-hover:text-foreground transition-colors" />
                   </div>
                 </button>
               </div>

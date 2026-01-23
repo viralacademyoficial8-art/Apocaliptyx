@@ -91,12 +91,12 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
 
   if (loading) {
     return (
-      <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 mb-4">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 mb-4">
         <div className="flex gap-4 overflow-hidden">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex flex-col items-center gap-2 animate-pulse">
-              <div className="w-16 h-16 rounded-full bg-gray-700" />
-              <div className="w-12 h-3 rounded bg-gray-700" />
+              <div className="w-16 h-16 rounded-full bg-muted" />
+              <div className="w-12 h-3 rounded bg-muted" />
             </div>
           ))}
         </div>
@@ -105,12 +105,12 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
   }
 
   return (
-    <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 mb-4 relative">
+    <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 mb-4 relative">
       {/* Scroll buttons */}
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/90 hover:bg-gray-700 p-1.5 rounded-full shadow-lg transition-colors"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-muted/90 hover:bg-muted p-1.5 rounded-full shadow-lg transition-colors"
         >
           <ChevronLeft className="w-5 h-5 text-white" />
         </button>
@@ -118,7 +118,7 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-gray-800/90 hover:bg-gray-700 p-1.5 rounded-full shadow-lg transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-muted/90 hover:bg-muted p-1.5 rounded-full shadow-lg transition-colors"
         >
           <ChevronRight className="w-5 h-5 text-white" />
         </button>
@@ -163,8 +163,8 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
                         : 'bg-transparent'
                     )}
                   >
-                    <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
-                      <div className="w-full h-full rounded-full overflow-hidden bg-gray-800">
+                    <div className="w-full h-full rounded-full bg-card p-[2px]">
+                      <div className="w-full h-full rounded-full overflow-hidden bg-muted">
                         {user.avatarUrl ? (
                           <img
                             src={user.avatarUrl}
@@ -172,7 +172,7 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xl font-bold text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-xl font-bold text-muted-foreground">
                             {(user.displayName || user.username || '?')[0].toUpperCase()}
                           </div>
                         )}
@@ -203,8 +203,8 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
               <span
                 className={cn(
                   'text-xs truncate max-w-[72px] text-center',
-                  isOwn ? 'text-gray-300' : 'text-gray-400',
-                  'group-hover:text-white transition-colors'
+                  isOwn ? 'text-foreground' : 'text-muted-foreground',
+                  'group-hover:text-foreground transition-colors'
                 )}
               >
                 {isOwn ? 'Tu historia' : user.displayName || user.username || 'Usuario'}
@@ -221,14 +221,14 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
           >
             <div className="relative">
               <div className="w-[68px] h-[68px] rounded-full p-[3px] bg-gradient-to-tr from-blue-400 via-purple-500 to-pink-500">
-                <div className="w-full h-full rounded-full bg-gray-900 p-[2px]">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-gray-800 flex items-center justify-center">
-                    <Plus className="w-8 h-8 text-gray-400 group-hover:text-white transition-colors" />
+                <div className="w-full h-full rounded-full bg-card p-[2px]">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-muted flex items-center justify-center">
+                    <Plus className="w-8 h-8 text-muted-foreground group-hover:text-foreground transition-colors" />
                   </div>
                 </div>
               </div>
             </div>
-            <span className="text-xs text-gray-300 group-hover:text-white transition-colors">
+            <span className="text-xs text-foreground group-hover:text-foreground transition-colors">
               Crear Story
             </span>
           </button>
@@ -236,7 +236,7 @@ export function StoriesBar({ onCreateStory, onViewStories, currentUserId }: Stor
 
         {/* Show message if not logged in and no stories */}
         {userStories.length === 0 && !currentUserId && (
-          <div className="flex items-center justify-center w-full py-4 text-gray-500">
+          <div className="flex items-center justify-center w-full py-4 text-muted-foreground">
             No hay stories disponibles. ¡Sé el primero en publicar!
           </div>
         )}

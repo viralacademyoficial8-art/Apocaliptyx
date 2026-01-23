@@ -92,7 +92,7 @@ export function CollectibleInventory({
           </div>
           <div>
             <h2 className="text-xl font-bold">Mi Inventario</h2>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               {collectibles.length} coleccionables
             </p>
           </div>
@@ -102,20 +102,20 @@ export function CollectibleInventory({
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar coleccionables..."
-            className="pl-10 bg-gray-800 border-gray-700"
+            className="pl-10 bg-muted border-border"
           />
         </div>
 
         <Select value={selectedType} onValueChange={setSelectedType}>
-          <SelectTrigger className="w-[150px] bg-gray-800 border-gray-700">
+          <SelectTrigger className="w-[150px] bg-muted border-border">
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-700">
+          <SelectContent className="bg-muted border-border">
             <SelectItem value="all">Todos</SelectItem>
             {types
               .filter((t) => t !== 'all')
@@ -128,10 +128,10 @@ export function CollectibleInventory({
         </Select>
 
         <Select value={selectedRarity} onValueChange={setSelectedRarity}>
-          <SelectTrigger className="w-[150px] bg-gray-800 border-gray-700">
+          <SelectTrigger className="w-[150px] bg-muted border-border">
             <SelectValue placeholder="Rareza" />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-700">
+          <SelectContent className="bg-muted border-border">
             <SelectItem value="all">Todas</SelectItem>
             <SelectItem value="common">Común</SelectItem>
             <SelectItem value="rare">Raro</SelectItem>
@@ -149,7 +149,7 @@ export function CollectibleInventory({
           <div key={type}>
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               {typeLabels[type] || type}
-              <span className="text-sm text-gray-400 font-normal">
+              <span className="text-sm text-muted-foreground font-normal">
                 ({items.length})
               </span>
             </h3>
@@ -177,7 +177,7 @@ export function CollectibleInventory({
       )}
 
       {filteredCollectibles.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-muted-foreground">
           <Package className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p>No tienes coleccionables</p>
         </div>

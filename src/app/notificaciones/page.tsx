@@ -169,7 +169,7 @@ const notificationConfig: Record<
 
   // Sistema
   system_announcement: { icon: Megaphone, color: "text-blue-400", bgColor: "bg-blue-500/20" },
-  maintenance: { icon: Wrench, color: "text-gray-400", bgColor: "bg-gray-500/20" },
+  maintenance: { icon: Wrench, color: "text-muted-foreground", bgColor: "bg-gray-500/20" },
   account_warning: { icon: AlertTriangle, color: "text-yellow-400", bgColor: "bg-yellow-500/20" },
   account_restored: { icon: CheckCircle, color: "text-green-400", bgColor: "bg-green-500/20" },
 };
@@ -315,7 +315,7 @@ export default function NotificacionesPage() {
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-          <span className="ml-3 text-gray-400">Cargando notificaciones...</span>
+          <span className="ml-3 text-muted-foreground">Cargando notificaciones...</span>
         </div>
       </div>
     );
@@ -331,7 +331,7 @@ export default function NotificacionesPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/dashboard"
-              className="p-1.5 sm:p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-muted rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </Link>
@@ -340,7 +340,7 @@ export default function NotificacionesPage() {
                 <Bell className="w-4 h-4 sm:w-6 sm:h-6 text-purple-500" />
                 Notificaciones
               </h1>
-              <p className="text-gray-400 text-[10px] sm:text-sm">
+              <p className="text-muted-foreground text-[10px] sm:text-sm">
                 {unreadCount > 0 ? `${unreadCount} sin leer` : "Todas leídas"}
               </p>
             </div>
@@ -381,7 +381,7 @@ export default function NotificacionesPage() {
             className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full text-[11px] sm:text-sm font-medium transition-colors ${
               filter === "all"
                 ? "bg-purple-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             Todas ({notifications.length})
@@ -391,7 +391,7 @@ export default function NotificacionesPage() {
             className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full text-[11px] sm:text-sm font-medium transition-colors ${
               filter === "unread"
                 ? "bg-purple-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             Sin leer ({unreadCount})
@@ -401,7 +401,7 @@ export default function NotificacionesPage() {
             className={`px-2.5 sm:px-4 py-1 sm:py-2 rounded-full text-[11px] sm:text-sm font-medium transition-colors ${
               filter === "read"
                 ? "bg-purple-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             Leídas ({notifications.length - unreadCount})
@@ -409,9 +409,9 @@ export default function NotificacionesPage() {
         </div>
 
         {/* Lista de notificaciones */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
           {filteredNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-gray-500">
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-muted-foreground">
               <Bell className="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 opacity-30" />
               <p className="text-base sm:text-lg font-medium">No hay notificaciones</p>
               <p className="text-xs sm:text-sm text-center px-4">
@@ -433,7 +433,7 @@ export default function NotificacionesPage() {
                 return (
                   <div
                     key={notification.id}
-                    className={`relative group p-3 sm:p-4 hover:bg-gray-800/50 transition-colors cursor-pointer ${
+                    className={`relative group p-3 sm:p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
                       !notification.is_read ? "bg-purple-500/5" : ""
                     }`}
                     onClick={() => handleNotificationClick(notification)}
@@ -451,7 +451,7 @@ export default function NotificacionesPage() {
                         <div className="flex items-start justify-between gap-2">
                           <p
                             className={`text-sm sm:text-base font-medium leading-tight ${
-                              !notification.is_read ? "text-white" : "text-gray-300"
+                              !notification.is_read ? "text-white" : "text-foreground"
                             }`}
                           >
                             {notification.title}
@@ -460,11 +460,11 @@ export default function NotificacionesPage() {
                             <span className="flex-shrink-0 w-2 h-2 bg-purple-500 rounded-full mt-1.5" />
                           )}
                         </div>
-                        <p className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1 line-clamp-2">
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1 line-clamp-2">
                           {notification.message}
                         </p>
                         <div className="flex items-center gap-2 sm:gap-4 mt-1.5 sm:mt-2">
-                          <p className="text-[10px] sm:text-xs text-gray-500">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">
                             {formatTimeAgo(notification.created_at)}
                           </p>
                           {notification.link_url && (
@@ -483,7 +483,7 @@ export default function NotificacionesPage() {
                               e.stopPropagation();
                               handleMarkAsRead(notification);
                             }}
-                            className="p-1.5 sm:p-2 text-gray-500 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                            className="p-1.5 sm:p-2 text-muted-foreground hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
                             title="Marcar como leída"
                           >
                             <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -494,7 +494,7 @@ export default function NotificacionesPage() {
                             e.stopPropagation();
                             handleDelete(notification.id);
                           }}
-                          className="p-1.5 sm:p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                          className="p-1.5 sm:p-2 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                           title="Eliminar"
                         >
                           <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

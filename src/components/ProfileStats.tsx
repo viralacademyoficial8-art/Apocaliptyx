@@ -99,7 +99,7 @@ export function ProfileStats({ user: profileUser }: ProfileStatsProps) {
               >
                 <Icon className={`w-5 h-5 ${stat.color}`} />
               </div>
-              <span className="text-xs sm:text-sm text-gray-400">
+              <span className="text-xs sm:text-sm text-muted-foreground">
                 {stat.label}
               </span>
             </div>

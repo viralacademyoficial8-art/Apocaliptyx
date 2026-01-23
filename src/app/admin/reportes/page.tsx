@@ -35,7 +35,7 @@ const REPORT_REASONS: Record<string, { label: string; color: string }> = {
   misleading: { label: 'Engañoso', color: 'bg-orange-500/20 text-orange-400' },
   spam: { label: 'Spam', color: 'bg-yellow-500/20 text-yellow-400' },
   impossible: { label: 'Imposible verificar', color: 'bg-purple-500/20 text-purple-400' },
-  other: { label: 'Otro', color: 'bg-gray-500/20 text-gray-400' },
+  other: { label: 'Otro', color: 'bg-gray-500/20 text-muted-foreground' },
 };
 
 // Estados de reporte
@@ -43,7 +43,7 @@ const REPORT_STATUS: Record<string, { label: string; icon: React.ReactNode; colo
   pending: { label: 'Pendiente', icon: <Clock className="w-3 h-3" />, color: 'bg-yellow-500/20 text-yellow-400' },
   reviewed: { label: 'Revisado', icon: <Eye className="w-3 h-3" />, color: 'bg-blue-500/20 text-blue-400' },
   resolved: { label: 'Resuelto', icon: <CheckCircle className="w-3 h-3" />, color: 'bg-green-500/20 text-green-400' },
-  dismissed: { label: 'Descartado', icon: <XCircle className="w-3 h-3" />, color: 'bg-gray-500/20 text-gray-400' },
+  dismissed: { label: 'Descartado', icon: <XCircle className="w-3 h-3" />, color: 'bg-gray-500/20 text-muted-foreground' },
 };
 
 interface ScenarioReport {
@@ -246,7 +246,7 @@ export default function AdminReportesPage() {
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gray-500/20 rounded-lg">
-                <XCircle className="w-5 h-5 text-gray-400" />
+                <XCircle className="w-5 h-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{reports.filter(r => r.status === 'dismissed').length}</p>

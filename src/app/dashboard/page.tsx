@@ -19,7 +19,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <div className="flex items-center gap-3">
         <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
-        <span className="text-gray-400">Redirigiendo...</span>
+        <span className="text-muted-foreground">Redirigiendo...</span>
       </div>
     </div>
   );

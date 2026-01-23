@@ -29,7 +29,7 @@ export function CategoryTabs() {
             key={category.id}
             onClick={() => setFilters({ category: category.id })}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
-              isActive ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+              isActive ? 'bg-purple-600 text-white' : 'bg-muted text-muted-foreground hover:bg-muted hover:text-foreground'
             }`}
           >
             <Icon className="w-4 h-4" />

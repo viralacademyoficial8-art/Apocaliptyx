@@ -229,7 +229,7 @@ export function NotificationPanel() {
         className="w-[400px] max-w-[95vw] bg-card border-border p-0 max-h-[600px] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gray-900 border-b border-border p-4 z-10">
+        <div className="sticky top-0 bg-card border-b border-border p-4 z-10">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <Bell className="w-5 h-5 text-yellow-500" />
@@ -278,7 +278,7 @@ export function NotificationPanel() {
               className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                 filter === 'all'
                   ? 'bg-muted text-foreground font-semibold'
-                  : 'text-muted-foreground hover:text-white'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               Todas ({notifications.length})
@@ -288,7 +288,7 @@ export function NotificationPanel() {
               className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                 filter === 'unread'
                   ? 'bg-muted text-foreground font-semibold'
-                  : 'text-muted-foreground hover:text-white'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               No leídas ({unreadCount})
@@ -368,7 +368,7 @@ export function NotificationPanel() {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="sticky bottom-0 bg-gray-900 border-t border-border p-3">
+          <div className="sticky bottom-0 bg-card border-t border-border p-3">
             <button
               onClick={() => {
                 router.push('/notificaciones');

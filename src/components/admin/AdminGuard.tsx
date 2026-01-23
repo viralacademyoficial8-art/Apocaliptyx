@@ -78,8 +78,8 @@ export function AdminGuard({
         <div className="text-center">
           <ShieldOff className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h1>
-          <p className="text-gray-400 mb-6">No tienes permisos para acceder a esta sección.</p>
-          <p className="text-gray-500 text-sm mb-4">Tu rol: {role}</p>
+          <p className="text-muted-foreground mb-6">No tienes permisos para acceder a esta sección.</p>
+          <p className="text-muted-foreground text-sm mb-4">Tu rol: {role}</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white"
@@ -109,7 +109,7 @@ export function AdminGuard({
           <div className="text-center">
             <ShieldOff className="w-16 h-16 text-orange-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white mb-2">Permisos Insuficientes</h1>
-            <p className="text-gray-400 mb-6">
+            <p className="text-muted-foreground mb-6">
               Tu rol de {role} no tiene los permisos necesarios para esta acción.
             </p>
             <button

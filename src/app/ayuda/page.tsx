@@ -187,7 +187,7 @@ export default function AyudaPage() {
             <HelpCircle className="w-8 h-8 text-purple-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Centro de Ayuda</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Encuentra respuestas a tus preguntas y aprende a sacar el máximo provecho de Apocaliptyx
           </p>
         </div>
@@ -195,16 +195,16 @@ export default function AyudaPage() {
         {/* Search Bar */}
         <div className="max-w-2xl mx-auto mb-12 relative">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
               placeholder="Buscar en el centro de ayuda..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-12 py-4 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg"
+              className="w-full pl-12 pr-12 py-4 bg-card border border-border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg"
             />
             {isSearching && (
-              <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 animate-spin" />
+              <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground animate-spin" />
             )}
             {searchQuery && !isSearching && (
               <button
@@ -212,7 +212,7 @@ export default function AyudaPage() {
                   setSearchQuery("");
                   setShowResults(false);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -221,7 +221,7 @@ export default function AyudaPage() {
 
           {/* Search Results Dropdown */}
           {showResults && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-800 rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
               {searchResults.map((article) => (
                 <Link
                   key={article.slug}
@@ -231,24 +231,24 @@ export default function AyudaPage() {
                     setShowResults(false);
                     setSearchQuery("");
                   }}
-                  className="flex items-center justify-between p-4 hover:bg-gray-800 transition-colors border-b border-gray-800 last:border-0"
+                  className="flex items-center justify-between p-4 hover:bg-muted transition-colors border-b border-border last:border-0"
                 >
                   <div>
                     <p className="text-white font-medium">{article.title}</p>
                     {article.description && (
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">{article.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{article.description}</p>
                     )}
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </Link>
               ))}
             </div>
           )}
 
           {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-800 rounded-xl shadow-xl z-50 p-6 text-center">
-              <p className="text-gray-400">No se encontraron resultados para &quot;{searchQuery}&quot;</p>
-              <p className="text-sm text-gray-500 mt-2">Intenta con otras palabras clave</p>
+            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-xl z-50 p-6 text-center">
+              <p className="text-muted-foreground">No se encontraron resultados para &quot;{searchQuery}&quot;</p>
+              <p className="text-sm text-muted-foreground mt-2">Intenta con otras palabras clave</p>
             </div>
           )}
         </div>
@@ -260,7 +260,7 @@ export default function AyudaPage() {
             return (
               <div
                 key={category.title}
-                className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-gray-700 transition-colors"
+                className="p-6 bg-card/50 border border-border rounded-xl hover:border-border transition-colors"
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`p-2 ${category.bgColor} rounded-lg`}>
@@ -268,7 +268,7 @@ export default function AyudaPage() {
                   </div>
                   <div>
                     <h2 className="font-bold text-white">{category.title}</h2>
-                    <p className="text-sm text-gray-500">{category.description}</p>
+                    <p className="text-sm text-muted-foreground">{category.description}</p>
                   </div>
                 </div>
                 <ul className="space-y-2">
@@ -277,7 +277,7 @@ export default function AyudaPage() {
                       <Link
                         href={article.href}
                         onClick={() => handleArticleClick(article.href.split("/").pop() || "")}
-                        className="flex items-center justify-between text-sm text-gray-400 hover:text-white transition-colors py-1 group"
+                        className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors py-1 group"
                       >
                         <span>{article.title}</span>
                         <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -296,10 +296,10 @@ export default function AyudaPage() {
             <Zap className="w-6 h-6 text-yellow-400" />
             Artículos Populares
           </h2>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
+          <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
             {loadingPopular ? (
               <div className="p-8 text-center">
-                <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-500" />
+                <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
               </div>
             ) : popularArticles.length > 0 ? (
               popularArticles.map((article, index) => (
@@ -307,16 +307,16 @@ export default function AyudaPage() {
                   key={article.slug}
                   href={`/ayuda/${article.slug}`}
                   onClick={() => handleArticleClick(article.slug)}
-                  className={`flex items-center justify-between p-4 hover:bg-gray-800/50 transition-colors ${
-                    index !== popularArticles.length - 1 ? "border-b border-gray-800" : ""
+                  className={`flex items-center justify-between p-4 hover:bg-muted/50 transition-colors ${
+                    index !== popularArticles.length - 1 ? "border-b border-border" : ""
                   }`}
                 >
-                  <span className="text-gray-300 hover:text-white">{article.title}</span>
-                  <span className="text-sm text-gray-500">{formatViews(article.views)} vistas</span>
+                  <span className="text-foreground hover:text-foreground">{article.title}</span>
+                  <span className="text-sm text-muted-foreground">{formatViews(article.views)} vistas</span>
                 </Link>
               ))
             ) : (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-muted-foreground">
                 No hay artículos populares
               </div>
             )}
@@ -332,10 +332,10 @@ export default function AyudaPage() {
               </div>
               <div>
                 <h3 className="font-bold text-white">Chat en Vivo</h3>
-                <p className="text-sm text-gray-400">Respuesta inmediata</p>
+                <p className="text-sm text-muted-foreground">Respuesta inmediata</p>
               </div>
             </div>
-            <p className="text-gray-300 mb-4">
+            <p className="text-foreground mb-4">
               Habla con nuestro equipo de soporte en tiempo real. Disponible de Lunes a Viernes, 9am - 6pm (CST).
             </p>
             <Link 
@@ -353,10 +353,10 @@ export default function AyudaPage() {
               </div>
               <div>
                 <h3 className="font-bold text-white">Enviar Email</h3>
-                <p className="text-sm text-gray-400">Respuesta en 24-48h</p>
+                <p className="text-sm text-muted-foreground">Respuesta en 24-48h</p>
               </div>
             </div>
-            <p className="text-gray-300 mb-4">
+            <p className="text-foreground mb-4">
               ¿Tienes una consulta más detallada? Envíanos un email y te responderemos lo antes posible.
             </p>
             <a
@@ -370,7 +370,7 @@ export default function AyudaPage() {
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
-          <p className="text-gray-400 mb-4">¿No encontraste lo que buscabas?</p>
+          <p className="text-muted-foreground mb-4">¿No encontraste lo que buscabas?</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/soporte"
@@ -381,7 +381,7 @@ export default function AyudaPage() {
             </Link>
             <a
               href="mailto:contacto@apocaliptyx.com"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-muted hover:bg-muted rounded-lg font-medium transition-colors"
             >
               <Mail className="w-5 h-5" />
               Enviar Email

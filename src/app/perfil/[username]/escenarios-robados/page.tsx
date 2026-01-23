@@ -92,7 +92,7 @@ function AccordionItem({
       gaming: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
       cripto: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     };
-    return colors[category?.toLowerCase()] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    return colors[category?.toLowerCase()] || 'bg-gray-500/20 text-muted-foreground border-gray-500/30';
   };
 
   const getStatusBadge = (status?: string) => {
@@ -112,7 +112,7 @@ function AccordionItem({
         );
       case 'cancelled':
         return (
-          <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded-full text-xs font-medium border border-gray-500/30">
+          <span className="px-2 py-1 bg-gray-500/20 text-muted-foreground rounded-full text-xs font-medium border border-gray-500/30">
             Cancelado
           </span>
         );
@@ -122,11 +122,11 @@ function AccordionItem({
   };
 
   return (
-    <div className="bg-gray-900/80 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-all">
+    <div className="bg-card/80 border border-border rounded-xl overflow-hidden hover:border-border transition-all">
       {/* Collapsed Header - Always visible */}
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center gap-4 text-left hover:bg-gray-800/30 transition-colors"
+        className="w-full p-4 flex items-center gap-4 text-left hover:bg-muted/30 transition-colors"
       >
         {/* Rank Badge */}
         <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/30 flex items-center justify-center">
@@ -144,7 +144,7 @@ function AccordionItem({
           <h3 className="font-semibold text-white truncate">
             {steal.scenario?.title || 'Escenario eliminado'}
           </h3>
-          <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+          <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
             <Calendar className="w-3.5 h-3.5" />
             {formatDistanceToNow(new Date(steal.stolen_at), { addSuffix: true, locale: es })}
           </p>
@@ -152,34 +152,34 @@ function AccordionItem({
 
         {/* Price Badge */}
         <div className="flex-shrink-0 text-right">
-          <p className="text-xs text-gray-500 mb-0.5">Precio</p>
+          <p className="text-xs text-muted-foreground mb-0.5">Precio</p>
           <p className="text-lg font-bold text-red-400">{steal.steal_price?.toLocaleString() || 0} <span className="text-sm">AP</span></p>
         </div>
 
         {/* Expand/Collapse Icon */}
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
+            <ChevronUp className="w-4 h-4 text-muted-foreground" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
           )}
         </div>
       </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-gray-800 bg-gray-900/50">
+        <div className="border-t border-border bg-card/50">
           {/* Description */}
           {steal.scenario?.description && (
-            <div className="px-4 py-3 border-b border-gray-800/50">
-              <p className="text-sm text-gray-400 leading-relaxed">
+            <div className="px-4 py-3 border-b border-border/50">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {steal.scenario.description}
               </p>
             </div>
           )}
 
           {/* Robbery Stats - Valor, Víctima, Mayor Golpe */}
-          <div className="grid grid-cols-3 gap-3 p-4 border-b border-gray-800/50">
+          <div className="grid grid-cols-3 gap-3 p-4 border-b border-border/50">
             <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-3 text-center">
               <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
               <p className="text-xl font-bold text-white">{steal.steal_price?.toLocaleString() || 0}</p>
@@ -202,41 +202,41 @@ function AccordionItem({
               </p>
               <p className="text-xs text-purple-400/80">Víctima</p>
             </Link>
-            <div className={`rounded-lg p-3 text-center ${isBiggestHeist ? 'bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/50' : 'bg-gray-800/50 border border-gray-700'}`}>
-              <Crown className={`w-5 h-5 mx-auto mb-1 ${isBiggestHeist ? 'text-orange-400' : 'text-gray-500'}`} />
-              <p className={`text-xl font-bold ${isBiggestHeist ? 'text-orange-400' : 'text-gray-500'}`}>
+            <div className={`rounded-lg p-3 text-center ${isBiggestHeist ? 'bg-gradient-to-br from-orange-500/20 to-red-500/20 border border-orange-500/50' : 'bg-muted/50 border border-border'}`}>
+              <Crown className={`w-5 h-5 mx-auto mb-1 ${isBiggestHeist ? 'text-orange-400' : 'text-muted-foreground'}`} />
+              <p className={`text-xl font-bold ${isBiggestHeist ? 'text-orange-400' : 'text-muted-foreground'}`}>
                 {isBiggestHeist ? 'SÍ' : 'NO'}
               </p>
-              <p className={`text-xs ${isBiggestHeist ? 'text-orange-400/80' : 'text-gray-500'}`}>Mayor Golpe</p>
+              <p className={`text-xs ${isBiggestHeist ? 'text-orange-400/80' : 'text-muted-foreground'}`}>Mayor Golpe</p>
             </div>
           </div>
 
           {/* Scenario Stats Grid */}
-          <div className="p-4 border-b border-gray-800/50">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <div className="p-4 border-b border-border/50">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
               <Target className="w-3.5 h-3.5" />
               Estadísticas del Escenario
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <Users className="w-4 h-4 text-purple-400 mx-auto mb-1" />
                 <p className="text-lg font-bold text-white">{steal.scenario?.participant_count || 0}</p>
-                <p className="text-xs text-gray-500">Participantes</p>
+                <p className="text-xs text-muted-foreground">Participantes</p>
               </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
                 <p className="text-lg font-bold text-white">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
-                <p className="text-xs text-gray-500">Pool Total</p>
+                <p className="text-xs text-muted-foreground">Pool Total</p>
               </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
                 <p className="text-lg font-bold text-white">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
-                <p className="text-xs text-gray-500">Pool Sí</p>
+                <p className="text-xs text-muted-foreground">Pool Sí</p>
               </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-red-400 mx-auto mb-1 rotate-180" />
                 <p className="text-lg font-bold text-white">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
-                <p className="text-xs text-gray-500">Pool No</p>
+                <p className="text-xs text-muted-foreground">Pool No</p>
               </div>
             </div>
           </div>
@@ -248,7 +248,7 @@ function AccordionItem({
               <Link
                 href={`/perfil/${steal.victim.username}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 flex items-center gap-3 bg-gray-800/50 hover:bg-gray-800 border border-gray-700 hover:border-purple-500/50 rounded-lg p-3 transition-all group"
+                className="flex-1 flex items-center gap-3 bg-muted/50 hover:bg-muted border border-border hover:border-purple-500/50 rounded-lg p-3 transition-all group"
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center overflow-hidden">
                   {steal.victim.avatar_url ? (
@@ -262,7 +262,7 @@ function AccordionItem({
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500 mb-0.5 flex items-center gap-1">
+                  <p className="text-xs text-muted-foreground mb-0.5 flex items-center gap-1">
                     <Skull className="w-3 h-3 text-red-400" />
                     Ver perfil de la víctima
                   </p>
@@ -270,7 +270,7 @@ function AccordionItem({
                     @{steal.victim.username}
                   </p>
                 </div>
-                <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-purple-400 transition-colors" />
+                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-purple-400 transition-colors" />
               </Link>
             )}
 
@@ -285,12 +285,12 @@ function AccordionItem({
                   <Eye className="w-5 h-5 text-red-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-500 mb-0.5">Ver escenario completo</p>
+                  <p className="text-xs text-muted-foreground mb-0.5">Ver escenario completo</p>
                   <p className="font-semibold text-white truncate group-hover:text-red-400 transition-colors">
                     Ir al escenario
                   </p>
                 </div>
-                <ExternalLink className="w-4 h-4 text-gray-500 group-hover:text-red-400 transition-colors" />
+                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-red-400 transition-colors" />
               </Link>
             )}
           </div>
@@ -448,7 +448,7 @@ export default function EscenariosRobadosPage() {
           {/* Back Button */}
           <Link
             href={`/perfil/${username}`}
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver al perfil de @{username}
@@ -460,7 +460,7 @@ export default function EscenariosRobadosPage() {
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-lg shadow-red-500/30">
                 <Swords className="w-10 h-10 text-white" />
               </div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-gray-900 border-2 border-red-500 flex items-center justify-center">
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-card border-2 border-red-500 flex items-center justify-center">
                 <Zap className="w-4 h-4 text-red-400" />
               </div>
             </div>
@@ -470,7 +470,7 @@ export default function EscenariosRobadosPage() {
               </h1>
               <Link
                 href={`/perfil/${profile.username}`}
-                className="text-gray-400 flex items-center gap-2 hover:text-white transition-colors group"
+                className="text-muted-foreground flex items-center gap-2 hover:text-foreground transition-colors group"
               >
                 {profile.avatar_url ? (
                   <img
@@ -490,42 +490,42 @@ export default function EscenariosRobadosPage() {
 
           {/* Stats Cards - Clickable */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-red-500/30 rounded-xl p-4 hover:border-red-500/60 transition-all cursor-default">
+            <div className="bg-card/80 backdrop-blur-sm border border-red-500/30 rounded-xl p-4 hover:border-red-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
                   <Swords className="w-5 h-5 text-red-400" />
                 </div>
-                <span className="text-sm text-gray-400">Total Robados</span>
+                <span className="text-sm text-muted-foreground">Total Robados</span>
               </div>
               <p className="text-3xl font-bold text-white">{stats.totalStolen}</p>
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4 hover:border-yellow-500/60 transition-all cursor-default">
+            <div className="bg-card/80 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4 hover:border-yellow-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
                   <Coins className="w-5 h-5 text-yellow-400" />
                 </div>
-                <span className="text-sm text-gray-400">Valor Total</span>
+                <span className="text-sm text-muted-foreground">Valor Total</span>
               </div>
               <p className="text-3xl font-bold text-white">{stats.totalValue.toLocaleString()} <span className="text-lg text-yellow-400">AP</span></p>
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 hover:border-purple-500/60 transition-all cursor-default">
+            <div className="bg-card/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 hover:border-purple-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
                   <Users className="w-5 h-5 text-purple-400" />
                 </div>
-                <span className="text-sm text-gray-400">Víctimas</span>
+                <span className="text-sm text-muted-foreground">Víctimas</span>
               </div>
               <p className="text-3xl font-bold text-white">{stats.uniqueVictims}</p>
             </div>
 
-            <div className="bg-gray-900/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4 hover:border-orange-500/60 transition-all cursor-default">
+            <div className="bg-card/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4 hover:border-orange-500/60 transition-all cursor-default">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
                   <Crown className="w-5 h-5 text-orange-400" />
                 </div>
-                <span className="text-sm text-gray-400">Mayor Golpe</span>
+                <span className="text-sm text-muted-foreground">Mayor Golpe</span>
               </div>
               <p className="text-3xl font-bold text-white">{stats.biggestHeist.toLocaleString()} <span className="text-lg text-orange-400">AP</span></p>
             </div>
@@ -536,12 +536,12 @@ export default function EscenariosRobadosPage() {
       {/* Scenarios List */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {stolenScenarios.length === 0 ? (
-          <div className="text-center py-20 bg-gray-900/50 border border-gray-800 rounded-2xl">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-800 flex items-center justify-center">
-              <Skull className="w-10 h-10 text-gray-600" />
+          <div className="text-center py-20 bg-card/50 border border-border rounded-2xl">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
+              <Skull className="w-10 h-10 text-muted-foreground" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Sin conquistas aún</h3>
-            <p className="text-gray-400 mb-6">@{profile.username} no ha robado ningún escenario todavía</p>
+            <p className="text-muted-foreground mb-6">@{profile.username} no ha robado ningún escenario todavía</p>
             <Link
               href="/explorar"
               className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl transition-colors"
@@ -557,21 +557,21 @@ export default function EscenariosRobadosPage() {
               <h2 className="text-xl font-semibold flex items-center gap-2">
                 <Flame className="w-5 h-5 text-orange-400" />
                 Historial de Robos
-                <span className="text-sm font-normal text-gray-500 ml-2">({stolenScenarios.length} escenarios)</span>
+                <span className="text-sm font-normal text-muted-foreground ml-2">({stolenScenarios.length} escenarios)</span>
               </h2>
 
               {/* Expand/Collapse Controls */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={expandAll}
-                  className="px-3 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-sm bg-muted hover:bg-muted border border-border rounded-lg transition-colors flex items-center gap-1.5"
                 >
                   <ChevronDown className="w-4 h-4" />
                   Expandir todo
                 </button>
                 <button
                   onClick={collapseAll}
-                  className="px-3 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 text-sm bg-muted hover:bg-muted border border-border rounded-lg transition-colors flex items-center gap-1.5"
                 >
                   <ChevronUp className="w-4 h-4" />
                   Colapsar todo

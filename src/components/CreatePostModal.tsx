@@ -81,7 +81,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+      <DialogContent className="bg-card border-border max-w-lg">
         {/* Header simple (sin DialogHeader / DialogTitle) */}
         <div className="mb-4">
           <h2 className="text-xl font-bold">Crear publicación</h2>
@@ -98,7 +98,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             </Avatar>
             <div>
               <div className="font-semibold">{user.displayName}</div>
-              <div className="text-sm text-gray-400">@{user.username}</div>
+              <div className="text-sm text-muted-foreground">@{user.username}</div>
             </div>
           </div>
 
@@ -108,16 +108,16 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="¿Qué predicción o pensamiento quieres compartir con la comunidad?"
-              className="bg-gray-800 border-gray-700 focus:border-purple-500 min-h-[150px] text-base"
+              className="bg-muted border-border focus:border-purple-500 min-h-[150px] text-base"
               maxLength={1000}
             />
             <div className="flex justify-between mt-1">
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 Tip: Usa @usuario para mencionar a otros profetas
               </span>
               <span
                 className={`text-xs ${
-                  content.length > 900 ? 'text-red-400' : 'text-gray-500'
+                  content.length > 900 ? 'text-red-400' : 'text-muted-foreground'
                 }`}
               >
                 {content.length}/1000
@@ -127,7 +127,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
           {/* Tags */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Etiquetas (máx. 3)
             </label>
             <div className="flex flex-wrap gap-2">
@@ -141,7 +141,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                     ${
                       selectedTags.includes(tag.id)
                         ? tag.color
-                        : 'border-gray-700 text-gray-400 hover:border-gray-600'
+                        : 'border-border text-muted-foreground hover:border-border'
                     }
                   `}
                 >
@@ -153,7 +153,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
           {/* Link Scenario */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               <LinkIcon className="w-4 h-4 inline mr-1" />
               Vincular escenario (opcional)
             </label>
@@ -162,7 +162,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             <select
               value={linkedScenarioId}
               onChange={(e) => setLinkedScenarioId(e.target.value)}
-              className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="">Ninguno</option>
               {userScenarios.map((scenario) => (
@@ -176,13 +176,13 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-gray-800">
+          <div className="flex items-center justify-between pt-4 border-t border-border">
             <div className="flex gap-2">
               {/* Placeholder para imágenes futuras */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-400"
+                className="text-muted-foreground"
                 disabled
               >
                 <ImageIcon className="w-5 h-5" />
@@ -193,7 +193,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               <Button
                 variant="outline"
                 onClick={onClose}
-                className="border-gray-700"
+                className="border-border"
               >
                 Cancelar
               </Button>

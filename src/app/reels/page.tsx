@@ -161,7 +161,7 @@ export default function ReelsPage() {
               <Video className="w-8 h-8 text-purple-400" />
               Reels
             </h1>
-            <p className="text-gray-400 mt-1">
+            <p className="text-muted-foreground mt-1">
               Videos cortos de predicciones y análisis
             </p>
           </div>
@@ -173,14 +173,14 @@ export default function ReelsPage() {
           <Button
             variant={filter === 'foryou' ? 'default' : 'outline'}
             onClick={() => setFilter('foryou')}
-            className={filter === 'foryou' ? 'bg-purple-600' : 'border-gray-700'}
+            className={filter === 'foryou' ? 'bg-purple-600' : 'border-border'}
           >
             Para ti
           </Button>
           <Button
             variant={filter === 'following' ? 'default' : 'outline'}
             onClick={() => setFilter('following')}
-            className={filter === 'following' ? 'bg-purple-600' : 'border-gray-700'}
+            className={filter === 'following' ? 'bg-purple-600' : 'border-border'}
           >
             <Users className="w-4 h-4 mr-1" />
             Siguiendo
@@ -188,7 +188,7 @@ export default function ReelsPage() {
           <Button
             variant={filter === 'trending' ? 'default' : 'outline'}
             onClick={() => setFilter('trending')}
-            className={filter === 'trending' ? 'bg-purple-600' : 'border-gray-700'}
+            className={filter === 'trending' ? 'bg-purple-600' : 'border-border'}
           >
             <TrendingUp className="w-4 h-4 mr-1" />
             Tendencias
@@ -198,7 +198,7 @@ export default function ReelsPage() {
         {/* Reels Feed */}
         {isLoading ? (
           <div className="max-w-[400px] mx-auto">
-            <div className="bg-gray-800/50 rounded-xl aspect-[9/16] max-h-[600px] animate-pulse" />
+            <div className="bg-muted/50 rounded-xl aspect-[9/16] max-h-[600px] animate-pulse" />
           </div>
         ) : reels.length > 0 ? (
           <ReelsFeed
@@ -210,7 +210,7 @@ export default function ReelsPage() {
             onLoadMore={() => {}}
           />
         ) : (
-          <div className="text-center py-16 text-gray-400">
+          <div className="text-center py-16 text-muted-foreground">
             <Video className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg">No hay reels disponibles</p>
           </div>

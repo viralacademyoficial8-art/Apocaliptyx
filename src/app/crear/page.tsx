@@ -277,7 +277,7 @@ export default function CrearPage() {
                   <button
                     type="button"
                     onClick={() => setShowDuplicateWarning(false)}
-                    className="text-zinc-400 hover:text-white"
+                    className="text-zinc-400 hover:text-foreground"
                   >
                     <X className="w-4 h-4" />
                   </button>

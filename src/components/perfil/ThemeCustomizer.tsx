@@ -73,13 +73,13 @@ export function ThemeCustomizer({ currentTheme, onSave }: ThemeCustomizerProps) 
         <Button
           variant="outline"
           size="sm"
-          className="border-gray-700 text-gray-400 hover:text-white"
+          className="border-border text-muted-foreground hover:text-foreground"
         >
           <Palette className="w-4 h-4 mr-2" />
           Personalizar tema
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+      <DialogContent className="bg-card border-border max-w-md">
         <DialogHeader>
           <DialogTitle>Personalizar tema del perfil</DialogTitle>
         </DialogHeader>
@@ -97,7 +97,7 @@ export function ThemeCustomizer({ currentTheme, onSave }: ThemeCustomizerProps) 
 
           {/* Preset Themes */}
           <div>
-            <label className="text-sm text-gray-400 mb-3 block">
+            <label className="text-sm text-muted-foreground mb-3 block">
               Temas predefinidos
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -131,12 +131,12 @@ export function ThemeCustomizer({ currentTheme, onSave }: ThemeCustomizerProps) 
 
           {/* Custom Colors */}
           <div className="space-y-4">
-            <label className="text-sm text-gray-400 block">
+            <label className="text-sm text-muted-foreground block">
               Colores personalizados
             </label>
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-muted-foreground mb-1 block">
                   Color primario
                 </label>
                 <div className="flex gap-2">
@@ -153,13 +153,13 @@ export function ThemeCustomizer({ currentTheme, onSave }: ThemeCustomizerProps) 
                     onChange={(e) =>
                       setTheme({ ...theme, primary: e.target.value })
                     }
-                    className="bg-gray-800 border-gray-700 text-sm"
+                    className="bg-muted border-border text-sm"
                     placeholder="#6366f1"
                   />
                 </div>
               </div>
               <div className="flex-1">
-                <label className="text-xs text-gray-500 mb-1 block">
+                <label className="text-xs text-muted-foreground mb-1 block">
                   Color secundario
                 </label>
                 <div className="flex gap-2">
@@ -176,7 +176,7 @@ export function ThemeCustomizer({ currentTheme, onSave }: ThemeCustomizerProps) 
                     onChange={(e) =>
                       setTheme({ ...theme, secondary: e.target.value })
                     }
-                    className="bg-gray-800 border-gray-700 text-sm"
+                    className="bg-muted border-border text-sm"
                     placeholder="#8b5cf6"
                   />
                 </div>

@@ -346,7 +346,7 @@ export function StoryViewer({
 
       {/* Story container */}
       <div
-        className="relative w-full max-w-[420px] h-full max-h-[90vh] bg-gray-900 rounded-lg overflow-hidden"
+        className="relative w-full max-w-[420px] h-full max-h-[90vh] bg-card rounded-lg overflow-hidden"
         onClick={handleClick}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
@@ -354,7 +354,7 @@ export function StoryViewer({
         {/* Progress bars */}
         <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
           {userStories.stories.map((_, index) => (
-            <div key={index} className="flex-1 h-1 bg-gray-600/50 rounded-full overflow-hidden">
+            <div key={index} className="flex-1 h-1 bg-muted/50 rounded-full overflow-hidden">
               <div
                 className="h-full bg-white rounded-full transition-all duration-100"
                 style={{
@@ -373,7 +373,7 @@ export function StoryViewer({
         {/* Header */}
         <div className="absolute top-6 left-0 right-0 z-20 flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
               {userStories.avatarUrl ? (
                 <img
                   src={userStories.avatarUrl}
@@ -381,7 +381,7 @@ export function StoryViewer({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-lg font-bold text-gray-400">
+                <div className="w-full h-full flex items-center justify-center text-lg font-bold text-muted-foreground">
                   {(userStories.displayName || userStories.username || '?')[0].toUpperCase()}
                 </div>
               )}
@@ -390,7 +390,7 @@ export function StoryViewer({
               <p className="text-white font-medium text-sm">
                 {userStories.displayName || userStories.username}
               </p>
-              <p className="text-gray-400 text-xs">
+              <p className="text-muted-foreground text-xs">
                 {formatDistanceToNow(new Date(currentStory.createdAt), {
                   addSuffix: true,
                   locale: es,
@@ -420,13 +420,13 @@ export function StoryViewer({
               >
                 <MoreHorizontal className="w-5 h-5" />
                 {showMenu && (
-                  <div className="absolute right-0 top-full mt-1 bg-gray-800 rounded-lg shadow-lg overflow-hidden min-w-[150px]">
+                  <div className="absolute right-0 top-full mt-1 bg-muted rounded-lg shadow-lg overflow-hidden min-w-[150px]">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteStory();
                       }}
-                      className="flex items-center gap-2 w-full px-4 py-3 text-red-400 hover:bg-gray-700 text-left"
+                      className="flex items-center gap-2 w-full px-4 py-3 text-red-400 hover:bg-muted text-left"
                     >
                       <Trash2 className="w-4 h-4" />
                       Eliminar
@@ -484,7 +484,7 @@ export function StoryViewer({
                 </div>
               ) : (
                 <div className="flex-1 flex items-center justify-center">
-                  <Globe className="w-24 h-24 text-gray-600" />
+                  <Globe className="w-24 h-24 text-muted-foreground" />
                 </div>
               )}
 
@@ -504,7 +504,7 @@ export function StoryViewer({
                   </h3>
                 )}
                 {currentStory.linkPreview.description && (
-                  <p className="text-gray-300 text-sm line-clamp-2 mb-3">
+                  <p className="text-foreground text-sm line-clamp-2 mb-3">
                     {currentStory.linkPreview.description}
                   </p>
                 )}
@@ -522,7 +522,7 @@ export function StoryViewer({
                   </p>
                 )}
                 {/* Tap to open indicator */}
-                <div className="flex items-center gap-2 mt-4 text-gray-400 text-sm">
+                <div className="flex items-center gap-2 mt-4 text-muted-foreground text-sm">
                   <ExternalLink className="w-4 h-4" />
                   <span>Toca para abrir el enlace</span>
                 </div>
@@ -568,7 +568,7 @@ export function StoryViewer({
                 e.stopPropagation();
                 setShowViewers(true);
               }}
-              className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-white/80 hover:text-foreground transition-colors"
             >
               <Eye className="w-5 h-5" />
               <span>{currentStory.viewsCount || 0} vistas</span>
@@ -629,7 +629,7 @@ export function StoryViewer({
                   e.stopPropagation();
                   setShowReactions(prev => !prev);
                 }}
-                className="p-2 text-white hover:text-gray-300 transition-colors"
+                className="p-2 text-white hover:text-foreground transition-colors"
               >
                 <Send className="w-7 h-7" />
               </button>
@@ -648,7 +648,7 @@ export function StoryViewer({
 
           {/* Reactions popup */}
           {showReactions && (
-            <div className="absolute bottom-20 left-4 right-4 bg-gray-800/95 backdrop-blur-sm rounded-xl p-4 flex justify-around">
+            <div className="absolute bottom-20 left-4 right-4 bg-muted/95 backdrop-blur-sm rounded-xl p-4 flex justify-around">
               {REACTIONS.map(reaction => (
                 <button
                   key={reaction}
@@ -675,27 +675,27 @@ export function StoryViewer({
             }}
           >
             <div
-              className="w-full bg-gray-900 rounded-t-xl max-h-[60vh] overflow-hidden"
+              className="w-full bg-card rounded-t-xl max-h-[60vh] overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
-              <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <div className="p-4 border-b border-border flex items-center justify-between">
                 <h3 className="text-white font-semibold">
                   Vistas ({viewers.length})
                 </h3>
                 <button
                   onClick={() => setShowViewers(false)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="overflow-y-auto max-h-[50vh]">
                 {viewers.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Aún nadie ha visto este story</p>
+                  <p className="text-muted-foreground text-center py-8">Aún nadie ha visto este story</p>
                 ) : (
                   viewers.map(viewer => (
-                    <div key={viewer.userId} className="flex items-center gap-3 p-4 hover:bg-gray-800/50">
-                      <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-700">
+                    <div key={viewer.userId} className="flex items-center gap-3 p-4 hover:bg-muted/50">
+                      <div className="w-10 h-10 rounded-full overflow-hidden bg-muted">
                         {viewer.avatarUrl ? (
                           <img
                             src={viewer.avatarUrl}
@@ -703,7 +703,7 @@ export function StoryViewer({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-lg font-bold text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-lg font-bold text-muted-foreground">
                             {(viewer.displayName || viewer.username || '?')[0].toUpperCase()}
                           </div>
                         )}
@@ -712,7 +712,7 @@ export function StoryViewer({
                         <p className="text-white font-medium">
                           {viewer.displayName || viewer.username}
                         </p>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-muted-foreground text-sm">
                           {formatDistanceToNow(new Date(viewer.viewedAt), {
                             addSuffix: true,
                             locale: es,

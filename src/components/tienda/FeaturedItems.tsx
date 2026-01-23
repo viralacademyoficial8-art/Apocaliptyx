@@ -22,7 +22,7 @@ export function FeaturedItems() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-white">{t('shop.featuredItems')}</h2>
-            <p className="text-gray-400 text-sm">{t('shop.mostPopular')}</p>
+            <p className="text-muted-foreground text-sm">{t('shop.mostPopular')}</p>
           </div>
         </div>
         <Link

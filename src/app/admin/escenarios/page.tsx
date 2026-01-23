@@ -39,7 +39,7 @@ const STATUS_COLORS: Record<string, string> = {
   DRAFT: 'bg-yellow-500/20 text-yellow-400',
   RESOLVED: 'bg-blue-500/20 text-blue-400',
   CLOSED: 'bg-purple-500/20 text-purple-400',
-  CANCELLED: 'bg-gray-500/20 text-gray-400',
+  CANCELLED: 'bg-gray-500/20 text-muted-foreground',
 };
 
 const STATUS_NAMES: Record<string, string> = {
@@ -313,7 +313,7 @@ export default function AdminEscenariosPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[scenario.status] || 'bg-gray-500/20 text-gray-400'}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[scenario.status] || 'bg-gray-500/20 text-muted-foreground'}`}>
                           {STATUS_NAMES[scenario.status] || scenario.status}
                         </span>
                       </td>
@@ -374,7 +374,7 @@ export default function AdminEscenariosPage() {
                                 Marcar Resuelto
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'CANCELLED')}>
-                                <XCircle className="w-4 h-4 mr-2 text-gray-400" />
+                                <XCircle className="w-4 h-4 mr-2 text-muted-foreground" />
                                 Cancelar
                               </DropdownMenuItem>
                             </PermissionGate>

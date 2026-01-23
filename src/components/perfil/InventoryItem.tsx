@@ -22,7 +22,7 @@ const typeIcons: Record<string, string> = {
 };
 
 const rarityColors: Record<string, { bg: string; border: string }> = {
-  COMMON: { bg: 'bg-gray-800', border: 'border-gray-700' },
+  COMMON: { bg: 'bg-muted', border: 'border-border' },
   RARE: { bg: 'bg-blue-900/30', border: 'border-blue-500/30' },
   EPIC: { bg: 'bg-purple-900/30', border: 'border-purple-500/30' },
   LEGENDARY: { bg: 'bg-yellow-900/30', border: 'border-yellow-500/30' },
@@ -55,7 +55,7 @@ export function InventoryItemCard({ item, onEquip, onUnequip, onUse }: Inventory
 
       {/* Info */}
       <h3 className="text-white font-bold text-center mb-1">{item.name}</h3>
-      <p className="text-gray-400 text-xs text-center mb-3 line-clamp-2">{item.description}</p>
+      <p className="text-muted-foreground text-xs text-center mb-3 line-clamp-2">{item.description}</p>
 
       {/* Expiration */}
       {item.expiresAt && (
@@ -81,7 +81,7 @@ export function InventoryItemCard({ item, onEquip, onUnequip, onUse }: Inventory
             onClick={item.isEquipped ? onUnequip : onEquip}
             className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
               item.isEquipped
-                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                ? 'bg-muted hover:bg-muted text-foreground'
                 : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}
           >

@@ -1622,7 +1622,7 @@ function ForoContent() {
 
             {/* Filters */}
             <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
-              <div className="flex bg-card border border-gray-800 rounded-lg p-1">
+              <div className="flex bg-card border border-border rounded-lg p-1">
                 <button
                   onClick={() => setFilter('recent')}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
@@ -1859,7 +1859,7 @@ function ForoContent() {
                     className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
                       selectedTag === tag.id
                         ? tag.color
-                        : 'border-border text-muted-foreground hover:border-border/80 hover:text-white'
+                        : 'border-border text-muted-foreground hover:border-border/80 hover:text-foreground'
                     }`}
                   >
                     {tag.label}
@@ -2574,7 +2574,7 @@ function ForoContent() {
               )}
 
               {/* Media buttons */}
-              <div className="flex items-center gap-2 mt-3 pb-3 border-b border-gray-800">
+              <div className="flex items-center gap-2 mt-3 pb-3 border-b border-border">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -2843,7 +2843,7 @@ function ForoContent() {
                         <div className="flex items-center gap-2">
                           <Link href={`/perfil/${comment.author?.username}`}>
                             <div
-                              className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                              className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
                               style={comment.author?.avatar_url ? { background: `url(${comment.author.avatar_url}) center/cover` } : undefined}
                             >
                               {!comment.author?.avatar_url && (comment.author?.display_name || comment.author?.username || 'U')[0].toUpperCase()}
@@ -2876,7 +2876,7 @@ function ForoContent() {
 
           {/* Input para nuevo comentario */}
           {isLoggedIn && (
-            <div className="mt-4 pt-4 border-t border-gray-800">
+            <div className="mt-4 pt-4 border-t border-border">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -3122,7 +3122,7 @@ function ForoContent() {
                     <p className="text-xs text-muted-foreground mb-2">{award.description}</p>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-yellow-400">{t('forum.actions.apCost', { cost: award.ap_cost })}</span>
-                      <span className="text-gray-600">→</span>
+                      <span className="text-muted-foreground">→</span>
                       <span className="text-green-400">{t('forum.actions.apReward', { reward: award.ap_reward })}</span>
                     </div>
                   </button>
@@ -3585,7 +3585,7 @@ function PostCard({
       )}
 
       {/* Actions */}
-      <div className="flex items-center justify-between pt-3 border-t border-gray-800">
+      <div className="flex items-center justify-between pt-3 border-t border-border">
         {/* Reactions Button with Popup */}
         <div className="relative">
           <button
@@ -3618,7 +3618,7 @@ function PostCard({
                     }}
                     title={reaction.label}
                     className={`text-xl hover:scale-125 transition-transform p-1 rounded ${
-                      isActive ? 'bg-gray-700' : ''
+                      isActive ? 'bg-muted' : ''
                     }`}
                   >
                     {reaction.emoji}

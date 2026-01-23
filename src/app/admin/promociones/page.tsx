@@ -59,7 +59,7 @@ const TYPE_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   active: 'bg-green-500/20 text-green-400',
-  inactive: 'bg-gray-500/20 text-gray-400',
+  inactive: 'bg-gray-500/20 text-muted-foreground',
   expired: 'bg-red-500/20 text-red-400',
 };
 

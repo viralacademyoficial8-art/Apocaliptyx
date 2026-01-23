@@ -249,7 +249,7 @@ export function AdminSearchBar() {
       ADMIN: 'bg-purple-500/20 text-purple-400',
       MODERATOR: 'bg-blue-500/20 text-blue-400',
       STAFF: 'bg-green-500/20 text-green-400',
-      USER: 'bg-gray-500/20 text-gray-400',
+      USER: 'bg-gray-500/20 text-muted-foreground',
     };
     return colors[role] || colors.USER;
   };
@@ -260,10 +260,10 @@ export function AdminSearchBar() {
       DRAFT: 'bg-yellow-500/20 text-yellow-400',
       RESOLVED: 'bg-blue-500/20 text-blue-400',
       CLOSED: 'bg-purple-500/20 text-purple-400',
-      CANCELLED: 'bg-gray-500/20 text-gray-400',
+      CANCELLED: 'bg-gray-500/20 text-muted-foreground',
       PENDING: 'bg-orange-500/20 text-orange-400',
     };
-    return colors[status] || 'bg-gray-500/20 text-gray-400';
+    return colors[status] || 'bg-gray-500/20 text-muted-foreground';
   };
 
   return (

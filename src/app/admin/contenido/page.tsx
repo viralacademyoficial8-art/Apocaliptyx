@@ -87,7 +87,7 @@ interface LiveStream {
 
 const STATUS_COLORS: Record<string, string> = {
   live: 'bg-red-500/20 text-red-400',
-  offline: 'bg-gray-500/20 text-gray-400',
+  offline: 'bg-gray-500/20 text-muted-foreground',
   ended: 'bg-blue-500/20 text-blue-400',
 };
 
@@ -468,7 +468,7 @@ export default function AdminContenidoPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="font-medium truncate">{stream.title || 'Sin título'}</p>
-                          <span className={`text-xs px-2 py-0.5 rounded ${STATUS_COLORS[stream.status] || 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`text-xs px-2 py-0.5 rounded ${STATUS_COLORS[stream.status] || 'bg-gray-500/20 text-muted-foreground'}`}>
                             {stream.status}
                           </span>
                         </div>

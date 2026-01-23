@@ -72,7 +72,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
   const prophetLevel = PROPHET_LEVELS[user.prophetLevel];
 
   return (
-    <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-border overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5 pointer-events-none">
         <div
@@ -89,7 +89,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
           {/* Avatar */}
           <div className="relative mx-auto md:mx-0">
-            <Avatar className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 border-4 border-gray-700 shadow-2xl">
+            <Avatar className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 border-4 border-border shadow-2xl">
               <AvatarImage src={user.avatarUrl} alt={user.username} />
               <AvatarFallback className="text-2xl sm:text-3xl bg-gradient-to-br from-purple-600 to-pink-600">
                 {user.username.substring(0, 2).toUpperCase()}
@@ -99,7 +99,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
             {/* Prophet Level Badge */}
             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
               <Badge
-                className={`${prophetLevel.color} bg-gray-900 border-2 border-gray-700 px-3 py-1 shadow-lg text-xs sm:text-sm`}
+                className={`${prophetLevel.color} bg-card border-2 border-border px-3 py-1 shadow-lg text-xs sm:text-sm`}
               >
                 <Crown className="w-3 h-3 mr-1" />
                 {prophetLevel.name}
@@ -115,7 +115,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                 <h1 className="text-2xl sm:text-3xl font-bold mb-1 truncate">
                   {user.displayName}
                 </h1>
-                <p className="text-gray-400 text-sm sm:text-base break-all">
+                <p className="text-muted-foreground text-sm sm:text-base break-all">
                   @{user.username}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                     onClick={handleFollow}
                     className={`flex-1 sm:flex-none ${
                       isFollowing
-                        ? 'bg-gray-700 hover:bg-gray-600'
+                        ? 'bg-muted hover:bg-muted'
                         : 'bg-purple-600 hover:bg-purple-700'
                     }`}
                   >
@@ -147,7 +147,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                   <Button
                     onClick={() => (window.location.href = '/configuracion')}
                     variant="outline"
-                    className="flex-1 sm:flex-none border-gray-700"
+                    className="flex-1 sm:flex-none border-border"
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Configuración
@@ -158,7 +158,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                   onClick={handleShare}
                   variant="outline"
                   size="icon"
-                  className="border-gray-700 flex-none"
+                  className="border-border flex-none"
                   aria-label="Compartir perfil"
                 >
                   <Share2 className="w-4 h-4" />
@@ -168,8 +168,8 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
 
             {/* Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-              <div className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700">
-                <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm mb-1">
+              <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-border">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm mb-1">
                   <Trophy className="w-4 h-4" />
                   Reputación
                 </div>
@@ -178,8 +178,8 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700">
-                <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm mb-1">
+              <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-border">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm mb-1">
                   <TrendingUp className="w-4 h-4" />
                   Win Rate
                 </div>
@@ -188,31 +188,31 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700">
-                <div className="text-gray-400 text-xs sm:text-sm mb-1">
+              <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-border">
+                <div className="text-muted-foreground text-xs sm:text-sm mb-1">
                   Escenarios
                 </div>
                 <div className="text-xl sm:text-2xl font-bold">
                   {user.scenariosWon}/{user.scenariosCreated}
                 </div>
-                <div className="text-[11px] sm:text-xs text-gray-500">
+                <div className="text-[11px] sm:text-xs text-muted-foreground">
                   ganados/creados
                 </div>
               </div>
 
-              <div className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700">
-                <div className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm mb-1">
+              <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-border">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs sm:text-sm mb-1">
                   <Users className="w-4 h-4" />
                   Comunidad
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
                   <div>
                     <span className="font-bold">{followersCount}</span>
-                    <span className="text-gray-500 ml-1">seguidores</span>
+                    <span className="text-muted-foreground ml-1">seguidores</span>
                   </div>
                   <div>
                     <span className="font-bold">{user.following}</span>
-                    <span className="text-gray-500 ml-1">siguiendo</span>
+                    <span className="text-muted-foreground ml-1">siguiendo</span>
                   </div>
                 </div>
               </div>

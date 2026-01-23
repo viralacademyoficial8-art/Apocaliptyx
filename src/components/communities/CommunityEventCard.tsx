@@ -25,7 +25,7 @@ interface CommunityEventCardProps {
 }
 
 const eventTypeLabels = {
-  general: { label: 'Evento', color: 'bg-gray-600' },
+  general: { label: 'Evento', color: 'bg-muted' },
   prediction_contest: { label: 'Concurso', color: 'bg-purple-600' },
   ama: { label: 'AMA', color: 'bg-blue-600' },
   live_stream: { label: 'En vivo', color: 'bg-red-600' },
@@ -60,12 +60,12 @@ export function CommunityEventCard({
 
   return (
     <div
-      className={`bg-gray-800/50 rounded-xl border overflow-hidden ${
+      className={`bg-muted/50 rounded-xl border overflow-hidden ${
         event.isCancelled
           ? 'border-red-500/50 opacity-60'
           : isLive
           ? 'border-red-500 animate-pulse-subtle'
-          : 'border-gray-700'
+          : 'border-border'
       }`}
     >
       {/* Image */}
@@ -105,13 +105,13 @@ export function CommunityEventCard({
 
         {/* Description */}
         {event.description && (
-          <p className="text-sm text-gray-400 line-clamp-2 mb-3">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {event.description}
           </p>
         )}
 
         {/* Details */}
-        <div className="space-y-2 text-sm text-gray-400 mb-4">
+        <div className="space-y-2 text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             <span>{formatDate(startDate)}</span>
@@ -151,7 +151,7 @@ export function CommunityEventCard({
                   <Button
                     variant="outline"
                     onClick={() => onCancel(event.id)}
-                    className="border-gray-600 text-gray-400"
+                    className="border-border text-muted-foreground"
                   >
                     Cancelar
                   </Button>

@@ -117,7 +117,7 @@ export function PushNotificationManager({
     return (
       <button
         disabled
-        className={`flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed ${className}`}
+        className={`flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-lg cursor-not-allowed ${className}`}
         title="Tu navegador no soporta notificaciones push"
       >
         <BellOff className="w-4 h-4" />
@@ -150,7 +150,7 @@ export function PushNotificationManager({
     return (
       <button
         disabled
-        className={`flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed ${className}`}
+        className={`flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-lg cursor-not-allowed ${className}`}
         title="Las notificaciones fueron bloqueadas. Habilítalas en la configuración del navegador."
       >
         <BellOff className="w-4 h-4" />

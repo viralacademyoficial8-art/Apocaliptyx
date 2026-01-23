@@ -57,7 +57,7 @@ const TYPE_LABELS: Record<string, { label: string; icon: string }> = {
 };
 
 const RARITY_COLORS: Record<string, string> = {
-  common: 'bg-gray-500/20 text-gray-400',
+  common: 'bg-gray-500/20 text-muted-foreground',
   rare: 'bg-blue-500/20 text-blue-400',
   epic: 'bg-purple-500/20 text-purple-400',
   legendary: 'bg-yellow-500/20 text-yellow-400',
@@ -346,7 +346,7 @@ export default function AdminColeccionablesPage() {
                           <span>{typeConfig.icon} {typeConfig.label}</span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${RARITY_COLORS[collectible.rarity] || 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${RARITY_COLORS[collectible.rarity] || 'bg-gray-500/20 text-muted-foreground'}`}>
                             {collectible.rarity}
                           </span>
                         </td>
@@ -364,7 +364,7 @@ export default function AdminColeccionablesPage() {
                           )}
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${collectible.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${collectible.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>
                             {collectible.is_active ? 'Activo' : 'Inactivo'}
                           </span>
                         </td>

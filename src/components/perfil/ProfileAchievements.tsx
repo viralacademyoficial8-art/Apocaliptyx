@@ -29,7 +29,7 @@ export function ProfileAchievements() {
           <Trophy className="w-6 h-6 text-yellow-400" />
           <div>
             <h2 className="text-xl font-bold text-white">Logros</h2>
-            <p className="text-gray-400 text-sm">
+            <p className="text-muted-foreground text-sm">
               {unlockedCount} de {achievements.length} desbloqueados
             </p>
           </div>
@@ -40,7 +40,7 @@ export function ProfileAchievements() {
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value as any)}
-            className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+            className="px-3 py-2 bg-muted border border-border rounded-lg text-white text-sm"
           >
             <option value="all">Todos</option>
             <option value="unlocked">Desbloqueados</option>
@@ -49,7 +49,7 @@ export function ProfileAchievements() {
           <select
             value={rarityFilter}
             onChange={(e) => setRarityFilter(e.target.value)}
-            className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+            className="px-3 py-2 bg-muted border border-border rounded-lg text-white text-sm"
           >
             <option value="all">Todas las rarezas</option>
             <option value="COMMON">Común</option>
@@ -61,14 +61,14 @@ export function ProfileAchievements() {
       </div>
 
       {/* Progress bar */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
+      <div className="bg-card rounded-xl border border-border p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-400">Progreso total</span>
+          <span className="text-muted-foreground">Progreso total</span>
           <span className="text-white font-medium">
             {Math.round((unlockedCount / achievements.length) * 100)}%
           </span>
         </div>
-        <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-3 bg-muted rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 rounded-full"
             style={{ width: `${(unlockedCount / achievements.length) * 100}%` }}
@@ -85,8 +85,8 @@ export function ProfileAchievements() {
 
       {filteredAchievements.length === 0 && (
         <div className="text-center py-12">
-          <Trophy className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-400">No hay logros que mostrar</p>
+          <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+          <p className="text-muted-foreground">No hay logros que mostrar</p>
         </div>
       )}
     </div>

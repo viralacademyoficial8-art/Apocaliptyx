@@ -106,10 +106,10 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
   if (loading) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-24 bg-gray-800 rounded-xl" />
+        <div className="h-24 bg-muted rounded-xl" />
         <div className="grid grid-cols-2 gap-4">
-          <div className="h-20 bg-gray-800 rounded-xl" />
-          <div className="h-20 bg-gray-800 rounded-xl" />
+          <div className="h-20 bg-muted rounded-xl" />
+          <div className="h-20 bg-muted rounded-xl" />
         </div>
       </div>
     );
@@ -130,7 +130,7 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
               className={cn('w-full rounded-t transition-all duration-500', color)}
               style={{ height: `${(value / max) * 100}%`, minHeight: value > 0 ? '4px' : '0' }}
             />
-            <span className="text-[10px] text-gray-500">{labels[i]}</span>
+            <span className="text-[10px] text-muted-foreground">{labels[i]}</span>
           </div>
         ))}
       </div>
@@ -139,13 +139,13 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
 
   if (compact) {
     return (
-      <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-gray-800">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-4 border border-border">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{data.rank.icon}</span>
             <div>
               <p className="font-bold text-white">Nivel {data.level}</p>
-              <p className="text-sm text-gray-400">{data.rank.nameEs}</p>
+              <p className="text-sm text-muted-foreground">{data.rank.nameEs}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -155,13 +155,13 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
         </div>
 
         {/* XP Bar */}
-        <div className="relative h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div className="relative h-2 bg-muted rounded-full overflow-hidden">
           <div
             className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
             style={{ width: `${xpProgress}%` }}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1 text-right">
+        <p className="text-xs text-muted-foreground mt-1 text-right">
           {data.xp.toLocaleString()} / {data.xpToNextLevel.toLocaleString()} XP
         </p>
       </div>
@@ -190,23 +190,23 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
               <Zap className="w-5 h-5 text-yellow-400" />
               <span className="text-xl font-bold text-yellow-400">{data.apCoins.toLocaleString()}</span>
             </div>
-            <p className="text-xs text-gray-400">AP Coins</p>
+            <p className="text-xs text-muted-foreground">AP Coins</p>
           </div>
         </div>
 
         {/* XP Progress */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Progreso de nivel</span>
+            <span className="text-muted-foreground">Progreso de nivel</span>
             <span className="text-purple-400">{Math.round(xpProgress)}%</span>
           </div>
-          <div className="relative h-3 bg-gray-800 rounded-full overflow-hidden">
+          <div className="relative h-3 bg-muted rounded-full overflow-hidden">
             <div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
               style={{ width: `${xpProgress}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>{data.xp.toLocaleString()} XP</span>
             <span>{data.xpToNextLevel.toLocaleString()} XP</span>
           </div>
@@ -222,12 +222,12 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
             </div>
             <div>
               <p className="text-2xl font-bold text-orange-400">{data.streak.current} días</p>
-              <p className="text-sm text-gray-400">Racha actual</p>
+              <p className="text-sm text-muted-foreground">Racha actual</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-lg font-bold text-gray-300">{data.streak.longest}</p>
-            <p className="text-xs text-gray-500">Mejor racha</p>
+            <p className="text-lg font-bold text-foreground">{data.streak.longest}</p>
+            <p className="text-xs text-muted-foreground">Mejor racha</p>
           </div>
         </div>
       </div>
@@ -268,7 +268,7 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
       {/* Activity Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Weekly Activity */}
-        <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-5 border border-gray-800">
+        <div className="bg-card/50 backdrop-blur-sm rounded-xl p-5 border border-border">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="w-5 h-5 text-green-400" />
             <h3 className="font-medium text-white">Actividad Semanal</h3>
@@ -281,7 +281,7 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
         </div>
 
         {/* Monthly XP */}
-        <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-5 border border-gray-800">
+        <div className="bg-card/50 backdrop-blur-sm rounded-xl p-5 border border-border">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-5 h-5 text-purple-400" />
             <h3 className="font-medium text-white">XP Mensual</h3>
@@ -295,7 +295,7 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
       </div>
 
       {/* More Stats */}
-      <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-5 border border-gray-800">
+      <div className="bg-card/50 backdrop-blur-sm rounded-xl p-5 border border-border">
         <h3 className="font-medium text-white mb-4 flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-blue-400" />
           Estadísticas Detalladas
@@ -328,20 +328,20 @@ function StatCard({
   bgColor: string;
 }) {
   return (
-    <div className={cn('rounded-xl p-4 border border-gray-800', bgColor)}>
+    <div className={cn('rounded-xl p-4 border border-border', bgColor)}>
       <div className={cn('mb-2', color)}>{icon}</div>
       <p className="text-2xl font-bold text-white">{value.toLocaleString()}</p>
-      <p className="text-xs text-gray-400">{label}</p>
-      {subValue && <p className="text-xs text-gray-500 mt-1">{subValue}</p>}
+      <p className="text-xs text-muted-foreground">{label}</p>
+      {subValue && <p className="text-xs text-muted-foreground mt-1">{subValue}</p>}
     </div>
   );
 }
 
 function DetailStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="text-center p-3 bg-gray-800/50 rounded-lg">
+    <div className="text-center p-3 bg-muted/50 rounded-lg">
       <p className="text-xl font-bold text-white">{value.toLocaleString()}</p>
-      <p className="text-xs text-gray-400">{label}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
 }

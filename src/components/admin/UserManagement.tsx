@@ -78,7 +78,7 @@ export function UserManagement() {
       render: (u: AdminUser) => (
         <div className="flex flex-col">
           <span className="text-white font-medium">@{u.username}</span>
-          <span className="text-xs text-gray-400">{u.email}</span>
+          <span className="text-xs text-muted-foreground">{u.email}</span>
         </div>
       ),
     },
@@ -109,7 +109,7 @@ export function UserManagement() {
       <select
         value={userFilters.role}
         onChange={(e) => setUserFilters({ role: e.target.value })}
-        className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+        className="bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
       >
         <option value="all">Todos los roles</option>
         <option value="USER">USER</option>
@@ -121,7 +121,7 @@ export function UserManagement() {
       <select
         value={userFilters.status}
         onChange={(e) => setUserFilters({ status: e.target.value })}
-        className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+        className="bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
       >
         <option value="all">Todos los estados</option>
         <option value="verified">Verificados</option>
@@ -132,7 +132,7 @@ export function UserManagement() {
       <select
         value={userFilters.sortBy}
         onChange={(e) => setUserFilters({ sortBy: e.target.value })}
-        className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+        className="bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
       >
         <option value="createdAt">Más nuevos</option>
         <option value="coins">Más coins</option>
@@ -141,7 +141,7 @@ export function UserManagement() {
 
       <button
         onClick={() => setUserFilters({ search: '', role: 'all', status: 'all', sortBy: 'createdAt' })}
-        className="bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+        className="bg-muted hover:bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
       >
         Reset filtros
       </button>
@@ -154,7 +154,7 @@ export function UserManagement() {
         value={banReason}
         onChange={(e) => setBanReason(e.target.value)}
         placeholder="Razón del ban masivo..."
-        className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200 w-64"
+        className="bg-muted border border-border rounded-lg px-3 py-2 text-gray-200 w-64"
       />
       <button
         onClick={() => bulkBanUsers(selectedUsers, banReason || 'Incumplimiento de reglas')}
@@ -193,7 +193,7 @@ export function UserManagement() {
           <div className="flex items-center justify-end gap-2">
             <button
               onClick={() => setDetailsUser(u)}
-              className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200"
+              className="p-2 rounded-lg bg-muted hover:bg-muted text-gray-200"
               title="Ver"
             >
               <Eye className="w-4 h-4" />
@@ -228,7 +228,7 @@ export function UserManagement() {
             {u.isBanned ? (
               <button
                 onClick={() => unbanUser(u.id)}
-                className="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs"
+                className="px-3 py-2 rounded-lg bg-muted hover:bg-muted text-gray-200 text-xs"
                 title="Desbanear"
               >
                 Unban
@@ -260,7 +260,7 @@ export function UserManagement() {
         title="Banear usuario"
         footer={
           <>
-            <button onClick={() => setBanTarget(null)} className="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200">
+            <button onClick={() => setBanTarget(null)} className="px-3 py-2 rounded-lg bg-muted hover:bg-muted text-gray-200">
               Cancelar
             </button>
             <button
@@ -277,14 +277,14 @@ export function UserManagement() {
         }
       >
         <div className="space-y-3">
-          <p className="text-gray-300">
+          <p className="text-foreground">
             Usuario: <span className="text-white font-semibold">@{banTarget?.username}</span>
           </p>
           <input
             value={banReason}
             onChange={(e) => setBanReason(e.target.value)}
             placeholder="Razón del ban..."
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
           />
         </div>
       </AdminModal>
@@ -295,7 +295,7 @@ export function UserManagement() {
         title="Ajustar AP Coins"
         footer={
           <>
-            <button onClick={() => setCoinsTarget(null)} className="px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200">
+            <button onClick={() => setCoinsTarget(null)} className="px-3 py-2 rounded-lg bg-muted hover:bg-muted text-gray-200">
               Cancelar
             </button>
             <button
@@ -313,7 +313,7 @@ export function UserManagement() {
         }
       >
         <div className="space-y-3">
-          <p className="text-gray-300">
+          <p className="text-foreground">
             Usuario: <span className="text-white font-semibold">@{coinsTarget?.username}</span>
           </p>
           <input
@@ -321,15 +321,15 @@ export function UserManagement() {
             value={coinsAmount}
             onChange={(e) => setCoinsAmount(Number(e.target.value))}
             placeholder="Ej: 500 o -200"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
           />
           <input
             value={coinsReason}
             onChange={(e) => setCoinsReason(e.target.value)}
             placeholder="Motivo (opcional)"
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-200"
+            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-gray-200"
           />
-          <p className="text-xs text-gray-500">Tip: número positivo suma, negativo resta. 😈</p>
+          <p className="text-xs text-muted-foreground">Tip: número positivo suma, negativo resta. 😈</p>
         </div>
       </AdminModal>
     </div>

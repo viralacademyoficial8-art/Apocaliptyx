@@ -97,7 +97,7 @@ export default function StreamDetailPage() {
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <Radio className="w-12 h-12 animate-pulse text-purple-500 mx-auto mb-4" />
-          <p className="text-gray-400">Cargando stream...</p>
+          <p className="text-muted-foreground">Cargando stream...</p>
         </div>
       </div>
     );
@@ -109,7 +109,7 @@ export default function StreamDetailPage() {
         <div className="text-center max-w-md mx-auto px-4">
           <Radio className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2">Stream no encontrado</h2>
-          <p className="text-gray-400 mb-6">{error || 'Este stream no existe o ha sido eliminado'}</p>
+          <p className="text-muted-foreground mb-6">{error || 'Este stream no existe o ha sido eliminado'}</p>
           <Button onClick={() => router.push('/streaming')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver a streams
@@ -122,20 +122,20 @@ export default function StreamDetailPage() {
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800">
+      <div className="bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.push('/streaming')}
-              className="text-gray-400 hover:text-white"
+              className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
               <h1 className="text-xl font-bold">Stream Archivado</h1>
-              <p className="text-sm text-gray-400">Detalles de la transmisión</p>
+              <p className="text-sm text-muted-foreground">Detalles de la transmisión</p>
             </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function StreamDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Thumbnail/Preview */}
-            <div className="relative aspect-video bg-gray-800 rounded-xl overflow-hidden">
+            <div className="relative aspect-video bg-muted rounded-xl overflow-hidden">
               {stream.thumbnailUrl ? (
                 <img
                   src={stream.thumbnailUrl}
@@ -161,7 +161,7 @@ export default function StreamDetailPage() {
 
               {/* Status Badge */}
               <div className="absolute top-4 left-4">
-                <span className="inline-flex items-center gap-1 bg-gray-600 px-3 py-1 rounded-lg text-sm font-medium">
+                <span className="inline-flex items-center gap-1 bg-muted px-3 py-1 rounded-lg text-sm font-medium">
                   <Clock className="w-4 h-4" />
                   TERMINADO
                 </span>
@@ -174,7 +174,7 @@ export default function StreamDetailPage() {
             </div>
 
             {/* Stream Info */}
-            <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+            <div className="bg-muted/50 rounded-xl border border-border p-6">
               <h2 className="text-2xl font-bold mb-2">{stream.title}</h2>
 
               {stream.category && (
@@ -184,35 +184,35 @@ export default function StreamDetailPage() {
               )}
 
               {stream.description && (
-                <p className="text-gray-400 mb-4">{stream.description}</p>
+                <p className="text-muted-foreground mb-4">{stream.description}</p>
               )}
 
               {/* Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
-                <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                <div className="bg-card/50 rounded-lg p-3 text-center">
                   <Eye className="w-5 h-5 mx-auto mb-1 text-blue-400" />
                   <p className="text-lg font-bold">{stream.totalViews.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500">Vistas totales</p>
+                  <p className="text-xs text-muted-foreground">Vistas totales</p>
                 </div>
-                <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                <div className="bg-card/50 rounded-lg p-3 text-center">
                   <Users className="w-5 h-5 mx-auto mb-1 text-green-400" />
                   <p className="text-lg font-bold">{stream.peakViewers.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500">Pico de viewers</p>
+                  <p className="text-xs text-muted-foreground">Pico de viewers</p>
                 </div>
-                <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                <div className="bg-card/50 rounded-lg p-3 text-center">
                   <Heart className="w-5 h-5 mx-auto mb-1 text-red-400" />
                   <p className="text-lg font-bold">{stream.likesCount.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500">Likes</p>
+                  <p className="text-xs text-muted-foreground">Likes</p>
                 </div>
-                <div className="bg-gray-900/50 rounded-lg p-3 text-center">
+                <div className="bg-card/50 rounded-lg p-3 text-center">
                   <Clock className="w-5 h-5 mx-auto mb-1 text-purple-400" />
                   <p className="text-lg font-bold">{formatDuration(stream.startedAt, stream.endedAt)}</p>
-                  <p className="text-xs text-gray-500">Duración</p>
+                  <p className="text-xs text-muted-foreground">Duración</p>
                 </div>
               </div>
 
               {/* Dates */}
-              <div className="flex flex-wrap gap-4 mt-6 text-sm text-gray-400">
+              <div className="flex flex-wrap gap-4 mt-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   <span>Iniciado: {formatDate(stream.startedAt)}</span>
@@ -231,7 +231,7 @@ export default function StreamDetailPage() {
                   {stream.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-gray-700 rounded-full text-xs text-gray-300"
+                      className="px-3 py-1 bg-muted rounded-full text-xs text-foreground"
                     >
                       {tag}
                     </span>
@@ -244,7 +244,7 @@ export default function StreamDetailPage() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Streamer Card */}
-            <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+            <div className="bg-muted/50 rounded-xl border border-border p-6">
               <div className="flex items-center gap-4 mb-4">
                 <Avatar className="w-16 h-16 border-2 border-purple-500">
                   <AvatarImage src={stream.avatarUrl} />
@@ -254,7 +254,7 @@ export default function StreamDetailPage() {
                 </Avatar>
                 <div>
                   <h3 className="font-bold text-lg">{stream.displayName || stream.username}</h3>
-                  <p className="text-gray-400 text-sm">@{stream.username}</p>
+                  <p className="text-muted-foreground text-sm">@{stream.username}</p>
                 </div>
               </div>
 
@@ -267,10 +267,10 @@ export default function StreamDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-4 space-y-3">
+            <div className="bg-muted/50 rounded-xl border border-border p-4 space-y-3">
               <Button
                 variant="outline"
-                className="w-full border-gray-700"
+                className="w-full border-border"
                 onClick={async () => {
                   try {
                     await navigator.clipboard.writeText(window.location.href);
@@ -293,7 +293,7 @@ export default function StreamDetailPage() {
 
               <Button
                 variant="outline"
-                className="w-full border-gray-700"
+                className="w-full border-border"
                 onClick={() => router.push('/streaming')}
               >
                 <Play className="w-4 h-4 mr-2" />
@@ -302,8 +302,8 @@ export default function StreamDetailPage() {
             </div>
 
             {/* Info Card */}
-            <div className="bg-gradient-to-r from-gray-600/10 to-gray-500/10 border border-gray-600/20 rounded-xl p-4">
-              <p className="text-sm text-gray-400">
+            <div className="bg-gradient-to-r from-gray-600/10 to-gray-500/10 border border-border/20 rounded-xl p-4">
+              <p className="text-sm text-muted-foreground">
                 Este stream ha terminado. Los streams archivados muestran las estadísticas finales de la transmisión.
               </p>
             </div>

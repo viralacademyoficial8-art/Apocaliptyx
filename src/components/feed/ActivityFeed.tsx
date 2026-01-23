@@ -65,7 +65,7 @@ const FILTER_OPTIONS: { id: FilterType; label: string; icon: React.ReactNode; co
   { id: 'votes_yes', label: 'Me gusta', icon: <ThumbsUp className="w-3.5 h-3.5" />, color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
   { id: 'votes_no', label: 'No me gusta', icon: <ThumbsDown className="w-3.5 h-3.5" />, color: 'bg-red-500/20 text-red-400 border-red-500/30' },
   { id: 'live_stream', label: 'En vivo', icon: <Radio className="w-3.5 h-3.5" />, color: 'bg-red-500/20 text-red-400 border-red-500/30' },
-  { id: 'scenario_closed', label: 'Cerrados', icon: <Lock className="w-3.5 h-3.5" />, color: 'bg-gray-500/20 text-gray-400 border-gray-500/30' },
+  { id: 'scenario_closed', label: 'Cerrados', icon: <Lock className="w-3.5 h-3.5" />, color: 'bg-gray-500/20 text-muted-foreground border-gray-500/30' },
   { id: 'scenario_resolved', label: 'Cumplidos', icon: <CheckCircle className="w-3.5 h-3.5" />, color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
 ];
 
@@ -108,7 +108,7 @@ const TYPE_STYLES: Record<string, { bg: string; border: string; iconBg: string }
   scenario_closed: {
     bg: 'bg-gray-500/5',
     border: 'border-gray-500/20',
-    iconBg: 'bg-gray-500/20 text-gray-400',
+    iconBg: 'bg-gray-500/20 text-muted-foreground',
   },
   live_stream: {
     bg: 'bg-red-500/5',
@@ -155,7 +155,7 @@ function CompactFeedItem({ item, onClick }: { item: FeedItem; onClick: () => voi
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-2 p-2 rounded-lg ${styles.bg} ${styles.border} border hover:bg-gray-800/50 transition-all text-left`}
+      className={`w-full flex items-center gap-2 p-2 rounded-lg ${styles.bg} ${styles.border} border hover:bg-muted/50 transition-all text-left`}
     >
       {/* User Avatar */}
       <div className="w-7 h-7 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0">
@@ -175,15 +175,15 @@ function CompactFeedItem({ item, onClick }: { item: FeedItem; onClick: () => voi
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-300 truncate">
+        <p className="text-xs text-foreground truncate">
           <span className="font-medium text-white">{item.user.displayName || item.user.username}</span>
           {' '}
-          <span className="text-gray-500">{item.title.toLowerCase()}</span>
+          <span className="text-muted-foreground">{item.title.toLowerCase()}</span>
         </p>
       </div>
 
       {/* Time */}
-      <span className="text-[10px] text-gray-500 flex-shrink-0">
+      <span className="text-[10px] text-muted-foreground flex-shrink-0">
         {formatDistanceToNow(new Date(item.timestamp), { addSuffix: false, locale: es })}
       </span>
 
@@ -242,7 +242,7 @@ function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
   return (
     <div
       onClick={handleCardClick}
-      className={`p-3 rounded-lg border ${styles.bg} ${styles.border} hover:bg-gray-800/50 transition-all cursor-pointer ${
+      className={`p-3 rounded-lg border ${styles.bg} ${styles.border} hover:bg-muted/50 transition-all cursor-pointer ${
         isNew ? 'animate-pulse ring-2 ring-purple-500/50' : ''
       }`}
     >
@@ -271,12 +271,12 @@ function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
               {item.title}
             </span>
           </div>
-          <p className="text-gray-400 text-xs mt-0.5 truncate">{item.description}</p>
+          <p className="text-muted-foreground text-xs mt-0.5 truncate">{item.description}</p>
         </div>
 
         {/* Meta */}
         <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <span className="text-[10px] text-gray-500">
+          <span className="text-[10px] text-muted-foreground">
             {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: es })}
           </span>
           {item.metadata?.amount && item.metadata.amount > 0 && (
@@ -448,9 +448,9 @@ export function ActivityFeed() {
   }
 
   return (
-    <div className="bg-gray-900/50 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="bg-card/50 rounded-xl border border-border overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-gray-800">
+      <div className="flex items-center justify-between p-3 border-b border-border">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-purple-400" />
           <h2 className="text-sm font-semibold text-white">Actividad en Tiempo Real</h2>
@@ -460,23 +460,23 @@ export function ActivityFeed() {
               <Wifi className="w-3 h-3" />
             </span>
           ) : (
-            <WifiOff className="w-3 h-3 text-gray-500" />
+            <WifiOff className="w-3 h-3 text-muted-foreground" />
           )}
         </div>
-        <button type="button" onClick={handleRefresh} disabled={refreshing} className="p-1.5 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50">
-          <RefreshCw className={`w-4 h-4 text-gray-400 ${refreshing ? 'animate-spin' : ''}`} />
+        <button type="button" onClick={handleRefresh} disabled={refreshing} className="p-1.5 rounded-lg hover:bg-muted transition-colors disabled:opacity-50">
+          <RefreshCw className={`w-4 h-4 text-muted-foreground ${refreshing ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {/* Filters - Always visible */}
-      <div className="p-2 border-b border-gray-800 flex flex-wrap gap-1">
+      <div className="p-2 border-b border-border flex flex-wrap gap-1">
         {FILTER_OPTIONS.map(filter => (
           <button
             type="button"
             key={filter.id}
             onClick={() => setActiveFilter(filter.id)}
             className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] border transition-all ${
-              activeFilter === filter.id ? filter.color : 'bg-gray-800/50 text-gray-400 border-gray-700 hover:border-gray-600'
+              activeFilter === filter.id ? filter.color : 'bg-muted/50 text-muted-foreground border-border hover:border-border'
             }`}
           >
             {filter.icon}
@@ -490,7 +490,7 @@ export function ActivityFeed() {
         <button
           type="button"
           onClick={handleLoadNewItems}
-          className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-medium transition-colors flex items-center justify-center gap-2 border-b border-gray-800"
+          className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-xs font-medium transition-colors flex items-center justify-center gap-2 border-b border-border"
         >
           <Bell className="w-3 h-3 animate-bounce" />
           {newItemsCount} {newItemsCount === 1 ? 'nueva actividad' : 'nuevas actividades'}
@@ -514,15 +514,15 @@ export function ActivityFeed() {
             </>
           ) : (
             <div className="text-center py-6">
-              <Users className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-              <p className="text-gray-400 text-xs">No hay actividad para este filtro</p>
+              <Users className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-muted-foreground text-xs">No hay actividad para este filtro</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-border">
         {filteredItems.length > 5 && (
           <button
             type="button"
@@ -546,7 +546,7 @@ export function ActivityFeed() {
           <button
             type="button"
             onClick={handleLoadMore}
-            className="w-full py-2 text-center text-gray-400 hover:text-gray-300 text-xs transition-colors border-t border-gray-800"
+            className="w-full py-2 text-center text-muted-foreground hover:text-foreground text-xs transition-colors border-t border-border"
           >
             Cargar más actividad
           </button>

@@ -75,7 +75,7 @@ export default function AnunciosPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">Anuncios</h1>
-            <p className="text-gray-400">Noticias y actualizaciones de Apocaliptyx</p>
+            <p className="text-muted-foreground">Noticias y actualizaciones de Apocaliptyx</p>
           </div>
         </div>
 
@@ -83,13 +83,13 @@ export default function AnunciosPage() {
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-            <span className="ml-3 text-gray-400">Cargando anuncios...</span>
+            <span className="ml-3 text-muted-foreground">Cargando anuncios...</span>
           </div>
         ) : announcements.length === 0 ? (
           <div className="text-center py-20">
             <Bell className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-400 mb-2">No hay anuncios</h2>
-            <p className="text-gray-500">
+            <h2 className="text-xl font-semibold text-muted-foreground mb-2">No hay anuncios</h2>
+            <p className="text-muted-foreground">
               Cuando haya novedades, las verás aquí
             </p>
           </div>
@@ -117,8 +117,8 @@ export default function AnunciosPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-300 mb-3">{announcement.content}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-foreground mb-3">{announcement.content}</p>
+                      <p className="text-sm text-muted-foreground">
                         {formatDistanceToNow(new Date(announcement.created_at), { 
                           addSuffix: true, 
                           locale: es 

@@ -29,12 +29,12 @@ export function AuditLogs() {
   }, [auditLogs]);
 
   const columns = [
-    { key: 'createdAt', header: 'Fecha', render: (l: AuditLog) => <span className="text-gray-400 text-sm">{new Date(l.createdAt).toLocaleString()}</span> },
+    { key: 'createdAt', header: 'Fecha', render: (l: AuditLog) => <span className="text-muted-foreground text-sm">{new Date(l.createdAt).toLocaleString()}</span> },
     { key: 'category', header: 'Categoría' },
     { key: 'action', header: 'Acción', render: (l: AuditLog) => <span className="text-white font-medium">{l.action}</span> },
-    { key: 'description', header: 'Descripción', render: (l: AuditLog) => <span className="text-gray-300">{l.description}</span> },
-    { key: 'admin', header: 'Admin', render: (l: AuditLog) => <span className="text-gray-300">{l.admin.username}</span> },
-    { key: 'ipAddress', header: 'IP', render: (l: AuditLog) => <span className="text-gray-500">{l.ipAddress ?? '—'}</span> },
+    { key: 'description', header: 'Descripción', render: (l: AuditLog) => <span className="text-foreground">{l.description}</span> },
+    { key: 'admin', header: 'Admin', render: (l: AuditLog) => <span className="text-foreground">{l.admin.username}</span> },
+    { key: 'ipAddress', header: 'IP', render: (l: AuditLog) => <span className="text-muted-foreground">{l.ipAddress ?? '—'}</span> },
   ] as const;
 
   const Filters = (
@@ -42,7 +42,7 @@ export function AuditLogs() {
       <select
         value={category}
         onChange={(e) => setCategory(e.target.value as any)}
-        className="px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+        className="px-3 py-2 bg-muted border border-border rounded-lg text-white"
       >
         <option value="all">Todas</option>
         <option value="USER">USER</option>

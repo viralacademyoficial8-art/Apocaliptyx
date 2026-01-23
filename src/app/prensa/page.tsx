@@ -35,7 +35,7 @@ export default function PrensaPage() {
             <Newspaper className="w-8 h-8 text-blue-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Sala de Prensa</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Recursos, noticias y materiales para medios de comunicación
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function PrensaPage() {
         <section className="mb-12">
           <div className="p-8 bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-xl">
             <h2 className="text-2xl font-bold mb-4">Kit de Prensa</h2>
-            <p className="text-gray-300 mb-6">
+            <p className="text-foreground mb-6">
               Descarga nuestro kit de prensa con logos, capturas de pantalla, información de la empresa 
               y todo lo que necesitas para escribir sobre Apocaliptyx.
             </p>
@@ -53,7 +53,7 @@ export default function PrensaPage() {
                 <Download className="w-5 h-5" />
                 Descargar Kit Completo (ZIP)
               </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors">
+              <button className="flex items-center gap-2 px-6 py-3 bg-muted hover:bg-muted rounded-lg font-medium transition-colors">
                 <Download className="w-5 h-5" />
                 Solo Logos (PNG/SVG)
               </button>
@@ -65,21 +65,21 @@ export default function PrensaPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Datos Clave</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl text-center">
+            <div className="p-4 bg-card/50 border border-border rounded-xl text-center">
               <div className="text-2xl font-bold text-purple-400">2024</div>
-              <div className="text-sm text-gray-500">Fundación</div>
+              <div className="text-sm text-muted-foreground">Fundación</div>
             </div>
-            <div className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl text-center">
+            <div className="p-4 bg-card/50 border border-border rounded-xl text-center">
               <div className="text-2xl font-bold text-purple-400">12K+</div>
-              <div className="text-sm text-gray-500">Usuarios</div>
+              <div className="text-sm text-muted-foreground">Usuarios</div>
             </div>
-            <div className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl text-center">
+            <div className="p-4 bg-card/50 border border-border rounded-xl text-center">
               <div className="text-2xl font-bold text-purple-400">50+</div>
-              <div className="text-sm text-gray-500">Países</div>
+              <div className="text-sm text-muted-foreground">Países</div>
             </div>
-            <div className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl text-center">
+            <div className="p-4 bg-card/50 border border-border rounded-xl text-center">
               <div className="text-2xl font-bold text-purple-400">100%</div>
-              <div className="text-sm text-gray-500">Remoto</div>
+              <div className="text-sm text-muted-foreground">Remoto</div>
             </div>
           </div>
         </section>
@@ -89,10 +89,10 @@ export default function PrensaPage() {
           <h2 className="text-2xl font-bold mb-6">Comunicados de Prensa</h2>
           <div className="space-y-4">
             {pressReleases.map((release, index) => (
-              <div key={index} className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-gray-700 transition-colors">
+              <div key={index} className="p-6 bg-card/50 border border-border rounded-xl hover:border-border transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-muted-foreground">
                       {new Date(release.date).toLocaleDateString('es-MX', { 
                         year: 'numeric', 
                         month: 'long', 
@@ -100,9 +100,9 @@ export default function PrensaPage() {
                       })}
                     </span>
                     <h3 className="text-lg font-bold text-white mt-1 mb-2">{release.title}</h3>
-                    <p className="text-gray-400">{release.excerpt}</p>
+                    <p className="text-muted-foreground">{release.excerpt}</p>
                   </div>
-                  <button className="p-2 text-gray-400 hover:text-white transition-colors flex-shrink-0">
+                  <button className="p-2 text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
                     <ExternalLink className="w-5 h-5" />
                   </button>
                 </div>
@@ -114,9 +114,9 @@ export default function PrensaPage() {
         {/* En los medios */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Apocaliptyx en los Medios</h2>
-          <div className="p-8 bg-gray-900/50 border border-gray-800 rounded-xl text-center">
-            <Newspaper className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400">
+          <div className="p-8 bg-card/50 border border-border rounded-xl text-center">
+            <Newspaper className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">
               Próximamente aparecerán aquí las menciones en medios de comunicación.
             </p>
           </div>
@@ -124,17 +124,17 @@ export default function PrensaPage() {
 
         {/* Contacto de prensa */}
         <section>
-          <div className="p-8 bg-gray-900/50 border border-gray-800 rounded-xl">
+          <div className="p-8 bg-card/50 border border-border rounded-xl">
             <div className="flex items-center gap-4 mb-4">
               <div className="p-3 bg-purple-500/20 rounded-lg">
                 <Mail className="w-6 h-6 text-purple-400" />
               </div>
               <div>
                 <h2 className="text-xl font-bold">Contacto de Prensa</h2>
-                <p className="text-gray-400">Para consultas de medios</p>
+                <p className="text-muted-foreground">Para consultas de medios</p>
               </div>
             </div>
-            <p className="text-gray-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Si eres periodista, blogger o representante de medios y deseas más información 
               sobre Apocaliptyx, estaremos encantados de ayudarte.
             </p>
@@ -147,7 +147,7 @@ export default function PrensaPage() {
                 prensa@apocaliptyx.com
               </a>
             </div>
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-muted-foreground mt-4">
               Tiempo de respuesta habitual: 24-48 horas
             </p>
           </div>

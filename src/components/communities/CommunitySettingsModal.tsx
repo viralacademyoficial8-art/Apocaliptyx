@@ -464,7 +464,7 @@ export function CommunitySettingsModal({
       case 'moderator':
         return <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full"><Shield className="w-3 h-3" /> Mod</span>;
       default:
-        return <span className="px-2 py-0.5 bg-gray-500/20 text-gray-400 text-xs rounded-full">Miembro</span>;
+        return <span className="px-2 py-0.5 bg-gray-500/20 text-muted-foreground text-xs rounded-full">Miembro</span>;
     }
   };
 
@@ -489,7 +489,7 @@ export function CommunitySettingsModal({
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                 activeSection === 'general'
                   ? 'bg-purple-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-800'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               General
@@ -499,7 +499,7 @@ export function CommunitySettingsModal({
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                 activeSection === 'privacy'
                   ? 'bg-purple-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-800'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               Privacidad
@@ -509,7 +509,7 @@ export function CommunitySettingsModal({
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                 activeSection === 'rules'
                   ? 'bg-purple-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-800'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               Reglas
@@ -520,7 +520,7 @@ export function CommunitySettingsModal({
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${
                   activeSection === 'requests'
                     ? 'bg-purple-600 text-white'
-                    : 'text-gray-400 hover:bg-gray-800'
+                    : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -539,7 +539,7 @@ export function CommunitySettingsModal({
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 ${
                 activeSection === 'members'
                   ? 'bg-purple-600 text-white'
-                  : 'text-gray-400 hover:bg-gray-800'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -650,7 +650,7 @@ export function CommunitySettingsModal({
                     className="hidden"
                     disabled={saving || uploadingIcon}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Banner: max 10MB | Logo: max 5MB (click en el icono para cambiar)
                   </p>
                 </div>
@@ -661,7 +661,7 @@ export function CommunitySettingsModal({
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="mt-1 bg-gray-800 border-gray-700"
+                    className="mt-1 bg-muted border-border"
                     maxLength={50}
                   />
                 </div>
@@ -672,10 +672,10 @@ export function CommunitySettingsModal({
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="mt-1 bg-gray-800 border-gray-700 min-h-[100px]"
+                    className="mt-1 bg-muted border-border min-h-[100px]"
                     maxLength={500}
                   />
-                  <p className="text-xs text-gray-500 mt-1">{description.length}/500</p>
+                  <p className="text-xs text-muted-foreground mt-1">{description.length}/500</p>
                 </div>
 
                 <div>
@@ -691,7 +691,7 @@ export function CommunitySettingsModal({
                     <Input
                       value={themeColor}
                       onChange={(e) => setThemeColor(e.target.value)}
-                      className="bg-gray-800 border-gray-700 w-28"
+                      className="bg-muted border-border w-28"
                       maxLength={7}
                     />
                     <div
@@ -705,7 +705,7 @@ export function CommunitySettingsModal({
 
             {activeSection === 'privacy' && (
               <div className="space-y-4">
-                <div className="p-4 bg-gray-800/50 rounded-xl">
+                <div className="p-4 bg-muted/50 rounded-xl">
                   <div className="flex items-start gap-3">
                     <div className={`p-2 rounded-lg ${isPublic ? 'bg-green-500/20' : 'bg-yellow-500/20'}`}>
                       {isPublic ? (
@@ -716,7 +716,7 @@ export function CommunitySettingsModal({
                     </div>
                     <div className="flex-1">
                       <h4 className="font-medium">Visibilidad</h4>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {isPublic
                           ? 'Cualquiera puede ver y unirse a esta comunidad'
                           : 'Solo los miembros pueden ver el contenido'}
@@ -726,7 +726,7 @@ export function CommunitySettingsModal({
                           size="sm"
                           variant={isPublic ? 'default' : 'outline'}
                           onClick={() => setIsPublic(true)}
-                          className={isPublic ? 'bg-green-600' : 'border-gray-700'}
+                          className={isPublic ? 'bg-green-600' : 'border-border'}
                         >
                           <Globe className="w-4 h-4 mr-1" />
                           Publica
@@ -735,7 +735,7 @@ export function CommunitySettingsModal({
                           size="sm"
                           variant={!isPublic ? 'default' : 'outline'}
                           onClick={() => setIsPublic(false)}
-                          className={!isPublic ? 'bg-yellow-600' : 'border-gray-700'}
+                          className={!isPublic ? 'bg-yellow-600' : 'border-border'}
                         >
                           <Lock className="w-4 h-4 mr-1" />
                           Privada
@@ -745,18 +745,18 @@ export function CommunitySettingsModal({
                   </div>
                 </div>
 
-                <div className="p-4 bg-gray-800/50 rounded-xl">
+                <div className="p-4 bg-muted/50 rounded-xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium">Requiere aprobacion</h4>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         Los nuevos miembros necesitan aprobacion para unirse
                       </p>
                     </div>
                     <button
                       onClick={() => setRequiresApproval(!requiresApproval)}
                       className={`relative w-12 h-6 rounded-full transition-colors ${
-                        requiresApproval ? 'bg-purple-600' : 'bg-gray-700'
+                        requiresApproval ? 'bg-purple-600' : 'bg-muted'
                       }`}
                     >
                       <span
@@ -772,7 +772,7 @@ export function CommunitySettingsModal({
 
             {activeSection === 'rules' && (
               <div className="space-y-4">
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   Define las reglas de tu comunidad. Maximo 10 reglas.
                 </p>
 
@@ -781,13 +781,13 @@ export function CommunitySettingsModal({
                     {rules.map((rule, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-2 p-3 bg-gray-800/50 rounded-lg"
+                        className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg"
                       >
                         <span className="text-purple-400 font-medium shrink-0">{index + 1}.</span>
                         <span className="flex-1 text-sm">{rule}</span>
                         <button
                           onClick={() => removeRule(index)}
-                          className="text-gray-500 hover:text-red-400 transition-colors"
+                          className="text-muted-foreground hover:text-red-400 transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -802,7 +802,7 @@ export function CommunitySettingsModal({
                       value={newRule}
                       onChange={(e) => setNewRule(e.target.value)}
                       placeholder="Escribe una nueva regla..."
-                      className="bg-gray-800 border-gray-700"
+                      className="bg-muted border-border"
                       maxLength={200}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
@@ -818,7 +818,7 @@ export function CommunitySettingsModal({
                 )}
 
                 {rules.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <p>No hay reglas definidas</p>
                     <p className="text-sm">Anade reglas para mantener el orden en tu comunidad</p>
                   </div>
@@ -851,7 +851,7 @@ export function CommunitySettingsModal({
                       const avatarUrl = request.user?.avatarUrl || request.users?.avatar_url;
 
                       return (
-                        <div key={request.id} className="p-4 bg-gray-800/50 rounded-xl">
+                        <div key={request.id} className="p-4 bg-muted/50 rounded-xl">
                           <div className="flex items-center gap-3">
                             <div
                               className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
@@ -865,16 +865,16 @@ export function CommunitySettingsModal({
                             </div>
                             <div className="flex-1">
                               <p className="font-medium">{displayName}</p>
-                              <p className="text-sm text-gray-400">@{username}</p>
+                              <p className="text-sm text-muted-foreground">@{username}</p>
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <Clock className="w-3 h-3" />
                               {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true, locale: es })}
                             </div>
                           </div>
 
                           {request.message && (
-                            <p className="mt-2 text-sm text-gray-400 italic">"{request.message}"</p>
+                            <p className="mt-2 text-sm text-muted-foreground italic">"{request.message}"</p>
                           )}
 
                           <div className="flex gap-2 mt-3">
@@ -909,7 +909,7 @@ export function CommunitySettingsModal({
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
+                  <div className="text-center py-12 text-muted-foreground">
                     <UserPlus className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No hay solicitudes pendientes</p>
                   </div>
@@ -921,12 +921,12 @@ export function CommunitySettingsModal({
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       value={memberSearch}
                       onChange={(e) => setMemberSearch(e.target.value)}
                       placeholder="Buscar miembros..."
-                      className="pl-9 bg-gray-800 border-gray-700"
+                      className="pl-9 bg-muted border-border"
                     />
                   </div>
                   <Button size="sm" variant="outline" onClick={loadMembers} disabled={loadingMembers}>
@@ -941,7 +941,7 @@ export function CommunitySettingsModal({
                 ) : filteredMembers.length > 0 ? (
                   <div className="space-y-2">
                     {filteredMembers.map((member) => (
-                      <div key={member.id} className="p-3 bg-gray-800/50 rounded-xl flex items-center gap-3">
+                      <div key={member.id} className="p-3 bg-muted/50 rounded-xl flex items-center gap-3">
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
                           style={{
@@ -957,7 +957,7 @@ export function CommunitySettingsModal({
                             <p className="font-medium truncate">{member.displayName || member.username}</p>
                             {getRoleBadge(member.role)}
                           </div>
-                          <p className="text-xs text-gray-500">@{member.username}</p>
+                          <p className="text-xs text-muted-foreground">@{member.username}</p>
                         </div>
 
                         {/* Actions - only show for non-owners and if current user has permission */}
@@ -979,7 +979,7 @@ export function CommunitySettingsModal({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-8 px-2 text-gray-400 hover:text-gray-300 hover:bg-gray-500/20"
+                                className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-gray-500/20"
                                 onClick={() => handleRoleChange(member.userId, 'member')}
                                 disabled={processingMember === member.userId}
                                 title="Quitar admin"
@@ -1017,7 +1017,7 @@ export function CommunitySettingsModal({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
+                  <div className="text-center py-12 text-muted-foreground">
                     <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>{memberSearch ? 'No se encontraron miembros' : 'No hay miembros'}</p>
                   </div>
@@ -1032,7 +1032,7 @@ export function CommunitySettingsModal({
                     <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-medium text-red-400">Eliminar comunidad</h4>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         Esta accion es irreversible. Se eliminaran todos los posts, miembros y datos de la comunidad.
                       </p>
 
@@ -1047,19 +1047,19 @@ export function CommunitySettingsModal({
                         </Button>
                       ) : (
                         <div className="mt-4 space-y-3">
-                          <p className="text-sm text-gray-300">
+                          <p className="text-sm text-foreground">
                             Escribe <strong className="text-red-400">{community.name}</strong> para confirmar:
                           </p>
                           <Input
                             value={deleteConfirmText}
                             onChange={(e) => setDeleteConfirmText(e.target.value)}
                             placeholder={community.name}
-                            className="bg-gray-800 border-red-500/50"
+                            className="bg-muted border-red-500/50"
                           />
                           <div className="flex gap-2">
                             <Button
                               variant="outline"
-                              className="border-gray-700"
+                              className="border-border"
                               onClick={() => {
                                 setShowDeleteConfirm(false);
                                 setDeleteConfirmText('');
@@ -1090,8 +1090,8 @@ export function CommunitySettingsModal({
           </div>
         </div>
 
-        <DialogFooter className="mt-4 pt-4 border-t border-gray-800">
-          <Button variant="outline" onClick={onClose} className="border-gray-700">
+        <DialogFooter className="mt-4 pt-4 border-t border-border">
+          <Button variant="outline" onClick={onClose} className="border-border">
             Cancelar
           </Button>
           <Button onClick={handleSave} disabled={saving} className="bg-purple-600 hover:bg-purple-700">

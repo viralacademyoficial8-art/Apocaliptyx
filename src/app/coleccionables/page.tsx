@@ -140,14 +140,14 @@ export default function ColeccionablesPage() {
             <Sparkles className="w-8 h-8 text-purple-400" />
             Coleccionables
           </h1>
-          <p className="text-gray-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Personaliza tu perfil con marcos, efectos y fondos únicos
           </p>
         </div>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-gray-800 border-gray-700 mb-6">
+          <TabsList className="bg-muted border-border mb-6">
             <TabsTrigger value="store" className="data-[state=active]:bg-purple-600">
               <ShoppingBag className="w-4 h-4 mr-2" />
               Tienda
@@ -163,12 +163,12 @@ export default function ColeccionablesPage() {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Buscar coleccionables..."
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-muted border-border"
                 />
               </div>
               <div className="flex gap-2 flex-wrap">
@@ -178,7 +178,7 @@ export default function ColeccionablesPage() {
                     variant={selectedType === type ? 'default' : 'outline'}
                     onClick={() => setSelectedType(type)}
                     size="sm"
-                    className={selectedType === type ? 'bg-purple-600' : 'border-gray-700'}
+                    className={selectedType === type ? 'bg-purple-600' : 'border-border'}
                   >
                     {type === 'all'
                       ? 'Todos'
@@ -196,7 +196,7 @@ export default function ColeccionablesPage() {
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {[...Array(10)].map((_, i) => (
-                  <div key={i} className="bg-gray-800/50 rounded-xl h-64 animate-pulse" />
+                  <div key={i} className="bg-muted/50 rounded-xl h-64 animate-pulse" />
                 ))}
               </div>
             ) : filteredStoreItems.length > 0 ? (
@@ -210,7 +210,7 @@ export default function ColeccionablesPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16 text-gray-400">
+              <div className="text-center py-16 text-muted-foreground">
                 <Package className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <p className="text-lg">No hay coleccionables disponibles</p>
               </div>
@@ -222,7 +222,7 @@ export default function ColeccionablesPage() {
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="bg-gray-800/50 rounded-xl h-64 animate-pulse" />
+                  <div key={i} className="bg-muted/50 rounded-xl h-64 animate-pulse" />
                 ))}
               </div>
             ) : (

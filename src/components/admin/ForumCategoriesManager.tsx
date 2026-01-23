@@ -283,7 +283,7 @@ export function ForumCategoriesManager({
               <div className="flex items-center gap-2">
                 <span className="font-medium">{category.name}</span>
                 {!category.isActive && (
-                  <span className="px-2 py-0.5 bg-gray-500/20 text-gray-400 rounded-full text-xs">
+                  <span className="px-2 py-0.5 bg-gray-500/20 text-muted-foreground rounded-full text-xs">
                     Inactiva
                   </span>
                 )}

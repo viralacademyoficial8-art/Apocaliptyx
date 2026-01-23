@@ -108,7 +108,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
           </Avatar>
 
           <div className="flex-1">
-            <div className="bg-gray-800/50 rounded-lg p-3">
+            <div className="bg-muted/50 rounded-lg p-3">
               <div className="flex items-center gap-2 mb-1">
                 <span
                   className="font-semibold text-sm hover:text-purple-400 cursor-pointer"
@@ -118,21 +118,21 @@ export function CommentSection({ postId }: CommentSectionProps) {
                 </span>
                 <Badge
                   variant="outline"
-                  className={`${prophetLevel.color} border-gray-700 text-xs py-0`}
+                  className={`${prophetLevel.color} border-border text-xs py-0`}
                 >
                   <Crown className="w-2 h-2 mr-1" />
                   {prophetLevel.name}
                 </Badge>
-                <span className="text-xs text-gray-500">{timeAgo}</span>
+                <span className="text-xs text-muted-foreground">{timeAgo}</span>
               </div>
-              <p className="text-sm text-gray-300">{comment.content}</p>
+              <p className="text-sm text-foreground">{comment.content}</p>
             </div>
 
             <div className="flex items-center gap-4 mt-1 ml-2">
               <button
                 onClick={() => toggleLikeComment(comment.id)}
                 className={`flex items-center gap-1 text-xs ${
-                  hasLiked ? "text-red-400" : "text-gray-500"
+                  hasLiked ? "text-red-400" : "text-muted-foreground"
                 } hover:text-red-400`}
               >
                 <Heart
@@ -146,7 +146,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   onClick={() =>
                     setReplyingTo(replyingTo === comment.id ? null : comment.id)
                   }
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-400"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-400"
                 >
                   <Reply className="w-3 h-3" />
                   <span>Responder</span>
@@ -156,7 +156,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
               {isAuthor && (
                 <button
                   onClick={() => handleDelete(comment.id)}
-                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-400"
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-red-400"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>Eliminar</span>
@@ -170,7 +170,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder={`Responder a @${comment.authorUsername}...`}
-                  className="bg-gray-800 border-gray-700 focus:border-purple-500 text-sm min-h-[60px]"
+                  className="bg-muted border-border focus:border-purple-500 text-sm min-h-[60px]"
                 />
                 <Button
                   onClick={() => handleSubmit(comment.id)}
@@ -215,7 +215,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
               value={replyingTo ? "" : newComment}
               onChange={(e) => !replyingTo && setNewComment(e.target.value)}
               placeholder="Escribe un comentario..."
-              className="bg-gray-800 border-gray-700 focus:border-purple-500 text-sm min-h-[60px]"
+              className="bg-muted border-border focus:border-purple-500 text-sm min-h-[60px]"
               disabled={!!replyingTo}
             />
             <Button
@@ -235,7 +235,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
       <div className="space-y-4">
         {mainComments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-muted-foreground">
             <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p>No hay comentarios aún. ¡Sé el primero!</p>
           </div>

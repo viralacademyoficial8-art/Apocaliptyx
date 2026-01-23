@@ -41,7 +41,7 @@ export function NotificationItem({ notification }: NotificationItemProps) {
       case 'stream_started':
         return <Radio className="w-5 h-5 text-red-500" />;
       default:
-        return <Bell className="w-5 h-5 text-gray-400" />;
+        return <Bell className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
@@ -109,7 +109,7 @@ export function NotificationItem({ notification }: NotificationItemProps) {
       className={`
         relative w-full text-left border-l-4 ${getNotificationColor(notification.type)}
         ${notification.isRead ? 'opacity-60' : ''}
-        hover:bg-gray-800/50 transition-all cursor-pointer
+        hover:bg-muted/50 transition-all cursor-pointer
         p-4 group
       `}
     >
@@ -126,10 +126,10 @@ export function NotificationItem({ notification }: NotificationItemProps) {
               <p className="font-semibold text-sm mb-1">
                 {notification.title}
               </p>
-              <p className="text-sm text-gray-400 line-clamp-2">
+              <p className="text-sm text-muted-foreground line-clamp-2">
                 {notification.message}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {timeAgo}
               </p>
             </div>
@@ -142,10 +142,10 @@ export function NotificationItem({ notification }: NotificationItemProps) {
                   e.stopPropagation();
                   handleOpen();
                 }}
-                className="p-1 hover:bg-gray-700 rounded transition-colors opacity-0 group-hover:opacity-100"
+                className="p-1 hover:bg-muted rounded transition-colors opacity-0 group-hover:opacity-100"
                 title="Ver detalles"
               >
-                <ExternalLink className="w-4 h-4 text-gray-400" />
+                <ExternalLink className="w-4 h-4 text-muted-foreground" />
               </button>
             )}
           </div>

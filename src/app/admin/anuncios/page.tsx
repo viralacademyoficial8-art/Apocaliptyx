@@ -372,7 +372,7 @@ export default function AdminAnunciosPage() {
                           {TARGET_LABELS[announcement.target] || announcement.target}
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${announcement.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${announcement.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>
                             {announcement.is_active ? 'Activo' : 'Inactivo'}
                           </span>
                         </td>

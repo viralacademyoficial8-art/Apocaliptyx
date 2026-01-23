@@ -108,9 +108,9 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
             {/* Glow effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 rounded-2xl blur-lg opacity-50" />
 
-            <div className="relative bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+            <div className="relative bg-card border border-border rounded-2xl overflow-hidden">
               {/* Header */}
-              <div className="relative bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-cyan-600/20 px-6 py-4 border-b border-gray-800">
+              <div className="relative bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-cyan-600/20 px-6 py-4 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
@@ -118,12 +118,12 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
                     </div>
                     <div>
                       <h2 className="text-lg font-bold">Configuración</h2>
-                      <p className="text-sm text-gray-400">Ajusta tu audio y video</p>
+                      <p className="text-sm text-muted-foreground">Ajusta tu audio y video</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowSettings(false)}
-                    className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
+                    className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted rounded-lg"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -134,14 +134,14 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
               <div className="p-6 space-y-6">
                 {/* Camera Selection */}
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-3">
                     <Camera className="w-4 h-4 text-purple-400" />
                     Cámara
                   </label>
                   <select
                     value={activeVideoDevice || ''}
                     onChange={(e) => setActiveVideoDevice(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   >
                     {videoDevices.map((device) => (
                       <option key={device.deviceId} value={device.deviceId}>
@@ -150,20 +150,20 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
                     ))}
                   </select>
                   {videoDevices.length === 0 && (
-                    <p className="text-xs text-gray-500 mt-2">No se encontraron cámaras</p>
+                    <p className="text-xs text-muted-foreground mt-2">No se encontraron cámaras</p>
                   )}
                 </div>
 
                 {/* Microphone Selection */}
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-3">
+                  <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-3">
                     <Mic className="w-4 h-4 text-blue-400" />
                     Micrófono
                   </label>
                   <select
                     value={activeAudioDevice || ''}
                     onChange={(e) => setActiveAudioDevice(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   >
                     {audioDevices.map((device) => (
                       <option key={device.deviceId} value={device.deviceId}>
@@ -172,13 +172,13 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
                     ))}
                   </select>
                   {audioDevices.length === 0 && (
-                    <p className="text-xs text-gray-500 mt-2">No se encontraron micrófonos</p>
+                    <p className="text-xs text-muted-foreground mt-2">No se encontraron micrófonos</p>
                   )}
                 </div>
 
                 {/* Info */}
                 <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     Los cambios se aplican en tiempo real. Si no ves tus dispositivos,
                     asegúrate de haber dado permisos al navegador.
                   </p>
@@ -186,7 +186,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-800 flex justify-end">
+              <div className="px-6 py-4 bg-card/50 border-t border-border flex justify-end">
                 <button
                   onClick={() => setShowSettings(false)}
                   className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 rounded-xl font-semibold transition-all"
@@ -199,7 +199,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
         </div>
       )}
 
-    <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
+    <div className="bg-card rounded-xl p-4 border border-border">
       <div className="flex items-center justify-between flex-wrap gap-4">
         {/* Media Controls */}
         <div className="flex items-center gap-2">
@@ -207,7 +207,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
             variant="outline"
             size="icon"
             onClick={toggleCamera}
-            className={`border-gray-700 ${
+            className={`border-border ${
               isCameraEnabled
                 ? 'bg-purple-600/20 border-purple-500 text-purple-400'
                 : 'bg-red-600/20 border-red-500 text-red-400'
@@ -225,7 +225,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
             variant="outline"
             size="icon"
             onClick={toggleMic}
-            className={`border-gray-700 ${
+            className={`border-border ${
               isMicEnabled
                 ? 'bg-purple-600/20 border-purple-500 text-purple-400'
                 : 'bg-red-600/20 border-red-500 text-red-400'
@@ -239,12 +239,12 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
             )}
           </Button>
 
-          <div className="w-px h-8 bg-gray-700 mx-2" />
+          <div className="w-px h-8 bg-muted mx-2" />
 
           <Button
             variant="outline"
             size="icon"
-            className="border-gray-700"
+            className="border-border"
             title="Configuración"
             onClick={() => setShowSettings(true)}
           >
@@ -269,7 +269,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
               size="sm"
               variant="outline"
               onClick={() => setShowEndConfirm(false)}
-              className="border-gray-600"
+              className="border-border"
             >
               Cancelar
             </Button>
@@ -286,7 +286,7 @@ export function StreamControls({ streamId, onEndStream }: StreamControlsProps) {
       </div>
 
       {/* Status indicators */}
-      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-800 text-sm text-gray-400">
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
           <span className={`w-2 h-2 rounded-full ${isCameraEnabled ? 'bg-green-500' : 'bg-red-500'}`} />
           Cámara {isCameraEnabled ? 'activa' : 'inactiva'}

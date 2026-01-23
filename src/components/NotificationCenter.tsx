@@ -162,7 +162,7 @@ const notificationConfig: Record<NotificationType, {
 
   // Sistema
   system_announcement: { icon: Megaphone, color: 'text-blue-400', bgColor: 'bg-blue-500/20' },
-  maintenance: { icon: Wrench, color: 'text-gray-400', bgColor: 'bg-gray-500/20' },
+  maintenance: { icon: Wrench, color: 'text-muted-foreground', bgColor: 'bg-gray-500/20' },
   account_warning: { icon: AlertTriangle, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20' },
   account_restored: { icon: CheckCircle, color: 'text-green-400', bgColor: 'bg-green-500/20' },
 };
@@ -337,7 +337,7 @@ export function NotificationCenter() {
         className={`relative p-2 rounded-lg transition-colors ${
           isOpen 
             ? 'bg-purple-500/20 text-purple-400' 
-            : 'hover:bg-gray-800 text-gray-400 hover:text-white'
+            : 'hover:bg-muted text-muted-foreground hover:text-foreground'
         }`}
         aria-label="Notificaciones"
       >
@@ -357,9 +357,9 @@ export function NotificationCenter() {
 
       {/* Panel desplegable */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-50">
+        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-50">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 bg-gray-900/95">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card/95">
             <h3 className="font-semibold text-white flex items-center gap-2">
               <Bell className="w-4 h-4" />
               Notificaciones
@@ -374,7 +374,7 @@ export function NotificationCenter() {
                 <button
                   onClick={handleMarkAllAsRead}
                   disabled={markingAll}
-                  className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                   title="Marcar todas como leídas"
                 >
                   {markingAll ? (
@@ -386,7 +386,7 @@ export function NotificationCenter() {
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -400,7 +400,7 @@ export function NotificationCenter() {
                 <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <Bell className="w-10 h-10 mb-3 opacity-50" />
                 <p className="text-sm">No tienes notificaciones</p>
               </div>
@@ -413,7 +413,7 @@ export function NotificationCenter() {
                   return (
                     <div
                       key={notification.id}
-                      className={`relative group px-4 py-3 hover:bg-gray-800/50 transition-colors cursor-pointer ${
+                      className={`relative group px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer ${
                         !notification.is_read ? 'bg-purple-500/5' : ''
                       }`}
                       onClick={() => handleNotificationClick(notification)}
@@ -426,13 +426,13 @@ export function NotificationCenter() {
 
                         {/* Contenido */}
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium ${!notification.is_read ? 'text-white' : 'text-gray-300'}`}>
+                          <p className={`text-sm font-medium ${!notification.is_read ? 'text-white' : 'text-foreground'}`}>
                             {notification.title}
                           </p>
-                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {formatTimeAgo(notification.created_at)}
                           </p>
                         </div>
@@ -449,7 +449,7 @@ export function NotificationCenter() {
                           e.stopPropagation();
                           handleDelete(notification.id);
                         }}
-                        className="absolute right-2 top-2 p-1.5 text-gray-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                        className="absolute right-2 top-2 p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                         title="Eliminar"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -463,7 +463,7 @@ export function NotificationCenter() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-2 border-t border-gray-800 bg-gray-900/95">
+            <div className="px-4 py-2 border-t border-border bg-card/95">
               <button
                 onClick={() => {
                   router.push('/notificaciones');

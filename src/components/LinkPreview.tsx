@@ -71,9 +71,9 @@ export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
 
   if (loading) {
     return (
-      <div className={`flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 ${className}`}>
-        <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-        <span className="text-sm text-gray-400">Cargando vista previa...</span>
+      <div className={`flex items-center gap-2 p-3 bg-muted/50 rounded-lg border border-border ${className}`}>
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">Cargando vista previa...</span>
       </div>
     );
   }
@@ -85,11 +85,11 @@ export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`flex items-center gap-2 p-3 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-800 transition-colors ${className}`}
+        className={`flex items-center gap-2 p-3 bg-muted/50 rounded-lg border border-border hover:bg-muted transition-colors ${className}`}
       >
-        <Globe className="w-4 h-4 text-gray-400" />
+        <Globe className="w-4 h-4 text-muted-foreground" />
         <span className="text-sm text-purple-400 hover:underline truncate">{url}</span>
-        <ExternalLink className="w-3 h-3 text-gray-500 flex-shrink-0" />
+        <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />
       </a>
     );
   }
@@ -99,11 +99,11 @@ export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`block overflow-hidden rounded-xl border border-gray-700 bg-gray-800/50 hover:bg-gray-800/80 transition-all hover:border-gray-600 ${className}`}
+      className={`block overflow-hidden rounded-xl border border-border bg-muted/50 hover:bg-muted/80 transition-all hover:border-border ${className}`}
     >
       {/* Image */}
       {preview.image && !imageError && (
-        <div className="relative w-full h-48 bg-gray-900">
+        <div className="relative w-full h-48 bg-card">
           <Image
             src={preview.image}
             alt={preview.title || 'Link preview'}
@@ -132,7 +132,7 @@ export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
               unoptimized
             />
           )}
-          <span className="text-xs text-gray-400 uppercase tracking-wide">
+          <span className="text-xs text-muted-foreground uppercase tracking-wide">
             {preview.siteName || new URL(url).hostname}
           </span>
         </div>
@@ -146,13 +146,13 @@ export function LinkPreview({ url, className = '' }: LinkPreviewProps) {
 
         {/* Description */}
         {preview.description && (
-          <p className="text-sm text-gray-400 line-clamp-2">
+          <p className="text-sm text-muted-foreground line-clamp-2">
             {preview.description}
           </p>
         )}
 
         {/* URL */}
-        <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
+        <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
           <ExternalLink className="w-3 h-3" />
           <span className="truncate">{new URL(url).hostname}</span>
         </div>

@@ -19,7 +19,7 @@ export default function CrearCuentaPage() {
       
       <main className="container mx-auto px-4 py-12 max-w-3xl">
         {/* Breadcrumb */}
-        <Link href="/ayuda" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
+        <Link href="/ayuda" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Volver al Centro de Ayuda
         </Link>
@@ -30,40 +30,40 @@ export default function CrearCuentaPage() {
             <UserPlus className="w-6 h-6 text-yellow-400" />
           </div>
           <h1 className="text-3xl font-bold mb-2">¿Cómo crear una cuenta?</h1>
-          <p className="text-gray-400">Guía paso a paso para registrarte en Apocaliptyx</p>
+          <p className="text-muted-foreground">Guía paso a paso para registrarte en Apocaliptyx</p>
         </div>
 
         {/* Content */}
         <div className="prose prose-invert max-w-none">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mb-8">
-            <p className="text-gray-300 leading-relaxed">
+          <div className="bg-card/50 border border-border rounded-xl p-6 mb-8">
+            <p className="text-foreground leading-relaxed">
               Crear una cuenta en Apocaliptyx es gratis y solo toma unos minutos. Una vez registrado, recibirás <strong className="text-yellow-400">1,000 AP Coins</strong> de bienvenida para comenzar a predecir.
             </p>
           </div>
 
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Paso 1: Ir a la página de registro</h2>
-          <p className="text-gray-300 mb-4">
+          <p className="text-foreground mb-4">
             Haz clic en el botón <strong>&quot;Registrarse&quot;</strong> en la esquina superior derecha de la página, o ve directamente a:
           </p>
-          <div className="bg-gray-800 rounded-lg p-4 mb-6">
+          <div className="bg-muted rounded-lg p-4 mb-6">
             <code className="text-purple-400">https://apocaliptyx.vercel.app/registro</code>
           </div>
 
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Paso 2: Elegir método de registro</h2>
-          <p className="text-gray-300 mb-4">Puedes registrarte de dos formas:</p>
+          <p className="text-foreground mb-4">Puedes registrarte de dos formas:</p>
           
           <div className="grid gap-4 mb-6">
-            <div className="flex items-start gap-3 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+            <div className="flex items-start gap-3 bg-card/50 border border-border rounded-lg p-4">
               <div className="p-2 bg-blue-500/20 rounded-lg">
                 <Mail className="w-5 h-5 text-blue-400" />
               </div>
               <div>
                 <h3 className="font-semibold text-white">Con Email</h3>
-                <p className="text-sm text-gray-400">Ingresa tu email, crea una contraseña y elige un nombre de usuario único.</p>
+                <p className="text-sm text-muted-foreground">Ingresa tu email, crea una contraseña y elige un nombre de usuario único.</p>
               </div>
             </div>
             
-            <div className="flex items-start gap-3 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+            <div className="flex items-start gap-3 bg-card/50 border border-border rounded-lg p-4">
               <div className="p-2 bg-red-500/20 rounded-lg">
                 <svg className="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -74,45 +74,45 @@ export default function CrearCuentaPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-white">Con Google o Discord</h3>
-                <p className="text-sm text-gray-400">Más rápido. Solo haz clic en el botón correspondiente y autoriza la conexión.</p>
+                <p className="text-sm text-muted-foreground">Más rápido. Solo haz clic en el botón correspondiente y autoriza la conexión.</p>
               </div>
             </div>
           </div>
 
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Paso 3: Completar tu perfil</h2>
-          <p className="text-gray-300 mb-4">
+          <p className="text-foreground mb-4">
             Si te registras con email, necesitarás proporcionar:
           </p>
           <ul className="space-y-2 mb-6">
-            <li className="flex items-center gap-2 text-gray-300">
+            <li className="flex items-center gap-2 text-foreground">
               <CheckCircle className="w-4 h-4 text-green-400" />
               <span><strong>Email:</strong> Tu correo electrónico (se usará para notificaciones)</span>
             </li>
-            <li className="flex items-center gap-2 text-gray-300">
+            <li className="flex items-center gap-2 text-foreground">
               <CheckCircle className="w-4 h-4 text-green-400" />
               <span><strong>Usuario:</strong> Nombre único que te identificará (3-20 caracteres)</span>
             </li>
-            <li className="flex items-center gap-2 text-gray-300">
+            <li className="flex items-center gap-2 text-foreground">
               <CheckCircle className="w-4 h-4 text-green-400" />
               <span><strong>Contraseña:</strong> Mínimo 8 caracteres</span>
             </li>
           </ul>
 
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Paso 4: Verificar tu email</h2>
-          <p className="text-gray-300 mb-4">
+          <p className="text-foreground mb-4">
             Recibirás un email de verificación. Haz clic en el enlace para activar tu cuenta completamente.
           </p>
 
           <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 mt-8">
             <h3 className="font-bold text-green-400 mb-2">🎉 ¡Listo!</h3>
-            <p className="text-gray-300">
+            <p className="text-foreground">
               Una vez verificado, recibirás tus <strong className="text-yellow-400">1,000 AP Coins</strong> de bienvenida y podrás comenzar a explorar escenarios, hacer predicciones y competir con otros profetas.
             </p>
           </div>
 
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mt-8">
+          <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
             <h3 className="font-bold text-white mb-2">¿Necesitas más ayuda?</h3>
-            <p className="text-gray-400 mb-4">Si tienes problemas para crear tu cuenta, contáctanos:</p>
+            <p className="text-muted-foreground mb-4">Si tienes problemas para crear tu cuenta, contáctanos:</p>
             <Link href="mailto:contacto@apocaliptyx.com" className="text-purple-400 hover:text-purple-300">
               contacto@apocaliptyx.com
             </Link>
@@ -120,16 +120,16 @@ export default function CrearCuentaPage() {
         </div>
 
         {/* Related Articles */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
+        <div className="mt-12 pt-8 border-t border-border">
           <h3 className="font-bold text-white mb-4">Artículos relacionados</h3>
           <div className="grid gap-2">
-            <Link href="/ayuda/ap-coins" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/ap-coins" className="text-muted-foreground hover:text-foreground transition-colors">
               → ¿Qué son los AP Coins?
             </Link>
-            <Link href="/ayuda/como-funciona" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/como-funciona" className="text-muted-foreground hover:text-foreground transition-colors">
               → ¿Cómo funciona la plataforma?
             </Link>
-            <Link href="/ayuda/guia-inicio" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/guia-inicio" className="text-muted-foreground hover:text-foreground transition-colors">
               → Guía de inicio rápido
             </Link>
           </div>

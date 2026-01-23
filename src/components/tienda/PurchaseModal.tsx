@@ -65,7 +65,7 @@ export function PurchaseModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={handleClose} />
 
-      <div className="relative w-full max-w-2xl bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-card rounded-2xl border border-border overflow-hidden">
         <div className={`relative h-48 bg-gradient-to-br ${rarityGradients[item.rarity]} flex items-center justify-center`}>
           <span className="text-8xl">{typeIcons[item.type]}</span>
 
@@ -101,7 +101,7 @@ export function PurchaseModal() {
                     ? 'bg-purple-500/20 text-purple-400'
                     : item.rarity === 'RARE'
                     ? 'bg-blue-500/20 text-blue-400'
-                    : 'bg-gray-500/20 text-gray-400'
+                    : 'bg-gray-500/20 text-muted-foreground'
                 }`}
               >
                 {item.rarity}
@@ -111,34 +111,34 @@ export function PurchaseModal() {
             <div className="flex items-center gap-1 text-sm">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               <span className="text-white font-medium">{item.rating}</span>
-              <span className="text-gray-500">({item.reviews} {t('shop.reviews')})</span>
+              <span className="text-muted-foreground">({item.reviews} {t('shop.reviews')})</span>
             </div>
           </div>
 
-          <p className="text-gray-400 mb-6">{item.longDescription || item.description}</p>
+          <p className="text-muted-foreground mb-6">{item.longDescription || item.description}</p>
 
           {item.effects && item.effects.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-300 mb-3">{t('shop.item.effect')}</h3>
+              <h3 className="text-sm font-medium text-foreground mb-3">{t('shop.item.effect')}</h3>
               <div className="space-y-2">
                 {item.effects.map((effect, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-gray-800 rounded-lg p-3">
+                  <div key={i} className="flex items-center gap-3 bg-muted rounded-lg p-3">
                     <Check className="w-5 h-5 text-green-400" />
                     <span className="text-white">{effect.description}</span>
-                    {effect.duration && <span className="ml-auto text-gray-500 text-sm">({effect.duration}h)</span>}
+                    {effect.duration && <span className="ml-auto text-muted-foreground text-sm">({effect.duration}h)</span>}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="flex items-center justify-between mb-6 p-4 bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between mb-6 p-4 bg-muted rounded-lg">
             <div>
-              <p className="text-sm text-gray-400 mb-1">{t('shop.quantity')}</p>
+              <p className="text-sm text-muted-foreground mb-1">{t('shop.quantity')}</p>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                  className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors"
                 >
                   <Minus className="w-4 h-4 text-white" />
                 </button>
@@ -146,21 +146,21 @@ export function PurchaseModal() {
                 <button
                   onClick={() => setQuantity((q) => Math.min(Math.max(1, maxCanBuy), q + 1))}
                   disabled={quantity >= maxCanBuy}
-                  className="p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+                  className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4 text-white" />
                 </button>
               </div>
-              {item.maxPerUser && <p className="text-xs text-gray-500 mt-1">{t('shop.maxPerUser')}: {item.maxPerUser}</p>}
+              {item.maxPerUser && <p className="text-xs text-muted-foreground mt-1">{t('shop.maxPerUser')}: {item.maxPerUser}</p>}
             </div>
 
             <div className="text-right">
-              <p className="text-sm text-gray-400 mb-1">Total</p>
+              <p className="text-sm text-muted-foreground mb-1">Total</p>
               <div className="flex items-center gap-2">
                 <span className="text-3xl font-bold text-yellow-400">{totalPrice.toLocaleString()}</span>
                 <span className="text-yellow-400/60">AP</span>
               </div>
-              {item.originalPrice && <p className="text-sm text-gray-500 line-through">{(item.originalPrice * quantity).toLocaleString()} AP</p>}
+              {item.originalPrice && <p className="text-sm text-muted-foreground line-through">{(item.originalPrice * quantity).toLocaleString()} AP</p>}
             </div>
           </div>
 
@@ -175,7 +175,7 @@ export function PurchaseModal() {
             <button
               onClick={handleAddToCart}
               disabled={maxCanBuy <= 0}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-800 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-muted hover:bg-muted text-white font-medium rounded-lg transition-colors disabled:opacity-50"
             >
               <ShoppingCart className="w-5 h-5" />
               {t('shop.addToCart')}
