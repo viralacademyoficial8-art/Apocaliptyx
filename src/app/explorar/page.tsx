@@ -131,6 +131,7 @@ export default function ExplorarPage() {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
 
   // Search dropdown
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -479,19 +480,37 @@ export default function ExplorarPage() {
                   </div>
 
                   {/* Grid de escenarios más interactuados - ordenados por robos + votos */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[...scenarios]
-                      .sort((a, b) => {
-                        // Algoritmo: prioridad a los más robados, luego los más votados
-                        const scoreA = (a.steal_count || 0) * 2 + a.participant_count;
-                        const scoreB = (b.steal_count || 0) * 2 + b.participant_count;
-                        return scoreB - scoreA;
-                      })
-                      .slice(0, 6)
-                      .map((scenario) => (
-                        <ScenarioCard key={scenario.id} scenario={scenario} />
-                      ))}
-                  </div>
+                  {(() => {
+                    const sortedScenarios = [...scenarios].sort((a, b) => {
+                      // Algoritmo: prioridad a los más robados, luego los más votados
+                      const scoreA = (a.steal_count || 0) * 2 + a.participant_count;
+                      const scoreB = (b.steal_count || 0) * 2 + b.participant_count;
+                      return scoreB - scoreA;
+                    });
+                    const visibleScenarios = showAllFeatured ? sortedScenarios : sortedScenarios.slice(0, 6);
+                    const remainingCount = sortedScenarios.length - 6;
+
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {visibleScenarios.map((scenario) => (
+                            <ScenarioCard key={scenario.id} scenario={scenario} />
+                          ))}
+                        </div>
+
+                        {/* Botón Ver más / Ver menos */}
+                        {sortedScenarios.length > 6 && (
+                          <button
+                            onClick={() => setShowAllFeatured(!showAllFeatured)}
+                            className="w-full mt-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-purple-500/50 transition-all flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300"
+                          >
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAllFeatured ? 'rotate-180' : ''}`} />
+                            {showAllFeatured ? 'Ver menos' : `Ver ${remainingCount} más`}
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
                 </section>
               )}
 
