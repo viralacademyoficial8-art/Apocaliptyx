@@ -30,24 +30,15 @@ export default function LoginPage() {
 
       {/* Header */}
       <header className="relative z-10 p-4 sm:p-6">
-        <Link href="/" className="flex items-center gap-3 w-fit group">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative bg-gradient-to-br from-purple-600 to-pink-600 p-2 rounded-xl">
-              <Image
-                src="/apocaliptyx-logo.png"
-                alt="Apocaliptyx"
-                width={24}
-                height={24}
-                className="w-5 h-5 sm:w-6 sm:h-6"
-              />
-            </div>
-          </div>
-          <span className="text-lg sm:text-xl font-black tracking-tight">
-            <span className="bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-              APOCALIPTYX
-            </span>
-          </span>
+        <Link href="/" className="flex items-center w-fit group">
+          <Image
+            src="/apocaliptyx-logo.png"
+            alt="Apocaliptyx"
+            width={160}
+            height={45}
+            className="h-8 sm:h-10 w-auto"
+            priority
+          />
         </Link>
       </header>
 
