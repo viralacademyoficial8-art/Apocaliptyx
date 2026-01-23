@@ -788,12 +788,12 @@ function ForoContent() {
     }
   }, [activeTab, loadReels]);
 
-  // Load communities when tab changes to comunidades or filter changes
-  useEffect(() => {
-    if (activeTab === 'comunidades') {
-      loadCommunities();
-    }
-  }, [activeTab, loadCommunities]);
+  // COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
+  // useEffect(() => {
+  //   if (activeTab === 'comunidades') {
+  //     loadCommunities();
+  //   }
+  // }, [activeTab, loadCommunities]);
 
   // Load streams when lives tab is active
   useEffect(() => {
