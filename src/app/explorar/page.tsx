@@ -132,6 +132,7 @@ export default function ExplorarPage() {
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
   const [showTopInteracted, setShowTopInteracted] = useState(false);
+  const [showFeaturedTop, setShowFeaturedTop] = useState(true);
 
   // Search dropdown
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -485,6 +486,91 @@ export default function ExplorarPage() {
                       .map((scenario) => (
                         <ScenarioCard key={scenario.id} scenario={scenario} />
                       ))}
+                  </div>
+
+                  {/* Top Interactuados - Desplegable */}
+                  <div className="mt-6 rounded-xl border border-zinc-800 overflow-hidden bg-gradient-to-b from-zinc-900/80 to-zinc-950/80">
+                    <button
+                      onClick={() => setShowFeaturedTop(!showFeaturedTop)}
+                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-zinc-800/50 transition-all"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🏆</span>
+                        <span className="text-sm font-medium text-zinc-200">Top Interactuados</span>
+                        <span className="text-xs text-zinc-500 hidden sm:inline">• Los más robados y votados</span>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-zinc-400 transition-transform duration-300 ${showFeaturedTop ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <div className={`overflow-hidden transition-all duration-300 ${showFeaturedTop ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="p-4 border-t border-zinc-800/50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Más Robados */}
+                          <div className="bg-gradient-to-br from-red-500/5 to-orange-500/5 rounded-lg p-4 border border-red-500/20">
+                            <h4 className="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
+                              <Swords className="w-4 h-4" />
+                              Más Robados
+                            </h4>
+                            <div className="space-y-2">
+                              {[...scenarios]
+                                .sort((a, b) => (b.steal_count || 0) - (a.steal_count || 0))
+                                .slice(0, 3)
+                                .map((scenario, index) => (
+                                  <div
+                                    key={scenario.id}
+                                    onClick={() => router.push(`/escenario/${scenario.id}`)}
+                                    className="flex items-center gap-3 p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800/70 cursor-pointer transition-all group"
+                                  >
+                                    <span className={`text-lg font-bold w-6 text-center ${
+                                      index === 0 ? 'text-yellow-400' : index === 1 ? 'text-zinc-400' : 'text-orange-600'
+                                    }`}>
+                                      {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                                    </span>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-zinc-100 truncate group-hover:text-purple-300">{scenario.title}</p>
+                                    </div>
+                                    <span className="text-xs font-bold text-red-400 bg-red-500/20 px-2 py-0.5 rounded-full">
+                                      {scenario.steal_count || 0} robos
+                                    </span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+
+                          {/* Más Votados */}
+                          <div className="bg-gradient-to-br from-green-500/5 to-emerald-500/5 rounded-lg p-4 border border-green-500/20">
+                            <h4 className="text-sm font-semibold text-green-400 mb-3 flex items-center gap-2">
+                              <Users className="w-4 h-4" />
+                              Más Votados
+                            </h4>
+                            <div className="space-y-2">
+                              {[...scenarios]
+                                .sort((a, b) => b.participant_count - a.participant_count)
+                                .slice(0, 3)
+                                .map((scenario, index) => (
+                                  <div
+                                    key={scenario.id}
+                                    onClick={() => router.push(`/escenario/${scenario.id}`)}
+                                    className="flex items-center gap-3 p-2 rounded-lg bg-zinc-900/50 hover:bg-zinc-800/70 cursor-pointer transition-all group"
+                                  >
+                                    <span className={`text-lg font-bold w-6 text-center ${
+                                      index === 0 ? 'text-yellow-400' : index === 1 ? 'text-zinc-400' : 'text-orange-600'
+                                    }`}>
+                                      {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                                    </span>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium text-zinc-100 truncate group-hover:text-purple-300">{scenario.title}</p>
+                                    </div>
+                                    <span className="text-xs font-bold text-green-400 bg-green-500/20 px-2 py-0.5 rounded-full">
+                                      {scenario.participant_count} votos
+                                    </span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </section>
               )}
