@@ -3293,18 +3293,20 @@ function PostCard({
           <span>{post.comments_count || 0}</span>
         </button>
 
-        {/* Repost */}
-        <button
-          onClick={() => onRepost(post)}
-          className={`flex items-center gap-2 transition-colors ${
-            post.user_reposted
-              ? 'text-green-400'
-              : 'text-gray-400 hover:text-green-400'
-          }`}
-        >
-          <Repeat2 className="w-5 h-5" />
-          <span>{post.reposts_count || 0}</span>
-        </button>
+        {/* Repost - OCULTO TEMPORALMENTE PARA MVP */}
+        {false && (
+          <button
+            onClick={() => onRepost(post)}
+            className={`flex items-center gap-2 transition-colors ${
+              post.user_reposted
+                ? 'text-green-400'
+                : 'text-gray-400 hover:text-green-400'
+            }`}
+          >
+            <Repeat2 className="w-5 h-5" />
+            <span>{post.reposts_count || 0}</span>
+          </button>
+        )}
 
         {/* Share Menu */}
         <div className="relative">
