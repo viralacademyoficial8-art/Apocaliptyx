@@ -17,7 +17,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, MessageCircle, Trophy, Sparkles, User, Settings, LogOut, ChevronDown, Flame, Infinity, Shield } from "lucide-react";
+import { Menu, MessageCircle, Trophy, Sparkles, User, Settings, LogOut, ChevronDown, Flame, Infinity, Shield, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 
 export function LandingNavbar() {
   const router = useRouter();
@@ -26,6 +27,12 @@ export function LandingNavbar() {
   const { data: session, status } = useSession();
   const { user, logout, refreshBalance } = useAuthStore();
   const { hasInfiniteCoins, isAdmin, roleName, roleIcon, roleColor } = usePermissions();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
 
   // Determinar si está autenticado
   const isLoggedIn = status === "authenticated" && !!session?.user;
@@ -138,6 +145,19 @@ export function LandingNavbar() {
               <div className="hidden xs:block sm:block">
                 <LanguageSelector variant="minimal" />
               </div>
+
+              {/* Theme Toggle - All devices */}
+              <button
+                onClick={toggleTheme}
+                className="relative group p-2 rounded-xl hover:bg-zinc-800/50 transition-all"
+                title={resolvedTheme === 'dark' ? 'Modo claro' : 'Modo oscuro'}
+              >
+                {resolvedTheme === 'dark' ? (
+                  <Moon className="w-5 h-5 text-zinc-400 group-hover:text-foreground transition-colors" />
+                ) : (
+                  <Sun className="w-5 h-5 text-yellow-500 group-hover:text-yellow-400 transition-colors" />
+                )}
+              </button>
 
               {/* Auth Buttons / User Dropdown - Desktop */}
               <div className="hidden sm:flex items-center gap-3">
