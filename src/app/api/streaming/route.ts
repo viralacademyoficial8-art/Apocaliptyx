@@ -329,6 +329,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Verificar que el usuario existe en la tabla users
+    const { data: userExists, error: userError } = await supabase
+      .from('users')
+      .select('id, username')
+      .eq('id', user.id)
+      .single();
+
+    if (userError || !userExists) {
+      console.error('User not found in users table:', user.id, userError);
+      return NextResponse.json(
+        { error: 'Tu cuenta no está correctamente configurada. Por favor, cierra sesión y vuelve a iniciar.' },
+        { status: 400 }
+      );
+    }
+
     // Check if user already has an active stream
     const { data: existingStream } = await supabase
       .from('live_streams')
