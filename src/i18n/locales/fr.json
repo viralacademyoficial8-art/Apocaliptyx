@@ -278,8 +278,8 @@
     "inDays": "dans {{count}} jours"
   },
   "forum": {
-    "title": "Communauté",
-    "subtitle": "Partagez des prédictions, des débats et des stratégies avec d'autres prophètes",
+    "title": "Feed",
+    "subtitle": "Votre activité et celle des autres prophètes en temps réel",
     "newPost": "Nouvelle Publication",
     "tabs": {
       "feed": "Fil",

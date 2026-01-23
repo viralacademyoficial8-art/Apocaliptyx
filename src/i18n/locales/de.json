@@ -278,8 +278,8 @@
     "inDays": "in {{count}} Tagen"
   },
   "forum": {
-    "title": "Community",
-    "subtitle": "Teile Vorhersagen, Debatten und Strategien mit anderen Propheten",
+    "title": "Feed",
+    "subtitle": "Deine Aktivität und die anderer Propheten in Echtzeit",
     "newPost": "Neuer Beitrag",
     "tabs": {
       "feed": "Feed",
