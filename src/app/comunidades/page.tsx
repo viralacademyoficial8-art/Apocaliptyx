@@ -8,21 +8,22 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 /**
- * Redirect page: /comunidades now redirects to /foro?tab=comunidades
- * This ensures all community functionality is unified in one place.
+ * COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
+ * Redirect page: /comunidades now redirects to /foro (comunidades deshabilitado temporalmente)
  */
 export default function ComunidadesRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/foro?tab=comunidades');
+    // Redirigir a /foro en lugar de /foro?tab=comunidades (MVP)
+    router.replace('/foro');
   }, [router]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500 mx-auto mb-4" />
-        <p className="text-gray-400">Redirigiendo a comunidades...</p>
+        <p className="text-gray-400">Redirigiendo al foro...</p>
       </div>
     </div>
   );

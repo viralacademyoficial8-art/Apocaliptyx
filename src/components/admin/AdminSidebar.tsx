@@ -61,7 +61,8 @@ const allMenuItems: MenuSection[] = [
       { href: '/admin/escenarios', label: 'Escenarios', icon: FileText, permission: 'admin.scenarios.view' },
       { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle, permission: 'admin.reports.view' },
       { href: '/admin/foro', label: 'Foro', icon: MessageSquare, permission: 'admin.scenarios.view' },
-      { href: '/admin/comunidades', label: 'Comunidades', icon: Users2, permission: 'admin.scenarios.view' },
+      // COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
+      // { href: '/admin/comunidades', label: 'Comunidades', icon: Users2, permission: 'admin.scenarios.view' },
     ],
   },
   {

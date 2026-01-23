@@ -302,7 +302,9 @@ export function GamificationStats({ userId, compact = false }: GamificationStats
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <DetailStat label="Predicciones Correctas" value={data.stats.predictionsCorrect} />
+          {/* COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
           <DetailStat label="Comunidades" value={data.stats.communitiesJoined} />
+          */}
           <DetailStat label="Posts Creados" value={data.stats.postsCreated} />
         </div>
       </div>

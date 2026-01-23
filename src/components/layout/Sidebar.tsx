@@ -54,7 +54,8 @@ export function Sidebar() {
     { icon: <Compass className="w-6 h-6" />, label: t('sidebar.explore'), href: '/explorar' },
     { icon: <Film className="w-6 h-6" />, label: t('nav.reels'), href: '/reels', highlight: true },
     { icon: <MessageCircle className="w-6 h-6" />, label: t('nav.forum'), href: '/foro' },
-    { icon: <Users className="w-6 h-6" />, label: t('nav.communities'), href: '/foro?tab=comunidades' },
+    // COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
+    // { icon: <Users className="w-6 h-6" />, label: t('nav.communities'), href: '/foro?tab=comunidades' },
     { icon: <Radio className="w-6 h-6" />, label: t('nav.streaming'), href: '/streaming' },
   ];
 
