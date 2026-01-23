@@ -154,13 +154,22 @@ class PublicProfileService {
       return false;
     }
 
-    // Crear notificación
+    // Obtener username del seguidor para la notificación
+    const { data: followerData } = await getSupabaseBrowser()
+      .from('users')
+      .select('username')
+      .eq('id', followerId)
+      .single();
+
+    const followerUsername = followerData?.username || followerId;
+
+    // Crear notificación con username en lugar de UUID
     await getSupabaseBrowser().from('notifications').insert({
       user_id: followingId,
       type: 'new_follower',
       title: '¡Nuevo seguidor!',
-      message: 'Alguien comenzó a seguirte',
-      link_url: `/perfil/${followerId}`,
+      message: `@${followerUsername} comenzó a seguirte`,
+      link_url: `/perfil/${followerUsername}`,
       is_read: false,
     });
 

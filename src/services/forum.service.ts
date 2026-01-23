@@ -1290,7 +1290,7 @@ class ForumService {
             'new_follower',
             '👤 Nuevo Seguidor',
             `@${follower.username} comenzó a seguirte`,
-            `/perfil/${followerId}`,
+            `/perfil/${follower.username}`,
             follower.avatar_url
           );
         }
