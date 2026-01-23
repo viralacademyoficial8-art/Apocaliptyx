@@ -209,10 +209,10 @@ export function NotificationPanel() {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative p-2 hover:bg-gray-800 rounded-lg transition-colors"
+          className="relative p-2 hover:bg-muted rounded-lg transition-colors"
           aria-label="Notificaciones"
         >
-          <Bell className="w-5 h-5 text-gray-300" />
+          <Bell className="w-5 h-5 text-foreground" />
           {unreadCount > 0 && (
             <>
               <Badge className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 min-w-[20px] h-5 flex items-center justify-center">
@@ -226,10 +226,10 @@ export function NotificationPanel() {
 
       <DropdownMenuContent
         align="end"
-        className="w-[400px] max-w-[95vw] bg-gray-900 border-gray-800 p-0 max-h-[600px] overflow-hidden flex flex-col"
+        className="w-[400px] max-w-[95vw] bg-card border-border p-0 max-h-[600px] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-4 z-10">
+        <div className="sticky top-0 bg-gray-900 border-b border-border p-4 z-10">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold text-lg flex items-center gap-2">
               <Bell className="w-5 h-5 text-yellow-500" />
@@ -277,8 +277,8 @@ export function NotificationPanel() {
               onClick={() => setFilter('all')}
               className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                 filter === 'all'
-                  ? 'bg-gray-800 text-white font-semibold'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'text-muted-foreground hover:text-white'
               }`}
             >
               Todas ({notifications.length})
@@ -287,8 +287,8 @@ export function NotificationPanel() {
               onClick={() => setFilter('unread')}
               className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
                 filter === 'unread'
-                  ? 'bg-gray-800 text-white font-semibold'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'text-muted-foreground hover:text-white'
               }`}
             >
               No leídas ({unreadCount})
@@ -304,8 +304,8 @@ export function NotificationPanel() {
             </div>
           ) : filteredNotifications.length === 0 ? (
             <div className="text-center py-12 px-4">
-              <Inbox className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400 text-sm">
+              <Inbox className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground text-sm">
                 {filter === 'unread'
                   ? 'No tienes notificaciones sin leer'
                   : 'No tienes notificaciones'}
@@ -317,7 +317,7 @@ export function NotificationPanel() {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 hover:bg-gray-800/50 transition-colors cursor-pointer ${
+                  className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
                     !notification.is_read ? 'bg-purple-500/5' : ''
                   }`}
                 >
@@ -334,14 +334,14 @@ export function NotificationPanel() {
                     {/* Contenido */}
                     <div className="flex-1 min-w-0">
                       <p className={`font-medium text-sm ${
-                        !notification.is_read ? 'text-white' : 'text-gray-300'
+                        !notification.is_read ? 'text-white' : 'text-foreground'
                       }`}>
                         {notification.title}
                       </p>
-                      <p className="text-sm text-gray-400 mt-0.5 line-clamp-2">
+                      <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(notification.created_at), {
                           addSuffix: true,
                           locale: es,
@@ -355,7 +355,7 @@ export function NotificationPanel() {
                         e.stopPropagation();
                         deleteNotification(notification.id);
                       }}
-                      className="p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-1 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded transition-colors opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -368,7 +368,7 @@ export function NotificationPanel() {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="sticky bottom-0 bg-gray-900 border-t border-gray-800 p-3">
+          <div className="sticky bottom-0 bg-gray-900 border-t border-border p-3">
             <button
               onClick={() => {
                 router.push('/notificaciones');

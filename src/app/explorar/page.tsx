@@ -585,7 +585,7 @@ export default function ExplorarPage() {
         )}
 
         {/* Results count */}
-        <div className="mb-4 text-sm text-gray-400">
+        <div className="mb-4 text-sm text-muted-foreground">
           {filteredScenarios.length} {t('explore.scenariosFound')}
         </div>
 
@@ -593,7 +593,7 @@ export default function ExplorarPage() {
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-            <span className="ml-3 text-gray-400">{t('dashboard.loadingScenarios')}</span>
+            <span className="ml-3 text-muted-foreground">{t('dashboard.loadingScenarios')}</span>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -608,9 +608,9 @@ export default function ExplorarPage() {
           </div>
         ) : filteredScenarios.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Search className="w-12 h-12 text-gray-600 mb-4" />
-            <p className="text-gray-400 mb-2">{t('explore.noScenarios')}</p>
-            <p className="text-gray-500 text-sm mb-4">
+            <Search className="w-12 h-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-2">{t('explore.noScenarios')}</p>
+            <p className="text-muted-foreground text-sm mb-4">
               {hasActiveFilters
                 ? t('explore.tryOtherFilters')
                 : t('explore.beFirstToCreate')
@@ -619,7 +619,7 @@ export default function ExplorarPage() {
             {hasActiveFilters ? (
               <button
                 onClick={clearFilters}
-                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg"
+                className="px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg"
               >
                 {t('explore.clearFilters')}
               </button>
@@ -665,7 +665,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
   return (
     <div
       onClick={() => router.push(`/escenario/${scenario.id}`)}
-      className="rounded-xl border border-gray-800 bg-gray-900/60 p-5 hover:border-purple-500/50 hover:bg-gray-900 transition-all cursor-pointer group"
+      className="rounded-xl border border-border bg-card/60 p-5 hover:border-purple-500/50 hover:bg-card transition-all cursor-pointer group"
     >
       {/* Category & badges */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -690,7 +690,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       </h3>
 
       {/* Description */}
-      <p className="text-gray-400 text-sm mb-3 line-clamp-2">
+      <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
         {scenario.description}
       </p>
 
@@ -728,7 +728,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
           <span className="text-green-400 font-medium">{t('common.yes')} {yesPercent}%</span>
           <span className="text-red-400 font-medium">{t('common.no')} {noPercent}%</span>
         </div>
-        <div className="h-2.5 bg-gray-800 rounded-full overflow-hidden flex">
+        <div className="h-2.5 bg-muted rounded-full overflow-hidden flex">
           <div
             className="bg-green-500 transition-all"
             style={{ width: `${yesPercent}%` }}
@@ -741,7 +741,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       </div>
 
       {/* Stats */}
-      <div className="flex items-center justify-between text-sm text-gray-400 pt-3 border-t border-gray-800">
+      <div className="flex items-center justify-between text-sm text-muted-foreground pt-3 border-t border-border">
         <div className="flex items-center gap-1">
           <Flame className="w-4 h-4 text-yellow-500" />
           <span>{scenario.total_pool.toLocaleString()} AP</span>

@@ -110,8 +110,8 @@ export function Sidebar() {
         className={cn(
           'flex items-center gap-4 px-3 py-3 rounded-xl transition-all duration-200 group relative',
           active
-            ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-white'
-            : 'text-gray-400 hover:text-white hover:bg-gray-800/50',
+            ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-foreground'
+            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
           item.highlight && !active && 'text-pink-400'
         )}
         onClick={() => setIsMobileOpen(false)}
@@ -146,7 +146,7 @@ export function Sidebar() {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-900/90 backdrop-blur-sm rounded-lg text-white"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-card/90 backdrop-blur-sm rounded-lg text-foreground border border-border"
       >
         {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
@@ -162,7 +162,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 h-full bg-background/95 backdrop-blur-md border-r border-gray-800/50 z-40',
+          'fixed left-0 top-0 h-full bg-background/95 backdrop-blur-md border-r border-border z-40',
           'flex flex-col py-6 transition-all duration-300',
           isExpanded ? 'w-64' : 'w-20',
           'lg:translate-x-0',
@@ -195,7 +195,7 @@ export function Sidebar() {
           </div>
 
           {/* Divider */}
-          <div className="my-4 border-t border-gray-800/50" />
+          <div className="my-4 border-t border-border" />
 
           {/* Social */}
           {isAuthenticated && (
@@ -205,7 +205,7 @@ export function Sidebar() {
                   <NavLink key={item.href} item={item} />
                 ))}
               </div>
-              <div className="my-4 border-t border-gray-800/50" />
+              <div className="my-4 border-t border-border" />
             </>
           )}
 
@@ -215,7 +215,7 @@ export function Sidebar() {
             isExpanded || isMobileOpen ? 'opacity-100' : 'opacity-50'
           )}>
             {(isExpanded || isMobileOpen) && (
-              <p className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <p className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 {t('sidebar.features')}
               </p>
             )}
@@ -246,27 +246,27 @@ export function Sidebar() {
         )}
 
         {/* User Profile / Settings */}
-        <div className="px-3 mt-4 pt-4 border-t border-gray-800/50">
+        <div className="px-3 mt-4 pt-4 border-t border-border">
           {isAuthenticated && user ? (
             <Link
               href="/perfil"
-              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-800/50 transition-colors"
+              className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/50 transition-colors"
             >
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden">
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-white text-sm font-bold">
+                  <span className="text-foreground text-sm font-bold">
                     {(user.username || user.email || 'U')[0].toUpperCase()}
                   </span>
                 )}
               </div>
               {(isExpanded || isMobileOpen) && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium truncate">
+                  <p className="text-foreground text-sm font-medium truncate">
                     {user.displayName || user.username}
                   </p>
-                  <p className="text-gray-500 text-xs truncate">@{user.username}</p>
+                  <p className="text-muted-foreground text-xs truncate">@{user.username}</p>
                 </div>
               )}
             </Link>
@@ -275,8 +275,8 @@ export function Sidebar() {
               href="/login"
               className={cn(
                 'flex items-center justify-center gap-3 py-3 rounded-xl',
-                'border border-gray-700 hover:border-purple-500 hover:bg-purple-500/10',
-                'text-gray-300 hover:text-white font-medium transition-all duration-200'
+                'border border-border hover:border-purple-500 hover:bg-purple-500/10',
+                'text-muted-foreground hover:text-foreground font-medium transition-all duration-200'
               )}
             >
               {(isExpanded || isMobileOpen) ? t('nav.login') : <Crown className="w-5 h-5" />}
@@ -286,7 +286,7 @@ export function Sidebar() {
           {/* Settings */}
           <Link
             href="/configuracion"
-            className="flex items-center gap-3 px-3 py-2 mt-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors"
+            className="flex items-center gap-3 px-3 py-2 mt-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
           >
             <Settings className="w-5 h-5" />
             {(isExpanded || isMobileOpen) && <span className="text-sm">{t('nav.settings')}</span>}
