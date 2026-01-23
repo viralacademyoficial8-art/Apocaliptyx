@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Crear perfil en nuestra tabla users con el mismo ID
-    const { data: newUser, error: userError } = await getSupabaseClient()
+    // IMPORTANTE: Usar admin client para bypasear RLS policies
+    const { data: newUser, error: userError } = await getSupabaseAdmin()
       .from("users")
       .insert({
         id: authData.user.id, // Usar el mismo ID de auth.users
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
         total_predictions: 0,
         correct_predictions: 0,
         total_earnings: 0,
-      })
+      } as never)
       .select()
       .single();
 

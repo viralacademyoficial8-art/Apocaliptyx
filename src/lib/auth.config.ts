@@ -285,8 +285,14 @@ export default {
           .single();
 
         if (userError || !user) {
-          // Si no existe el perfil, crearlo
-          const { data: newUser, error: createError } = await supabase
+          // Si no existe el perfil, crearlo usando admin client para bypasear RLS
+          const adminSupabase = getSupabaseAdmin();
+          if (!adminSupabase) {
+            console.error("Admin client not available for user creation");
+            return null;
+          }
+
+          const { data: newUser, error: createError } = await adminSupabase
             .from("users")
             .insert({
               id: authData.user.id,
@@ -304,11 +310,12 @@ export default {
               total_predictions: 0,
               correct_predictions: 0,
               total_earnings: 0,
-            })
+            } as never)
             .select()
             .single();
 
           if (createError || !newUser) {
+            console.error("Error creating user profile:", createError);
             return null;
           }
 
