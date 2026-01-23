@@ -1924,8 +1924,8 @@ function ForoContent() {
           </div>
         )}
 
-        {/* COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP
-        {activeTab === 'comunidades' && (
+        {/* COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP */}
+        {false && activeTab === 'comunidades' && (
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -2281,7 +2281,6 @@ function ForoContent() {
             )}
           </div>
         )}
-        */}
         {/* FIN COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP */}
       </div>
 
