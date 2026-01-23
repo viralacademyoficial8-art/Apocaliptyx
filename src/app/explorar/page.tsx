@@ -105,12 +105,12 @@ export default function ExplorarPage() {
   ];
 
   const SORT_OPTIONS = [
-    { value: 'recent', label: '🔥 ' + t('explore.trending') },
+    { value: 'recent', label: '🔥 Tendencias' },
     { value: 'mostStolen', label: '⚔️ Más robados' },
     { value: 'mostVoted', label: '🗳️ Más votados' },
-    { value: 'popular', label: t('scenarios.sort.popular') },
-    { value: 'pool', label: t('explore.highestPool') },
-    { value: 'ending', label: t('scenarios.sort.ending') },
+    { value: 'popular', label: '👥 Más populares' },
+    { value: 'pool', label: '💰 Mayor pool' },
+    { value: 'ending', label: '⏰ Por terminar' },
   ];
 
   // Estados
