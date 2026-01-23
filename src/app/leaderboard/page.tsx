@@ -188,7 +188,7 @@ export default function LeaderboardPage() {
               <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
                 {t('rankings.title')}
               </h1>
-              <p className="text-sm sm:text-base text-gray-400">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 {t('rankings.subtitle')}
               </p>
             </div>
@@ -228,18 +228,18 @@ export default function LeaderboardPage() {
           {/* Total Prophets Card */}
           <div
             onClick={() => router.push('/comunidad')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 hover:border-blue-500/30 transition-all group"
+            className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-muted/50 hover:border-blue-500/30 transition-all group"
           >
             <div className="p-2 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
               <Users className="w-6 h-6 text-blue-400" />
             </div>
             <div className="flex-1">
-              <div className="text-xs sm:text-sm text-gray-400">
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 {t('leaderboard.totalProphets')}
               </div>
               <div className="text-2xl font-bold">{users.length}</div>
             </div>
-            <div className="text-gray-600 group-hover:text-blue-400 transition-colors">
+            <div className="text-muted-foreground group-hover:text-blue-400 transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -255,7 +255,7 @@ export default function LeaderboardPage() {
               <Trophy className="w-6 h-6 text-yellow-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs sm:text-sm text-gray-400">
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 {t('leaderboard.currentLeader')}
               </div>
               <div className="flex items-center gap-2">
@@ -294,13 +294,13 @@ export default function LeaderboardPage() {
           {/* Average Win Rate Card */}
           <div
             onClick={() => router.push('/estadisticas')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 hover:border-green-500/30 transition-all group"
+            className="bg-card border border-border rounded-xl p-4 flex items-center gap-3 cursor-pointer hover:bg-muted/50 hover:border-green-500/30 transition-all group"
           >
             <div className="p-2 bg-green-500/20 rounded-lg group-hover:bg-green-500/30 transition-colors">
               <TrendingUp className="w-6 h-6 text-green-400" />
             </div>
             <div className="flex-1">
-              <div className="text-xs sm:text-sm text-gray-400">
+              <div className="text-xs sm:text-sm text-muted-foreground">
                 {t('leaderboard.avgWinRate')}
               </div>
               <div className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export default function LeaderboardPage() {
                 </div>
               </div>
             </div>
-            <div className="text-gray-600 group-hover:text-green-400 transition-colors">
+            <div className="text-muted-foreground group-hover:text-green-400 transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -396,14 +396,14 @@ export default function LeaderboardPage() {
                     </span>
                   </div>
 
-                  <p className="text-[11px] sm:text-xs text-gray-400 mb-3">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mb-3">
                     {option.description}
                   </p>
 
                   {/* Top User Preview */}
                   {topUser && (
                     <div
-                      className="flex items-center gap-2 pt-2 border-t border-gray-700/50 cursor-pointer"
+                      className="flex items-center gap-2 pt-2 border-t border-border cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/perfil/${topUser.username}`);
@@ -423,8 +423,8 @@ export default function LeaderboardPage() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <div className="text-[10px] text-gray-500">Top #1</div>
-                        <div className="text-xs font-medium truncate text-gray-300 hover:text-white transition-colors">
+                        <div className="text-[10px] text-muted-foreground">Top #1</div>
+                        <div className="text-xs font-medium truncate text-foreground hover:text-white transition-colors">
                           {topUser.display_name || topUser.username}
                         </div>
                       </div>
@@ -442,7 +442,7 @@ export default function LeaderboardPage() {
         {/* Leaderboard Cards */}
         <section className="space-y-3">
           {/* Header Row */}
-          <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <div className="hidden md:grid md:grid-cols-12 gap-4 px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
             <div className="col-span-1">{t('rankings.position')}</div>
             <div className="col-span-4">{t('leaderboard.prophet')}</div>
             <div className="col-span-2 text-center">{t('leaderboard.sortBy.level')}</div>
@@ -488,12 +488,12 @@ export default function LeaderboardPage() {
                   badge: 'bg-gradient-to-r from-amber-600 to-orange-600 text-white',
                 };
                 return {
-                  bg: 'bg-gray-900/50',
-                  border: 'border-gray-800',
+                  bg: 'bg-card/50',
+                  border: 'border-border',
                   ring: '',
                   glow: '',
                   avatar: 'ring-2 ring-gray-700',
-                  badge: 'bg-gray-800 text-gray-300',
+                  badge: 'bg-muted text-foreground',
                 };
               };
 
@@ -560,7 +560,7 @@ export default function LeaderboardPage() {
                               <span className="flex-shrink-0 text-yellow-400 text-sm">★</span>
                             )}
                           </div>
-                          <div className="text-sm text-gray-500">@{u.username}</div>
+                          <div className="text-sm text-muted-foreground">@{u.username}</div>
                         </div>
 
                         {/* Level Badge */}
@@ -570,23 +570,23 @@ export default function LeaderboardPage() {
                       </div>
 
                       {/* Stats Grid Mobile */}
-                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-800/50">
-                        <div className="text-center p-2 rounded-lg bg-gray-800/30">
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border">
+                        <div className="text-center p-2 rounded-lg bg-muted/30">
                           <div className="text-yellow-400 font-bold">{u.ap_coins.toLocaleString()}</div>
-                          <div className="text-[10px] text-gray-500 uppercase">AP Coins</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">AP Coins</div>
                         </div>
-                        <div className="text-center p-2 rounded-lg bg-gray-800/30">
+                        <div className="text-center p-2 rounded-lg bg-muted/30">
                           <div className="text-green-400 font-bold">{u.correct_predictions}/{u.total_predictions}</div>
-                          <div className="text-[10px] text-gray-500 uppercase">Aciertos</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">Aciertos</div>
                         </div>
-                        <div className="text-center p-2 rounded-lg bg-gray-800/30">
+                        <div className="text-center p-2 rounded-lg bg-muted/30">
                           <div className={`font-bold ${
                             parseFloat(winRate) >= 60 ? 'text-green-400' :
                             parseFloat(winRate) >= 40 ? 'text-yellow-400' : 'text-red-400'
                           }`}>
                             {winRate}%
                           </div>
-                          <div className="text-[10px] text-gray-500 uppercase">Win Rate</div>
+                          <div className="text-[10px] text-muted-foreground uppercase">Win Rate</div>
                         </div>
                       </div>
                     </div>
@@ -634,7 +634,7 @@ export default function LeaderboardPage() {
                               <span className="flex-shrink-0 text-yellow-400 text-sm">★</span>
                             )}
                           </div>
-                          <div className="text-sm text-gray-500">@{u.username}</div>
+                          <div className="text-sm text-muted-foreground">@{u.username}</div>
                         </div>
                       </div>
 
@@ -679,7 +679,7 @@ export default function LeaderboardPage() {
                             {winRate}%
                           </span>
                           {/* Mini progress bar */}
-                          <div className="absolute bottom-1 left-2 right-2 h-0.5 bg-gray-800 rounded-full overflow-hidden">
+                          <div className="absolute bottom-1 left-2 right-2 h-0.5 bg-muted rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all ${
                                 parseFloat(winRate) >= 60 ? 'bg-green-400' :
@@ -698,15 +698,15 @@ export default function LeaderboardPage() {
           </div>
 
           {sortedUsers.length === 0 && (
-            <div className="text-center py-12 bg-gray-900/50 rounded-xl border border-gray-800">
-              <Trophy className="w-12 h-12 text-gray-700 mx-auto mb-3" />
-              <p className="text-gray-500">{t('leaderboard.noProphets')}</p>
+            <div className="text-center py-12 bg-card/50 rounded-xl border border-border">
+              <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">{t('leaderboard.noProphets')}</p>
             </div>
           )}
         </section>
 
         {/* Info Footer */}
-        <section className="text-center text-xs sm:text-sm text-gray-500 pb-4 sm:pb-8">
+        <section className="text-center text-xs sm:text-sm text-muted-foreground pb-4 sm:pb-8">
           <p>
             {t('leaderboard.infoText1')}
           </p>

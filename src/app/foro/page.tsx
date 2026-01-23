@@ -109,7 +109,7 @@ const BADGE_STYLES: Record<BadgeType, { icon: string; color: string; bg: string 
 // Loading fallback component
 function ForoLoadingFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-purple-900/20 to-background">
       <Navbar />
       <div className="flex items-center justify-center h-[50vh]">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
@@ -1470,7 +1470,7 @@ function ForoContent() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'feed'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
-                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border'
             }`}
           >
             <MessageCircle className="w-4 h-4" />
@@ -1482,7 +1482,7 @@ function ForoContent() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'reels'
                 ? 'bg-pink-600 text-white shadow-lg shadow-pink-500/25'
-                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border'
             }`}
           >
             <Video className="w-4 h-4" />
@@ -1494,7 +1494,7 @@ function ForoContent() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all relative ${
               activeTab === 'lives'
                 ? 'bg-red-600 text-white shadow-lg shadow-red-500/25'
-                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border'
             }`}
           >
             <Radio className="w-4 h-4" />
@@ -1509,7 +1509,7 @@ function ForoContent() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeTab === 'comunidades'
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                : 'bg-gray-800/50 text-gray-400 hover:bg-gray-800 hover:text-white border border-gray-700/50'
+                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground border border-border'
             }`}
           >
             <Users className="w-4 h-4" />
@@ -1536,7 +1536,7 @@ function ForoContent() {
                 {streams.map((stream) => (
                   <div
                     key={stream.id}
-                    className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:bg-gray-800/50 transition-all cursor-pointer"
+                    className="bg-card/50 border border-red-500/30 rounded-xl p-4 hover:bg-muted/50 transition-all cursor-pointer"
                     onClick={() => router.push(`/streaming/${stream.id}`)}
                   >
                     <div className="flex items-center gap-4">
@@ -1568,7 +1568,7 @@ function ForoContent() {
                             EN VIVO
                           </span>
                           {stream.category && (
-                            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded">
+                            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
                               {stream.category}
                             </span>
                           )}
@@ -1576,7 +1576,7 @@ function ForoContent() {
                         <p className="font-semibold text-white truncate">
                           {stream.displayName || stream.username} está transmitiendo
                         </p>
-                        <p className="text-sm text-gray-400 truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           {stream.title || 'Sin título'}
                         </p>
                       </div>
@@ -1600,7 +1600,7 @@ function ForoContent() {
                   <MessageCircle className="w-8 h-8 text-purple-400" />
                   {t('forum.title')}
                 </h1>
-                <p className="text-gray-400 mt-1">
+                <p className="text-muted-foreground mt-1">
                   {t('forum.subtitle')}
                 </p>
               </div>
@@ -1622,13 +1622,13 @@ function ForoContent() {
 
             {/* Filters */}
             <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
-              <div className="flex bg-gray-900 border border-gray-800 rounded-lg p-1">
+              <div className="flex bg-card border border-gray-800 rounded-lg p-1">
                 <button
                   onClick={() => setFilter('recent')}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     filter === 'recent'
                       ? 'bg-purple-600 text-white'
-                      : 'text-gray-400 hover:text-white'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Clock className="w-4 h-4" />
@@ -1639,7 +1639,7 @@ function ForoContent() {
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     filter === 'hot'
                       ? 'bg-orange-600 text-white'
-                      : 'text-gray-400 hover:text-white'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Flame className="w-4 h-4" />
@@ -1650,7 +1650,7 @@ function ForoContent() {
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     filter === 'rising'
                       ? 'bg-green-600 text-white'
-                      : 'text-gray-400 hover:text-white'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <TrendingUp className="w-4 h-4" />
@@ -1661,7 +1661,7 @@ function ForoContent() {
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     filter === 'popular'
                       ? 'bg-purple-600 text-white'
-                      : 'text-gray-400 hover:text-white'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Sparkles className="w-4 h-4" />
@@ -1673,7 +1673,7 @@ function ForoContent() {
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                       filter === 'following'
                         ? 'bg-purple-600 text-white'
-                        : 'text-gray-400 hover:text-white'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     <Users className="w-4 h-4" />
@@ -1703,7 +1703,7 @@ function ForoContent() {
               <div className="text-center py-20">
                 <MessageCircle className="w-16 h-16 text-gray-700 mx-auto mb-4" />
                 <h3 className="text-xl font-bold mb-2">{t('forum.posts.noPosts')}</h3>
-                <p className="text-gray-400 mb-6">
+                <p className="text-muted-foreground mb-6">
                   {selectedTag
                     ? t('forum.posts.noPostsWithTag')
                     : t('forum.posts.beFirstToShare')}
@@ -1780,7 +1780,7 @@ function ForoContent() {
           <div className="w-full lg:w-80 space-y-6">
             {/* CATEGORIAS - OCULTO TEMPORALMENTE PARA MVP */}
             {false && categories.length > 0 && (
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <div className="bg-card/50 border border-border rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-4">{t('forum.sidebar.categories')}</h3>
                 <div className="space-y-2">
                   <button
@@ -1788,7 +1788,7 @@ function ForoContent() {
                     className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                       selectedCategory === 'all'
                         ? 'bg-purple-500/20 text-purple-400'
-                        : 'text-gray-400 hover:bg-gray-800'
+                        : 'text-muted-foreground hover:bg-muted'
                     }`}
                   >
                     {t('forum.sidebar.allCategories')}
@@ -1800,7 +1800,7 @@ function ForoContent() {
                       className={`w-full text-left px-3 py-2 rounded-lg transition-colors flex items-center gap-2 ${
                         selectedCategory === cat.id
                           ? 'bg-purple-500/20 text-purple-400'
-                          : 'text-gray-400 hover:bg-gray-800'
+                          : 'text-muted-foreground hover:bg-muted'
                       }`}
                     >
                       <span>{cat.icon}</span>
@@ -1828,12 +1828,12 @@ function ForoContent() {
                         className="w-full text-left hover:bg-white/5 rounded-lg p-2 transition-colors group"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-gray-500 text-sm w-4">{index + 1}</span>
+                          <span className="text-muted-foreground text-sm w-4">{index + 1}</span>
                           <div className="flex-1">
                             <span className="font-medium text-white group-hover:text-orange-400 transition-colors">
                               {tagInfo?.label || `#${trend.tag}`}
                             </span>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-muted-foreground">
                               {t('forum.sidebar.postsThisWeek', { count: trend.post_count })}
                             </p>
                           </div>
@@ -1846,7 +1846,7 @@ function ForoContent() {
             )}
 
             {/* Tags */}
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+            <div className="bg-card/50 border border-border rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Hash className="w-5 h-5 text-purple-400" />
                 {t('forum.sidebar.tags')}
@@ -1859,7 +1859,7 @@ function ForoContent() {
                     className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
                       selectedTag === tag.id
                         ? tag.color
-                        : 'border-gray-700 text-gray-400 hover:border-gray-600 hover:text-white'
+                        : 'border-border text-muted-foreground hover:border-border/80 hover:text-white'
                     }`}
                   >
                     {tag.label}
@@ -1894,7 +1894,7 @@ function ForoContent() {
                   <Video className="w-7 h-7 text-pink-400" />
                   {t('forum.reels.title')}
                 </h2>
-                <p className="text-gray-400 mt-1">{t('forum.reels.subtitle')}</p>
+                <p className="text-muted-foreground mt-1">{t('forum.reels.subtitle')}</p>
               </div>
               {isLoggedIn && (
                 <CreateReelModal onCreateReel={handleCreateReel} />
@@ -1906,7 +1906,7 @@ function ForoContent() {
               <Button
                 variant={reelsFilter === 'foryou' ? 'default' : 'outline'}
                 onClick={() => setReelsFilter('foryou')}
-                className={reelsFilter === 'foryou' ? 'bg-pink-600' : 'border-gray-700'}
+                className={reelsFilter === 'foryou' ? 'bg-pink-600' : 'border-border'}
                 size="sm"
               >
                 {t('forum.reels.forYou')}
@@ -1914,7 +1914,7 @@ function ForoContent() {
               <Button
                 variant={reelsFilter === 'following' ? 'default' : 'outline'}
                 onClick={() => setReelsFilter('following')}
-                className={reelsFilter === 'following' ? 'bg-pink-600' : 'border-gray-700'}
+                className={reelsFilter === 'following' ? 'bg-pink-600' : 'border-border'}
                 size="sm"
               >
                 <Users className="w-4 h-4 mr-1" />
@@ -1923,7 +1923,7 @@ function ForoContent() {
               <Button
                 variant={reelsFilter === 'trending' ? 'default' : 'outline'}
                 onClick={() => setReelsFilter('trending')}
-                className={reelsFilter === 'trending' ? 'bg-pink-600' : 'border-gray-700'}
+                className={reelsFilter === 'trending' ? 'bg-pink-600' : 'border-border'}
                 size="sm"
               >
                 <TrendingUp className="w-4 h-4 mr-1" />
@@ -1934,7 +1934,7 @@ function ForoContent() {
             {/* Reels Content */}
             {reelsLoading ? (
               <div className="max-w-[400px] mx-auto">
-                <div className="bg-gray-800/50 rounded-xl aspect-[9/16] max-h-[600px] animate-pulse flex items-center justify-center">
+                <div className="bg-muted/50 rounded-xl aspect-[9/16] max-h-[600px] animate-pulse flex items-center justify-center">
                   <Loader2 className="w-8 h-8 animate-spin text-pink-400" />
                 </div>
               </div>
@@ -1948,10 +1948,10 @@ function ForoContent() {
                 onLoadMore={() => {}}
               />
             ) : (
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+              <div className="bg-card/50 border border-border rounded-xl p-12 text-center">
                 <Video className="w-16 h-16 text-pink-400/50 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('forum.reels.noReels')}</h3>
-                <p className="text-gray-400 mb-4">
+                <p className="text-muted-foreground mb-4">
                   {t('forum.reels.beFirst')}
                 </p>
                 {isLoggedIn && (
@@ -1971,7 +1971,7 @@ function ForoContent() {
                   <Radio className="w-7 h-7 text-red-400" />
                   {t('forum.lives.title')}
                 </h2>
-                <p className="text-gray-400 mt-1">{t('forum.lives.subtitle')}</p>
+                <p className="text-muted-foreground mt-1">{t('forum.lives.subtitle')}</p>
               </div>
               {isLoggedIn && (
                 <Button
@@ -1987,29 +1987,29 @@ function ForoContent() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+              <div className="bg-muted/50 rounded-xl p-4 border border-border">
                 <div className="flex items-center gap-2 text-red-400 mb-1">
                   <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                   <span className="text-sm">{t('forum.lives.liveNow')}</span>
                 </div>
                 <p className="text-2xl font-bold">{liveStats.liveNow}</p>
               </div>
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                <div className="flex items-center gap-2 text-gray-400 mb-1">
+              <div className="bg-muted/50 rounded-xl p-4 border border-border">
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
                   <Users className="w-4 h-4" />
                   <span className="text-sm">{t('forum.lives.viewers')}</span>
                 </div>
                 <p className="text-2xl font-bold">{liveStats.totalViewers}</p>
               </div>
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                <div className="flex items-center gap-2 text-gray-400 mb-1">
+              <div className="bg-muted/50 rounded-xl p-4 border border-border">
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
                   <TrendingUp className="w-4 h-4" />
                   <span className="text-sm">{t('forum.lives.mostWatchedToday')}</span>
                 </div>
                 <p className="text-2xl font-bold">{liveStats.mostWatchedToday}</p>
               </div>
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
-                <div className="flex items-center gap-2 text-gray-400 mb-1">
+              <div className="bg-muted/50 rounded-xl p-4 border border-border">
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
                   <Clock className="w-4 h-4" />
                   <span className="text-sm">{t('forum.lives.streamsToday')}</span>
                 </div>
@@ -2028,10 +2028,10 @@ function ForoContent() {
                   <div
                     key={stream.id}
                     onClick={() => router.push(`/streaming/live/${stream.id}`)}
-                    className="bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden cursor-pointer hover:border-red-500/50 transition-all group"
+                    className="bg-muted/50 border border-border rounded-xl overflow-hidden cursor-pointer hover:border-red-500/50 transition-all group"
                   >
                     {/* Thumbnail placeholder */}
-                    <div className="aspect-video bg-gray-900 relative">
+                    <div className="aspect-video bg-card relative">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Radio className="w-12 h-12 text-red-400/50 group-hover:text-red-400 transition-colors" />
                       </div>
@@ -2054,7 +2054,7 @@ function ForoContent() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium truncate">{stream.title || 'Stream en vivo'}</h3>
-                          <p className="text-sm text-gray-400 truncate">{stream.displayName || stream.username}</p>
+                          <p className="text-sm text-muted-foreground truncate">{stream.displayName || stream.username}</p>
                           {stream.category && (
                             <span className="text-xs text-red-400">{stream.category}</span>
                           )}
@@ -2065,10 +2065,10 @@ function ForoContent() {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+              <div className="bg-card/50 border border-border rounded-xl p-12 text-center">
                 <Radio className="w-16 h-16 text-red-400/50 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('forum.lives.noStreams')}</h3>
-                <p className="text-gray-400 mb-4">
+                <p className="text-muted-foreground mb-4">
                   {t('forum.lives.beFirst')}
                 </p>
                 {isLoggedIn && (
@@ -2095,7 +2095,7 @@ function ForoContent() {
                   <Users className="w-7 h-7 text-blue-400" />
                   {t('forum.communities.title')}
                 </h2>
-                <p className="text-gray-400 mt-1">{t('forum.communities.subtitle')}</p>
+                <p className="text-muted-foreground mt-1">{t('forum.communities.subtitle')}</p>
               </div>
               {isLoggedIn && (
                 <CreateCommunityModal
@@ -2116,12 +2116,12 @@ function ForoContent() {
             {/* Search and Filter */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   value={communitySearch}
                   onChange={(e) => setCommunitySearch(e.target.value)}
                   placeholder={t('forum.communities.searchPlaceholder')}
-                  className="pl-10 bg-gray-800 border-gray-700"
+                  className="pl-10 bg-muted border-border"
                 />
               </div>
               <div className="flex gap-2">
@@ -2129,7 +2129,7 @@ function ForoContent() {
                   type="button"
                   variant={communitiesFilter === 'all' ? 'default' : 'outline'}
                   onClick={() => setCommunitiesFilter('all')}
-                  className={communitiesFilter === 'all' ? 'bg-blue-600' : 'border-gray-700'}
+                  className={communitiesFilter === 'all' ? 'bg-blue-600' : 'border-border'}
                   size="sm"
                 >
                   {t('forum.communities.all')}
@@ -2138,7 +2138,7 @@ function ForoContent() {
                   type="button"
                   variant={communitiesFilter === 'joined' ? 'default' : 'outline'}
                   onClick={() => setCommunitiesFilter('joined')}
-                  className={communitiesFilter === 'joined' ? 'bg-blue-600' : 'border-gray-700'}
+                  className={communitiesFilter === 'joined' ? 'bg-blue-600' : 'border-border'}
                   size="sm"
                 >
                   {t('forum.communities.myCommunities')}
@@ -2147,7 +2147,7 @@ function ForoContent() {
                   type="button"
                   variant={communitiesFilter === 'popular' ? 'default' : 'outline'}
                   onClick={() => setCommunitiesFilter('popular')}
-                  className={communitiesFilter === 'popular' ? 'bg-blue-600' : 'border-gray-700'}
+                  className={communitiesFilter === 'popular' ? 'bg-blue-600' : 'border-border'}
                   size="sm"
                 >
                   <TrendingUp className="w-4 h-4 mr-1" />
@@ -2160,7 +2160,7 @@ function ForoContent() {
             {communitiesLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-gray-800/50 rounded-xl h-72 animate-pulse" />
+                  <div key={i} className="bg-muted/50 rounded-xl h-72 animate-pulse" />
                 ))}
               </div>
             ) : filteredCommunities.length > 0 ? (
@@ -2168,12 +2168,12 @@ function ForoContent() {
                 {filteredCommunities.map((community, i) => (
                   <div
                     key={community.id}
-                    className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors relative"
+                    className="bg-card/50 border border-border rounded-xl overflow-hidden hover:border-blue-500/50 transition-colors relative"
                   >
                     {/* Private Badge & Menu */}
                     <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
                       {!community.isPublic && (
-                        <span className="bg-gray-900/80 backdrop-blur-sm text-gray-300 text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                        <span className="bg-card/80 backdrop-blur-sm text-foreground text-xs px-2 py-1 rounded-md flex items-center gap-1">
                           <Lock className="w-3 h-3" />
                           Privada
                         </span>
@@ -2186,14 +2186,14 @@ function ForoContent() {
                             e.stopPropagation();
                             setOpenCommunityMenu(openCommunityMenu === community.id ? null : community.id);
                           }}
-                          className="w-7 h-7 rounded-full bg-gray-900/80 backdrop-blur-sm flex items-center justify-center text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+                          className="w-7 h-7 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
 
                         {/* Dropdown Menu */}
                         {openCommunityMenu === community.id && (
-                          <div className="absolute right-0 top-9 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl py-1 z-50">
+                          <div className="absolute right-0 top-9 w-48 bg-card border border-border rounded-lg shadow-xl py-1 z-50">
                             <button
                               type="button"
                               onClick={(e) => {
@@ -2204,7 +2204,7 @@ function ForoContent() {
                                 toast.success('Enlace copiado');
                                 setOpenCommunityMenu(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                              className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                             >
                               <Link2 className="w-4 h-4" />
                               Copiar enlace
@@ -2217,7 +2217,7 @@ function ForoContent() {
                                 window.open(`/foro/comunidad/${community.slug}`, '_blank');
                                 setOpenCommunityMenu(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                              className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                             >
                               <ExternalLink className="w-4 h-4" />
                               Abrir en nueva pestaña
@@ -2240,14 +2240,14 @@ function ForoContent() {
                                 }
                                 setOpenCommunityMenu(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-800 flex items-center gap-2"
+                              className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-2"
                             >
                               <Share2 className="w-4 h-4" />
                               Compartir
                             </button>
                             {community.isMember && (
                               <>
-                                <div className="border-t border-gray-700 my-1" />
+                                <div className="border-t border-border my-1" />
                                 <button
                                   type="button"
                                   onClick={(e) => {
@@ -2256,7 +2256,7 @@ function ForoContent() {
                                     handleLeaveCommunity(community.id);
                                     setOpenCommunityMenu(null);
                                   }}
-                                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-800 flex items-center gap-2"
+                                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-muted flex items-center gap-2"
                                 >
                                   <LogOut className="w-4 h-4" />
                                   Salir de la comunidad
@@ -2265,7 +2265,7 @@ function ForoContent() {
                             )}
                             {isLoggedIn && !community.isMember && (
                               <>
-                                <div className="border-t border-gray-700 my-1" />
+                                <div className="border-t border-border my-1" />
                                 <button
                                   type="button"
                                   onClick={(e) => {
@@ -2274,7 +2274,7 @@ function ForoContent() {
                                     toast.success('Gracias por tu reporte. Lo revisaremos pronto.');
                                     setOpenCommunityMenu(null);
                                   }}
-                                  className="w-full px-4 py-2 text-left text-sm text-orange-400 hover:bg-gray-800 flex items-center gap-2"
+                                  className="w-full px-4 py-2 text-left text-sm text-orange-400 hover:bg-muted flex items-center gap-2"
                                 >
                                   <Flag className="w-4 h-4" />
                                   Reportar comunidad
@@ -2320,7 +2320,7 @@ function ForoContent() {
                         </div>
                       </Link>
 
-                      <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                         {community.description || t('forum.communities.defaultDescription')}
                       </p>
 
@@ -2330,7 +2330,7 @@ function ForoContent() {
                           {community.categories.slice(0, 3).map((cat, idx) => (
                             <span
                               key={idx}
-                              className="text-[10px] px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700"
+                              className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border"
                             >
                               {cat}
                             </span>
@@ -2339,7 +2339,7 @@ function ForoContent() {
                       )}
 
                       {/* Stats */}
-                      <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
                         <span className="flex items-center gap-1">
                           <Users className="w-3 h-3" />
                           {community.membersCount} miembros
@@ -2379,7 +2379,7 @@ function ForoContent() {
                             type="button"
                             size="sm"
                             variant="outline"
-                            className="border-gray-600 text-gray-400 hover:text-red-400 hover:border-red-500/50"
+                            className="border-border/80 text-muted-foreground hover:text-red-400 hover:border-red-500/50"
                             onClick={(e) => {
                               e.preventDefault();
                               handleLeaveCommunity(community.id);
@@ -2421,10 +2421,10 @@ function ForoContent() {
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-12 text-center">
+              <div className="bg-card/50 border border-border rounded-xl p-12 text-center">
                 <Users className="w-16 h-16 text-blue-400/50 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{t('forum.communities.noCommunitiesFound')}</h3>
-                <p className="text-gray-400 mb-4">
+                <p className="text-muted-foreground mb-4">
                   {communitySearch
                     ? t('forum.communities.tryOtherTerms')
                     : t('forum.communities.beFirstToCreate')}
@@ -2448,7 +2448,7 @@ function ForoContent() {
 
       {/* Create Post Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">{t('forum.createModal.title')}</h2>
 
           {/* Post Type Selector */}
@@ -2459,7 +2459,7 @@ function ForoContent() {
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 createMode === 'post'
                   ? 'bg-purple-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-muted text-muted-foreground hover:bg-muted'
               }`}
             >
               <MessageCircle className="w-4 h-4" />
@@ -2471,7 +2471,7 @@ function ForoContent() {
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 createMode === 'poll'
                   ? 'bg-orange-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-muted text-muted-foreground hover:bg-muted'
               }`}
             >
               <BarChart3 className="w-4 h-4" />
@@ -2483,7 +2483,7 @@ function ForoContent() {
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
                 createMode === 'thread'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                  : 'bg-muted text-muted-foreground hover:bg-muted'
               }`}
             >
               <ListPlus className="w-4 h-4" />
@@ -2501,18 +2501,18 @@ function ForoContent() {
                   onChange={(e) => handleContentChange(e.target.value, e.target.selectionStart)}
                   placeholder={t('forum.createModal.placeholder')}
                   rows={4}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full p-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 />
 
                 {/* Mention Suggestions */}
                 {showMentions && mentionSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
+                  <div className="absolute left-0 right-0 mt-1 bg-muted border border-border rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
                     {mentionSuggestions.map((user) => (
                       <button
                         type="button"
                         key={user.id}
                         onClick={() => insertMention(user.username)}
-                        className="w-full px-4 py-2 flex items-center gap-3 hover:bg-gray-700 transition-colors"
+                        className="w-full px-4 py-2 flex items-center gap-3 hover:bg-muted transition-colors"
                       >
                         <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold">
                           {user.username[0].toUpperCase()}
@@ -2544,7 +2544,7 @@ function ForoContent() {
                   <button
                     type="button"
                     onClick={() => setSelectedGif(null)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-gray-900/80 rounded-full flex items-center justify-center text-white hover:bg-gray-900"
+                    className="absolute top-2 right-2 w-6 h-6 bg-card/80 rounded-full flex items-center justify-center text-white hover:bg-card"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -2559,7 +2559,7 @@ function ForoContent() {
                       <img
                         src={URL.createObjectURL(file)}
                         alt={`Preview ${index + 1}`}
-                        className="w-20 h-20 object-cover rounded-lg border border-gray-700"
+                        className="w-20 h-20 object-cover rounded-lg border border-border"
                       />
                       <button
                         type="button"
@@ -2587,7 +2587,7 @@ function ForoContent() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={selectedImages.length >= 4}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-purple-400 hover:bg-purple-500/10 transition-colors disabled:opacity-50"
                 >
                   <ImageIcon className="w-5 h-5" />
                   {t('forum.createModal.image')}
@@ -2596,7 +2596,7 @@ function ForoContent() {
                 {false && (
                   <button
                     type="button"
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                   >
                     GIF
                   </button>
@@ -2606,7 +2606,7 @@ function ForoContent() {
                   <button
                     type="button"
                     onClick={triggerMention}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
                   >
                     <AtSign className="w-5 h-5" />
                     {t('forum.createModal.mention')}
@@ -2620,18 +2620,18 @@ function ForoContent() {
           {createMode === 'poll' && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">{t('forum.poll.question')}</label>
+                <label className="text-sm text-muted-foreground mb-1 block">{t('forum.poll.question')}</label>
                 <input
                   type="text"
                   value={pollQuestion}
                   onChange={(e) => setPollQuestion(e.target.value)}
                   placeholder={t('forum.poll.questionPlaceholder')}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full p-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">{t('forum.poll.options')}</label>
+                <label className="text-sm text-muted-foreground mb-2 block">{t('forum.poll.options')}</label>
                 <div className="space-y-2">
                   {pollOptions.map((option, index) => (
                     <div key={index} className="flex gap-2">
@@ -2644,7 +2644,7 @@ function ForoContent() {
                           setPollOptions(newOptions);
                         }}
                         placeholder={t('forum.poll.optionPlaceholder', { number: index + 1 })}
-                        className="flex-1 p-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="flex-1 p-2 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500"
                       />
                       {pollOptions.length > 2 && (
                         <button
@@ -2671,11 +2671,11 @@ function ForoContent() {
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">{t('forum.poll.duration')}</label>
+                <label className="text-sm text-muted-foreground mb-1 block">{t('forum.poll.duration')}</label>
                 <select
                   value={pollDuration}
                   onChange={(e) => setPollDuration(Number(e.target.value))}
-                  className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full p-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   <option value={1}>1 {t('forum.poll.hour')}</option>
                   <option value={6}>6 {t('forum.poll.hours')}</option>
@@ -2692,18 +2692,18 @@ function ForoContent() {
           {createMode === 'thread' && (
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400 mb-1 block">{t('forum.thread.titleOptional')}</label>
+                <label className="text-sm text-muted-foreground mb-1 block">{t('forum.thread.titleOptional')}</label>
                 <input
                   type="text"
                   value={newPostContent}
                   onChange={(e) => setNewPostContent(e.target.value)}
                   placeholder={t('forum.thread.titlePlaceholder')}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">{t('forum.thread.posts')}</label>
+                <label className="text-sm text-muted-foreground mb-2 block">{t('forum.thread.posts')}</label>
                 <div className="space-y-3">
                   {threadPosts.map((post, index) => (
                     <div key={index} className="relative">
@@ -2721,7 +2721,7 @@ function ForoContent() {
                           }}
                           placeholder={t('forum.thread.postPlaceholder', { number: index + 1 })}
                           rows={3}
-                          className="flex-1 p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          className="flex-1 p-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         />
                       </div>
                     </div>
@@ -2743,7 +2743,7 @@ function ForoContent() {
 
           {/* Tags */}
           <div className="mt-4">
-            <p className="text-sm text-gray-400 mb-2">{t('forum.createModal.tagsOptional')}</p>
+            <p className="text-sm text-muted-foreground mb-2">{t('forum.createModal.tagsOptional')}</p>
             <div className="flex flex-wrap gap-2">
               {FORUM_TAGS.map((tag) => (
                 <button
@@ -2753,7 +2753,7 @@ function ForoContent() {
                   className={`px-3 py-1.5 rounded-lg text-sm border transition-all ${
                     newPostTags.includes(tag.id)
                       ? tag.color
-                      : 'border-gray-700 text-gray-400 hover:border-gray-600'
+                      : 'border-border text-muted-foreground hover:border-border/80'
                   }`}
                 >
                   {tag.label}
@@ -2766,7 +2766,7 @@ function ForoContent() {
             <Button
               variant="outline"
               onClick={resetCreateModal}
-              className="border-gray-700"
+              className="border-border"
             >
               {t('common.cancel')}
             </Button>
@@ -2798,13 +2798,13 @@ function ForoContent() {
 
       {/* Comments Modal */}
       <Dialog open={!!selectedPostId} onOpenChange={() => setSelectedPostId(null)}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <h2 className="text-xl font-bold mb-4">{t('forum.comments.title')}</h2>
 
           {selectedPost && (
             <div className="flex-1 overflow-y-auto space-y-4">
               {/* Post original */}
-              <div className="bg-gray-800/50 rounded-lg p-4">
+              <div className="bg-muted/50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Link href={`/perfil/${selectedPost.author?.username}`}>
                     <div
@@ -2818,12 +2818,12 @@ function ForoContent() {
                     <Link href={`/perfil/${selectedPost.author?.username}`} className="font-semibold hover:text-purple-400 transition-colors">
                       {selectedPost.author?.display_name || selectedPost.author?.username}
                     </Link>
-                    <Link href={`/perfil/${selectedPost.author?.username}`} className="text-gray-500 text-sm ml-2 hover:text-purple-400 transition-colors">
+                    <Link href={`/perfil/${selectedPost.author?.username}`} className="text-muted-foreground text-sm ml-2 hover:text-purple-400 transition-colors">
                       @{selectedPost.author?.username}
                     </Link>
                   </div>
                 </div>
-                <p className="text-gray-300">{selectedPost.content}</p>
+                <p className="text-foreground">{selectedPost.content}</p>
               </div>
 
               {/* Lista de comentarios */}
@@ -2832,13 +2832,13 @@ function ForoContent() {
                   <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
                 </div>
               ) : comments.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-muted-foreground py-8">
                   {t('forum.comments.noComments')}
                 </p>
               ) : (
                 <div className="space-y-3">
                   {comments.map((comment) => (
-                    <div key={comment.id} className="bg-gray-800/30 rounded-lg p-3">
+                    <div key={comment.id} className="bg-muted/30 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                           <Link href={`/perfil/${comment.author?.username}`}>
@@ -2852,21 +2852,21 @@ function ForoContent() {
                           <Link href={`/perfil/${comment.author?.username}`} className="font-medium text-sm hover:text-purple-400 transition-colors">
                             {comment.author?.display_name || comment.author?.username}
                           </Link>
-                          <span className="text-gray-500 text-xs">
+                          <span className="text-muted-foreground text-xs">
                             {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
                           </span>
                         </div>
                         {user?.id === comment.author_id && (
                           <button
                             onClick={() => openDeleteConfirm(comment.id)}
-                            className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                            className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
                             title={t('forum.comments.delete') || 'Eliminar comentario'}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
                       </div>
-                      <p className="text-gray-300 text-sm ml-8">{comment.content}</p>
+                      <p className="text-foreground text-sm ml-8">{comment.content}</p>
                     </div>
                   ))}
                 </div>
@@ -2883,7 +2883,7 @@ function ForoContent() {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder={t('forum.comments.placeholder')}
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                   onKeyDown={(e) => e.key === 'Enter' && handleCreateComment()}
                 />
                 <Button
@@ -2910,7 +2910,7 @@ function ForoContent() {
           if (!open) setDeletingCommentId(null);
         }
       }}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-sm">
+        <DialogContent className="bg-card border-border max-w-sm">
           <div className="flex flex-col items-center text-center py-4">
             {/* Icon */}
             <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4 animate-pulse">
@@ -2923,7 +2923,7 @@ function ForoContent() {
             </h2>
 
             {/* Description */}
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-muted-foreground text-sm mb-6">
               Esta acción no se puede deshacer. El comentario será eliminado permanentemente.
             </p>
 
@@ -2931,7 +2931,7 @@ function ForoContent() {
             <div className="flex gap-3 w-full">
               <Button
                 variant="outline"
-                className="flex-1 border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="flex-1 border-border hover:bg-muted text-foreground"
                 onClick={() => {
                   setDeleteConfirmOpen(false);
                   setDeletingCommentId(null);
@@ -2969,7 +2969,7 @@ function ForoContent() {
           if (!open) setDeletingPostId(null);
         }
       }}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-sm">
+        <DialogContent className="bg-card border-border max-w-sm">
           <div className="flex flex-col items-center text-center py-4">
             {/* Icon */}
             <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4 animate-pulse">
@@ -2982,7 +2982,7 @@ function ForoContent() {
             </h2>
 
             {/* Description */}
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-muted-foreground text-sm mb-6">
               Esta acción no se puede deshacer. La publicación será eliminada permanentemente.
             </p>
 
@@ -2990,7 +2990,7 @@ function ForoContent() {
             <div className="flex gap-3 w-full">
               <Button
                 variant="outline"
-                className="flex-1 border-gray-700 hover:bg-gray-800 text-gray-300"
+                className="flex-1 border-border hover:bg-muted text-foreground"
                 onClick={() => {
                   setDeletePostConfirmOpen(false);
                   setDeletingPostId(null);
@@ -3023,7 +3023,7 @@ function ForoContent() {
 
       {/* Repost Modal */}
       <Dialog open={repostModalOpen} onOpenChange={setRepostModalOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+        <DialogContent className="bg-card border-border max-w-lg">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Repeat2 className="w-5 h-5 text-green-400" />
             {t('forum.actions.sharePost')}
@@ -3031,7 +3031,7 @@ function ForoContent() {
 
           {repostingPost && (
             <>
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700 mb-4">
+              <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Link href={`/perfil/${repostingPost.author?.username}`}>
                     <div
@@ -3045,11 +3045,11 @@ function ForoContent() {
                     {repostingPost.author?.display_name || repostingPost.author?.username}
                   </Link>
                 </div>
-                <p className="text-gray-300 text-sm line-clamp-3">{repostingPost.content}</p>
+                <p className="text-foreground text-sm line-clamp-3">{repostingPost.content}</p>
               </div>
 
               <div className="mb-4">
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-muted-foreground mb-2 block">
                   {t('forum.actions.addCommentOptional')}
                 </label>
                 <textarea
@@ -3057,7 +3057,7 @@ function ForoContent() {
                   onChange={(e) => setQuoteContent(e.target.value)}
                   placeholder={t('forum.actions.whatDoYouThink')}
                   rows={3}
-                  className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                  className="w-full p-3 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                 />
               </div>
 
@@ -3066,7 +3066,7 @@ function ForoContent() {
                   onClick={() => handleRepost(false)}
                   disabled={isReposting}
                   variant="outline"
-                  className="flex-1 border-gray-700 hover:border-green-500 hover:text-green-400"
+                  className="flex-1 border-border hover:border-green-500 hover:text-green-400"
                 >
                   {isReposting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Repeat2 className="w-4 h-4 mr-2" />}
                   {t('forum.actions.share')}
@@ -3087,7 +3087,7 @@ function ForoContent() {
 
       {/* Award Modal */}
       <Dialog open={awardModalOpen} onOpenChange={setAwardModalOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+        <DialogContent className="bg-card border-border max-w-lg">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-yellow-400" />
             {t('forum.actions.giveAward')}
@@ -3095,9 +3095,9 @@ function ForoContent() {
 
           {awardingPost && (
             <>
-              <div className="bg-gray-800/50 rounded-lg p-3 mb-4 border border-gray-700">
-                <p className="text-gray-300 text-sm line-clamp-2">{awardingPost.content}</p>
-                <span className="text-xs text-gray-500 mt-1 block">
+              <div className="bg-muted/50 rounded-lg p-3 mb-4 border border-border">
+                <p className="text-foreground text-sm line-clamp-2">{awardingPost.content}</p>
+                <span className="text-xs text-muted-foreground mt-1 block">
                   {t('forum.actions.by')} <Link href={`/perfil/${awardingPost.author?.username}`} className="hover:text-purple-400 transition-colors">@{awardingPost.author?.username}</Link>
                 </span>
               </div>
@@ -3110,7 +3110,7 @@ function ForoContent() {
                     className={`p-3 rounded-lg border transition-all text-left ${
                       selectedAward?.id === award.id
                         ? 'border-yellow-500 bg-yellow-500/10'
-                        : 'border-gray-700 hover:border-gray-600'
+                        : 'border-border hover:border-border/80'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -3119,7 +3119,7 @@ function ForoContent() {
                         {award.name}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mb-2">{award.description}</p>
+                    <p className="text-xs text-muted-foreground mb-2">{award.description}</p>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-yellow-400">{t('forum.actions.apCost', { cost: award.ap_cost })}</span>
                       <span className="text-gray-600">→</span>
@@ -3131,7 +3131,7 @@ function ForoContent() {
 
               {selectedAward && (
                 <div className="mb-4">
-                  <label className="text-sm text-gray-400 mb-2 block">
+                  <label className="text-sm text-muted-foreground mb-2 block">
                     {t('forum.actions.messageOptional')}
                   </label>
                   <input
@@ -3139,7 +3139,7 @@ function ForoContent() {
                     value={awardMessage}
                     onChange={(e) => setAwardMessage(e.target.value)}
                     placeholder={t('forum.actions.addMessage')}
-                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                    className="w-full p-2 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   />
                 </div>
               )}
@@ -3148,7 +3148,7 @@ function ForoContent() {
                 <Button
                   variant="outline"
                   onClick={() => setAwardModalOpen(false)}
-                  className="border-gray-700"
+                  className="border-border"
                 >
                   {t('common.cancel')}
                 </Button>
@@ -3250,7 +3250,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
       case 'scenario_resolved':
         return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400', accent: 'text-emerald-400' };
       case 'scenario_closed':
-        return { bg: 'bg-gray-500/10', border: 'border-gray-500/30', iconBg: 'bg-gray-500/20 text-gray-400', accent: 'text-gray-400' };
+        return { bg: 'bg-gray-500/10', border: 'border-gray-500/30', iconBg: 'bg-gray-500/20 text-muted-foreground', accent: 'text-muted-foreground' };
       case 'live_stream':
         return { bg: 'bg-red-500/10', border: 'border-red-500/30', iconBg: 'bg-red-500/20 text-red-400', accent: 'text-red-400' };
       case 'achievement':
@@ -3311,7 +3311,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
 
   return (
     <div
-      className={`${styles.bg} border ${styles.border} rounded-xl p-5 hover:bg-gray-800/50 transition-all cursor-pointer`}
+      className={`${styles.bg} border ${styles.border} rounded-xl p-5 hover:bg-muted/50 transition-all cursor-pointer`}
       onClick={handleClick}
     >
       {/* Header */}
@@ -3343,7 +3343,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
             </span>
           </div>
 
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-muted-foreground mb-2">
             @{item.user.username} • {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: dateLocale })}
           </p>
 
@@ -3427,7 +3427,7 @@ function PostCard({
     : [];
 
   return (
-    <div id={`post-${post.id}`} className="bg-gray-900/50 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-all">
+    <div id={`post-${post.id}`} className="bg-card/50 border border-border rounded-xl p-5 hover:border-border transition-all">
       {/* Thread indicator */}
       {post.thread_id && (
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg px-3 py-2 mb-3">
@@ -3479,7 +3479,7 @@ function PostCard({
               {post.is_pinned && <Pin className="w-4 h-4 text-yellow-400" />}
               {post.is_locked && <Lock className="w-4 h-4 text-red-400" />}
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Link href={`/perfil/${post.author?.username}`} className="hover:text-purple-400 transition-colors">
                 @{post.author?.username}
               </Link>
@@ -3494,7 +3494,7 @@ function PostCard({
           {!isAuthor && currentUserId && (
             <button
               onClick={() => onAward(post)}
-              className="p-2 text-gray-500 hover:text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-colors"
+              className="p-2 text-muted-foreground hover:text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-colors"
               title="Dar premio"
             >
               <Gift className="w-4 h-4" />
@@ -3504,7 +3504,7 @@ function PostCard({
           {isAuthor && (
             <button
               onClick={() => onDelete(post.id)}
-              className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+              className="p-2 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -3525,7 +3525,7 @@ function PostCard({
             </span>
           ))}
           {post.awards.length > 5 && (
-            <span className="text-xs text-gray-500">+{post.awards.length - 5}</span>
+            <span className="text-xs text-muted-foreground">+{post.awards.length - 5}</span>
           )}
         </div>
       )}
@@ -3559,7 +3559,7 @@ function PostCard({
           <img
             src={post.image_url}
             alt="Imagen del post"
-            className="w-full max-h-[500px] object-contain bg-gray-800/50"
+            className="w-full max-h-[500px] object-contain bg-muted/50"
           />
         </div>
       )}
@@ -3591,7 +3591,7 @@ function PostCard({
           <button
             onClick={() => setShowReactions(!showReactions)}
             onMouseEnter={() => setShowReactions(true)}
-            className="flex items-center gap-2 text-gray-400 hover:text-orange-400 transition-colors group"
+            className="flex items-center gap-2 text-muted-foreground hover:text-orange-400 transition-colors group"
           >
             {topReactions.length > 0 ? (
               <span className="text-base">{topReactions.join('')}</span>
@@ -3604,7 +3604,7 @@ function PostCard({
           {/* Reactions Popup */}
           {showReactions && (
             <div
-              className="absolute bottom-full left-0 mb-2 flex gap-1 bg-gray-800 border border-gray-700 rounded-full px-2 py-1 shadow-xl z-50"
+              className="absolute bottom-full left-0 mb-2 flex gap-1 bg-muted border border-border rounded-full px-2 py-1 shadow-xl z-50"
               onMouseLeave={() => setShowReactions(false)}
             >
               {REACTIONS.map((reaction) => {
@@ -3632,7 +3632,7 @@ function PostCard({
         {/* Comments */}
         <button
           onClick={() => onOpenComments(post.id)}
-          className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-blue-400 transition-colors"
         >
           <MessageCircle className="w-5 h-5" />
           <span>{post.comments_count || 0}</span>
@@ -3645,7 +3645,7 @@ function PostCard({
             className={`flex items-center gap-2 transition-colors ${
               post.user_reposted
                 ? 'text-green-400'
-                : 'text-gray-400 hover:text-green-400'
+                : 'text-muted-foreground hover:text-green-400'
             }`}
           >
             <Repeat2 className="w-5 h-5" />
@@ -3657,75 +3657,75 @@ function PostCard({
         <div className="relative">
           <button
             onClick={() => setShowShareMenu(!showShareMenu)}
-            className="flex items-center gap-2 text-gray-400 hover:text-purple-400 transition-colors"
+            className="flex items-center gap-2 text-muted-foreground hover:text-purple-400 transition-colors"
           >
             <Share2 className="w-5 h-5" />
           </button>
 
           {showShareMenu && (
             <div
-              className="absolute bottom-full right-0 mb-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[160px] py-2"
+              className="absolute bottom-full right-0 mb-2 bg-muted border border-border rounded-lg shadow-xl z-50 min-w-[160px] py-2"
               onMouseLeave={() => setShowShareMenu(false)}
             >
               <button
                 onClick={() => { onShare(post, 'clipboard'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                 {t('forum.actions.copyLink')}
               </button>
               <button
                 onClick={() => { onShare(post, 'twitter'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 X (Twitter)
               </button>
               <button
                 onClick={() => { onShare(post, 'whatsapp'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 WhatsApp
               </button>
               <button
                 onClick={() => { onShare(post, 'telegram'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="#0088cc" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                 Telegram
               </button>
               <button
                 onClick={() => { onShare(post, 'facebook'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="#1877F2" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 Facebook
               </button>
               <button
                 onClick={() => { onShare(post, 'instagram'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="url(#instagram-gradient)" viewBox="0 0 24 24"><defs><linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#FFDC80"/><stop offset="25%" stopColor="#F77737"/><stop offset="50%" stopColor="#E1306C"/><stop offset="75%" stopColor="#C13584"/><stop offset="100%" stopColor="#833AB4"/></linearGradient></defs><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
                 Instagram
               </button>
               <button
                 onClick={() => { onShare(post, 'tiktok'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
                 TikTok
               </button>
               <button
                 onClick={() => { onShare(post, 'reddit'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="#FF4500" viewBox="0 0 24 24"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
                 Reddit
               </button>
               <button
                 onClick={() => { onShare(post, 'linkedin'); setShowShareMenu(false); }}
-                className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700 flex items-center gap-3"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="#0A66C2" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
                 LinkedIn
@@ -3740,7 +3740,7 @@ function PostCard({
           className={`flex items-center gap-1 transition-colors ${
             post.user_bookmarked
               ? 'text-yellow-400'
-              : 'text-gray-400 hover:text-yellow-400'
+              : 'text-muted-foreground hover:text-yellow-400'
           }`}
         >
           {post.user_bookmarked ? (
@@ -3754,7 +3754,7 @@ function PostCard({
         </button>
 
         {/* Views */}
-        <span className="text-gray-500 text-sm">
+        <span className="text-muted-foreground text-sm">
           {post.views_count || 0} {t('forum.posts.views')}
         </span>
       </div>
@@ -3766,7 +3766,7 @@ function PostCard({
           onClick={() => setShowImageModal(false)}
         >
           <button
-            className="absolute top-4 right-4 p-2 text-white hover:text-gray-300 transition-colors z-10"
+            className="absolute top-4 right-4 p-2 text-white hover:text-foreground transition-colors z-10"
             onClick={() => setShowImageModal(false)}
           >
             <X className="w-8 h-8" />
@@ -3826,7 +3826,7 @@ function PollDisplay({
   const showResults = localPoll.has_voted || isExpired;
 
   return (
-    <div className="bg-gray-800/50 rounded-xl p-4 mb-4 border border-gray-700">
+    <div className="bg-muted/50 rounded-xl p-4 mb-4 border border-border">
       <div className="flex items-center gap-2 mb-3">
         <BarChart3 className="w-5 h-5 text-orange-400" />
         <span className="font-medium">{localPoll.question}</span>
@@ -3847,10 +3847,10 @@ function PollDisplay({
               className={`w-full text-left rounded-lg overflow-hidden transition-all ${
                 showResults
                   ? 'cursor-default'
-                  : 'hover:bg-gray-700/50 cursor-pointer'
+                  : 'hover:bg-muted/50 cursor-pointer'
               }`}
             >
-              <div className="relative p-3 border border-gray-700 rounded-lg">
+              <div className="relative p-3 border border-border rounded-lg">
                 {showResults && (
                   <div
                     className="absolute inset-0 bg-orange-500/20 rounded-lg transition-all"
@@ -3867,7 +3867,7 @@ function PollDisplay({
                     </span>
                   </div>
                   {showResults && (
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-muted-foreground">
                       {percentage}%
                     </span>
                   )}
@@ -3878,7 +3878,7 @@ function PollDisplay({
         })}
       </div>
 
-      <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+      <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
         <span>{localPoll.total_votes} {localPoll.total_votes === 1 ? t('forum.poll.vote') : t('forum.poll.votes')}</span>
         <span>
           {isExpired ? (

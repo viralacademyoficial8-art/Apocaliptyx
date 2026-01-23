@@ -135,7 +135,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         `}
       >
         {/* Glassmorphism Background */}
-        <div className="absolute inset-0 bg-zinc-950/95 backdrop-blur-xl" />
+        <div className="absolute inset-0 bg-background/95 backdrop-blur-xl" />
 
         {/* Gradient Orbs */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -144,7 +144,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {/* Content */}
         <div className="relative flex flex-col h-full safe-area-all">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-zinc-800/50">
+          <div className="flex items-center justify-between p-4 border-b border-border">
             <Link href="/" onClick={onClose} className="flex items-center gap-2 group">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-50 group-hover:opacity-75 transition-opacity" />
@@ -164,10 +164,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </Link>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-zinc-800/50 rounded-xl transition-colors touch-target-sm"
+              className="p-2 hover:bg-muted rounded-xl transition-colors touch-target-sm"
               aria-label={t("common.close")}
             >
-              <X className="w-5 h-5 text-zinc-400" />
+              <X className="w-5 h-5 text-muted-foreground" />
             </button>
           </div>
 
@@ -178,11 +178,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 {/* Glow effect */}
                 <div className={`absolute -inset-0.5 bg-gradient-to-r ${isAdmin ? 'from-yellow-500/30 to-orange-500/30' : 'from-purple-600/30 to-pink-600/30'} rounded-2xl blur`} />
 
-                <div className="relative bg-zinc-900/80 border border-zinc-800/50 rounded-2xl p-4">
+                <div className="relative bg-card/80 border border-border rounded-2xl p-4">
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <div className={`absolute -inset-1 bg-gradient-to-r ${isAdmin ? 'from-yellow-500 to-orange-500' : 'from-purple-600 to-pink-600'} rounded-full blur-sm opacity-50`} />
-                      <Avatar className={`relative w-14 h-14 border-2 ${isAdmin ? 'border-yellow-500' : 'border-zinc-700'}`}>
+                      <Avatar className={`relative w-14 h-14 border-2 ${isAdmin ? 'border-yellow-500' : 'border-border'}`}>
                         <AvatarImage src={currentUser.avatarUrl} alt={currentUser.username} />
                         <AvatarFallback className="bg-gradient-to-br from-purple-600 to-pink-600 text-white font-bold">
                           {currentUser.username?.substring(0, 2).toUpperCase() || "US"}
@@ -204,11 +204,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-zinc-500 truncate">
+                      <div className="text-sm text-muted-foreground truncate">
                         @{currentUser.username}
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-zinc-600" />
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </div>
 
                   {/* AP Coins */}
@@ -254,7 +254,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       ${
                         isActive
                           ? "bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-500/25"
-                          : "hover:bg-zinc-800/50"
+                          : "hover:bg-muted"
                       }
                     `}
                   >
@@ -267,7 +267,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     `}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
-                    <span className={`font-medium ${isActive ? "text-white" : "text-zinc-300 group-hover:text-white"}`}>
+                    <span className={`font-medium ${isActive ? "text-white" : "text-foreground group-hover:text-white"}`}>
                       {item.label}
                     </span>
                     {isActive && <Zap className="w-4 h-4 text-yellow-300 ml-auto" />}
@@ -281,7 +281,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <div className="mt-6">
                 <div className="flex items-center gap-2 px-3 mb-3">
                   <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
                     {t("nav.social")}
                   </span>
                 </div>
@@ -299,7 +299,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                           flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group touch-target
                           ${isActive
                             ? "bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-500/25"
-                            : "hover:bg-zinc-800/50"
+                            : "hover:bg-muted"
                           }
                         `}
                       >
@@ -309,7 +309,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         `}>
                           <Icon className="w-4 h-4 text-white" />
                         </div>
-                        <span className={`font-medium ${isActive ? "text-white" : "text-zinc-300 group-hover:text-white"}`}>
+                        <span className={`font-medium ${isActive ? "text-white" : "text-foreground group-hover:text-white"}`}>
                           {item.label}
                         </span>
                         {item.badge && (
@@ -326,13 +326,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
             {/* User Actions */}
             {isAuthenticated && currentUser && (
-              <div className="mt-6 pt-4 border-t border-zinc-800/50 space-y-1.5">
+              <div className="mt-6 pt-4 border-t border-border space-y-1.5">
                 <Link
                   href={`/perfil/${currentUser.username}`}
                   onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-zinc-400 hover:bg-zinc-800/50 hover:text-white transition-all touch-target"
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-muted hover:text-white transition-all touch-target"
                 >
-                  <div className="p-2 rounded-lg bg-zinc-800">
+                  <div className="p-2 rounded-lg bg-muted">
                     <User className="w-4 h-4" />
                   </div>
                   <span className="font-medium">{t("nav.profile")}</span>
@@ -341,9 +341,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Link
                   href="/configuracion"
                   onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-zinc-400 hover:bg-zinc-800/50 hover:text-white transition-all touch-target"
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-muted hover:text-white transition-all touch-target"
                 >
-                  <div className="p-2 rounded-lg bg-zinc-800">
+                  <div className="p-2 rounded-lg bg-muted">
                     <Settings className="w-4 h-4" />
                   </div>
                   <span className="font-medium">{t("nav.settings")}</span>
@@ -352,7 +352,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Link
                   href="/mensajes"
                   onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-zinc-400 hover:bg-blue-500/10 hover:text-blue-400 transition-all touch-target"
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-blue-500/10 hover:text-blue-400 transition-all touch-target"
                 >
                   <div className="p-2 rounded-lg bg-blue-500/20">
                     <Mail className="w-4 h-4 text-blue-400" />
@@ -393,15 +393,15 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
           {/* Footer (no logueado) */}
           {!isAuthenticated && (
-            <div className="p-4 border-t border-zinc-800/50 space-y-3">
+            <div className="p-4 border-t border-border space-y-3">
               {/* Language Selector */}
-              <div className="pb-3 border-b border-zinc-800/50">
+              <div className="pb-3 border-b border-border">
                 <LanguageSelector variant="mobile" />
               </div>
 
               {/* Login Button */}
               <Link href="/login" onClick={onClose} className="block">
-                <button className="w-full py-3.5 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]">
+                <button className="w-full py-3.5 bg-muted/50 hover:bg-muted border border-border/50 text-white font-semibold rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98]">
                   {t("nav.login")}
                 </button>
               </Link>
@@ -418,7 +418,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               </Link>
 
               {/* Bonus text */}
-              <p className="text-center text-xs text-zinc-500">
+              <p className="text-center text-xs text-muted-foreground">
                 <span className="text-yellow-400">+1,000 AP Coins</span> gratis al registrarte
               </p>
             </div>

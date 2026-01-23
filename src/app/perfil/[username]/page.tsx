@@ -543,7 +543,7 @@ export default function PublicProfilePage() {
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-          <span className="ml-3 text-gray-400">Cargando perfil...</span>
+          <span className="ml-3 text-muted-foreground">Cargando perfil...</span>
         </div>
       </div>
     );
@@ -556,7 +556,7 @@ export default function PublicProfilePage() {
         <div className="flex flex-col items-center justify-center py-32">
           <User className="w-16 h-16 text-gray-600 mb-4" />
           <h1 className="text-2xl font-bold mb-2">Usuario no encontrado</h1>
-          <p className="text-gray-400 mb-6">@{username} no existe</p>
+          <p className="text-muted-foreground mb-6">@{username} no existe</p>
           <Link
             href="/explorar"
             className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
@@ -594,7 +594,7 @@ export default function PublicProfilePage() {
           {/* Avatar */}
           <div className="absolute -top-16 left-4 sm:left-6">
             <div className="relative">
-              <div className={`w-32 h-32 rounded-full border-4 ${profile.is_premium ? 'border-yellow-500' : 'border-gray-950'} bg-gray-800 overflow-hidden`}>
+              <div className={`w-32 h-32 rounded-full border-4 ${profile.is_premium ? 'border-yellow-500' : 'border-gray-950'} bg-muted overflow-hidden`}>
                 {profile.avatar_url ? (
                   <img
                     src={profile.avatar_url}
@@ -620,7 +620,7 @@ export default function PublicProfilePage() {
             {isOwnProfile ? (
               <Link
                 href="/configuracion"
-                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center gap-2 transition-colors"
+                className="px-4 py-2 bg-muted hover:bg-gray-700 rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 Editar perfil
@@ -632,7 +632,7 @@ export default function PublicProfilePage() {
                   disabled={followLoading}
                   className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                     isFollowing
-                      ? 'bg-gray-800 hover:bg-red-600/20 hover:text-red-400'
+                      ? 'bg-muted hover:bg-red-600/20 hover:text-red-400'
                       : 'bg-purple-600 hover:bg-purple-700'
                   }`}
                 >
@@ -653,7 +653,7 @@ export default function PublicProfilePage() {
                 <button 
                   onClick={handleStartChat}
                   disabled={chatLoading || isBlocked}
-                  className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                  className="p-2 bg-muted hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
                   title={isBlocked ? 'Usuario bloqueado' : 'Enviar mensaje'}
                 >
                   {chatLoading ? (
@@ -666,15 +666,15 @@ export default function PublicProfilePage() {
                 {/* Menú de opciones */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors">
+                    <button className="p-2 bg-muted hover:bg-gray-700 rounded-lg transition-colors">
                       <MoreHorizontal className="w-5 h-5" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-800">
+                  <DropdownMenuContent align="end" className="w-56 bg-card border-border">
                     {/* Compartir */}
                     <DropdownMenuItem 
                       onClick={handleShare}
-                      className="cursor-pointer hover:bg-gray-800"
+                      className="cursor-pointer hover:bg-muted"
                     >
                       <Share2 className="mr-2 h-4 w-4" />
                       Compartir perfil
@@ -682,18 +682,18 @@ export default function PublicProfilePage() {
                     
                     <DropdownMenuItem 
                       onClick={handleCopyLink}
-                      className="cursor-pointer hover:bg-gray-800"
+                      className="cursor-pointer hover:bg-muted"
                     >
                       <Copy className="mr-2 h-4 w-4" />
                       Copiar link
                     </DropdownMenuItem>
                     
-                    <div className="my-1 h-px bg-gray-800" />
+                    <div className="my-1 h-px bg-muted" />
                     
                     {/* Silenciar */}
                     <DropdownMenuItem 
                       onClick={handleToggleMute}
-                      className="cursor-pointer hover:bg-gray-800"
+                      className="cursor-pointer hover:bg-muted"
                     >
                       {isMuted ? (
                         <>
@@ -711,7 +711,7 @@ export default function PublicProfilePage() {
                     {/* Bloquear */}
                     <DropdownMenuItem 
                       onClick={handleToggleBlock}
-                      className={`cursor-pointer ${isBlocked ? 'hover:bg-gray-800' : 'hover:bg-red-500/10 text-red-400'}`}
+                      className={`cursor-pointer ${isBlocked ? 'hover:bg-muted' : 'hover:bg-red-500/10 text-red-400'}`}
                     >
                       {isBlocked ? (
                         <>
@@ -726,7 +726,7 @@ export default function PublicProfilePage() {
                       )}
                     </DropdownMenuItem>
                     
-                    <div className="my-1 h-px bg-gray-800" />
+                    <div className="my-1 h-px bg-muted" />
                     
                     {/* Reportar */}
                     <DropdownMenuItem 
@@ -764,16 +764,16 @@ export default function PublicProfilePage() {
 
             <div className="flex items-center gap-2 mt-1">
               <span className="text-purple-400 font-medium">{getTitle()}</span>
-              <span className="text-gray-500">•</span>
-              <span className="text-gray-400">@{profile.username}</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-muted-foreground">@{profile.username}</span>
             </div>
 
             {profile.bio && (
-              <p className="mt-3 text-gray-300 max-w-2xl">{profile.bio}</p>
+              <p className="mt-3 text-foreground max-w-2xl">{profile.bio}</p>
             )}
 
             {/* Meta info */}
-            <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-400">
+            <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 Se unió {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: es })}
@@ -806,33 +806,33 @@ export default function PublicProfilePage() {
             <div className="flex flex-wrap gap-6 mt-6">
               <button
                 onClick={handleOpenFollowers}
-                className="text-center hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-colors"
+                className="text-center hover:bg-muted/50 px-3 py-2 rounded-lg transition-colors"
               >
                 <span className="text-xl font-bold">{profile.followers_count}</span>
-                <span className="text-gray-400 text-sm ml-1">seguidores</span>
+                <span className="text-muted-foreground text-sm ml-1">seguidores</span>
               </button>
               <button
                 onClick={handleOpenFollowing}
-                className="text-center hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-colors"
+                className="text-center hover:bg-muted/50 px-3 py-2 rounded-lg transition-colors"
               >
                 <span className="text-xl font-bold">{profile.following_count}</span>
-                <span className="text-gray-400 text-sm ml-1">siguiendo</span>
+                <span className="text-muted-foreground text-sm ml-1">siguiendo</span>
               </button>
               <div className="text-center px-3 py-2">
                 <span className="text-xl font-bold">#{profile.rank || '-'}</span>
-                <span className="text-gray-400 text-sm ml-1">ranking</span>
+                <span className="text-muted-foreground text-sm ml-1">ranking</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Level Progress */}
-        <div className="px-4 sm:px-6 py-4 border-t border-gray-800">
+        <div className="px-4 sm:px-6 py-4 border-t border-border">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-400">Nivel {profile.level}</span>
-            <span className="text-gray-400">{profile.xp} XP</span>
+            <span className="text-muted-foreground">Nivel {profile.level}</span>
+            <span className="text-muted-foreground">{profile.xp} XP</span>
           </div>
-          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
               style={{ width: `${xpProgress}%` }}
@@ -841,36 +841,36 @@ export default function PublicProfilePage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 px-4 sm:px-6 py-6 border-t border-gray-800">
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 px-4 sm:px-6 py-6 border-t border-border">
+          <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
             <Target className="w-6 h-6 text-blue-400 mx-auto mb-2" />
             <p className="text-2xl font-bold">{profile.total_predictions}</p>
-            <p className="text-sm text-gray-400">Predicciones</p>
+            <p className="text-sm text-muted-foreground">Predicciones</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
             <CheckCircle className="w-6 h-6 text-green-400 mx-auto mb-2" />
             <p className="text-2xl font-bold">{profile.correct_predictions}</p>
-            <p className="text-sm text-gray-400">Aciertos</p>
+            <p className="text-sm text-muted-foreground">Aciertos</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
             <BarChart3 className="w-6 h-6 text-purple-400 mx-auto mb-2" />
             <p className="text-2xl font-bold">{profile.accuracy}%</p>
-            <p className="text-sm text-gray-400">Precisión</p>
+            <p className="text-sm text-muted-foreground">Precisión</p>
           </div>
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
             <Flame className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
             <p className="text-2xl font-bold">{profile.total_earnings.toLocaleString()}</p>
-            <p className="text-sm text-gray-400">AP Ganadas</p>
+            <p className="text-sm text-muted-foreground">AP Ganadas</p>
           </div>
           <div className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 text-center">
             <Crown className="w-6 h-6 text-red-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-red-400">{scenariosHeldCount}</p>
-            <p className="text-sm text-gray-400">Holder Actual</p>
+            <p className="text-sm text-muted-foreground">Holder Actual</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="border-t border-gray-800">
+        <div className="border-t border-border">
           <div className="flex overflow-x-auto px-4 sm:px-6">
             {[
               { id: 'general', label: 'General', icon: User },
@@ -888,7 +888,7 @@ export default function PublicProfilePage() {
                   className={`flex items-center gap-2 px-4 py-4 border-b-2 transition-colors whitespace-nowrap ${
                     activeTab === tab.id
                       ? 'border-purple-500 text-purple-400'
-                      : 'border-transparent text-gray-400 hover:text-white'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -904,52 +904,52 @@ export default function PublicProfilePage() {
           {activeTab === 'general' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Info Card */}
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <div className="bg-card/50 border border-border rounded-xl p-6">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
                   <Award className="w-5 h-5 text-purple-400" />
                   Información
                 </h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Nivel</span>
+                    <span className="text-muted-foreground">Nivel</span>
                     <span className="font-medium">{profile.level}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">XP Total</span>
+                    <span className="text-muted-foreground">XP Total</span>
                     <span className="font-medium">{profile.xp.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Ranking</span>
+                    <span className="text-muted-foreground">Ranking</span>
                     <span className="font-medium">#{profile.rank}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Precisión</span>
+                    <span className="text-muted-foreground">Precisión</span>
                     <span className="font-medium text-green-400">{profile.accuracy}%</span>
                   </div>
                 </div>
               </div>
 
               {/* Quick Stats */}
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <div className="bg-card/50 border border-border rounded-xl p-6">
                 <h3 className="font-semibold mb-4 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-green-400" />
                   Estadísticas
                 </h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Predicciones totales</span>
+                    <span className="text-muted-foreground">Predicciones totales</span>
                     <span className="font-medium">{profile.total_predictions}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Predicciones correctas</span>
+                    <span className="text-muted-foreground">Predicciones correctas</span>
                     <span className="font-medium text-green-400">{profile.correct_predictions}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">AP Coins ganadas</span>
+                    <span className="text-muted-foreground">AP Coins ganadas</span>
                     <span className="font-medium text-yellow-400">{profile.total_earnings.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Holder Actual</span>
+                    <span className="text-muted-foreground">Holder Actual</span>
                     <span className="font-medium text-red-400">{scenariosHeldCount}</span>
                   </div>
                 </div>
@@ -964,7 +964,7 @@ export default function PublicProfilePage() {
                 Escenarios Robados
               </h3>
               {stolenScenarios.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-muted-foreground">
                   <Skull className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No ha robado escenarios aún</p>
                 </div>
@@ -974,7 +974,7 @@ export default function PublicProfilePage() {
                     <Link
                       key={steal.id}
                       href={`/escenario/${steal.scenario?.id}`}
-                      className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-red-500/50 transition-colors"
+                      className="bg-card/50 border border-border rounded-lg p-4 hover:border-red-500/50 transition-colors"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
@@ -986,14 +986,14 @@ export default function PublicProfilePage() {
                         </span>
                       </div>
                       <h4 className="font-medium mt-2 line-clamp-2">{steal.scenario?.title || 'Escenario eliminado'}</h4>
-                      <div className="flex items-center gap-4 mt-3 text-sm text-gray-400">
+                      <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Flame className="w-4 h-4 text-yellow-500" />
                           {steal.scenario?.total_pool?.toLocaleString() || 0} AP
                         </span>
                         <span>{steal.scenario?.participant_count || 0} participantes</span>
                       </div>
-                      <div className="mt-3 pt-3 border-t border-gray-700 text-xs text-gray-500">
+                      <div className="mt-3 pt-3 border-t border-border text-xs text-muted-foreground">
                         <p>Robado a @{steal.victim?.username || 'desconocido'} por {steal.price_paid} AP</p>
                         <p>{formatDistanceToNow(new Date(steal.stolen_at), { addSuffix: true, locale: es })}</p>
                       </div>
@@ -1008,7 +1008,7 @@ export default function PublicProfilePage() {
             <div className="space-y-4">
               <h3 className="font-semibold mb-4">Escenarios Creados</h3>
               {scenarios.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-muted-foreground">
                   <Zap className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No ha creado escenarios aún</p>
                 </div>
@@ -1018,13 +1018,13 @@ export default function PublicProfilePage() {
                     <Link
                       key={scenario.id}
                       href={`/escenario/${scenario.id}`}
-                      className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 hover:border-purple-500/50 transition-colors"
+                      className="bg-card/50 border border-border rounded-lg p-4 hover:border-purple-500/50 transition-colors"
                     >
                       <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
                         {scenario.category}
                       </span>
                       <h4 className="font-medium mt-2 line-clamp-2">{scenario.title}</h4>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                         <span>{scenario.total_pool?.toLocaleString() || 0} AP</span>
                         <span>{scenario.participant_count || 0} participantes</span>
                       </div>
@@ -1039,7 +1039,7 @@ export default function PublicProfilePage() {
             <div className="space-y-4">
               <h3 className="font-semibold mb-4">Actividad Reciente</h3>
               {activity.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-muted-foreground">
                   <Eye className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No hay actividad reciente</p>
                 </div>
@@ -1048,16 +1048,16 @@ export default function PublicProfilePage() {
                   {activity.map((item) => (
                     <div
                       key={item.id}
-                      className="bg-gray-900/50 border border-gray-800 rounded-lg p-4 flex items-center gap-4"
+                      className="bg-card/50 border border-border rounded-lg p-4 flex items-center gap-4"
                     >
                       <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
                         <Target className="w-5 h-5 text-purple-400" />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">{item.title}</p>
-                        <p className="text-sm text-gray-400">{item.description}</p>
+                        <p className="text-sm text-muted-foreground">{item.description}</p>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: es })}
                       </span>
                     </div>
@@ -1079,7 +1079,7 @@ export default function PublicProfilePage() {
                   <Loader2 className="w-8 h-8 animate-spin text-red-400" />
                 </div>
               ) : scenariosHeld.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-muted-foreground">
                   <Crown className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No posee ningún escenario actualmente</p>
                   <p className="text-sm mt-2">Crea o roba escenarios para verlos aquí</p>
@@ -1094,7 +1094,7 @@ export default function PublicProfilePage() {
                         className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <span className="text-xs px-2 py-1 bg-gray-800 rounded-full text-gray-400">
+                          <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
                             {scenario.category}
                           </span>
                           {scenario.creator_id !== scenario.current_holder_id && (
@@ -1111,7 +1111,7 @@ export default function PublicProfilePage() {
                           )}
                         </div>
                         <h4 className="font-semibold text-white mb-2 line-clamp-2">{scenario.title}</h4>
-                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Flame className="w-4 h-4 text-yellow-400" />
                             {scenario.total_pool?.toLocaleString() || 0} AP
@@ -1135,7 +1135,7 @@ export default function PublicProfilePage() {
                   {scenariosHeld.length > HOLDER_INITIAL_SHOW && (
                     <button
                       onClick={() => setHolderExpanded(!holderExpanded)}
-                      className="w-full py-3 mt-4 bg-gray-900/50 border border-gray-700 hover:border-red-500/50 rounded-xl text-purple-400 hover:text-red-400 transition-all flex items-center justify-center gap-2"
+                      className="w-full py-3 mt-4 bg-gray-900/50 border border-border hover:border-red-500/50 rounded-xl text-purple-400 hover:text-red-400 transition-all flex items-center justify-center gap-2"
                     >
                       <ChevronDown className={`w-5 h-5 transition-transform ${holderExpanded ? 'rotate-180' : ''}`} />
                       {holderExpanded
@@ -1160,7 +1160,7 @@ export default function PublicProfilePage() {
                   <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
                 </div>
               ) : bookmarks.length === 0 ? (
-                <div className="text-center py-12 text-gray-400">
+                <div className="text-center py-12 text-muted-foreground">
                   <Bookmark className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No tienes publicaciones guardadas</p>
                   <p className="text-sm mt-2">Guarda publicaciones del foro haciendo clic en el icono de marcador</p>
@@ -1171,7 +1171,7 @@ export default function PublicProfilePage() {
                     <Link
                       key={post.id}
                       href={`/foro?post=${post.id}`}
-                      className="block bg-gray-900/50 border border-gray-800 rounded-xl p-4 hover:border-purple-500/50 transition-colors"
+                      className="block bg-card/50 border border-border rounded-xl p-4 hover:border-purple-500/50 transition-colors"
                     >
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -1190,14 +1190,14 @@ export default function PublicProfilePage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-medium">{post.author?.display_name || post.author?.username}</span>
-                            <span className="text-gray-500">@{post.author?.username}</span>
+                            <span className="text-muted-foreground">@{post.author?.username}</span>
                             <span className="text-gray-600">·</span>
-                            <span className="text-gray-500 text-sm">
+                            <span className="text-muted-foreground text-sm">
                               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: es })}
                             </span>
                           </div>
-                          <p className="mt-2 text-gray-300 line-clamp-3">{post.content}</p>
-                          <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                          <p className="mt-2 text-foreground line-clamp-3">{post.content}</p>
+                          <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Heart className="w-4 h-4" />
                               {post.reactions_count
@@ -1222,7 +1222,7 @@ export default function PublicProfilePage() {
 
       {/* Modal de Reporte */}
       <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+        <DialogContent className="bg-card border-border max-w-md">
           <div className="mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Flag className="w-5 h-5 text-red-400" />
@@ -1232,7 +1232,7 @@ export default function PublicProfilePage() {
           
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-gray-400 mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 ¿Por qué quieres reportar a este usuario?
               </label>
               <div className="space-y-2">
@@ -1243,7 +1243,7 @@ export default function PublicProfilePage() {
                     className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                       reportReason === reason.id
                         ? 'bg-purple-500/20 border-purple-500 text-purple-400'
-                        : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                        : 'bg-muted border-border hover:border-border/80'
                     }`}
                   >
                     {reason.label}
@@ -1253,7 +1253,7 @@ export default function PublicProfilePage() {
             </div>
             
             <div>
-              <label className="text-sm text-gray-400 mb-2 block">
+              <label className="text-sm text-muted-foreground mb-2 block">
                 Detalles adicionales (opcional)
               </label>
               <textarea
@@ -1261,10 +1261,10 @@ export default function PublicProfilePage() {
                 onChange={(e) => setReportDescription(e.target.value)}
                 placeholder="Proporciona más información sobre el problema..."
                 rows={3}
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 maxLength={500}
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {reportDescription.length}/500 caracteres
               </p>
             </div>
@@ -1277,7 +1277,7 @@ export default function PublicProfilePage() {
                   setReportReason('');
                   setReportDescription('');
                 }}
-                className="flex-1 border-gray-700"
+                className="flex-1 border-border"
               >
                 Cancelar
               </Button>
@@ -1302,13 +1302,13 @@ export default function PublicProfilePage() {
 
       {/* Modal de Seguidores */}
       <Dialog open={showFollowersModal} onOpenChange={setShowFollowersModal}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-card border-border max-w-md max-h-[80vh] overflow-hidden flex flex-col">
           <div className="mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-400" />
               Seguidores de @{profile?.username}
             </h2>
-            <p className="text-sm text-gray-400 mt-1">{profile?.followers_count} seguidores</p>
+            <p className="text-sm text-muted-foreground mt-1">{profile?.followers_count} seguidores</p>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
@@ -1317,7 +1317,7 @@ export default function PublicProfilePage() {
                 <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
               </div>
             ) : followersList.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>Aún no tiene seguidores</p>
               </div>
@@ -1327,7 +1327,7 @@ export default function PublicProfilePage() {
                   key={follower.id}
                   href={`/perfil/${follower.username}`}
                   onClick={() => setShowFollowersModal(false)}
-                  className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors"
+                  className="flex items-center gap-3 p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
                     {follower.avatar_url ? (
@@ -1342,9 +1342,9 @@ export default function PublicProfilePage() {
                       {follower.is_verified && <CheckCircle className="w-4 h-4 text-blue-400" />}
                       {follower.is_premium && <Crown className="w-4 h-4 text-yellow-400" />}
                     </p>
-                    <p className="text-sm text-gray-400 truncate">@{follower.username}</p>
+                    <p className="text-sm text-muted-foreground truncate">@{follower.username}</p>
                   </div>
-                  <span className="text-xs text-gray-500">Nivel {follower.level}</span>
+                  <span className="text-xs text-muted-foreground">Nivel {follower.level}</span>
                 </Link>
               ))
             )}
@@ -1354,13 +1354,13 @@ export default function PublicProfilePage() {
 
       {/* Modal de Siguiendo */}
       <Dialog open={showFollowingModal} onOpenChange={setShowFollowingModal}>
-        <DialogContent className="bg-gray-900 border-gray-800 max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-card border-border max-w-md max-h-[80vh] overflow-hidden flex flex-col">
           <div className="mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-400" />
               @{profile?.username} sigue a
             </h2>
-            <p className="text-sm text-gray-400 mt-1">{profile?.following_count} siguiendo</p>
+            <p className="text-sm text-muted-foreground mt-1">{profile?.following_count} siguiendo</p>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
@@ -1369,7 +1369,7 @@ export default function PublicProfilePage() {
                 <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
               </div>
             ) : followingList.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-muted-foreground">
                 <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No sigue a nadie todavía</p>
               </div>
@@ -1379,7 +1379,7 @@ export default function PublicProfilePage() {
                   key={following.id}
                   href={`/perfil/${following.username}`}
                   onClick={() => setShowFollowingModal(false)}
-                  className="flex items-center gap-3 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors"
+                  className="flex items-center gap-3 p-3 bg-muted/50 hover:bg-muted rounded-lg transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
                     {following.avatar_url ? (
@@ -1394,9 +1394,9 @@ export default function PublicProfilePage() {
                       {following.is_verified && <CheckCircle className="w-4 h-4 text-blue-400" />}
                       {following.is_premium && <Crown className="w-4 h-4 text-yellow-400" />}
                     </p>
-                    <p className="text-sm text-gray-400 truncate">@{following.username}</p>
+                    <p className="text-sm text-muted-foreground truncate">@{following.username}</p>
                   </div>
-                  <span className="text-xs text-gray-500">Nivel {following.level}</span>
+                  <span className="text-xs text-muted-foreground">Nivel {following.level}</span>
                 </Link>
               ))
             )}

@@ -403,7 +403,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-background border-t border-gray-800">
+    <footer className="bg-background border-t border-border">
       {/* Sección Principal */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
@@ -419,39 +419,39 @@ export function Footer() {
               />
             </Link>
 
-            <p className="text-gray-400 text-sm mb-6 max-w-xs">{t.description}</p>
+            <p className="text-muted-foreground text-sm mb-6 max-w-xs">{t.description}</p>
 
             {/* Stats en tiempo real */}
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+              <div className="flex items-center gap-2 bg-card px-3 py-2.5 rounded-lg border border-border">
                 <Flame className="w-4 h-4 text-yellow-500 flex-shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-xs text-gray-500 truncate">{t.labels.bolsaTotal}</div>
-                  <div className="text-sm font-bold text-yellow-400">{stats.totalPool.value} AP</div>
+                  <div className="text-xs text-muted-foreground truncate">{t.labels.bolsaTotal}</div>
+                  <div className="text-sm font-bold text-yellow-500 dark:text-yellow-400">{stats.totalPool.value} AP</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+              <div className="flex items-center gap-2 bg-card px-3 py-2.5 rounded-lg border border-border">
                 <Users className="w-4 h-4 text-purple-500 flex-shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-xs text-gray-500 truncate">{t.labels.profetas}</div>
-                  <div className="text-sm font-bold text-purple-400">{stats.users.value}</div>
+                  <div className="text-xs text-muted-foreground truncate">{t.labels.profetas}</div>
+                  <div className="text-sm font-bold text-purple-500 dark:text-purple-400">{stats.users.value}</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+              <div className="flex items-center gap-2 bg-card px-3 py-2.5 rounded-lg border border-border">
                 <Target className="w-4 h-4 text-blue-500 flex-shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-xs text-gray-500 truncate">{t.labels.escenarios}</div>
-                  <div className="text-sm font-bold text-blue-400">{stats.scenarios.value}</div>
+                  <div className="text-xs text-muted-foreground truncate">{t.labels.escenarios}</div>
+                  <div className="text-sm font-bold text-blue-500 dark:text-blue-400">{stats.scenarios.value}</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-900/80 px-3 py-2.5 rounded-lg border border-gray-800">
+              <div className="flex items-center gap-2 bg-card px-3 py-2.5 rounded-lg border border-border">
                 <TrendingUp className="w-4 h-4 text-green-500 flex-shrink-0" />
                 <div className="min-w-0">
-                  <div className="text-xs text-gray-500 truncate">{t.labels.predicciones}</div>
-                  <div className="text-sm font-bold text-green-400">{stats.predictions.value}</div>
+                  <div className="text-xs text-muted-foreground truncate">{t.labels.predicciones}</div>
+                  <div className="text-sm font-bold text-green-500 dark:text-green-400">{stats.predictions.value}</div>
                 </div>
               </div>
             </div>
@@ -466,7 +466,7 @@ export function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 bg-gray-900 hover:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-colors border border-gray-800"
+                    className="w-10 h-10 bg-card hover:bg-muted rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors border border-border"
                     aria-label={social.label}
                   >
                     <Icon className="w-5 h-5" />
@@ -478,13 +478,13 @@ export function Footer() {
 
           {/* Links - Plataforma */}
           <div>
-            <h3 className="text-white font-semibold mb-4">{t.headings.plataforma}</h3>
+            <h3 className="text-foreground font-semibold mb-4">{t.headings.plataforma}</h3>
             <ul className="space-y-3">
               {t.links.plataforma.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -495,13 +495,13 @@ export function Footer() {
 
           {/* Links - Soporte */}
           <div>
-            <h3 className="text-white font-semibold mb-4">{t.headings.soporte}</h3>
+            <h3 className="text-foreground font-semibold mb-4">{t.headings.soporte}</h3>
             <ul className="space-y-3">
               {t.links.soporte.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -512,13 +512,13 @@ export function Footer() {
 
           {/* Links - Legal */}
           <div>
-            <h3 className="text-white font-semibold mb-4">{t.headings.legal}</h3>
+            <h3 className="text-foreground font-semibold mb-4">{t.headings.legal}</h3>
             <ul className="space-y-3">
               {t.links.legal.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -529,13 +529,13 @@ export function Footer() {
 
           {/* Links - Empresa */}
           <div>
-            <h3 className="text-white font-semibold mb-4">{t.headings.empresa}</h3>
+            <h3 className="text-foreground font-semibold mb-4">{t.headings.empresa}</h3>
             <ul className="space-y-3">
               {t.links.empresa.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -547,12 +547,12 @@ export function Footer() {
       </div>
 
       {/* Newsletter */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-white font-semibold mb-1">{t.labels.newsletterTitle}</h3>
-              <p className="text-gray-400 text-sm">{t.labels.newsletterSubtitle}</p>
+              <h3 className="text-foreground font-semibold mb-1">{t.labels.newsletterTitle}</h3>
+              <p className="text-muted-foreground text-sm">{t.labels.newsletterSubtitle}</p>
             </div>
 
             <form onSubmit={handleNewsletterSubmit} className="flex flex-col w-full md:w-auto gap-2">
@@ -563,7 +563,7 @@ export function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.labels.newsletterPlaceholder}
                   disabled={newsletterStatus === 'loading'}
-                  className="flex-1 md:w-64 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
+                  className="flex-1 md:w-64 px-4 py-2 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:opacity-50"
                 />
                 <button
                   type="submit"
@@ -584,13 +584,13 @@ export function Footer() {
       </div>
 
       {/* Copyright - Mejorado */}
-      <div className="border-t border-gray-800 bg-gray-900/30">
+      <div className="border-t border-border bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* Copyright */}
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>© {currentYear}</span>
-              <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
                 Apocaliptyx
               </Link>
               <span className="hidden sm:inline">•</span>
@@ -599,7 +599,7 @@ export function Footer() {
 
             {/* Centro */}
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-500">{t.labels.madeWith}</span>
+              <span className="text-muted-foreground">{t.labels.madeWith}</span>
               <Image
                 src="/apocaliptyx-logo.png"
                 alt="Apocaliptyx"
@@ -607,17 +607,17 @@ export function Footer() {
                 height={24}
                 className="h-5 w-auto"
               />
-              <span className="text-gray-500">{t.labels.global}</span>
+              <span className="text-muted-foreground">{t.labels.global}</span>
             </div>
 
             {/* Derecha */}
             <div className="flex items-center gap-3 text-sm">
-              <div className="flex items-center gap-1.5 text-gray-500">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
                 <span>CDMX, México</span>
               </div>
-              <span className="text-gray-700">•</span>
-              <span className="text-gray-600 font-mono text-xs">{t.labels.version}</span>
+              <span className="text-muted-foreground/50">•</span>
+              <span className="text-muted-foreground font-mono text-xs">{t.labels.version}</span>
             </div>
           </div>
         </div>
