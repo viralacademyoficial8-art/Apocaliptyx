@@ -795,9 +795,9 @@ function ForoContent() {
   //   }
   // }, [activeTab, loadCommunities]);
 
-  // Load streams when lives tab is active
+  // Load streams when lives tab or feed tab is active
   useEffect(() => {
-    if (activeTab === 'lives') {
+    if (activeTab === 'lives' || activeTab === 'feed') {
       loadStreams();
     }
   }, [activeTab, loadStreams]);
@@ -1464,10 +1464,74 @@ function ForoContent() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
           <div className="flex-1 space-y-8">
-            {/* Activity Feed Section */}
+            {/* Activity Feed Section - OCULTO PARA MVP: Los lives aparecen directamente en el feed de posts */}
+            {false && (
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
               <ActivityFeed />
             </div>
+            )}
+
+            {/* Live Streams in Feed */}
+            {streams.length > 0 && (
+              <div className="space-y-4 mb-6">
+                {streams.map((stream) => (
+                  <div
+                    key={stream.id}
+                    className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:bg-gray-800/50 transition-all cursor-pointer"
+                    onClick={() => router.push(`/streaming/${stream.id}`)}
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div className="relative">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center overflow-hidden ring-2 ring-red-500 animate-pulse">
+                          {stream.avatarUrl ? (
+                            <img
+                              src={stream.avatarUrl}
+                              alt={stream.displayName || stream.username}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-lg font-bold text-white">
+                              {(stream.displayName || stream.username || '?')[0].toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 bg-red-500 rounded-full p-1">
+                          <Radio className="w-3 h-3 text-white" />
+                        </div>
+                      </div>
+
+                      {/* Stream Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                            EN VIVO
+                          </span>
+                          {stream.category && (
+                            <span className="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded">
+                              {stream.category}
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-semibold text-white truncate">
+                          {stream.displayName || stream.username} está transmitiendo
+                        </p>
+                        <p className="text-sm text-gray-400 truncate">
+                          {stream.title || 'Sin título'}
+                        </p>
+                      </div>
+
+                      {/* Viewers */}
+                      <div className="flex items-center gap-2 text-red-400">
+                        <Eye className="w-4 h-4" />
+                        <span className="font-medium">{stream.viewersCount || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Community Posts Section */}
             {/* Header */}
