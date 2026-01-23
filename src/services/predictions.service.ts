@@ -65,16 +65,16 @@ export const predictionsService = {
     }
 
     // Actualizar los pools del escenario después de crear la predicción
-    const votes = await this.countVotes(input.scenarioId);
-    const totalParticipants = votes.yes + votes.no;
+    // Usar calculatePools para sumar los montos apostados (no solo contar votos)
+    const pools = await this.calculatePools(input.scenarioId);
 
     await supabase
       .from('scenarios')
       .update({
-        yes_pool: votes.yes,
-        no_pool: votes.no,
-        total_pool: totalParticipants,
-        participant_count: totalParticipants,
+        yes_pool: pools.yesPool,
+        no_pool: pools.noPool,
+        total_pool: pools.totalPool,
+        participant_count: pools.participantCount,
         updated_at: new Date().toISOString(),
       } as never)
       .eq('id', input.scenarioId);
@@ -140,7 +140,7 @@ export const predictionsService = {
     return (data as Prediction[]) || [];
   },
 
-  // Contar votos de un escenario
+  // Contar votos de un escenario (solo conteo para porcentajes de votación)
   async countVotes(scenarioId: string): Promise<{ yes: number; no: number }> {
     const supabase = getSupabaseClient();
 
@@ -157,6 +157,38 @@ export const predictionsService = {
     const no = data.filter((p: { prediction: string }) => p.prediction === 'NO').length;
 
     return { yes, no };
+  },
+
+  // Calcular pools sumando los montos apostados (para estadística "AP en juego")
+  async calculatePools(scenarioId: string): Promise<{ yesPool: number; noPool: number; totalPool: number; participantCount: number }> {
+    const supabase = getSupabaseClient();
+
+    const { data, error } = await supabase
+      .from('predictions')
+      .select('prediction, amount')
+      .eq('scenario_id', scenarioId);
+
+    if (error || !data) {
+      return { yesPool: 0, noPool: 0, totalPool: 0, participantCount: 0 };
+    }
+
+    let yesPool = 0;
+    let noPool = 0;
+
+    data.forEach((p: { prediction: string; amount: number }) => {
+      if (p.prediction === 'YES') {
+        yesPool += p.amount || 0;
+      } else if (p.prediction === 'NO') {
+        noPool += p.amount || 0;
+      }
+    });
+
+    return {
+      yesPool,
+      noPool,
+      totalPool: yesPool + noPool,
+      participantCount: data.length,
+    };
   },
 
   // ============================================
