@@ -106,6 +106,8 @@ export default function ExplorarPage() {
 
   const SORT_OPTIONS = [
     { value: 'recent', label: '🔥 ' + t('explore.trending') },
+    { value: 'mostStolen', label: '⚔️ Más robados' },
+    { value: 'mostVoted', label: '🗳️ Más votados' },
     { value: 'popular', label: t('scenarios.sort.popular') },
     { value: 'pool', label: t('explore.highestPool') },
     { value: 'ending', label: t('scenarios.sort.ending') },
@@ -129,6 +131,7 @@ export default function ExplorarPage() {
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
+  const [showTopInteracted, setShowTopInteracted] = useState(false);
 
   // Search dropdown
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -241,6 +244,14 @@ export default function ExplorarPage() {
 
     // Ordenar
     switch (sortBy) {
+      case 'mostStolen':
+        // Ordenar solo por más robados
+        result.sort((a, b) => (b.steal_count || 0) - (a.steal_count || 0));
+        break;
+      case 'mostVoted':
+        // Ordenar solo por más votados (participantes)
+        result.sort((a, b) => b.participant_count - a.participant_count);
+        break;
       case 'popular':
         result.sort((a, b) => b.participant_count - a.participant_count);
         break;
@@ -731,6 +742,93 @@ export default function ExplorarPage() {
             {filteredScenarios.map((scenario) => (
               <ScenarioCard key={scenario.id} scenario={scenario} />
             ))}
+          </div>
+        )}
+
+        {/* Sección desplegable: Más interactuados */}
+        {scenarios.length > 0 && (
+          <div className="mt-8 border border-gray-800 rounded-xl overflow-hidden">
+            <button
+              onClick={() => setShowTopInteracted(!showTopInteracted)}
+              className="w-full px-6 py-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 transition-all flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏆</span>
+                <div className="text-left">
+                  <h3 className="text-lg font-bold text-white">Escenarios más interactuados</h3>
+                  <p className="text-sm text-gray-400">Los más robados y votados de la plataforma</p>
+                </div>
+              </div>
+              <ChevronDown className={`w-6 h-6 text-purple-400 transition-transform ${showTopInteracted ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showTopInteracted && (
+              <div className="p-6 bg-gray-900/50 border-t border-gray-800">
+                {/* Top Más Robados */}
+                <div className="mb-8">
+                  <h4 className="text-md font-semibold text-red-400 mb-4 flex items-center gap-2">
+                    <Swords className="w-5 h-5" />
+                    Top 5 - Más Robados
+                  </h4>
+                  <div className="space-y-3">
+                    {[...scenarios]
+                      .sort((a, b) => (b.steal_count || 0) - (a.steal_count || 0))
+                      .slice(0, 5)
+                      .map((scenario, index) => (
+                        <div
+                          key={scenario.id}
+                          onClick={() => router.push(`/escenario/${scenario.id}`)}
+                          className="flex items-center gap-4 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 cursor-pointer transition-all group"
+                        >
+                          <span className={`text-2xl font-bold ${index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-orange-400' : 'text-gray-500'}`}>
+                            #{index + 1}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-white truncate group-hover:text-purple-300">{scenario.title}</p>
+                            <p className="text-xs text-gray-500">{scenario.category}</p>
+                          </div>
+                          <div className="flex items-center gap-1 px-3 py-1 bg-red-500/20 rounded-full">
+                            <Swords className="w-4 h-4 text-red-400" />
+                            <span className="text-sm font-bold text-red-400">{scenario.steal_count || 0}</span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Top Más Votados */}
+                <div>
+                  <h4 className="text-md font-semibold text-green-400 mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Top 5 - Más Votados
+                  </h4>
+                  <div className="space-y-3">
+                    {[...scenarios]
+                      .sort((a, b) => b.participant_count - a.participant_count)
+                      .slice(0, 5)
+                      .map((scenario, index) => (
+                        <div
+                          key={scenario.id}
+                          onClick={() => router.push(`/escenario/${scenario.id}`)}
+                          className="flex items-center gap-4 p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 cursor-pointer transition-all group"
+                        >
+                          <span className={`text-2xl font-bold ${index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : index === 2 ? 'text-orange-400' : 'text-gray-500'}`}>
+                            #{index + 1}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-white truncate group-hover:text-purple-300">{scenario.title}</p>
+                            <p className="text-xs text-gray-500">{scenario.category}</p>
+                          </div>
+                          <div className="flex items-center gap-1 px-3 py-1 bg-green-500/20 rounded-full">
+                            <Users className="w-4 h-4 text-green-400" />
+                            <span className="text-sm font-bold text-green-400">{scenario.participant_count}</span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
