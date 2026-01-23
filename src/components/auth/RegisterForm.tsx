@@ -84,7 +84,7 @@ export function RegisterForm() {
       </div>
 
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Crear Cuenta</h1>
         <p className="text-muted-foreground">Únete a la comunidad de profetas</p>
       </div>
 

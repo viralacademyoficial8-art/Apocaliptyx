@@ -196,7 +196,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold text-white truncate flex items-center gap-2">
+                      <div className="font-bold text-foreground truncate flex items-center gap-2">
                         {currentUser.displayName}
                         {isAdmin && (
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${roleColor.bg} ${roleColor.text}`}>

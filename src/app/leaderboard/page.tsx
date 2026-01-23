@@ -548,7 +548,7 @@ export default function LeaderboardPage() {
                         {/* User Info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white truncate">
+                            <span className="font-semibold text-foreground truncate">
                               {u.display_name || u.username}
                             </span>
                             {u.is_verified && (
@@ -622,7 +622,7 @@ export default function LeaderboardPage() {
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-white truncate">
+                            <span className="font-semibold text-foreground truncate">
                               {u.display_name || u.username}
                             </span>
                             {u.is_verified && (

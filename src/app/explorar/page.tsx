@@ -685,7 +685,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       </div>
 
       {/* Title */}
-      <h3 className="font-semibold text-white mb-2 line-clamp-2 group-hover:text-purple-300 transition-colors text-lg">
+      <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-purple-300 transition-colors text-lg">
         {scenario.title}
       </h3>
 

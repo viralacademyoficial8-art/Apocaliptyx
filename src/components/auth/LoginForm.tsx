@@ -85,7 +85,7 @@ export function LoginForm() {
 
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-black text-white mb-2">
+            <h1 className="text-3xl font-black text-foreground mb-2">
               Bienvenido
             </h1>
             <p className="text-zinc-400">

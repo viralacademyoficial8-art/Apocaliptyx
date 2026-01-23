@@ -58,7 +58,7 @@ export default function SeguirUsuariosPage() {
           </ol>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">Ver a quién sigues</h3>
+            <h3 className="font-bold text-foreground mb-2">Ver a quién sigues</h3>
             <p className="text-muted-foreground">
               En tu perfil puedes ver la lista de usuarios que sigues y tus seguidores.
             </p>

@@ -1573,7 +1573,7 @@ function ForoContent() {
                             </span>
                           )}
                         </div>
-                        <p className="font-semibold text-white truncate">
+                        <p className="font-semibold text-foreground truncate">
                           {stream.displayName || stream.username} está transmitiendo
                         </p>
                         <p className="text-sm text-muted-foreground truncate">
@@ -2918,7 +2918,7 @@ function ForoContent() {
             </div>
 
             {/* Title */}
-            <h2 className="text-xl font-bold text-white mb-2">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               ¿Eliminar comentario?
             </h2>
 
@@ -2977,7 +2977,7 @@ function ForoContent() {
             </div>
 
             {/* Title */}
-            <h2 className="text-xl font-bold text-white mb-2">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               ¿Eliminar publicación?
             </h2>
 

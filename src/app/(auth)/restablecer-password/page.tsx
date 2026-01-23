@@ -127,7 +127,7 @@ function ResetPasswordForm() {
         <div className="inline-flex items-center justify-center w-20 h-20 bg-red-500/10 rounded-full mb-6">
           <AlertCircle className="w-10 h-10 text-red-400" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">
+        <h2 className="text-xl font-bold text-foreground mb-2">
           Enlace invalido o expirado
         </h2>
         <p className="text-zinc-400 mb-6">
@@ -151,7 +151,7 @@ function ResetPasswordForm() {
         <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500/10 rounded-full mb-6">
           <CheckCircle className="w-10 h-10 text-green-400" />
         </div>
-        <h2 className="text-xl font-bold text-white mb-2">
+        <h2 className="text-xl font-bold text-foreground mb-2">
           Contrasena actualizada
         </h2>
         <p className="text-zinc-400 mb-6">
@@ -351,7 +351,7 @@ export default function RestablecerPasswordPage() {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-2xl mb-4">
                   <Lock className="w-8 h-8 text-purple-400" />
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">
+                <h1 className="text-2xl sm:text-3xl font-black text-foreground mb-2">
                   Nueva Contrasena
                 </h1>
                 <p className="text-zinc-400">

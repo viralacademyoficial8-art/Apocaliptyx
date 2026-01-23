@@ -285,7 +285,7 @@ export default function AdminSoportePage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-white line-clamp-1">{ticket.subject}</p>
+                        <p className="font-medium text-foreground line-clamp-1">{ticket.subject}</p>
                         <p className="text-sm text-muted-foreground mt-1">
                           {ticket.user?.username || ticket.guest_name || "Invitado"}
                         </p>

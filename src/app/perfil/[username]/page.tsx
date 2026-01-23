@@ -1110,7 +1110,7 @@ export default function PublicProfilePage() {
                             </span>
                           )}
                         </div>
-                        <h4 className="font-semibold text-white mb-2 line-clamp-2">{scenario.title}</h4>
+                        <h4 className="font-semibold text-foreground mb-2 line-clamp-2">{scenario.title}</h4>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Flame className="w-4 h-4 text-yellow-400" />
@@ -1337,7 +1337,7 @@ export default function PublicProfilePage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white truncate flex items-center gap-1">
+                    <p className="font-medium text-foreground truncate flex items-center gap-1">
                       {follower.display_name || follower.username}
                       {follower.is_verified && <CheckCircle className="w-4 h-4 text-blue-400" />}
                       {follower.is_premium && <Crown className="w-4 h-4 text-yellow-400" />}
@@ -1389,7 +1389,7 @@ export default function PublicProfilePage() {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white truncate flex items-center gap-1">
+                    <p className="font-medium text-foreground truncate flex items-center gap-1">
                       {following.display_name || following.username}
                       {following.is_verified && <CheckCircle className="w-4 h-4 text-blue-400" />}
                       {following.is_premium && <Crown className="w-4 h-4 text-yellow-400" />}

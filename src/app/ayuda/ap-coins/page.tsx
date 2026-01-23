@@ -111,7 +111,7 @@ export default function CrearCuentaPage() {
           </div>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">¿Necesitas más ayuda?</h3>
+            <h3 className="font-bold text-foreground mb-2">¿Necesitas más ayuda?</h3>
             <p className="text-muted-foreground mb-4">Si tienes problemas para crear tu cuenta, contáctanos:</p>
             <Link href="mailto:contacto@apocaliptyx.com" className="text-purple-400 hover:text-purple-300">
               contacto@apocaliptyx.com

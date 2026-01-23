@@ -77,7 +77,7 @@ export function AdminGuard({
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <ShieldOff className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">Acceso Denegado</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Acceso Denegado</h1>
           <p className="text-muted-foreground mb-6">No tienes permisos para acceder a esta sección.</p>
           <p className="text-muted-foreground text-sm mb-4">Tu rol: {role}</p>
           <button
@@ -108,7 +108,7 @@ export function AdminGuard({
         <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center">
             <ShieldOff className="w-16 h-16 text-orange-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2">Permisos Insuficientes</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Permisos Insuficientes</h1>
             <p className="text-muted-foreground mb-6">
               Tu rol de {role} no tiene los permisos necesarios para esta acción.
             </p>

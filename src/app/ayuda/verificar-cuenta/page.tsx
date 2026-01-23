@@ -59,7 +59,7 @@ export default function VerificarCuentaPage() {
           </ol>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">¿No recibiste el email?</h3>
+            <h3 className="font-bold text-foreground mb-2">¿No recibiste el email?</h3>
             <p className="text-muted-foreground">
               Ve a Configuración &gt; Cuenta y haz clic en &quot;Reenviar email de verificación&quot;. Si sigue sin llegar, contacta a soporte.
             </p>

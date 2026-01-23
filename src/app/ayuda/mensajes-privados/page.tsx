@@ -67,7 +67,7 @@ export default function MensajesPrivadosPage() {
           </div>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">Acceder a tus chats</h3>
+            <h3 className="font-bold text-foreground mb-2">Acceder a tus chats</h3>
             <p className="text-muted-foreground">
               Encuentra todas tus conversaciones en el icono de chat en la barra de navegación, o ve directamente a <Link href="/chat" className="text-purple-400">/chat</Link>
             </p>

@@ -78,7 +78,7 @@ export default function ReglasEscenariosPage() {
           </ul>
 
           <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
-            <h3 className="font-bold text-white mb-2">¿Crees que un escenario viola las reglas?</h3>
+            <h3 className="font-bold text-foreground mb-2">¿Crees que un escenario viola las reglas?</h3>
             <p className="text-muted-foreground mb-4">
               Usa el botón de &quot;Reportar&quot; en la página del escenario para notificar a los moderadores.
             </p>
