@@ -391,7 +391,23 @@ export default function CrearPage() {
               )}
 
               {!isDuplicate && (
-                <div className="mt-3">
+                <div className="mt-3 space-y-2">
+                  {/* Opción de robar el escenario similar */}
+                  {similarScenarios.length > 0 && (
+                    <div className="p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg">
+                      <p className="text-xs text-purple-200/80 mb-2">
+                        ¿Te gusta este escenario? ¡Róbalo en lugar de crear uno nuevo!
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleGoToExistingScenario(similarScenarios[0].id)}
+                        className="w-full px-3 py-2 text-xs bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2"
+                      >
+                        <span>⚡</span>
+                        Robar por {similarScenarios[0]?.current_price || 11} AP
+                      </button>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
