@@ -57,39 +57,24 @@ export async function POST(request: NextRequest) {
       bookmarked = true;
     }
 
-    // Get updated count
-    const { data: postData } = await supabase()
+    // Count actual bookmarks from the table (more reliable than incrementing)
+    const { count: actualCount } = await supabase()
+      .from('forum_bookmarks')
+      .select('*', { count: 'exact', head: true })
+      .eq('post_id', postId);
+
+    const finalCount = actualCount || 0;
+
+    // Update the post's bookmark count to match actual count
+    await supabase()
       .from('forum_posts')
-      .select('bookmarks_count')
-      .eq('id', postId)
-      .single();
-
-    const count = (postData as { bookmarks_count?: number } | null)?.bookmarks_count || 0;
-
-    // Update count manually if needed
-    if (bookmarked) {
-      await supabase()
-        .from('forum_posts')
-        .update({ bookmarks_count: count + 1 })
-        .eq('id', postId);
-    } else {
-      await supabase()
-        .from('forum_posts')
-        .update({ bookmarks_count: Math.max(0, count - 1) })
-        .eq('id', postId);
-    }
-
-    // Return the final count
-    const { data: finalPost } = await supabase()
-      .from('forum_posts')
-      .select('bookmarks_count')
-      .eq('id', postId)
-      .single();
+      .update({ bookmarks_count: finalCount })
+      .eq('id', postId);
 
     return NextResponse.json({
       success: true,
       bookmarked,
-      count: (finalPost as { bookmarks_count?: number } | null)?.bookmarks_count || 0,
+      count: finalCount,
     });
   } catch (error) {
     console.error('Error toggling bookmark:', error);
