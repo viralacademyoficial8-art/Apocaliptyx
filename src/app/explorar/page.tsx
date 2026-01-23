@@ -465,19 +465,91 @@ export default function ExplorarPage() {
                       <TrendingUp className="w-5 h-5 text-purple-400" />
                       {t('dashboard.featuredScenarios')}
                     </h2>
-                    <button
-                      onClick={() => {
-                        setSelectedCategory('Todos');
-                        setSortBy('popular');
-                        setTimeout(() => {
-                          document.getElementById('explorar-escenarios')?.scrollIntoView({ behavior: 'smooth' });
-                        }, 100);
-                      }}
-                      className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
-                    >
-                      {t('common.viewAll')} <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Filter button */}
+                      <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`px-3 py-1.5 rounded-lg border transition-colors flex items-center gap-2 text-sm ${
+                          showFilters
+                            ? 'bg-purple-500/20 border-purple-500 text-purple-400'
+                            : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:border-zinc-600'
+                        }`}
+                      >
+                        <Filter className="w-4 h-4" />
+                        {t('common.filter')}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedCategory('Todos');
+                          setSortBy('popular');
+                          setTimeout(() => {
+                            document.getElementById('explorar-escenarios')?.scrollIntoView({ behavior: 'smooth' });
+                          }, 100);
+                        }}
+                        className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                      >
+                        {t('common.viewAll')} <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Filters panel */}
+                  {showFilters && (
+                    <div className="mb-4 p-4 bg-zinc-900 border border-zinc-800 rounded-xl space-y-4">
+                      {/* Categories */}
+                      <div>
+                        <label className="text-sm text-zinc-400 mb-2 block">{t('scenarios.create.category')}</label>
+                        <div className="flex flex-wrap gap-2">
+                          {CATEGORIES.map((cat) => (
+                            <button
+                              key={cat.key}
+                              onClick={() => setSelectedCategory(cat.value)}
+                              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                                selectedCategory === cat.value
+                                  ? 'bg-purple-500 text-white'
+                                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                              }`}
+                            >
+                              {cat.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Sort */}
+                      <div>
+                        <label className="text-sm text-zinc-400 mb-2 block">{t('leaderboard.sortByLabel')}</label>
+                        <div className="flex flex-wrap gap-2">
+                          {SORT_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              onClick={() => setSortBy(option.value)}
+                              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                                sortBy === option.value
+                                  ? 'bg-purple-500 text-white'
+                                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                              }`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Clear filters */}
+                      {(selectedCategory !== 'Todos' || sortBy !== 'recent') && (
+                        <button
+                          onClick={() => {
+                            setSelectedCategory('Todos');
+                            setSortBy('recent');
+                          }}
+                          className="text-sm text-purple-400 hover:text-purple-300"
+                        >
+                          {t('explore.clearFilters')}
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Grid de escenarios más interactuados - ordenados por robos + votos */}
                   {(() => {
@@ -517,202 +589,6 @@ export default function ExplorarPage() {
             </div>
           </FadeInView>
         )}
-
-        {/* Header */}
-        <div id="explorar-escenarios" className="mb-8 scroll-mt-24">
-          <h1 className="text-3xl font-bold mb-2">{t('explore.title')}</h1>
-          <p className="text-gray-400">
-            {t('explore.subtitle')}
-          </p>
-        </div>
-
-        {/* Search & Filters */}
-        <div className="mb-6 space-y-4">
-          <div className="flex gap-3">
-            {/* Search input with dropdown */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 z-10" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder={`${t('common.search')} escenarios...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsSearchOpen(true)}
-                onKeyDown={handleSearchKeyDown}
-                className="w-full pl-10 pr-10 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-              {searchQuery && (
-                <button
-                  onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white z-10"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-
-              {/* Search Dropdown */}
-              {isSearchOpen && (
-                <div
-                  ref={searchDropdownRef}
-                  className="absolute top-full left-0 right-0 mt-2 bg-gray-900 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden"
-                >
-                  {/* Resultados rápidos */}
-                  {searchQuery.length >= 2 && (
-                    <div className="border-b border-gray-800">
-                      {quickResults.length > 0 ? (
-                        <div className="p-3">
-                          <span className="text-xs font-medium text-gray-400 flex items-center gap-1 mb-2">
-                            <Search className="w-3 h-3" />
-                            Resultados
-                          </span>
-                          {quickResults.map((scenario) => (
-                            <button
-                              key={scenario.id}
-                              onClick={() => handleQuickResultClick(scenario.id)}
-                              className="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-gray-800 transition-colors"
-                            >
-                              <div className="font-medium text-white line-clamp-1">{scenario.title}</div>
-                              <div className="text-xs text-gray-500 flex items-center gap-2">
-                                <span>{scenario.category}</span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1">
-                                  <Users className="w-3 h-3" />
-                                  {scenario.participant_count}
-                                </span>
-                                <span>•</span>
-                                <span className="flex items-center gap-1 text-yellow-500">
-                                  <Flame className="w-3 h-3" />
-                                  {scenario.total_pool.toLocaleString()}
-                                </span>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500 text-center py-4">
-                          No se encontraron escenarios
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Búsquedas recientes */}
-                  {recentSearches.length > 0 && !searchQuery && (
-                    <div className="p-3 border-b border-gray-800">
-                      <span className="text-xs font-medium text-gray-400 flex items-center gap-1 mb-2">
-                        <Clock className="w-3 h-3" />
-                        Recientes
-                      </span>
-                      <div className="space-y-1">
-                        {recentSearches.slice(0, 3).map((search, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleSearchSubmit(search)}
-                            className="w-full text-left px-3 py-1.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
-                          >
-                            {search}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Trending */}
-                  {!searchQuery && (
-                    <div className="p-3">
-                      <span className="text-xs font-medium text-gray-400 flex items-center gap-1 mb-2">
-                        <TrendingUp className="w-3 h-3" />
-                        Trending
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {trendingSearches.map((trend, i) => (
-                          <button
-                            key={i}
-                            onClick={() => handleSearchSubmit(trend)}
-                            className="px-3 py-1 text-xs bg-gray-800 text-gray-300 hover:bg-purple-500/20 hover:text-purple-400 rounded-full transition-colors"
-                          >
-                            {trend}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            {/* Filter button */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-3 rounded-xl border transition-colors flex items-center gap-2 ${
-                showFilters || hasActiveFilters
-                  ? 'bg-purple-500/20 border-purple-500 text-purple-400'
-                  : 'bg-gray-900 border-gray-800 text-gray-400 hover:border-gray-700'
-              }`}
-            >
-              <Filter className="w-5 h-5" />
-              {t('common.filter')}
-              {hasActiveFilters && (
-                <span className="w-2 h-2 bg-purple-500 rounded-full" />
-              )}
-            </button>
-          </div>
-
-          {/* Filters panel */}
-          {showFilters && (
-            <div className="p-4 bg-gray-900 border border-gray-800 rounded-xl space-y-4">
-              {/* Categories */}
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">{t('scenarios.create.category')}</label>
-                <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.key}
-                      onClick={() => setSelectedCategory(cat.value)}
-                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                        selectedCategory === cat.value
-                          ? 'bg-purple-500 text-white'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sort */}
-              <div>
-                <label className="text-sm text-gray-400 mb-2 block">{t('leaderboard.sortByLabel')}</label>
-                <div className="flex flex-wrap gap-2">
-                  {SORT_OPTIONS.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => setSortBy(option.value)}
-                      className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                        sortBy === option.value
-                          ? 'bg-purple-500 text-white'
-                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Clear filters */}
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-purple-400 hover:text-purple-300"
-                >
-                  {t('explore.clearFilters')}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
 
         {/* Results count */}
         <div className="mb-4 text-sm text-gray-400">
