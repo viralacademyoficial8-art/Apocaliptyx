@@ -916,6 +916,10 @@ export default function PublicProfilePage() {
                     <span className="text-gray-400">AP Coins ganadas</span>
                     <span className="font-medium text-yellow-400">{profile.total_earnings.toLocaleString()}</span>
                   </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Holder Actual</span>
+                    <span className="font-medium text-red-400">{scenariosHeldCount}</span>
+                  </div>
                 </div>
               </div>
             </div>
