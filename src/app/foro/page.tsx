@@ -68,6 +68,14 @@ import {
   Flag,
   ExternalLink,
   LogOut,
+  // Icons for ActivityCard
+  Target,
+  Swords,
+  Shield,
+  ThumbsUp,
+  ThumbsDown,
+  CheckCircle,
+  Trophy,
 } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { formatDistanceToNow, type Locale } from 'date-fns';
@@ -82,7 +90,8 @@ import { StoriesBar, StoryViewer, CreateStoryModal } from '@/components/stories'
 import { ReelsFeed } from '@/components/reels/ReelsFeed';
 import { CreateReelModal } from '@/components/reels/CreateReelModal';
 import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
-import { ActivityFeed } from '@/components/feed';
+// ActivityFeed component removed - activities now shown as posts in feed
+// import { ActivityFeed } from '@/components/feed';
 import Link from 'next/link';
 
 // Reaction and tag definitions are now inside ForoContent component for i18n support
@@ -397,6 +406,34 @@ function ForoContent() {
     streamsToday: 0,
   });
 
+  // Feed de actividades (escenarios creados, robados, protegidos, votos, etc.)
+  interface FeedItem {
+    id: string;
+    type: 'scenario_created' | 'scenario_stolen' | 'scenario_protected' | 'scenario_vote' | 'scenario_resolved' | 'scenario_closed' | 'live_stream' | 'achievement';
+    title: string;
+    description: string;
+    timestamp: string;
+    user: {
+      id: string;
+      username: string;
+      displayName: string | null;
+      avatarUrl: string | null;
+      level: number;
+      isVerified: boolean;
+    };
+    metadata?: {
+      scenarioId?: string;
+      scenarioTitle?: string;
+      amount?: number;
+      voteType?: 'YES' | 'NO';
+      outcome?: boolean;
+      previousHolder?: string;
+      streamId?: string;
+    };
+  }
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [feedLoading, setFeedLoading] = useState(false);
+
   // Función para ordenar posts respetando el orden de los hilos
   const sortPostsRespectingThreads = useCallback((posts: ForumPost[]): ForumPost[] => {
     // Agrupar posts por thread_id
@@ -592,6 +629,21 @@ function ForoContent() {
       console.error('Error loading streams:', error);
     } finally {
       setStreamsLoading(false);
+    }
+  }, []);
+
+  // Cargar actividades del feed (escenarios creados, robados, protegidos, votos, etc.)
+  const loadFeedItems = useCallback(async () => {
+    setFeedLoading(true);
+    try {
+      const response = await fetch('/api/feed?limit=30');
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      const data = await response.json();
+      setFeedItems(data.items || []);
+    } catch (error) {
+      console.error('Error loading feed items:', error);
+    } finally {
+      setFeedLoading(false);
     }
   }, []);
 
@@ -801,6 +853,13 @@ function ForoContent() {
       loadStreams();
     }
   }, [activeTab, loadStreams]);
+
+  // Load feed activities when feed tab is active
+  useEffect(() => {
+    if (activeTab === 'feed') {
+      loadFeedItems();
+    }
+  }, [activeTab, loadFeedItems]);
 
   // Search mentions
   const searchMentions = useCallback(async (query: string) => {
@@ -1464,16 +1523,16 @@ function ForoContent() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
           <div className="flex-1 space-y-8">
-            {/* Activity Feed Section - OCULTO PARA MVP: Los lives aparecen directamente en el feed de posts */}
-            {false && (
-            <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
-              <ActivityFeed />
-            </div>
-            )}
+            {/* ActivityFeed component removed - Activities now appear as posts in the feed */}
 
-            {/* Live Streams in Feed */}
+            {/* Live Streams Activos - Sección destacada */}
             {streams.length > 0 && (
               <div className="space-y-4 mb-6">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Radio className="w-5 h-5 text-red-500" />
+                  <span>En Vivo Ahora</span>
+                  <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{streams.length}</span>
+                </h2>
                 {streams.map((stream) => (
                   <div
                     key={stream.id}
@@ -1635,12 +1694,12 @@ function ForoContent() {
               )}
             </div>
 
-            {/* Posts Feed */}
-            {loading ? (
+            {/* Combined Feed: Posts + Activities */}
+            {loading || feedLoading ? (
               <div className="flex justify-center py-20">
                 <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
               </div>
-            ) : posts.length === 0 ? (
+            ) : posts.length === 0 && feedItems.length === 0 ? (
               <div className="text-center py-20">
                 <MessageCircle className="w-16 h-16 text-gray-700 mx-auto mb-4" />
                 <h3 className="text-xl font-bold mb-2">{t('forum.posts.noPosts')}</h3>
@@ -1658,23 +1717,61 @@ function ForoContent() {
               </div>
             ) : (
               <div className="space-y-4">
-                {posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    currentUserId={user?.id}
-                    onOpenComments={openComments}
-                    onDelete={openDeletePostConfirm}
-                    onReaction={handleReaction}
-                    onBookmark={handleBookmark}
-                    onRepost={openRepostModal}
-                    onShare={handleShare}
-                    onAward={openAwardModal}
-                    REACTIONS={REACTIONS}
-                    FORUM_TAGS={FORUM_TAGS}
-                    dateLocale={dateLocale}
-                  />
-                ))}
+                {/* Combinar posts y actividades, ordenados por fecha */}
+                {/* Nota: Los streams en vivo se muestran en la sección "En Vivo Ahora" arriba */}
+                {(() => {
+                  // Crear un array combinado con tipo discriminador
+                  type CombinedItem =
+                    | { type: 'post'; data: ForumPost; timestamp: Date }
+                    | { type: 'activity'; data: typeof feedItems[0]; timestamp: Date };
+
+                  const combinedItems: CombinedItem[] = [
+                    ...posts.map(post => ({
+                      type: 'post' as const,
+                      data: post,
+                      timestamp: new Date(post.created_at)
+                    })),
+                    // Filtrar actividades de tipo live_stream ya que se muestran en sección separada
+                    ...feedItems.filter(item => item.type !== 'live_stream').map(item => ({
+                      type: 'activity' as const,
+                      data: item,
+                      timestamp: new Date(item.timestamp)
+                    }))
+                  ];
+
+                  // Ordenar por fecha descendente (más reciente primero)
+                  combinedItems.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+                  return combinedItems.map((item) => {
+                    if (item.type === 'post') {
+                      return (
+                        <PostCard
+                          key={`post-${item.data.id}`}
+                          post={item.data}
+                          currentUserId={user?.id}
+                          onOpenComments={openComments}
+                          onDelete={openDeletePostConfirm}
+                          onReaction={handleReaction}
+                          onBookmark={handleBookmark}
+                          onRepost={openRepostModal}
+                          onShare={handleShare}
+                          onAward={openAwardModal}
+                          REACTIONS={REACTIONS}
+                          FORUM_TAGS={FORUM_TAGS}
+                          dateLocale={dateLocale}
+                        />
+                      );
+                    } else {
+                      return (
+                        <ActivityCard
+                          key={`activity-${item.data.id}`}
+                          item={item.data}
+                          dateLocale={dateLocale}
+                        />
+                      );
+                    }
+                  });
+                })()}
               </div>
             )}
           </div>
@@ -3098,6 +3195,184 @@ function ForoContent() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+// Componente de tarjeta de actividad (escenarios creados, robados, votos, etc.)
+interface ActivityCardProps {
+  item: {
+    id: string;
+    type: 'scenario_created' | 'scenario_stolen' | 'scenario_protected' | 'scenario_vote' | 'scenario_resolved' | 'scenario_closed' | 'live_stream' | 'achievement';
+    title: string;
+    description: string;
+    timestamp: string;
+    user: {
+      id: string;
+      username: string;
+      displayName: string | null;
+      avatarUrl: string | null;
+      level: number;
+      isVerified: boolean;
+    };
+    metadata?: {
+      scenarioId?: string;
+      scenarioTitle?: string;
+      amount?: number;
+      voteType?: 'YES' | 'NO';
+      outcome?: boolean;
+      previousHolder?: string;
+      streamId?: string;
+    };
+  };
+  dateLocale: Locale;
+}
+
+function ActivityCard({ item, dateLocale }: ActivityCardProps) {
+  const router = useRouter();
+  const { t } = useTranslation();
+
+  const isYesVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'YES';
+  const isNoVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'NO';
+
+  // Estilos según el tipo de actividad
+  const getActivityStyles = () => {
+    if (isYesVote) return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400', accent: 'text-emerald-400' };
+    if (isNoVote) return { bg: 'bg-red-500/10', border: 'border-red-500/30', iconBg: 'bg-red-500/20 text-red-400', accent: 'text-red-400' };
+
+    switch (item.type) {
+      case 'scenario_created':
+        return { bg: 'bg-blue-500/10', border: 'border-blue-500/30', iconBg: 'bg-blue-500/20 text-blue-400', accent: 'text-blue-400' };
+      case 'scenario_stolen':
+        return { bg: 'bg-orange-500/10', border: 'border-orange-500/30', iconBg: 'bg-orange-500/20 text-orange-400', accent: 'text-orange-400' };
+      case 'scenario_protected':
+        return { bg: 'bg-green-500/10', border: 'border-green-500/30', iconBg: 'bg-green-500/20 text-green-400', accent: 'text-green-400' };
+      case 'scenario_resolved':
+        return { bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400', accent: 'text-emerald-400' };
+      case 'scenario_closed':
+        return { bg: 'bg-gray-500/10', border: 'border-gray-500/30', iconBg: 'bg-gray-500/20 text-gray-400', accent: 'text-gray-400' };
+      case 'live_stream':
+        return { bg: 'bg-red-500/10', border: 'border-red-500/30', iconBg: 'bg-red-500/20 text-red-400', accent: 'text-red-400' };
+      case 'achievement':
+        return { bg: 'bg-yellow-500/10', border: 'border-yellow-500/30', iconBg: 'bg-yellow-500/20 text-yellow-400', accent: 'text-yellow-400' };
+      default:
+        return { bg: 'bg-purple-500/10', border: 'border-purple-500/30', iconBg: 'bg-purple-500/20 text-purple-400', accent: 'text-purple-400' };
+    }
+  };
+
+  // Icono según el tipo de actividad
+  const getActivityIcon = () => {
+    if (isYesVote) return <ThumbsUp className="w-5 h-5" />;
+    if (isNoVote) return <ThumbsDown className="w-5 h-5" />;
+
+    switch (item.type) {
+      case 'scenario_created': return <Target className="w-5 h-5" />;
+      case 'scenario_stolen': return <Swords className="w-5 h-5" />;
+      case 'scenario_protected': return <Shield className="w-5 h-5" />;
+      case 'scenario_resolved': return <CheckCircle className="w-5 h-5" />;
+      case 'scenario_closed': return <Lock className="w-5 h-5" />;
+      case 'live_stream': return <Radio className="w-5 h-5" />;
+      case 'achievement': return <Trophy className="w-5 h-5" />;
+      default: return <Target className="w-5 h-5" />;
+    }
+  };
+
+  // Texto de la acción
+  const getActionText = () => {
+    if (isYesVote) return 'votó SÍ en';
+    if (isNoVote) return 'votó NO en';
+
+    switch (item.type) {
+      case 'scenario_created': return 'creó el escenario';
+      case 'scenario_stolen': return 'robó el escenario';
+      case 'scenario_protected': return 'protegió el escenario';
+      case 'scenario_resolved': return 'acertó en';
+      case 'scenario_closed': return 'cerró el escenario';
+      case 'live_stream': return 'está en vivo';
+      case 'achievement': return 'desbloqueó un logro';
+      default: return item.title;
+    }
+  };
+
+  const styles = getActivityStyles();
+
+  const handleClick = () => {
+    if (item.type === 'live_stream' && item.metadata?.streamId) {
+      router.push(`/streaming/${item.metadata.streamId}`);
+    } else if (item.metadata?.scenarioId) {
+      router.push(`/escenario/${item.metadata.scenarioId}`);
+    }
+  };
+
+  const handleUserClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/perfil/${item.user.username}`);
+  };
+
+  return (
+    <div
+      className={`${styles.bg} border ${styles.border} rounded-xl p-5 hover:bg-gray-800/50 transition-all cursor-pointer`}
+      onClick={handleClick}
+    >
+      {/* Header */}
+      <div className="flex items-start gap-3">
+        {/* Avatar */}
+        <button type="button" onClick={handleUserClick} className="flex-shrink-0">
+          <div
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+            style={item.user.avatarUrl ? { background: `url(${item.user.avatarUrl}) center/cover` } : undefined}
+          >
+            {!item.user.avatarUrl && (item.user.displayName || item.user.username || 'U')[0].toUpperCase()}
+          </div>
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <button type="button" onClick={handleUserClick} className="font-semibold text-white hover:text-purple-400 transition-colors">
+              {item.user.displayName || item.user.username}
+            </button>
+            {item.user.level && (
+              <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded">
+                Lvl {item.user.level}
+              </span>
+            )}
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${styles.iconBg}`}>
+              {getActivityIcon()}
+              <span className="hidden sm:inline">{getActionText()}</span>
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-500 mb-2">
+            @{item.user.username} • {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: dateLocale })}
+          </p>
+
+          {/* Descripción/Título del escenario */}
+          <p className="text-gray-200 text-sm sm:text-base">
+            {item.type === 'live_stream' ? (
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                {item.description || 'Transmitiendo en vivo'}
+              </span>
+            ) : (
+              item.description || item.metadata?.scenarioTitle || item.title
+            )}
+          </p>
+
+          {/* Amount si existe */}
+          {item.metadata?.amount && item.metadata.amount > 0 && (
+            <div className="mt-2 flex items-center gap-1 text-yellow-500">
+              <Flame className="w-4 h-4" />
+              <span className="text-sm font-medium">{item.metadata.amount.toLocaleString()} AP</span>
+            </div>
+          )}
+        </div>
+
+        {/* Icono principal a la derecha */}
+        <div className={`p-2 rounded-lg ${styles.iconBg}`}>
+          {getActivityIcon()}
+        </div>
+      </div>
     </div>
   );
 }
