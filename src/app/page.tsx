@@ -159,29 +159,29 @@ export default function LandingPage() {
           <FadeInView direction="up" delay={0.1}>
             <div className="max-w-5xl mx-auto text-center">
               {/* Live Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/80 border border-zinc-800 backdrop-blur-sm mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/80 dark:bg-zinc-900/80 border border-border backdrop-blur-sm mb-8">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <span className="text-sm text-zinc-300">
-                  <span className="text-white font-semibold">{isLoading ? '...' : formatNumber(stats.totalUsers)}</span> profetas activos ahora
+                <span className="text-sm text-muted-foreground">
+                  <span className="text-foreground font-semibold">{isLoading ? '...' : formatNumber(stats.totalUsers)}</span> profetas activos ahora
                 </span>
               </div>
 
               {/* Main Title */}
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-[0.9] tracking-tight">
-                <span className="text-white">Predice.</span>
+                <span className="text-foreground">Predice.</span>
                 <br />
                 <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent">
                   Compite.
                 </span>
                 <br />
-                <span className="text-white">Gana.</span>
+                <span className="text-foreground">Gana.</span>
               </h1>
 
               {/* Subtitle */}
-              <p className="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
                 El juego de predicciones donde tu vision del futuro vale oro.
                 Crea escenarios, roba predicciones y conviertete en leyenda.
               </p>
@@ -196,7 +196,7 @@ export default function LandingPage() {
                   </Button>
                 </Link>
                 <Link href="#como-funciona">
-                  <Button variant="outline" className="border-zinc-700 bg-zinc-900/50 backdrop-blur-sm text-white hover:bg-zinc-800 px-8 py-6 text-lg rounded-xl">
+                  <Button variant="outline" className="border-border bg-card/50 dark:bg-zinc-900/50 backdrop-blur-sm text-foreground hover:bg-muted px-8 py-6 text-lg rounded-xl">
                     <Play className="w-5 h-5 mr-2" />
                     Ver como funciona
                   </Button>
@@ -204,10 +204,10 @@ export default function LandingPage() {
               </div>
 
               {/* Bonus Badge */}
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
-                <Gift className="w-6 h-6 text-yellow-400" />
-                <span className="text-yellow-200">
-                  <span className="font-bold text-yellow-400">1,000 AP Coins</span> gratis al registrarte
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30">
+                <Gift className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
+                <span className="text-yellow-700 dark:text-yellow-200">
+                  <span className="font-bold text-yellow-600 dark:text-yellow-400">1,000 AP Coins</span> gratis al registrarte
                 </span>
               </div>
             </div>
@@ -224,16 +224,16 @@ export default function LandingPage() {
               ].map((stat, i) => (
                 <div
                   key={i}
-                  className="group relative p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 backdrop-blur-sm hover:border-zinc-700 transition-all duration-300 hover:-translate-y-1"
+                  className="group relative p-4 rounded-2xl bg-card/60 dark:bg-zinc-900/60 border border-border backdrop-blur-sm hover:border-muted-foreground/30 transition-all duration-300 hover:-translate-y-1"
                 >
-                  <stat.icon className={`w-5 h-5 mb-2 text-${stat.color}-400`} />
-                  <div className="text-2xl sm:text-3xl font-bold text-white">
+                  <stat.icon className={`w-5 h-5 mb-2 text-${stat.color}-500 dark:text-${stat.color}-400`} />
+                  <div className="text-2xl sm:text-3xl font-bold text-foreground">
                     {isLoading ? '...' : (
                       <CounterAnimation end={stat.value} duration={2} />
                     )}
                     {stat.suffix}
                   </div>
-                  <div className="text-xs text-zinc-500">{stat.label}</div>
+                  <div className="text-xs text-muted-foreground">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -251,11 +251,11 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <FadeInView direction="up">
             <div className="text-center mb-16">
-              <span className="text-purple-400 text-sm font-semibold tracking-wider uppercase">Como funciona</span>
-              <h2 className="text-4xl sm:text-5xl font-black mt-2 mb-4">
+              <span className="text-purple-500 dark:text-purple-400 text-sm font-semibold tracking-wider uppercase">Como funciona</span>
+              <h2 className="text-4xl sm:text-5xl font-black mt-2 mb-4 text-foreground">
                 4 pasos para ganar
               </h2>
-              <p className="text-zinc-400 max-w-xl mx-auto">
+              <p className="text-muted-foreground max-w-xl mx-auto">
                 Simple, adictivo y estrategico. Asi es Apocaliptyx.
               </p>
             </div>
@@ -296,13 +296,13 @@ export default function LandingPage() {
                 <div className="group relative h-full">
                   <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl"
                        style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))` }} />
-                  <div className="relative h-full p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 group-hover:-translate-y-2">
+                  <div className="relative h-full p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border hover:border-muted-foreground/30 transition-all duration-300 group-hover:-translate-y-2">
                     <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${item.color} mb-4`}>
                       <item.icon className="w-6 h-6 text-white" />
                     </div>
-                    <div className="text-xs text-zinc-600 font-mono mb-2">{item.step}</div>
-                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                    <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
+                    <div className="text-xs text-muted-foreground font-mono mb-2">{item.step}</div>
+                    <h3 className="text-xl font-bold mb-2 text-foreground">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               </StaggerItem>
@@ -312,12 +312,12 @@ export default function LandingPage() {
       </section>
 
       {/* FEATURES BENTO GRID */}
-      <section className="py-24 bg-zinc-900/30">
+      <section className="py-24 bg-muted/30 dark:bg-zinc-900/30">
         <div className="container mx-auto px-4">
           <FadeInView direction="up">
             <div className="text-center mb-16">
-              <span className="text-purple-400 text-sm font-semibold tracking-wider uppercase">Caracteristicas</span>
-              <h2 className="text-4xl sm:text-5xl font-black mt-2">
+              <span className="text-purple-500 dark:text-purple-400 text-sm font-semibold tracking-wider uppercase">Caracteristicas</span>
+              <h2 className="text-4xl sm:text-5xl font-black mt-2 text-foreground">
                 Todo lo que necesitas
               </h2>
             </div>
@@ -326,21 +326,21 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-4 max-w-6xl mx-auto">
             {/* Large Card */}
             <FadeInView direction="up" delay={0.1} className="md:col-span-2 md:row-span-2">
-              <div className="h-full p-8 rounded-3xl bg-gradient-to-br from-purple-900/40 to-pink-900/40 border border-purple-500/20 relative overflow-hidden group">
+              <div className="h-full p-8 rounded-3xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-900/40 dark:to-pink-900/40 border border-purple-500/20 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors" />
                 <div className="relative z-10">
-                  <Crown className="w-12 h-12 text-purple-400 mb-4" />
-                  <h3 className="text-2xl font-bold mb-3">Sistema de Niveles</h3>
-                  <p className="text-zinc-400 mb-6 max-w-md">
+                  <Crown className="w-12 h-12 text-purple-500 dark:text-purple-400 mb-4" />
+                  <h3 className="text-2xl font-bold mb-3 text-foreground">Sistema de Niveles</h3>
+                  <p className="text-muted-foreground mb-6 max-w-md">
                     Evoluciona desde Monividente hasta Nostradamus Supremo. Cada nivel desbloquea nuevas habilidades y prestigio.
                   </p>
                   <div className="flex gap-2 flex-wrap">
                     {['Monividente', 'Oraculo', 'Vidente', 'Nostradamus'].map((level, i) => (
                       <span key={i} className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        i === 0 ? 'bg-zinc-700 text-zinc-300' :
-                        i === 1 ? 'bg-blue-500/20 text-blue-400' :
-                        i === 2 ? 'bg-purple-500/20 text-purple-400' :
-                        'bg-yellow-500/20 text-yellow-400'
+                        i === 0 ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300' :
+                        i === 1 ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' :
+                        i === 2 ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400' :
+                        'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'
                       }`}>
                         {level}
                       </span>
@@ -352,42 +352,42 @@ export default function LandingPage() {
 
             {/* Small Cards */}
             <FadeInView direction="up" delay={0.2}>
-              <div className="p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-colors h-full">
-                <Lock className="w-8 h-8 text-blue-400 mb-3" />
-                <h3 className="font-bold mb-2">Items Estrategicos</h3>
-                <p className="text-sm text-zinc-400">Candados, escudos y relojes para dominar el juego.</p>
+              <div className="p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border hover:border-muted-foreground/30 transition-colors h-full">
+                <Lock className="w-8 h-8 text-blue-500 dark:text-blue-400 mb-3" />
+                <h3 className="font-bold mb-2 text-foreground">Items Estrategicos</h3>
+                <p className="text-sm text-muted-foreground">Candados, escudos y relojes para dominar el juego.</p>
               </div>
             </FadeInView>
 
             <FadeInView direction="up" delay={0.3}>
-              <div className="p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-colors h-full">
-                <Activity className="w-8 h-8 text-green-400 mb-3" />
-                <h3 className="font-bold mb-2">Tiempo Real</h3>
-                <p className="text-sm text-zinc-400">Ve robos y predicciones cumplirse en vivo.</p>
+              <div className="p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border hover:border-muted-foreground/30 transition-colors h-full">
+                <Activity className="w-8 h-8 text-green-500 dark:text-green-400 mb-3" />
+                <h3 className="font-bold mb-2 text-foreground">Tiempo Real</h3>
+                <p className="text-sm text-muted-foreground">Ve robos y predicciones cumplirse en vivo.</p>
               </div>
             </FadeInView>
 
             <FadeInView direction="up" delay={0.4}>
-              <div className="p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-colors">
-                <Zap className="w-8 h-8 text-yellow-400 mb-3" />
-                <h3 className="font-bold mb-2">7 Categorias</h3>
-                <p className="text-sm text-zinc-400">Tecnologia, deportes, politica y mas.</p>
+              <div className="p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border hover:border-muted-foreground/30 transition-colors">
+                <Zap className="w-8 h-8 text-yellow-500 dark:text-yellow-400 mb-3" />
+                <h3 className="font-bold mb-2 text-foreground">7 Categorias</h3>
+                <p className="text-sm text-muted-foreground">Tecnologia, deportes, politica y mas.</p>
               </div>
             </FadeInView>
 
             <FadeInView direction="up" delay={0.5}>
-              <div className="p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-colors">
-                <Users className="w-8 h-8 text-pink-400 mb-3" />
-                <h3 className="font-bold mb-2">Red Social</h3>
-                <p className="text-sm text-zinc-400">Sigue profetas, comenta y compite.</p>
+              <div className="p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border hover:border-muted-foreground/30 transition-colors">
+                <Users className="w-8 h-8 text-pink-500 dark:text-pink-400 mb-3" />
+                <h3 className="font-bold mb-2 text-foreground">Red Social</h3>
+                <p className="text-sm text-muted-foreground">Sigue profetas, comenta y compite.</p>
               </div>
             </FadeInView>
 
             <FadeInView direction="up" delay={0.6}>
-              <div className="p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 hover:border-zinc-700 transition-colors">
-                <Eye className="w-8 h-8 text-cyan-400 mb-3" />
-                <h3 className="font-bold mb-2">Leaderboard</h3>
-                <p className="text-sm text-zinc-400">Compite por ser el #1 global.</p>
+              <div className="p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border hover:border-muted-foreground/30 transition-colors">
+                <Eye className="w-8 h-8 text-cyan-500 dark:text-cyan-400 mb-3" />
+                <h3 className="font-bold mb-2 text-foreground">Leaderboard</h3>
+                <p className="text-sm text-muted-foreground">Compite por ser el #1 global.</p>
               </div>
             </FadeInView>
           </div>
@@ -403,26 +403,26 @@ export default function LandingPage() {
               <div className="h-full">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 rounded-xl bg-yellow-500/10">
-                    <Crown className="w-6 h-6 text-yellow-400" />
+                    <Crown className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">Top Profetas</h3>
-                    <p className="text-sm text-zinc-500">Los mejores de la plataforma</p>
+                    <h3 className="text-xl font-bold text-foreground">Top Profetas</h3>
+                    <p className="text-sm text-muted-foreground">Los mejores de la plataforma</p>
                   </div>
                 </div>
 
-                <div className="rounded-3xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
+                <div className="rounded-3xl bg-card/60 dark:bg-zinc-900/60 border border-border overflow-hidden">
                   {isLoading ? (
-                    <div className="p-8 text-center text-zinc-500">Cargando...</div>
+                    <div className="p-8 text-center text-muted-foreground">Cargando...</div>
                   ) : topProphets.length > 0 ? (
-                    <div className="divide-y divide-zinc-800">
+                    <div className="divide-y divide-border">
                       {topProphets.slice(0, 5).map((prophet, i) => (
-                        <div key={prophet.id} className="flex items-center gap-4 p-4 hover:bg-zinc-800/50 transition-colors">
+                        <div key={prophet.id} className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
                             i === 0 ? 'bg-yellow-500 text-black' :
                             i === 1 ? 'bg-zinc-400 text-black' :
                             i === 2 ? 'bg-orange-600 text-white' :
-                            'bg-zinc-800 text-zinc-400'
+                            'bg-muted text-muted-foreground'
                           }`}>
                             {i + 1}
                           </div>
@@ -436,20 +436,20 @@ export default function LandingPage() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate">{prophet.displayName}</div>
-                            <div className="text-xs text-zinc-500">@{prophet.username}</div>
+                            <div className="font-medium truncate text-foreground">{prophet.displayName}</div>
+                            <div className="text-xs text-muted-foreground">@{prophet.username}</div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-yellow-400">{formatNumber(prophet.apCoins)}</div>
-                            <div className="text-xs text-zinc-500">AP</div>
+                            <div className="font-bold text-yellow-500 dark:text-yellow-400">{formatNumber(prophet.apCoins)}</div>
+                            <div className="text-xs text-muted-foreground">AP</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="p-8 text-center text-zinc-500">Se el primero</div>
+                    <div className="p-8 text-center text-muted-foreground">Se el primero</div>
                   )}
-                  <Link href="/leaderboard" className="flex items-center justify-center gap-2 p-4 bg-zinc-800/50 text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
+                  <Link href="/leaderboard" className="flex items-center justify-center gap-2 p-4 bg-muted/50 dark:bg-zinc-800/50 text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors text-sm font-medium">
                     Ver leaderboard completo <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -461,27 +461,27 @@ export default function LandingPage() {
               <div className="h-full">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-2 rounded-xl bg-green-500/10">
-                    <Activity className="w-6 h-6 text-green-400" />
+                    <Activity className="w-6 h-6 text-green-500 dark:text-green-400" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">Actividad Reciente</h3>
-                    <p className="text-sm text-zinc-500">Lo ultimo en la plataforma</p>
+                    <h3 className="text-xl font-bold text-foreground">Actividad Reciente</h3>
+                    <p className="text-sm text-muted-foreground">Lo ultimo en la plataforma</p>
                   </div>
                 </div>
 
-                <div className="rounded-3xl bg-zinc-900/60 border border-zinc-800 overflow-hidden">
+                <div className="rounded-3xl bg-card/60 dark:bg-zinc-900/60 border border-border overflow-hidden">
                   {isLoading ? (
-                    <div className="p-8 text-center text-zinc-500">Cargando...</div>
+                    <div className="p-8 text-center text-muted-foreground">Cargando...</div>
                   ) : recentActivity.length > 0 ? (
-                    <div className="divide-y divide-zinc-800">
+                    <div className="divide-y divide-border">
                       {recentActivity.slice(0, 5).map((activity) => (
-                        <div key={activity.id} className="flex items-center gap-4 p-4 hover:bg-zinc-800/50 transition-colors">
+                        <div key={activity.id} className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors">
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getCategoryColor(activity.category)} flex items-center justify-center flex-shrink-0`}>
                             <Target className="w-5 h-5 text-white" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-medium truncate text-sm">{activity.title}</div>
-                            <div className="flex items-center gap-2 text-xs text-zinc-500">
+                            <div className="font-medium truncate text-sm text-foreground">{activity.title}</div>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <span className="capitalize">{activity.category}</span>
                               <span>•</span>
                               <Clock className="w-3 h-3" />
@@ -489,15 +489,15 @@ export default function LandingPage() {
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-green-400 text-sm">{activity.price} AP</div>
+                            <div className="font-bold text-green-500 dark:text-green-400 text-sm">{activity.price} AP</div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="p-8 text-center text-zinc-500">Sin actividad</div>
+                    <div className="p-8 text-center text-muted-foreground">Sin actividad</div>
                   )}
-                  <Link href="/explorar" className="flex items-center justify-center gap-2 p-4 bg-zinc-800/50 text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium">
+                  <Link href="/explorar" className="flex items-center justify-center gap-2 p-4 bg-muted/50 dark:bg-zinc-800/50 text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors text-sm font-medium">
                     Explorar escenarios <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -508,12 +508,12 @@ export default function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-24 bg-zinc-900/30">
+      <section className="py-24 bg-muted/30 dark:bg-zinc-900/30">
         <div className="container mx-auto px-4">
           <FadeInView direction="up">
             <div className="text-center mb-16">
-              <span className="text-purple-400 text-sm font-semibold tracking-wider uppercase">Testimonios</span>
-              <h2 className="text-4xl sm:text-5xl font-black mt-2">
+              <span className="text-purple-500 dark:text-purple-400 text-sm font-semibold tracking-wider uppercase">Testimonios</span>
+              <h2 className="text-4xl sm:text-5xl font-black mt-2 text-foreground">
                 Lo que dicen los profetas
               </h2>
             </div>
@@ -526,16 +526,16 @@ export default function LandingPage() {
               { text: "Perfecto para gamers que les gustan las noticias. Lo juego todos los dias.", author: "Leo G.", level: "Oraculo" },
             ].map((t, i) => (
               <StaggerItem key={i}>
-                <div className="p-6 rounded-3xl bg-zinc-900/80 border border-zinc-800 h-full flex flex-col">
+                <div className="p-6 rounded-3xl bg-card/80 dark:bg-zinc-900/80 border border-border h-full flex flex-col">
                   <div className="flex gap-1 mb-4">
                     {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                   </div>
-                  <p className="text-zinc-300 italic flex-1 mb-4">&quot;{t.text}&quot;</p>
+                  <p className="text-muted-foreground italic flex-1 mb-4">&quot;{t.text}&quot;</p>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600" />
                     <div>
-                      <div className="font-medium text-sm">{t.author}</div>
-                      <div className="text-xs text-zinc-500">{t.level}</div>
+                      <div className="font-medium text-sm text-foreground">{t.author}</div>
+                      <div className="text-xs text-muted-foreground">{t.level}</div>
                     </div>
                   </div>
                 </div>
@@ -553,11 +553,11 @@ export default function LandingPage() {
               {/* Glow Effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-red-600/20 rounded-3xl blur-3xl" />
 
-              <div className="relative p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800 text-center overflow-hidden">
+              <div className="relative p-8 sm:p-12 rounded-3xl bg-gradient-to-br from-card to-card/50 dark:from-zinc-900 dark:to-zinc-900/50 border border-border text-center overflow-hidden">
                 {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0 opacity-5 dark:opacity-5">
                   <div className="absolute inset-0" style={{
-                    backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)',
                     backgroundSize: '32px 32px',
                   }} />
                 </div>
@@ -567,11 +567,11 @@ export default function LandingPage() {
                     <Skull className="w-10 h-10 text-white" />
                   </div>
 
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 text-foreground">
                     Listo para predecir?
                   </h2>
 
-                  <p className="text-zinc-400 max-w-lg mx-auto mb-8">
+                  <p className="text-muted-foreground max-w-lg mx-auto mb-8">
                     Unete a la comunidad de profetas y demuestra que puedes ver el futuro.
                   </p>
 
@@ -582,7 +582,7 @@ export default function LandingPage() {
                     </Button>
                   </Link>
 
-                  <p className="text-xs text-zinc-600 mt-6">
+                  <p className="text-xs text-muted-foreground mt-6">
                     Sin tarjeta • 1,000 AP Coins gratis • Cancela cuando quieras
                   </p>
                 </div>
