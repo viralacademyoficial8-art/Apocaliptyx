@@ -1617,8 +1617,8 @@ function ForoContent() {
 
           {/* Sidebar */}
           <div className="w-full lg:w-80 space-y-6">
-            {/* Categories */}
-            {categories.length > 0 && (
+            {/* CATEGORIAS - OCULTO TEMPORALMENTE PARA MVP */}
+            {false && categories.length > 0 && (
               <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-4">{t('forum.sidebar.categories')}</h3>
                 <div className="space-y-2">
@@ -1684,7 +1684,8 @@ function ForoContent() {
               </div>
             )}
 
-            {/* Tags */}
+            {/* ETIQUETAS - OCULTO TEMPORALMENTE PARA MVP */}
+            {false && (
             <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Hash className="w-5 h-5 text-purple-400" />
@@ -1706,6 +1707,7 @@ function ForoContent() {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Rules */}
             <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
