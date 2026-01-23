@@ -2281,7 +2281,8 @@ function ForoContent() {
             )}
           </div>
         )}
-        FIN COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP */}
+        */}
+        {/* FIN COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP */}
       </div>
 
       {/* Create Post Modal */}
