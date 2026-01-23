@@ -70,8 +70,8 @@ export function NotificationItem({ notification }: NotificationItemProps) {
 
     // Navegación según el tipo de notificación
     if (notification.relatedScenarioId) {
-      // Ajusta la ruta si usas otra para detalle de escenario
-      router.push(`/escenarios/${notification.relatedScenarioId}`);
+      // Ruta correcta al detalle de escenario
+      router.push(`/escenario/${notification.relatedScenarioId}`);
       return;
     }
 

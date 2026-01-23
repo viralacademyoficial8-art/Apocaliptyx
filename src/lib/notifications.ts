@@ -119,7 +119,7 @@ export function createNotificationPayload(
         title: '🎯 Escenario Resuelto',
         body: `El escenario "${data.title}" ha sido resuelto`,
         tag: 'scenario',
-        data: { url: `/escenarios/${data.id}` },
+        data: { url: `/escenario/${data.id}` },
       };
     
     case 'SCENARIO_STOLEN':
@@ -127,7 +127,7 @@ export function createNotificationPayload(
         title: '😱 ¡Te robaron!',
         body: `${data.thief} robó tu escenario "${data.title}"`,
         tag: 'steal',
-        data: { url: `/escenarios/${data.id}` },
+        data: { url: `/escenario/${data.id}` },
       };
     
     case 'PREDICTION_WON':
