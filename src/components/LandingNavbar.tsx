@@ -39,25 +39,16 @@ export function LandingNavbar() {
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-3 group"
+              className="flex items-center gap-2 group"
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative bg-gradient-to-br from-purple-600 to-pink-600 p-2 rounded-xl">
-                  <Image
-                    src="/apocaliptyx-logo.png"
-                    alt="Apocaliptyx"
-                    width={28}
-                    height={28}
-                    className="w-6 h-6 sm:w-7 sm:h-7"
-                  />
-                </div>
-              </div>
-              <span className="text-xl sm:text-2xl font-black tracking-tight hidden sm:block">
-                <span className="bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-                  APOCALIPTYX
-                </span>
-              </span>
+              <Image
+                src="/apocaliptyx-logo.png"
+                alt="Apocaliptyx"
+                width={180}
+                height={50}
+                className="h-8 sm:h-10 w-auto"
+                priority
+              />
             </Link>
 
             {/* Center Navigation - Desktop */}
