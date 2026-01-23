@@ -346,13 +346,13 @@ export default function CrearPage() {
               </div>
 
               {isDuplicate && similarScenarios.length > 0 && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/40 rounded-xl">
+                <div className="mt-4 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/40 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg">⚡</span>
-                    <h4 className="text-sm font-bold text-white">¡Roba este escenario!</h4>
+                    <span className="text-lg">🎯</span>
+                    <h4 className="text-sm font-bold text-white">¡Este escenario ya existe!</h4>
                   </div>
-                  <p className="text-xs text-purple-200/80 mb-3">
-                    {t('create.duplicates.participateInstead')}
+                  <p className="text-xs text-green-200/80 mb-3">
+                    Participa en el escenario existente comprándolo o robándolo al holder actual.
                   </p>
                   <div className="bg-zinc-900/50 rounded-lg p-3 mb-3">
                     <div className="flex items-center justify-between">
@@ -367,11 +367,11 @@ export default function CrearPage() {
                             @{similarScenarios[0].holder_username}
                           </button>
                         ) : (
-                          <p className="text-sm font-medium text-zinc-500">Dueño original</p>
+                          <p className="text-sm font-medium text-zinc-500">Creador original</p>
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-zinc-400">Precio para robar</p>
+                        <p className="text-xs text-zinc-400">Precio actual</p>
                         <p className="text-lg font-bold text-yellow-400">{similarScenarios[0]?.current_price || 11} AP</p>
                       </div>
                     </div>
@@ -379,13 +379,13 @@ export default function CrearPage() {
                   <button
                     type="button"
                     onClick={() => handleGoToExistingScenario(similarScenarios[0].id)}
-                    className="w-full px-4 py-3 text-sm bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
+                    className="w-full px-4 py-3 text-sm bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
                   >
-                    <span>⚡</span>
-                    Robar por {similarScenarios[0]?.current_price || 11} AP
+                    <span>🛒</span>
+                    Comprar escenario por {similarScenarios[0]?.current_price || 11} AP
                   </button>
                   <p className="text-[10px] text-zinc-500 text-center mt-2">
-                    Haz clic para ir al escenario y robarlo
+                    Haz clic para ir al escenario y participar
                   </p>
                 </div>
               )}

@@ -186,8 +186,8 @@ class DuplicateDetectionService {
       const combinedSimilarity = (titleSimilarity * 0.7) + (descSimilarity * 0.3);
       const similarityPercent = Math.round(combinedSimilarity * 100);
 
-      // Solo incluir si la similitud es > 50%
-      if (similarityPercent > 50) {
+      // Solo incluir si la similitud es > 35% (más estricto para mostrar sugerencias)
+      if (similarityPercent > 35) {
         // Obtener el username del holder real
         const holderUsername = scenario.current_holder_id
           ? holderMap[scenario.current_holder_id] || 'holder'
@@ -212,9 +212,9 @@ class DuplicateDetectionService {
     // Tomar los top 5
     const topSimilar = similarScenarios.slice(0, 5);
 
-    // Considerar duplicado si hay alguno con similitud >= 50%
-    // Umbral estricto para evitar escenarios duplicados - debe comprar el existente
-    const isDuplicate = topSimilar.some(s => s.similarity >= 50);
+    // Considerar duplicado si hay alguno con similitud >= 40%
+    // Umbral MÁS ESTRICTO para evitar escenarios duplicados - debe comprar el existente
+    const isDuplicate = topSimilar.some(s => s.similarity >= 40);
 
     return {
       isDuplicate,
@@ -266,7 +266,7 @@ class DuplicateDetectionService {
       const similarity = this.levenshteinSimilarity(partialTitle, scenario.title);
       const similarityPercent = Math.round(similarity * 100);
 
-      if (similarityPercent > 40) {
+      if (similarityPercent > 30) {
         suggestions.push({
           id: scenario.id,
           title: scenario.title,
