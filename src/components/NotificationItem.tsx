@@ -10,6 +10,7 @@ import {
   UserPlus,
   MessageCircle,
   ExternalLink,
+  Radio,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useNotificationStore } from '@/lib/stores';
@@ -37,6 +38,8 @@ export function NotificationItem({ notification }: NotificationItemProps) {
       case 'comment':
       case 'mention':
         return <MessageCircle className="w-5 h-5 text-cyan-400" />;
+      case 'stream_started':
+        return <Radio className="w-5 h-5 text-red-500" />;
       default:
         return <Bell className="w-5 h-5 text-gray-400" />;
     }
@@ -57,6 +60,8 @@ export function NotificationItem({ notification }: NotificationItemProps) {
       case 'comment':
       case 'mention':
         return 'border-l-cyan-500 bg-cyan-500/5';
+      case 'stream_started':
+        return 'border-l-red-600 bg-red-600/10';
       default:
         return 'border-l-gray-500 bg-gray-500/5';
     }
@@ -68,15 +73,21 @@ export function NotificationItem({ notification }: NotificationItemProps) {
       markAsRead(notification.id);
     }
 
-    // Navegación según el tipo de notificación
+    // Prioridad 1: linkUrl (soporta ambos formatos: camelCase y snake_case)
+    const linkUrl = notification.linkUrl || notification.link_url;
+    if (linkUrl) {
+      router.push(linkUrl);
+      return;
+    }
+
+    // Prioridad 2: relatedScenarioId
     if (notification.relatedScenarioId) {
-      // Ruta correcta al detalle de escenario
       router.push(`/escenario/${notification.relatedScenarioId}`);
       return;
     }
 
+    // Prioridad 3: relatedUserId
     if (notification.relatedUserId) {
-      // Aquí asumo que guardas username o id, tú decides qué es
       router.push(`/perfil/${notification.relatedUserId}`);
     }
   };
@@ -124,7 +135,7 @@ export function NotificationItem({ notification }: NotificationItemProps) {
             </div>
 
             {/* Acción de ver detalles */}
-            {(notification.relatedScenarioId || notification.relatedUserId) && (
+            {(notification.linkUrl || notification.link_url || notification.relatedScenarioId || notification.relatedUserId) && (
               <button
                 type="button"
                 onClick={(e) => {

@@ -170,7 +170,8 @@ export type NotificationType =
   | 'community_request_rejected'
   | 'community_new_member'
   | 'community_ownership_transferred'
-  | 'community_post';
+  | 'community_post'
+  | 'stream_started';
 
 /**
  * Tipo único de notificación en toda la app
@@ -184,6 +185,14 @@ export interface Notification {
   message: string;
   relatedUserId?: string;
   relatedScenarioId?: string;
+
+  /** URL a la que navegar al hacer clic */
+  linkUrl?: string;
+  link_url?: string; // DB field name
+
+  /** Imagen de la notificación */
+  imageUrl?: string;
+  image_url?: string; // DB field name
 
   /** true = ya leída, false = pendiente */
   read: boolean;
