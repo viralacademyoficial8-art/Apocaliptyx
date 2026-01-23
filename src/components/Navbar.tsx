@@ -296,6 +296,7 @@ export function Navbar() {
                           <span className="text-xs text-muted-foreground font-medium">{t("nav.social")}</span>
                         </div>
 
+                        {/* COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
                         <DropdownMenuItem
                           onClick={() => router.push("/foro?tab=comunidades")}
                           className="cursor-pointer hover:bg-muted"
@@ -303,6 +304,7 @@ export function Navbar() {
                           <Users className="mr-2 h-4 w-4 text-blue-400" />
                           {t("nav.communities")}
                         </DropdownMenuItem>
+                        */}
 
                         <DropdownMenuItem
                           onClick={() => router.push("/reels")}

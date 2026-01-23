@@ -254,11 +254,13 @@ function ForoContent() {
 
   // Tab navigation for social hub - persist with localStorage and URL
   // Use lazy initialization to read from localStorage immediately on client
-  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives' | 'comunidades'>(() => {
+  // COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP (removido 'comunidades' del tipo)
+  const [activeTab, setActiveTab] = useState<'feed' | 'reels' | 'lives'>(() => {
     // This runs only on client side
     if (typeof window !== 'undefined') {
-      const savedTab = localStorage.getItem('foro_active_tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
-      if (savedTab && ['feed', 'reels', 'lives', 'comunidades'].includes(savedTab)) {
+      const savedTab = localStorage.getItem('foro_active_tab') as 'feed' | 'reels' | 'lives' | null;
+      // Si tenía guardado 'comunidades', redirigir a 'feed'
+      if (savedTab && ['feed', 'reels', 'lives'].includes(savedTab)) {
         return savedTab;
       }
     }
@@ -267,8 +269,9 @@ function ForoContent() {
 
   // Sync with URL params on mount (URL takes priority if present)
   useEffect(() => {
-    const urlTab = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | 'comunidades' | null;
-    if (urlTab && ['feed', 'reels', 'lives', 'comunidades'].includes(urlTab)) {
+    const urlTab = searchParams.get('tab') as 'feed' | 'reels' | 'lives' | null;
+    // Si viene ?tab=comunidades, redirigir a feed
+    if (urlTab && ['feed', 'reels', 'lives'].includes(urlTab)) {
       setActiveTab(urlTab);
       localStorage.setItem('foro_active_tab', urlTab);
     }
@@ -1439,6 +1442,7 @@ function ForoContent() {
             {/* Live indicator dot */}
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
           </button>
+          {/* COMUNIDADES - OCULTO TEMPORALMENTE PARA MVP
           <button
             type="button"
             onClick={() => changeTab('comunidades')}
@@ -1451,6 +1455,7 @@ function ForoContent() {
             <Users className="w-4 h-4" />
             {t('forum.tabs.communities')}
           </button>
+          */}
         </div>
 
         {/* Tab Content */}
@@ -1919,7 +1924,7 @@ function ForoContent() {
           </div>
         )}
 
-        {/* Comunidades Tab */}
+        {/* COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP
         {activeTab === 'comunidades' && (
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-6">
@@ -2276,6 +2281,7 @@ function ForoContent() {
             )}
           </div>
         )}
+        FIN COMUNIDADES TAB - OCULTO TEMPORALMENTE PARA MVP */}
       </div>
 
       {/* Create Post Modal */}
