@@ -831,9 +831,9 @@ export default function PublicProfilePage() {
             <p className="text-2xl font-bold">{profile.total_earnings.toLocaleString()}</p>
             <p className="text-sm text-gray-400">AP Ganadas</p>
           </div>
-          <div className="bg-gray-900/50 border border-orange-500/30 rounded-xl p-4 text-center">
-            <Crown className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{scenariosHeldCount}</p>
+          <div className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 text-center">
+            <Crown className="w-6 h-6 text-red-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-red-400">{scenariosHeldCount}</p>
             <p className="text-sm text-gray-400">Holder Actual</p>
           </div>
         </div>
