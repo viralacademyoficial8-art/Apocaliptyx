@@ -352,7 +352,7 @@ export default function CrearPage() {
                     <h4 className="text-sm font-bold text-white">¡Este escenario ya existe!</h4>
                   </div>
                   <p className="text-xs text-green-200/80 mb-3">
-                    Participa en el escenario existente comprándolo o robándolo al holder actual.
+                    Participa en el escenario existente robándolo al holder actual.
                   </p>
                   <div className="bg-zinc-900/50 rounded-lg p-3 mb-3">
                     <div className="flex items-center justify-between">
