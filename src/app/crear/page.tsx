@@ -379,13 +379,13 @@ export default function CrearPage() {
                   <button
                     type="button"
                     onClick={() => handleGoToExistingScenario(similarScenarios[0].id)}
-                    className="w-full px-4 py-3 text-sm bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+                    className="w-full px-4 py-3 text-sm bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
                   >
-                    <span>🛒</span>
-                    Comprar escenario por {similarScenarios[0]?.current_price || 11} AP
+                    <span>⚡</span>
+                    Robar escenario por {similarScenarios[0]?.current_price || 11} AP
                   </button>
                   <p className="text-[10px] text-zinc-500 text-center mt-2">
-                    Haz clic para ir al escenario y participar
+                    Haz clic para ir al escenario y robarlo
                   </p>
                 </div>
               )}
