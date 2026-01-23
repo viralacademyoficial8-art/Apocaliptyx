@@ -120,8 +120,8 @@ export function StreamPlayer({
               <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover" />
             ) : (
               <div className="text-center">
-                <Radio className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">
+                <Radio className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
                   {isLive ? 'Cargando stream...' : 'Stream no disponible'}
                 </p>
               </div>
@@ -213,7 +213,7 @@ export function StreamPlayer({
       </div>
 
       {/* Stream Info */}
-      <div className="p-4 bg-gray-900">
+      <div className="p-4 bg-card">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
             <Avatar className="w-12 h-12 border-2 border-purple-500">
@@ -222,7 +222,7 @@ export function StreamPlayer({
             </Avatar>
             <div>
               <h3 className="font-semibold">{streamerName}</h3>
-              <p className="text-sm text-gray-400">@{streamerUsername}</p>
+              <p className="text-sm text-muted-foreground">@{streamerUsername}</p>
             </div>
           </div>
 
@@ -231,7 +231,7 @@ export function StreamPlayer({
               variant="outline"
               size="sm"
               onClick={onLike}
-              className={`border-gray-700 ${
+              className={`border-border ${
                 isLiked ? 'bg-red-500/20 border-red-500 text-red-400' : ''
               }`}
             >
@@ -243,7 +243,7 @@ export function StreamPlayer({
               variant="outline"
               size="sm"
               onClick={onShare}
-              className="border-gray-700"
+              className="border-border"
             >
               <Share2 className="w-4 h-4 mr-1" />
               Compartir
@@ -253,7 +253,7 @@ export function StreamPlayer({
               onClick={onFollow}
               className={
                 isFollowing
-                  ? 'bg-gray-700 hover:bg-gray-600'
+                  ? 'bg-muted hover:bg-muted'
                   : 'bg-purple-600 hover:bg-purple-700'
               }
             >

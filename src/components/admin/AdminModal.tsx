@@ -52,13 +52,13 @@ export function AdminModal({
         onClick={onClose}
       />
       <div
-        className={`relative w-full ${sizeClasses[size]} bg-gray-900 rounded-xl border border-gray-800 shadow-xl`}
+        className={`relative w-full ${sizeClasses[size]} bg-card rounded-xl border border-border shadow-xl`}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="text-lg font-semibold text-white">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="p-1 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
             aria-label="Cerrar"
           >
             <X className="w-5 h-5" />
@@ -68,7 +68,7 @@ export function AdminModal({
         <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">{children}</div>
 
         {footer && (
-          <div className="px-6 py-4 border-t border-gray-800 flex items-center justify-end gap-3">
+          <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-3">
             {footer}
           </div>
         )}

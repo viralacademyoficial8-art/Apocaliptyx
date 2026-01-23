@@ -13,9 +13,9 @@ export function ShopItemGrid() {
   if (items.length === 0) {
     return (
       <div className="text-center py-16">
-        <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+        <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-xl font-bold text-white mb-2">{t('shop.noItemsFound')}</h3>
-        <p className="text-gray-400">{t('shop.tryAdjustFilters')}</p>
+        <p className="text-muted-foreground">{t('shop.tryAdjustFilters')}</p>
       </div>
     );
   }

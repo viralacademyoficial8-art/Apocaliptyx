@@ -368,7 +368,7 @@ export default function AdminForoPage() {
                             {category.posts_count || 0}
                           </td>
                           <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${category.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${category.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>
                               {category.is_active ? 'Activa' : 'Inactiva'}
                             </span>
                           </td>
@@ -447,7 +447,7 @@ export default function AdminForoPage() {
                             </div>
                           </td>
                           <td className="py-3 px-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[post.status] || 'bg-gray-500/20 text-gray-400'}`}>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[post.status] || 'bg-gray-500/20 text-muted-foreground'}`}>
                               {post.status}
                             </span>
                           </td>

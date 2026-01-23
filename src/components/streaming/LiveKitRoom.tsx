@@ -39,8 +39,8 @@ function VideoDisplay({ isHost }: { isHost: boolean }) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
         <div className="text-center">
-          <Radio className="w-16 h-16 text-gray-600 mx-auto mb-4 animate-pulse" />
-          <p className="text-gray-400">
+          <Radio className="w-16 h-16 text-muted-foreground mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">
             {isHost ? 'Haz clic en la cámara para comenzar a transmitir' : 'Esperando al streamer...'}
           </p>
         </div>
@@ -182,10 +182,10 @@ export function LiveKitRoom({
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 bg-gray-900 rounded-xl">
+      <div className="flex flex-col items-center justify-center h-96 bg-card rounded-xl">
         <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
         <h3 className="text-xl font-semibold mb-2">Error de conexión</h3>
-        <p className="text-gray-400 mb-4">{error}</p>
+        <p className="text-muted-foreground mb-4">{error}</p>
         <button
           onClick={() => setError(null)}
           className="px-4 py-2 bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors"

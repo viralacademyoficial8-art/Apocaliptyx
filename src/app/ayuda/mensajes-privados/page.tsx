@@ -18,7 +18,7 @@ export default function MensajesPrivadosPage() {
       <Navbar />
       
       <main className="container mx-auto px-4 py-12 max-w-3xl">
-        <Link href="/ayuda" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
+        <Link href="/ayuda" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Volver al Centro de Ayuda
         </Link>
@@ -28,22 +28,22 @@ export default function MensajesPrivadosPage() {
             <Mail className="w-6 h-6 text-purple-400" />
           </div>
           <h1 className="text-3xl font-bold mb-2">¿Cómo enviar mensajes privados?</h1>
-          <p className="text-gray-400">Guía para usar el chat privado</p>
+          <p className="text-muted-foreground">Guía para usar el chat privado</p>
         </div>
 
         <div className="prose prose-invert max-w-none">
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Iniciar una conversación</h2>
           
           <ol className="space-y-3 mb-8">
-            <li className="flex items-start gap-3 text-gray-300">
+            <li className="flex items-start gap-3 text-foreground">
               <span className="flex-shrink-0 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-sm font-bold">1</span>
               <span>Ve al perfil del usuario que quieres contactar</span>
             </li>
-            <li className="flex items-start gap-3 text-gray-300">
+            <li className="flex items-start gap-3 text-foreground">
               <span className="flex-shrink-0 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-sm font-bold">2</span>
               <span>Haz clic en el botón &quot;Mensaje&quot;</span>
             </li>
-            <li className="flex items-start gap-3 text-gray-300">
+            <li className="flex items-start gap-3 text-foreground">
               <span className="flex-shrink-0 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-sm font-bold">3</span>
               <span>Escribe tu mensaje y envía</span>
             </li>
@@ -52,35 +52,35 @@ export default function MensajesPrivadosPage() {
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Funciones del chat</h2>
           
           <div className="grid gap-3 mb-8">
-            <div className="flex items-center gap-3 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-3 bg-card/50 border border-border rounded-lg p-4">
               <Image className="w-5 h-5 text-blue-400" />
-              <span className="text-gray-300">Enviar imágenes y archivos</span>
+              <span className="text-foreground">Enviar imágenes y archivos</span>
             </div>
-            <div className="flex items-center gap-3 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-3 bg-card/50 border border-border rounded-lg p-4">
               <Smile className="w-5 h-5 text-yellow-400" />
-              <span className="text-gray-300">Usar emojis</span>
+              <span className="text-foreground">Usar emojis</span>
             </div>
-            <div className="flex items-center gap-3 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+            <div className="flex items-center gap-3 bg-card/50 border border-border rounded-lg p-4">
               <Ban className="w-5 h-5 text-red-400" />
-              <span className="text-gray-300">Bloquear usuarios no deseados</span>
+              <span className="text-foreground">Bloquear usuarios no deseados</span>
             </div>
           </div>
 
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mt-8">
+          <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
             <h3 className="font-bold text-white mb-2">Acceder a tus chats</h3>
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               Encuentra todas tus conversaciones en el icono de chat en la barra de navegación, o ve directamente a <Link href="/chat" className="text-purple-400">/chat</Link>
             </p>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-800">
+        <div className="mt-12 pt-8 border-t border-border">
           <h3 className="font-bold text-white mb-4">Artículos relacionados</h3>
           <div className="grid gap-2">
-            <Link href="/ayuda/usar-foro" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/usar-foro" className="text-muted-foreground hover:text-foreground transition-colors">
               → ¿Cómo usar el foro?
             </Link>
-            <Link href="/ayuda/seguir-usuarios" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/seguir-usuarios" className="text-muted-foreground hover:text-foreground transition-colors">
               → Seguir a otros usuarios
             </Link>
           </div>

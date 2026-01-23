@@ -282,7 +282,7 @@ function SearchContent() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
               showFilters
                 ? 'bg-purple-500/20 border-purple-500 text-purple-400'
-                : 'bg-card border-border text-muted-foreground hover:border-gray-600'
+                : 'bg-card border-border text-muted-foreground hover:border-border'
             }`}
           >
             <Filter className="w-4 h-4" />
@@ -349,7 +349,7 @@ function SearchContent() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'escenarios'
                 ? 'bg-purple-500 text-white'
-                : 'bg-card border border-border text-muted-foreground hover:border-gray-600'
+                : 'bg-card border border-border text-muted-foreground hover:border-border'
             }`}
           >
             <Search className="w-4 h-4" />
@@ -363,7 +363,7 @@ function SearchContent() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'profetas'
                 ? 'bg-purple-500 text-white'
-                : 'bg-card border border-border text-muted-foreground hover:border-gray-600'
+                : 'bg-card border border-border text-muted-foreground hover:border-border'
             }`}
           >
             <User className="w-4 h-4" />

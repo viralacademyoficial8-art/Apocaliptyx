@@ -111,7 +111,7 @@ export function ScenarioHistory({
       case "recovery":
         return <Shield className="w-4 h-4 text-blue-400" />;
       default:
-        return <ArrowRight className="w-4 h-4 text-gray-400" />;
+        return <ArrowRight className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -137,7 +137,7 @@ export function ScenarioHistory({
       case "recovery":
         return "bg-blue-500/20 text-blue-400 border-blue-500/30";
       default:
-        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+        return "bg-gray-500/20 text-muted-foreground border-gray-500/30";
     }
   };
 

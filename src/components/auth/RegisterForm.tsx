@@ -85,7 +85,7 @@ export function RegisterForm() {
 
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-white mb-2">Crear Cuenta</h1>
-        <p className="text-gray-400">Únete a la comunidad de profetas</p>
+        <p className="text-muted-foreground">Únete a la comunidad de profetas</p>
       </div>
 
       <div className="mb-6 p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-lg text-center">
@@ -106,33 +106,33 @@ export function RegisterForm() {
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-700"></div>
+          <div className="w-full border-t border-border"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-gray-900 text-gray-400">o regístrate con email</span>
+          <span className="px-4 bg-card text-muted-foreground">o regístrate con email</span>
         </div>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Nombre completo</label>
+          <label className="block text-sm text-muted-foreground mb-1">Nombre completo</label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
               placeholder="Tu nombre"
               disabled={isLoading}
-              className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
+              className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Nombre de usuario</label>
+          <label className="block text-sm text-muted-foreground mb-1">Nombre de usuario</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">@</span>
             <input
               type="text"
               value={formData.username}
@@ -141,12 +141,12 @@ export function RegisterForm() {
               placeholder="tu_usuario"
               minLength={3}
               disabled={isLoading}
-              className={`w-full pl-8 pr-10 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
-                validation.usernameExists ? "border-red-500" : "border-gray-700"
+              className={`w-full pl-8 pr-10 py-3 bg-muted border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
+                validation.usernameExists ? "border-red-500" : "border-border"
               }`}
             />
             {validation.checkingUsername && (
-              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 animate-spin" />
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground animate-spin" />
             )}
             {!validation.checkingUsername && formData.username.length >= 3 && (
               validation.usernameExists ? (
@@ -162,9 +162,9 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Email</label>
+          <label className="block text-sm text-muted-foreground mb-1">Email</label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="email"
               value={formData.email}
@@ -172,12 +172,12 @@ export function RegisterForm() {
               onBlur={handleEmailBlur}
               placeholder="tu@email.com"
               disabled={isLoading}
-              className={`w-full pl-10 pr-10 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
-                validation.emailExists ? "border-red-500" : "border-gray-700"
+              className={`w-full pl-10 pr-10 py-3 bg-muted border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
+                validation.emailExists ? "border-red-500" : "border-border"
               }`}
             />
             {validation.checkingEmail && (
-              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 animate-spin" />
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground animate-spin" />
             )}
           </div>
           {validation.emailExists && (
@@ -186,9 +186,9 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Contraseña</label>
+          <label className="block text-sm text-muted-foreground mb-1">Contraseña</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type={showPassword ? "text" : "password"}
               value={formData.password}
@@ -196,18 +196,18 @@ export function RegisterForm() {
               placeholder="••••••••"
               minLength={6}
               disabled={isLoading}
-              className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
+              className="w-full pl-10 pr-12 py-3 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
           <div className="mt-2 space-y-1">
-            <p className={`text-xs flex items-center gap-1 ${passwordValidation.minLength ? "text-green-400" : "text-gray-500"}`}>
+            <p className={`text-xs flex items-center gap-1 ${passwordValidation.minLength ? "text-green-400" : "text-muted-foreground"}`}>
               {passwordValidation.minLength ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
               Mínimo 6 caracteres
             </p>
@@ -215,17 +215,17 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-400 mb-1">Confirmar contraseña</label>
+          <label className="block text-sm text-muted-foreground mb-1">Confirmar contraseña</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type={showPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={(e) => handleChange("confirmPassword", e.target.value)}
               placeholder="••••••••"
               disabled={isLoading}
-              className={`w-full pl-10 pr-4 py-3 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
-                formData.confirmPassword && !passwordValidation.matches ? "border-red-500" : "border-gray-700"
+              className={`w-full pl-10 pr-4 py-3 bg-muted border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 ${
+                formData.confirmPassword && !passwordValidation.matches ? "border-red-500" : "border-border"
               }`}
             />
           </div>
@@ -240,9 +240,9 @@ export function RegisterForm() {
             id="terms"
             checked={acceptTerms}
             onChange={(e) => setAcceptTerms(e.target.checked)}
-            className="mt-1 w-4 h-4 rounded border-gray-600 bg-gray-800 text-red-600 focus:ring-red-500"
+            className="mt-1 w-4 h-4 rounded border-border bg-muted text-red-600 focus:ring-red-500"
           />
-          <label htmlFor="terms" className="text-sm text-gray-400">
+          <label htmlFor="terms" className="text-sm text-muted-foreground">
             Acepto los{" "}
             <a href="/terminos" target="_blank" rel="noopener noreferrer" className="text-red-400 hover:text-red-300">
               Términos de Servicio
@@ -349,7 +349,7 @@ export function RegisterForm() {
         </button>
       </div>
 
-      <p className="mt-6 text-center text-gray-400">
+      <p className="mt-6 text-center text-muted-foreground">
         ¿Ya tienes cuenta?{" "}
         <Link href="/login" className="text-red-400 hover:text-red-300 font-medium">
           Inicia sesión

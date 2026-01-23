@@ -14,7 +14,7 @@ const resultConfig: Record<string, { icon: any; color: string; bg: string; label
   WON: { icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-500/20', label: 'Ganada' },
   LOST: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/20', label: 'Perdida' },
   PENDING: { icon: Clock, color: 'text-yellow-400', bg: 'bg-yellow-500/20', label: 'Pendiente' },
-  CANCELLED: { icon: MinusCircle, color: 'text-gray-400', bg: 'bg-gray-500/20', label: 'Cancelada' },
+  CANCELLED: { icon: MinusCircle, color: 'text-muted-foreground', bg: 'bg-gray-500/20', label: 'Cancelada' },
 };
 
 const categoryColors: Record<string, string> = {
@@ -24,7 +24,7 @@ const categoryColors: Record<string, string> = {
   POLITICA: 'text-red-400 bg-red-500/20',
   CIENCIA: 'text-purple-400 bg-purple-500/20',
   ENTRETENIMIENTO: 'text-pink-400 bg-pink-500/20',
-  OTROS: 'text-gray-400 bg-gray-500/20',
+  OTROS: 'text-muted-foreground bg-gray-500/20',
 };
 
 export function PredictionHistoryCard({ prediction }: PredictionHistoryCardProps) {
@@ -33,7 +33,7 @@ export function PredictionHistoryCard({ prediction }: PredictionHistoryCardProps
   const categoryColor = categoryColors[prediction.scenarioCategory] || categoryColors.OTROS;
 
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 hover:border-gray-700 transition-colors">
+    <div className="bg-card rounded-xl border border-border p-4 hover:border-border transition-colors">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           {/* Category */}
@@ -51,7 +51,7 @@ export function PredictionHistoryCard({ prediction }: PredictionHistoryCardProps
 
           {/* Prediction direction */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-gray-400 text-sm">Predicción:</span>
+            <span className="text-muted-foreground text-sm">Predicción:</span>
             <span className={`flex items-center gap-1 ${
               prediction.prediction === 'UP' ? 'text-green-400' : 'text-red-400'
             }`}>
@@ -66,10 +66,10 @@ export function PredictionHistoryCard({ prediction }: PredictionHistoryCardProps
 
           {/* Amount & Date */}
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-gray-400">
+            <span className="text-muted-foreground">
               Apostado: <span className="text-yellow-400 font-medium">{prediction.amount.toLocaleString()} AP</span>
             </span>
-            <span className="text-gray-500">
+            <span className="text-muted-foreground">
               {new Date(prediction.createdAt).toLocaleDateString()}
             </span>
           </div>

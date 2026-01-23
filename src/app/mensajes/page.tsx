@@ -756,7 +756,7 @@ function MensajesContent() {
             {/* Responder */}
             <button
               onClick={() => setReplyingTo(message)}
-              className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white"
+              className="p-1.5 rounded-full bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
               title="Responder"
             >
               <Reply className="w-4 h-4" />
@@ -766,19 +766,19 @@ function MensajesContent() {
             <div className="relative">
               <button
                 onClick={() => setShowReactionsFor(showReactionsFor === message.id ? null : message.id)}
-                className="p-1.5 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white"
+                className="p-1.5 rounded-full bg-muted hover:bg-muted text-muted-foreground hover:text-foreground"
                 title="Reaccionar"
               >
                 <Smile className="w-4 h-4" />
               </button>
 
               {showReactionsFor === message.id && (
-                <div className="absolute bottom-full mb-2 left-0 bg-gray-800 border border-gray-700 rounded-lg p-1 flex gap-1 z-50">
+                <div className="absolute bottom-full mb-2 left-0 bg-muted border border-border rounded-lg p-1 flex gap-1 z-50">
                   {QUICK_REACTIONS.map(emoji => (
                     <button
                       key={emoji}
                       onClick={() => handleReaction(message.id, emoji)}
-                      className="w-8 h-8 flex items-center justify-center hover:bg-gray-700 rounded text-lg"
+                      className="w-8 h-8 flex items-center justify-center hover:bg-muted rounded text-lg"
                     >
                       {emoji}
                     </button>
@@ -792,7 +792,7 @@ function MensajesContent() {
               <button
                 onClick={() => handleDeleteMessage(message.id)}
                 disabled={deletingMessageId === message.id}
-                className="p-1.5 rounded-full bg-gray-800 hover:bg-red-600 text-gray-400 hover:text-white"
+                className="p-1.5 rounded-full bg-muted hover:bg-red-600 text-muted-foreground hover:text-foreground"
                 title={`Eliminar (${Math.floor((timeLeft || 0) / 60)}:${String((timeLeft || 0) % 60).padStart(2, '0')} restantes)`}
               >
                 {deletingMessageId === message.id ? (
@@ -813,13 +813,13 @@ function MensajesContent() {
               {/* Gradient border effect */}
               <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-2xl opacity-70 group-hover:opacity-100 transition-opacity duration-300 blur-[1px]" />
 
-              <div className="relative bg-gray-900 rounded-2xl p-3 max-w-[280px]">
+              <div className="relative bg-card rounded-2xl p-3 max-w-[280px]">
                 {/* Header with avatar and username */}
                 <div className="flex items-center gap-2 mb-2">
                   {/* Mini avatar with gradient ring */}
                   <div className="relative">
                     <div className="absolute -inset-[2px] bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-full" />
-                    <div className="relative w-6 h-6 rounded-full bg-gray-900 p-[2px]">
+                    <div className="relative w-6 h-6 rounded-full bg-card p-[2px]">
                       {message.story_preview?.storyOwnerAvatarUrl ? (
                         <img
                           src={message.story_preview.storyOwnerAvatarUrl}
@@ -837,7 +837,7 @@ function MensajesContent() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-gray-400">
+                    <p className="text-[11px] text-muted-foreground">
                       {isOwn ? 'Respondiste a la historia de' : 'Respondió a tu historia'}
                     </p>
                     <p className="text-xs text-white font-medium truncate">
@@ -847,7 +847,7 @@ function MensajesContent() {
                 </div>
 
                 {/* Story Content Preview */}
-                <div className="relative rounded-xl overflow-hidden aspect-[9/16] max-h-[200px] bg-gray-800">
+                <div className="relative rounded-xl overflow-hidden aspect-[9/16] max-h-[200px] bg-muted">
                   {message.story_preview?.mediaUrl ? (
                     <div className="relative w-full h-full">
                       <img
@@ -920,15 +920,15 @@ function MensajesContent() {
         <div className={`
           max-w-[75%] rounded-2xl overflow-hidden transition-all duration-200
           ${message.is_deleted
-            ? 'bg-gray-800/30 border border-gray-700/50 backdrop-blur-sm'
+            ? 'bg-muted/30 border border-border/50 backdrop-blur-sm'
             : isOwn
               ? 'bg-gradient-to-br from-purple-600 to-purple-700 rounded-br-md shadow-lg shadow-purple-500/20'
-              : 'bg-gray-800/80 backdrop-blur-sm border border-gray-700/30 rounded-bl-md'
+              : 'bg-muted/80 backdrop-blur-sm border border-border/30 rounded-bl-md'
           }
         `}>
           {/* Mensaje de respuesta */}
           {message.reply_to && !message.is_deleted && (
-            <div className={`px-3 py-2 border-l-2 ${isOwn ? 'border-pink-400 bg-purple-700/60' : 'border-purple-400 bg-gray-700/60'}`}>
+            <div className={`px-3 py-2 border-l-2 ${isOwn ? 'border-pink-400 bg-purple-700/60' : 'border-purple-400 bg-muted/60'}`}>
               <p className="text-xs opacity-80 font-medium">
                 Respondiendo a {message.reply_to.sender?.display_name || 'Usuario'}
               </p>
@@ -940,7 +940,7 @@ function MensajesContent() {
 
           {/* Mensaje eliminado */}
           {message.is_deleted ? (
-            <p className="text-sm text-gray-500 italic px-4 py-3 flex items-center gap-2">
+            <p className="text-sm text-muted-foreground italic px-4 py-3 flex items-center gap-2">
               <Trash2 className="w-4 h-4" /> Este mensaje fue eliminado
             </p>
           ) : (
@@ -963,7 +963,7 @@ function MensajesContent() {
                       href={message.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-3 p-3 ${isOwn ? 'bg-purple-700' : 'bg-gray-700'} hover:opacity-80`}
+                      className={`flex items-center gap-3 p-3 ${isOwn ? 'bg-purple-700' : 'bg-muted'} hover:opacity-80`}
                     >
                       {getFileIcon(message.file_type || 'document')}
                       <div className="flex-1 min-w-0">
@@ -987,13 +987,13 @@ function MensajesContent() {
 
           {/* Hora y estado */}
           <div className={`flex items-center gap-1 px-4 pb-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(message.created_at), { addSuffix: false, locale: es })}
             </span>
             {isOwn && !message.is_deleted && (
               message.is_read
                 ? <CheckCheck className="w-3 h-3 text-blue-400" />
-                : <Check className="w-3 h-3 text-gray-400" />
+                : <Check className="w-3 h-3 text-muted-foreground" />
             )}
           </div>
         </div>
@@ -1007,8 +1007,8 @@ function MensajesContent() {
                 onClick={() => handleReaction(message.id, group.emoji)}
                 className={`
                   flex items-center gap-1 px-2 py-0.5 rounded-full text-xs
-                  ${group.hasCurrentUser ? 'bg-purple-500/30 border border-purple-500' : 'bg-gray-800 border border-gray-700'}
-                  hover:bg-gray-700 transition-colors
+                  ${group.hasCurrentUser ? 'bg-purple-500/30 border border-purple-500' : 'bg-muted border border-border'}
+                  hover:bg-muted transition-colors
                 `}
                 title={group.users.join(', ')}
               >
@@ -1062,13 +1062,13 @@ function MensajesContent() {
         w-full md:w-80 lg:w-96 md:flex-shrink-0
         bg-[#0d0d14] md:bg-[#0d0d14]/90
         backdrop-blur-xl
-        border-r border-gray-800/50
+        border-r border-border/50
         flex flex-col h-screen
         transition-transform duration-300 ease-out
         ${selectedConversation ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}
       `}>
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-gray-800/50">
+        <div className="p-4 border-b border-border/50">
           {/* Logo and title */}
           <div className="flex items-center justify-between mb-4">
             <Link href="/" className="flex items-center gap-3 group">
@@ -1082,7 +1082,7 @@ function MensajesContent() {
                 <h1 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Mensajes
                 </h1>
-                <p className="text-[10px] text-gray-500 -mt-0.5">Apocaliptyx Chat</p>
+                <p className="text-[10px] text-muted-foreground -mt-0.5">Apocaliptyx Chat</p>
               </div>
             </Link>
             <button
@@ -1090,19 +1090,19 @@ function MensajesContent() {
               className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 border border-transparent hover:border-purple-500/30"
               title="Crear grupo"
             >
-              <Plus className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
+              <Plus className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
             </button>
           </div>
 
           {/* Search bar */}
           <div className="relative mb-3 group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-purple-400 transition-colors" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar conversaciones..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-800/50 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
+              className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
             />
           </div>
 
@@ -1116,7 +1116,7 @@ function MensajesContent() {
                   flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
                   ${activeFilter === filter.key
                     ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-gray-800/80 text-gray-400 hover:bg-gray-700/80 hover:text-white border border-gray-700/50 hover:border-purple-500/30'
+                    : 'bg-muted/80 text-muted-foreground hover:bg-muted/80 hover:text-foreground border border-border/50 hover:border-purple-500/30'
                   }
                 `}
               >
@@ -1134,7 +1134,7 @@ function MensajesContent() {
               <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-4">
                 <MessageCircle className="w-10 h-10 text-purple-400" />
               </div>
-              <p className="text-gray-300 font-medium">
+              <p className="text-foreground font-medium">
                 {activeFilter === 'all' ? 'No tienes conversaciones' :
                  activeFilter === 'unread' ? 'No hay mensajes sin leer' :
                  activeFilter === 'favorites' ? 'No tienes favoritos' :
@@ -1142,7 +1142,7 @@ function MensajesContent() {
                  'No hay chats archivados'}
               </p>
               {activeFilter === 'all' && (
-                <p className="text-gray-500 text-sm mt-2">
+                <p className="text-muted-foreground text-sm mt-2">
                   Ve al perfil de alguien para enviar un mensaje
                 </p>
               )}
@@ -1203,9 +1203,9 @@ function MensajesContent() {
                         {getConversationName(conv)}
                       </span>
                       {conv.is_favorite && <Star className="w-3 h-3 text-yellow-400 flex-shrink-0" />}
-                      {conv.is_muted && <BellOff className="w-3 h-3 text-gray-500 flex-shrink-0" />}
+                      {conv.is_muted && <BellOff className="w-3 h-3 text-muted-foreground flex-shrink-0" />}
                     </div>
-                    <span className="text-[10px] text-gray-500 flex-shrink-0">
+                    <span className="text-[10px] text-muted-foreground flex-shrink-0">
                       {conv.last_message && formatDistanceToNow(new Date(conv.last_message.created_at), { addSuffix: false, locale: es })}
                     </span>
                   </div>
@@ -1225,15 +1225,15 @@ function MensajesContent() {
                       return (
                         <div className="flex items-center gap-2 mt-0.5">
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[10px] ${conv.unread_count ? 'text-gray-300' : 'text-gray-500'}`}>
+                            <p className={`text-[10px] ${conv.unread_count ? 'text-foreground' : 'text-muted-foreground'}`}>
                               Respondió a tu historia
                             </p>
-                            <p className={`text-xs truncate ${conv.unread_count ? 'text-white font-medium' : 'text-gray-400'}`}>
+                            <p className={`text-xs truncate ${conv.unread_count ? 'text-white font-medium' : 'text-muted-foreground'}`}>
                               {getActualContent()}
                             </p>
                           </div>
                           {conv.last_message?.story_preview ? (
-                            <div className="flex-shrink-0 w-8 h-8 rounded overflow-hidden border border-gray-700/50 bg-gray-800">
+                            <div className="flex-shrink-0 w-8 h-8 rounded overflow-hidden border border-border/50 bg-muted">
                               {conv.last_message.story_preview.mediaUrl ? (
                                 <img src={conv.last_message.story_preview.mediaUrl} alt="" className="w-full h-full object-cover" />
                               ) : conv.last_message.story_preview.linkPreview?.image ? (
@@ -1254,7 +1254,7 @@ function MensajesContent() {
                     }
 
                     return (
-                      <p className={`text-xs truncate mt-0.5 ${conv.unread_count ? 'text-white font-medium' : 'text-gray-500'}`}>
+                      <p className={`text-xs truncate mt-0.5 ${conv.unread_count ? 'text-white font-medium' : 'text-muted-foreground'}`}>
                         {conv.last_message?.file_url ? '📎 Archivo adjunto' : conv.last_message?.content || 'Sin mensajes'}
                       </p>
                     );
@@ -1273,7 +1273,7 @@ function MensajesContent() {
         {selectedConversation ? (
           <>
             {/* Chat Header */}
-            <header className="flex-shrink-0 p-4 border-b border-gray-800/50 backdrop-blur-xl bg-[#0d0d14]/80">
+            <header className="flex-shrink-0 p-4 border-b border-border/50 backdrop-blur-xl bg-[#0d0d14]/80">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button onClick={handleBack} className="md:hidden p-2 hover:bg-white/10 rounded-xl transition-all duration-200">
@@ -1314,7 +1314,7 @@ function MensajesContent() {
                           {getConversationName(selectedConversation)}
                         </p>
                         {selectedConversation.type === 'group' && (
-                          <span className="text-[10px] text-gray-400 px-2 py-0.5 rounded-full bg-gray-800/50">
+                          <span className="text-[10px] text-muted-foreground px-2 py-0.5 rounded-full bg-muted/50">
                             {selectedConversation.members?.length || 0} miembros
                           </span>
                         )}
@@ -1323,7 +1323,7 @@ function MensajesContent() {
                         <OnlineStatus userId={selectedConversation.other_user.id} showText size="sm" />
                       )}
                       {selectedConversation.type === 'group' && selectedConversation.group_description && (
-                        <p className="text-xs text-gray-400 truncate max-w-[200px]">
+                        <p className="text-xs text-muted-foreground truncate max-w-[200px]">
                           {selectedConversation.group_description}
                         </p>
                       )}
@@ -1365,13 +1365,13 @@ function MensajesContent() {
                   <div className="bg-[#0d0d14] rounded-t-2xl pt-2 pb-4 px-3 max-h-[60vh] overflow-y-auto">
                     {/* Handle indicator */}
                     <div className="flex justify-center mb-2">
-                      <div className="w-8 h-1 bg-gray-600 rounded-full" />
+                      <div className="w-8 h-1 bg-muted rounded-full" />
                     </div>
 
                     {/* Title */}
                     <div className="text-center mb-3 px-2">
                       <h3 className="text-sm font-semibold text-white">Opciones del chat</h3>
-                      <p className="text-[10px] text-gray-500 mt-0.5">
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
                         {selectedConversation.type === 'group' ? selectedConversation.group_name : selectedConversation.other_user?.display_name}
                       </p>
                     </div>
@@ -1381,45 +1381,45 @@ function MensajesContent() {
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); handleToggleFavorite(); }}
-                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-muted/50 hover:bg-muted/50 transition-all group"
                       >
-                        <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
-                          {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
+                        <div className={`p-2 rounded-lg ${selectedConversation.is_favorite ? 'bg-yellow-500/20' : 'bg-muted/80 group-hover:bg-purple-500/20'} transition-colors`}>
+                          {selectedConversation.is_favorite ? <StarOff className="w-4 h-4 text-yellow-400" /> : <Star className="w-4 h-4 text-muted-foreground group-hover:text-purple-400" />}
                         </div>
-                        <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_favorite ? 'Quitar' : 'Favorito'}</span>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight">{selectedConversation.is_favorite ? 'Quitar' : 'Favorito'}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); handleToggleMute(); }}
-                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-muted/50 hover:bg-muted/50 transition-all group"
                       >
-                        <div className={`p-2 rounded-lg ${selectedConversation.is_muted ? 'bg-green-500/20' : 'bg-gray-700/80 group-hover:bg-purple-500/20'} transition-colors`}>
-                          {selectedConversation.is_muted ? <Bell className="w-4 h-4 text-green-400" /> : <BellOff className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />}
+                        <div className={`p-2 rounded-lg ${selectedConversation.is_muted ? 'bg-green-500/20' : 'bg-muted/80 group-hover:bg-purple-500/20'} transition-colors`}>
+                          {selectedConversation.is_muted ? <Bell className="w-4 h-4 text-green-400" /> : <BellOff className="w-4 h-4 text-muted-foreground group-hover:text-purple-400" />}
                         </div>
-                        <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_muted ? 'Activar' : 'Silenciar'}</span>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight">{selectedConversation.is_muted ? 'Activar' : 'Silenciar'}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); handleToggleArchive(); }}
-                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-muted/50 hover:bg-muted/50 transition-all group"
                       >
-                        <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
-                          <Archive className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                        <div className="p-2 rounded-lg bg-muted/80 group-hover:bg-purple-500/20 transition-colors">
+                          <Archive className="w-4 h-4 text-muted-foreground group-hover:text-purple-400" />
                         </div>
-                        <span className="text-[10px] text-gray-400 text-center leading-tight">{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight">{selectedConversation.is_archived ? 'Desarchivar' : 'Archivar'}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setShowSearchInChat(true); setShowChatMenu(false); }}
-                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-gray-800/50 hover:bg-gray-700/50 transition-all group"
+                        className="flex flex-col items-center gap-1 p-2 rounded-xl bg-muted/50 hover:bg-muted/50 transition-all group"
                       >
-                        <div className="p-2 rounded-lg bg-gray-700/80 group-hover:bg-purple-500/20 transition-colors">
-                          <Search className="w-4 h-4 text-gray-400 group-hover:text-purple-400" />
+                        <div className="p-2 rounded-lg bg-muted/80 group-hover:bg-purple-500/20 transition-colors">
+                          <Search className="w-4 h-4 text-muted-foreground group-hover:text-purple-400" />
                         </div>
-                        <span className="text-[10px] text-gray-400 text-center leading-tight">Buscar</span>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight">Buscar</span>
                       </button>
                     </div>
 
@@ -1427,32 +1427,32 @@ function MensajesContent() {
                     {selectedConversation.type === 'group' && (
                       <>
                         <div className="mx-2 mb-2">
-                          <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 px-1">Opciones de grupo</p>
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 px-1">Opciones de grupo</p>
                           <div className="space-y-0.5">
                             <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); loadFollowingUsers(); setShowAddMembers(true); setShowChatMenu(false); }}
-                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all group"
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50 transition-all group"
                             >
                               <div className="p-1.5 rounded-md bg-purple-500/20">
                                 <UserPlus className="w-3.5 h-3.5 text-purple-400" />
                               </div>
-                              <span className="text-xs text-gray-300 group-hover:text-white">Agregar miembros</span>
+                              <span className="text-xs text-foreground group-hover:text-foreground">Agregar miembros</span>
                             </button>
                             <button
                               type="button"
                               onClick={(e) => { e.stopPropagation(); handleGetInviteLink(); setShowChatMenu(false); }}
-                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition-all group"
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-muted/50 transition-all group"
                             >
                               <div className="p-1.5 rounded-md bg-blue-500/20">
                                 <Link2 className="w-3.5 h-3.5 text-blue-400" />
                               </div>
-                              <span className="text-xs text-gray-300 group-hover:text-white">Enlace de invitación</span>
+                              <span className="text-xs text-foreground group-hover:text-foreground">Enlace de invitación</span>
                             </button>
                           </div>
                         </div>
 
-                        <div className="mx-2 pt-2 border-t border-gray-800/50">
+                        <div className="mx-2 pt-2 border-t border-border/50">
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); handleLeaveGroup(); }}
@@ -1472,7 +1472,7 @@ function MensajesContent() {
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setShowChatMenu(false); }}
-                        className="w-full py-2.5 rounded-lg bg-gray-800/80 hover:bg-gray-700/80 text-gray-300 hover:text-white text-sm font-medium transition-all"
+                        className="w-full py-2.5 rounded-lg bg-muted/80 hover:bg-muted/80 text-foreground hover:text-foreground text-sm font-medium transition-all"
                       >
                         Cancelar
                       </button>
@@ -1484,17 +1484,17 @@ function MensajesContent() {
 
             {/* Search in chat */}
             {showSearchInChat && (
-              <div className="p-3 border-b border-gray-800/50 bg-[#0d0d14]/50">
+              <div className="p-3 border-b border-border/50 bg-[#0d0d14]/50">
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                       type="text"
                       value={searchInChatQuery}
                       onChange={(e) => setSearchInChatQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearchInChat()}
                       placeholder="Buscar mensajes..."
-                      className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                      className="w-full pl-10 pr-4 py-2 bg-muted/50 border border-border/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                       autoFocus
                     />
                   </div>
@@ -1506,7 +1506,7 @@ function MensajesContent() {
                   <div className="mt-2 max-h-48 overflow-y-auto">
                     {searchResults.map(msg => (
                       <div key={msg.id} className="p-2 hover:bg-white/5 rounded-lg cursor-pointer text-sm">
-                        <p className="text-gray-400 text-xs">{msg.sender?.display_name}</p>
+                        <p className="text-muted-foreground text-xs">{msg.sender?.display_name}</p>
                         <p className="truncate">{msg.content}</p>
                       </div>
                     ))}
@@ -1524,8 +1524,8 @@ function MensajesContent() {
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <MessageCircle className="w-12 h-12 text-gray-700 mb-4" />
-                  <p className="text-gray-400">No hay mensajes aún</p>
-                  <p className="text-gray-500 text-sm">¡Envía el primer mensaje!</p>
+                  <p className="text-muted-foreground">No hay mensajes aún</p>
+                  <p className="text-muted-foreground text-sm">¡Envía el primer mensaje!</p>
                 </div>
               ) : (
                 messages.map((message) => {
@@ -1535,7 +1535,7 @@ function MensajesContent() {
                   if (isSystem) {
                     return (
                       <div key={message.id} className="flex justify-center">
-                        <span className="text-xs text-gray-500 bg-gray-800/50 px-3 py-1 rounded-full">
+                        <span className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
                           {message.content}
                         </span>
                       </div>
@@ -1552,7 +1552,7 @@ function MensajesContent() {
 
               {/* Typing indicator */}
               {typingUsers.length > 0 && (
-                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground text-sm">
                   <div className="flex space-x-1">
                     <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -1567,9 +1567,9 @@ function MensajesContent() {
 
             {/* Reply preview */}
             {replyingTo && (
-              <div className="px-4 py-2 border-t border-gray-800/50 bg-[#0d0d14]/80 flex items-center gap-3">
+              <div className="px-4 py-2 border-t border-border/50 bg-[#0d0d14]/80 flex items-center gap-3">
                 <div className="flex-1 border-l-2 border-purple-500 pl-3">
-                  <p className="text-xs text-gray-400">Respondiendo a {replyingTo.sender?.display_name || 'Usuario'}</p>
+                  <p className="text-xs text-muted-foreground">Respondiendo a {replyingTo.sender?.display_name || 'Usuario'}</p>
                   <p className="text-sm truncate">{replyingTo.content}</p>
                 </div>
                 <button onClick={() => setReplyingTo(null)} className="p-1 hover:bg-white/10 rounded-lg">
@@ -1580,18 +1580,18 @@ function MensajesContent() {
 
             {/* File preview */}
             {selectedFile && (
-              <div className="px-4 py-2 border-t border-gray-800/50 bg-[#0d0d14]/80">
-                <div className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-xl">
+              <div className="px-4 py-2 border-t border-border/50 bg-[#0d0d14]/80">
+                <div className="flex items-center gap-3 p-2 bg-muted/50 rounded-xl">
                   {filePreview ? (
                     <img src={filePreview} alt="Preview" className="w-14 h-14 object-cover rounded-lg" />
                   ) : (
-                    <div className="w-14 h-14 bg-gray-700/50 rounded-lg flex items-center justify-center">
+                    <div className="w-14 h-14 bg-muted/50 rounded-lg flex items-center justify-center">
                       {getFileIcon(selectedFile.type.split('/')[0])}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{selectedFile.name}</p>
-                    <p className="text-xs text-gray-400">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p className="text-xs text-muted-foreground">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
                   <button onClick={handleCancelFile} className="p-2 hover:bg-white/10 rounded-lg">
                     <X className="w-5 h-5" />
@@ -1601,15 +1601,15 @@ function MensajesContent() {
             )}
 
             {/* Message input */}
-            <form onSubmit={handleSendMessage} className="flex-shrink-0 p-4 border-t border-gray-800/50 backdrop-blur-xl bg-[#0d0d14]/80">
+            <form onSubmit={handleSendMessage} className="flex-shrink-0 p-4 border-t border-border/50 backdrop-blur-xl bg-[#0d0d14]/80">
               <div className="flex items-center gap-3">
                 {/* Emoji button */}
                 <div className="relative" ref={emojiPickerRef}>
-                  <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-2.5 text-gray-400 hover:text-purple-400 hover:bg-white/5 rounded-xl transition-all duration-200">
+                  <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-2.5 text-muted-foreground hover:text-purple-400 hover:bg-white/5 rounded-xl transition-all duration-200">
                     <Smile className="w-5 h-5" />
                   </button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-14 left-0 w-80 backdrop-blur-xl bg-gray-900/95 border border-gray-700/50 rounded-2xl shadow-2xl shadow-purple-500/10 p-4 z-50">
+                    <div className="absolute bottom-14 left-0 w-80 backdrop-blur-xl bg-card/95 border border-border/50 rounded-2xl shadow-2xl shadow-purple-500/10 p-4 z-50">
                       <div className="grid grid-cols-8 gap-2 max-h-52 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
                         {EMOJI_LIST.map((emoji, i) => (
                           <button key={i} type="button" onClick={() => handleEmojiSelect(emoji)} className="w-9 h-9 flex items-center justify-center text-xl hover:bg-white/10 rounded-lg transition-all duration-200 hover:scale-110">
@@ -1622,7 +1622,7 @@ function MensajesContent() {
                 </div>
 
                 {/* Attach button */}
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2.5 text-gray-400 hover:text-purple-400 hover:bg-white/5 rounded-xl transition-all duration-200">
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2.5 text-muted-foreground hover:text-purple-400 hover:bg-white/5 rounded-xl transition-all duration-200">
                   <Paperclip className="w-5 h-5" />
                 </button>
                 <input ref={fileInputRef} type="file" onChange={handleFileSelect} accept="image/*,video/*,.pdf,.doc,.docx,.txt" className="hidden" />
@@ -1635,7 +1635,7 @@ function MensajesContent() {
                     value={newMessage}
                     onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
                     placeholder="Escribe un mensaje..."
-                    className="w-full px-5 py-3 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
+                    className="w-full px-5 py-3 bg-muted/50 border border-border/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
                     disabled={sending || uploading}
                   />
                 </div>
@@ -1656,14 +1656,14 @@ function MensajesContent() {
           <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
             <div className="relative mb-6">
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-xl" />
-              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-gray-800 flex items-center justify-center">
-                <MessageCircle className="w-12 h-12 text-gray-600" />
+              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-border flex items-center justify-center">
+                <MessageCircle className="w-12 h-12 text-muted-foreground" />
               </div>
             </div>
             <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
               Tus mensajes
             </h2>
-            <p className="text-gray-500 max-w-sm text-sm">
+            <p className="text-muted-foreground max-w-sm text-sm">
               Selecciona una conversación de la lista o ve al perfil de un usuario para empezar a chatear
             </p>
             <Link
@@ -1692,7 +1692,7 @@ function MensajesContent() {
             <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-75" />
             <div className="relative bg-[#0d0d14] rounded-2xl overflow-hidden">
               {/* Header */}
-              <div className="p-5 border-b border-gray-800/50 flex items-center justify-between">
+              <div className="p-5 border-b border-border/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
                     <Users className="w-5 h-5 text-white" />
@@ -1701,21 +1701,21 @@ function MensajesContent() {
                     <h2 className="text-lg font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                       Crear grupo
                     </h2>
-                    <p className="text-xs text-gray-500">Crea un espacio para tu comunidad</p>
+                    <p className="text-xs text-muted-foreground">Crea un espacio para tu comunidad</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowCreateGroup(false)}
                   className="p-2 hover:bg-white/10 rounded-xl transition-all duration-200 hover:rotate-90"
                 >
-                  <X className="w-5 h-5 text-gray-400" />
+                  <X className="w-5 h-5 text-muted-foreground" />
                 </button>
               </div>
 
               {/* Form */}
               <div className="p-5 space-y-5">
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300">
+                  <label className="block text-sm font-medium text-foreground">
                     Nombre del grupo <span className="text-pink-500">*</span>
                   </label>
                   <div className="relative group">
@@ -1725,16 +1725,16 @@ function MensajesContent() {
                       value={groupName}
                       onChange={(e) => setGroupName(e.target.value)}
                       placeholder="Ej: Profetas del Apocalipsis"
-                      className="relative w-full px-4 py-3 bg-gray-800/80 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
+                      className="relative w-full px-4 py-3 bg-muted/80 border border-border/50 rounded-xl text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300"
                       maxLength={50}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 text-right">{groupName.length}/50</p>
+                  <p className="text-xs text-muted-foreground text-right">{groupName.length}/50</p>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-300">
-                    Descripción <span className="text-gray-500">(opcional)</span>
+                  <label className="block text-sm font-medium text-foreground">
+                    Descripción <span className="text-muted-foreground">(opcional)</span>
                   </label>
                   <div className="relative group">
                     <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity blur-sm" />
@@ -1742,27 +1742,27 @@ function MensajesContent() {
                       value={groupDescription}
                       onChange={(e) => setGroupDescription(e.target.value)}
                       placeholder="¿De qué trata este grupo?"
-                      className="relative w-full px-4 py-3 bg-gray-800/80 border border-gray-700/50 rounded-xl text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300 resize-none"
+                      className="relative w-full px-4 py-3 bg-muted/80 border border-border/50 rounded-xl text-sm focus:outline-none focus:border-purple-500/50 placeholder-gray-500 transition-all duration-300 resize-none"
                       rows={3}
                       maxLength={200}
                     />
                   </div>
-                  <p className="text-xs text-gray-500 text-right">{groupDescription.length}/200</p>
+                  <p className="text-xs text-muted-foreground text-right">{groupDescription.length}/200</p>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl">
                   <span className="text-xl">💡</span>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     Después de crear el grupo podrás agregar miembros y personalizar la configuración desde el menú de opciones.
                   </p>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="p-5 border-t border-gray-800/50 flex gap-3">
+              <div className="p-5 border-t border-border/50 flex gap-3">
                 <button
                   onClick={() => setShowCreateGroup(false)}
-                  className="flex-1 px-4 py-3 bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700/50 rounded-xl transition-all duration-300 font-medium text-gray-300 hover:text-white"
+                  className="flex-1 px-4 py-3 bg-muted/80 hover:bg-muted/80 border border-border/50 rounded-xl transition-all duration-300 font-medium text-foreground hover:text-foreground"
                 >
                   Cancelar
                 </button>
@@ -1794,18 +1794,18 @@ function MensajesContent() {
       {/* ============================================ */}
       {showAddMembers && selectedConversation?.type === 'group' && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-purple-400" />
                 Agregar miembros
               </h2>
-              <button onClick={() => setShowAddMembers(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+              <button onClick={() => setShowAddMembers(false)} className="p-2 hover:bg-muted rounded-lg">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 text-sm text-gray-400 border-b border-gray-800">
+            <div className="p-4 text-sm text-muted-foreground border-b border-border">
               Invita a personas que sigues a unirse a &quot;{selectedConversation.group_name}&quot;
             </div>
 
@@ -1815,7 +1815,7 @@ function MensajesContent() {
                   <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
                 </div>
               ) : followingUsers.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>No hay usuarios disponibles para invitar</p>
                   <p className="text-xs mt-1">Sigue a más personas para poder invitarlas</p>
@@ -1825,7 +1825,7 @@ function MensajesContent() {
                   {followingUsers.map(user => (
                     <div
                       key={user.id}
-                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800/50"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50"
                     >
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 overflow-hidden">
                         {user.avatar_url ? (
@@ -1838,7 +1838,7 @@ function MensajesContent() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{user.display_name || user.username}</p>
-                        <p className="text-xs text-gray-500">@{user.username}</p>
+                        <p className="text-xs text-muted-foreground">@{user.username}</p>
                       </div>
                       <button
                         onClick={() => handleInviteUser(user.id)}
@@ -1860,13 +1860,13 @@ function MensajesContent() {
               )}
             </div>
 
-            <div className="p-4 border-t border-gray-800">
+            <div className="p-4 border-t border-border">
               <button
                 onClick={() => {
                   setShowAddMembers(false);
                   handleGetInviteLink();
                 }}
-                className="w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full px-4 py-2 bg-muted hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <Link2 className="w-4 h-4" />
                 Obtener enlace de invitación
@@ -1881,19 +1881,19 @@ function MensajesContent() {
       {/* ============================================ */}
       {showInviteLink && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md">
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md">
+            <div className="p-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Link2 className="w-5 h-5 text-purple-400" />
                 Enlace de invitación
               </h2>
-              <button onClick={() => setShowInviteLink(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+              <button onClick={() => setShowInviteLink(false)} className="p-2 hover:bg-muted rounded-lg">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-4 space-y-4">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 Comparte este enlace para que otros puedan unirse al grupo
               </p>
 
@@ -1902,7 +1902,7 @@ function MensajesContent() {
                   type="text"
                   value={inviteLink || ''}
                   readOnly
-                  className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm"
+                  className="flex-1 px-4 py-2 bg-muted border border-border rounded-lg text-sm"
                 />
                 <button
                   onClick={handleCopyInviteLink}
@@ -1916,7 +1916,7 @@ function MensajesContent() {
                 <button
                   onClick={handleRegenerateLink}
                   disabled={loadingInviteLink}
-                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                  className="flex-1 px-4 py-2 bg-muted hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
                 >
                   {loadingInviteLink ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -1929,7 +1929,7 @@ function MensajesContent() {
                 </button>
               </div>
 
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-muted-foreground text-center">
                 Cualquier persona con este enlace podrá unirse al grupo
               </p>
             </div>
@@ -1957,13 +1957,13 @@ function MensajesContent() {
       {/* ============================================ */}
       {showInvitations && pendingInvitations.length > 0 && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
-            <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+            <div className="p-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Users className="w-5 h-5 text-purple-400" />
                 Invitaciones a grupos
               </h2>
-              <button onClick={() => setShowInvitations(false)} className="p-2 hover:bg-gray-800 rounded-lg">
+              <button onClick={() => setShowInvitations(false)} className="p-2 hover:bg-muted rounded-lg">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1972,7 +1972,7 @@ function MensajesContent() {
               {pendingInvitations.map(inv => (
                 <div
                   key={inv.id}
-                  className="p-4 rounded-lg bg-gray-800/50 mb-2"
+                  className="p-4 rounded-lg bg-muted/50 mb-2"
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -1984,11 +1984,11 @@ function MensajesContent() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium">{inv.group?.group_name}</p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-muted-foreground">
                         <span className="text-purple-400">@{inv.inviter?.username}</span> te invitó
                       </p>
                       {inv.group?.members_count && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {inv.group.members_count} miembro{inv.group.members_count !== 1 ? 's' : ''}
                         </p>
                       )}
@@ -1998,7 +1998,7 @@ function MensajesContent() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleRespondInvitation(inv.id, false)}
-                      className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 px-4 py-2 bg-muted hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
                       <UserX className="w-4 h-4" />
                       Rechazar

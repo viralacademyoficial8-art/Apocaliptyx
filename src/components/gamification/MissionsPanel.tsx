@@ -60,10 +60,10 @@ export function MissionsPanel({
     return (
       <div
         key={mission.id}
-        className={`bg-gray-900/50 rounded-lg p-4 border transition-colors ${
+        className={`bg-card/50 rounded-lg p-4 border transition-colors ${
           mission.isCompleted
             ? 'border-green-500/50 bg-green-500/5'
-            : 'border-gray-700'
+            : 'border-border'
         }`}
       >
         <div className="flex items-start gap-3">
@@ -79,13 +79,13 @@ export function MissionsPanel({
                 {difficultyLabels[mission.difficulty]}
               </span>
             </div>
-            <p className="text-sm text-gray-400 mb-3">{mission.descriptionEs}</p>
+            <p className="text-sm text-muted-foreground mb-3">{mission.descriptionEs}</p>
 
             {/* Progress */}
             <div className="space-y-1 mb-3">
               <div className="flex justify-between text-xs">
-                <span className="text-gray-400">Progreso</span>
-                <span className="text-gray-300">
+                <span className="text-muted-foreground">Progreso</span>
+                <span className="text-foreground">
                   {mission.progress} / {mission.target}
                 </span>
               </div>
@@ -132,15 +132,15 @@ export function MissionsPanel({
   };
 
   return (
-    <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
+    <div className="bg-muted/50 rounded-xl border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold flex items-center gap-2">
             <Target className="w-5 h-5 text-blue-400" />
             Misiones
           </h3>
-          <div className="flex items-center gap-1 text-sm text-gray-400">
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <CheckCircle className="w-4 h-4 text-green-400" />
             {completedCount}/{missions.length}
           </div>
@@ -148,13 +148,13 @@ export function MissionsPanel({
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-700">
+      <div className="flex border-b border-border">
         <button
           onClick={() => setActiveTab('daily')}
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
             activeTab === 'daily'
               ? 'text-purple-400 border-b-2 border-purple-400'
-              : 'text-gray-400 hover:text-white'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           <div className="flex items-center justify-center gap-2">
@@ -167,7 +167,7 @@ export function MissionsPanel({
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
             activeTab === 'weekly'
               ? 'text-purple-400 border-b-2 border-purple-400'
-              : 'text-gray-400 hover:text-white'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           <div className="flex items-center justify-center gap-2">
@@ -182,7 +182,7 @@ export function MissionsPanel({
         {missions.length > 0 ? (
           missions.map(renderMission)
         ) : (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-muted-foreground">
             <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>No hay misiones disponibles</p>
           </div>

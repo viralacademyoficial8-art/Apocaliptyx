@@ -35,13 +35,13 @@ export function LevelProgress({
             <Sparkles className={`${s.icon} text-yellow-400`} />
             <span className={`${s.text} font-bold text-white`}>Nivel {level}</span>
           </div>
-          <span className={`${s.text} text-gray-400`}>
+          <span className={`${s.text} text-muted-foreground`}>
             {xp.toLocaleString()} / {xpToNextLevel.toLocaleString()} XP
           </span>
         </div>
       )}
 
-      <div className={`w-full ${s.height} bg-gray-800 rounded-full overflow-hidden`}>
+      <div className={`w-full ${s.height} bg-muted rounded-full overflow-hidden`}>
         <div
           className={`${s.height} bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300 rounded-full transition-all duration-500`}
           style={{ width: `${Math.min(progress, 100)}%` }}

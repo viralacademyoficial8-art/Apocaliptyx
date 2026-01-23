@@ -226,7 +226,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
           Crear comunidad
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Crear nueva comunidad</DialogTitle>
         </DialogHeader>
@@ -234,7 +234,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
         <div className="space-y-6 mt-4">
           {/* Banner Upload */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Banner de la comunidad
             </label>
             <div
@@ -309,46 +309,46 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
               className="hidden"
               disabled={isLoading}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Banner: max 10MB | Logo: max 5MB (click en el icono para cambiar)
             </p>
           </div>
 
           {/* Name */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Nombre de la comunidad *
             </label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ej: Predicciones de Fútbol"
-              className="bg-gray-800 border-gray-700"
+              className="bg-muted border-border"
               maxLength={50}
               disabled={isLoading}
             />
-            <p className="text-xs text-gray-500 mt-1">{name.length}/50</p>
+            <p className="text-xs text-muted-foreground mt-1">{name.length}/50</p>
           </div>
 
           {/* Description */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Descripción
             </label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe de qué trata tu comunidad..."
-              className="bg-gray-800 border-gray-700 min-h-[80px]"
+              className="bg-muted border-border min-h-[80px]"
               maxLength={500}
               disabled={isLoading}
             />
-            <p className="text-xs text-gray-500 mt-1">{description.length}/500</p>
+            <p className="text-xs text-muted-foreground mt-1">{description.length}/500</p>
           </div>
 
           {/* Categories */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Categorías (máx. 3)
             </label>
             <div className="flex flex-wrap gap-2">
@@ -361,7 +361,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                   className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                     selectedCategories.includes(cat)
                       ? 'bg-purple-600 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:text-white'
+                      : 'bg-muted text-muted-foreground hover:text-foreground'
                   } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {cat}
@@ -372,7 +372,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
 
           {/* Theme Color */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Color del tema
             </label>
             <div className="flex gap-2">
@@ -406,7 +406,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
                   <p className="font-medium">
                     {isPublic ? 'Comunidad pública' : 'Comunidad privada'}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {isPublic
                       ? 'Cualquiera puede ver y unirse'
                       : 'Solo con invitación o aprobación'}
@@ -424,7 +424,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Requiere aprobación</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     Los nuevos miembros deben ser aprobados
                   </p>
                 </div>

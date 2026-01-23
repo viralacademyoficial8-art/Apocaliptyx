@@ -17,7 +17,7 @@ export function ProfileTabs() {
   const { activeTab, setActiveTab } = useProfileStore();
 
   return (
-    <div className="border-b border-gray-800">
+    <div className="border-b border-border">
       <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -30,7 +30,7 @@ export function ProfileTabs() {
               className={`flex items-center gap-2 px-4 py-3 font-medium whitespace-nowrap transition-colors relative ${
                 isActive
                   ? 'text-purple-400'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               <Icon className="w-4 h-4" />

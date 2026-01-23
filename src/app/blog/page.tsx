@@ -79,7 +79,7 @@ export default function BlogPage() {
             <BookOpen className="w-8 h-8 text-purple-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Blog</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Noticias, guías, estrategias y actualizaciones de Apocaliptyx
           </p>
         </div>
@@ -92,9 +92,9 @@ export default function BlogPage() {
               <ul className="space-y-2">
                 {categories.map((cat) => (
                   <li key={cat.name}>
-                    <button className="w-full flex items-center justify-between p-3 bg-gray-900/50 hover:bg-gray-800/50 border border-gray-800 rounded-lg transition-colors text-left">
-                      <span className="text-gray-400">{cat.name}</span>
-                      <span className="text-xs text-gray-600 bg-gray-800 px-2 py-1 rounded">{cat.count}</span>
+                    <button className="w-full flex items-center justify-between p-3 bg-card/50 hover:bg-muted/50 border border-border rounded-lg transition-colors text-left">
+                      <span className="text-muted-foreground">{cat.name}</span>
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">{cat.count}</span>
                     </button>
                   </li>
                 ))}
@@ -102,13 +102,13 @@ export default function BlogPage() {
 
               <div className="mt-8 p-4 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl">
                 <h3 className="font-bold mb-2">Newsletter</h3>
-                <p className="text-sm text-gray-400 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Recibe las últimas noticias en tu correo
                 </p>
                 <input
                   type="email"
                   placeholder="tu@email.com"
-                  className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-2"
+                  className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-2"
                 />
                 <button className="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
                   Suscribirse
@@ -135,8 +135,8 @@ export default function BlogPage() {
                 <h2 className="text-2xl font-bold mb-2 group-hover:text-purple-400 transition-colors">
                   {blogPosts[0].title}
                 </h2>
-                <p className="text-gray-400 mb-4">{blogPosts[0].excerpt}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
+                <p className="text-muted-foreground mb-4">{blogPosts[0].excerpt}</p>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <User className="w-4 h-4" />
                     {blogPosts[0].author}
@@ -163,7 +163,7 @@ export default function BlogPage() {
                         <BookOpen className="w-10 h-10 text-gray-700" />
                       </div>
                       <div className="absolute top-3 left-3">
-                        <span className="px-2 py-0.5 bg-gray-800 text-gray-400 text-xs rounded-full">
+                        <span className="px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">
                           {post.category}
                         </span>
                       </div>
@@ -171,8 +171,8 @@ export default function BlogPage() {
                     <h3 className="font-bold mb-2 group-hover:text-purple-400 transition-colors line-clamp-2">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">{post.excerpt}</p>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{post.excerpt}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {new Date(post.date).toLocaleDateString('es-MX')}
@@ -189,8 +189,8 @@ export default function BlogPage() {
 
             {/* Más posts */}
             <div className="mt-8 text-center">
-              <p className="text-gray-500 mb-4">Mostrando 4 de 4 artículos</p>
-              <button disabled className="px-6 py-3 bg-gray-800 text-gray-500 rounded-lg cursor-not-allowed">
+              <p className="text-muted-foreground mb-4">Mostrando 4 de 4 artículos</p>
+              <button disabled className="px-6 py-3 bg-muted text-muted-foreground rounded-lg cursor-not-allowed">
                 No hay más artículos
               </button>
             </div>

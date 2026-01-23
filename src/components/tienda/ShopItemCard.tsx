@@ -13,7 +13,7 @@ interface ShopItemCardProps {
 }
 
 const rarityColors: Record<string, { bg: string; text: string; border: string }> = {
-  COMMON: { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/30' },
+  COMMON: { bg: 'bg-gray-500/20', text: 'text-muted-foreground', border: 'border-gray-500/30' },
   RARE: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' },
   EPIC: { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' },
   LEGENDARY: { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' },
@@ -51,7 +51,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
 
   return (
     <div
-      className={`group relative bg-gray-900 rounded-xl border ${rarity.border} overflow-hidden hover:border-opacity-60 transition-all hover:shadow-lg hover:shadow-purple-500/10`}
+      className={`group relative bg-card rounded-xl border ${rarity.border} overflow-hidden hover:border-opacity-60 transition-all hover:shadow-lg hover:shadow-purple-500/10`}
     >
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
         {item.isNew && (
@@ -76,7 +76,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
           <span
             className={`px-2 py-1 text-xs font-bold rounded-full ${
               item.stock === 0
-                ? 'bg-gray-700 text-gray-400'
+                ? 'bg-muted text-muted-foreground'
                 : item.stock <= 10
                 ? 'bg-red-500/20 text-red-400'
                 : 'bg-yellow-500/20 text-yellow-400'
@@ -98,7 +98,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
           <span className={`px-2 py-0.5 text-xs font-medium rounded ${rarity.bg} ${rarity.text}`}>{item.rarity}</span>
-          <div className="flex items-center gap-1 text-gray-500 text-sm">
+          <div className="flex items-center gap-1 text-muted-foreground text-sm">
             <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
             <span>{item.rating}</span>
             <span>({item.reviews})</span>
@@ -106,7 +106,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
         </div>
 
         <h3 className="text-white font-bold mb-1 line-clamp-1">{item.name}</h3>
-        <p className="text-gray-400 text-sm line-clamp-2 mb-3">{item.description}</p>
+        <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{item.description}</p>
 
         {item.effects && item.effects.length > 0 && (
           <div className="mb-3">
@@ -118,9 +118,9 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-yellow-400">{item.price.toLocaleString()}</span>
             <span className="text-yellow-400/60 text-sm">AP</span>
-            {item.originalPrice && <span className="text-gray-500 line-through text-sm">{item.originalPrice.toLocaleString()}</span>}
+            {item.originalPrice && <span className="text-muted-foreground line-through text-sm">{item.originalPrice.toLocaleString()}</span>}
           </div>
-          {item.purchaseCount > 1000 && <span className="text-xs text-gray-500">{(item.purchaseCount / 1000).toFixed(1)}k {t('shop.sold')}</span>}
+          {item.purchaseCount > 1000 && <span className="text-xs text-muted-foreground">{(item.purchaseCount / 1000).toFixed(1)}k {t('shop.sold')}</span>}
         </div>
 
         <div className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
             disabled={item.stock === 0 || !canAddMore || isAdding}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-all ${
               item.stock === 0
-                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
                 : isInCart
                 ? 'bg-green-600 hover:bg-green-700 text-white'
                 : 'bg-purple-600 hover:bg-purple-700 text-white'
@@ -153,7 +153,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
           <button
             onClick={onViewDetails}
             type="button"
-            className="p-2.5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-lg transition-colors"
+            className="p-2.5 bg-muted hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors"
           >
             <Eye className="w-5 h-5" />
           </button>

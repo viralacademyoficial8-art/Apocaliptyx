@@ -56,7 +56,7 @@ const rarityColors: Record<string, string> = {
 };
 
 const rarityTextColors: Record<string, string> = {
-  COMMON: "text-gray-400",
+  COMMON: "text-muted-foreground",
   RARE: "text-blue-400",
   EPIC: "text-purple-400",
   LEGENDARY: "text-yellow-400",
@@ -136,7 +136,7 @@ export default function PerfilPage() {
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-          <span className="ml-3 text-gray-400">Cargando perfil...</span>
+          <span className="ml-3 text-muted-foreground">Cargando perfil...</span>
         </div>
       </div>
     );
@@ -147,9 +147,9 @@ export default function PerfilPage() {
       <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex flex-col items-center justify-center py-32">
-          <User className="w-16 h-16 text-gray-600 mb-4" />
+          <User className="w-16 h-16 text-muted-foreground mb-4" />
           <h1 className="text-2xl font-bold mb-2">Perfil no encontrado</h1>
-          <p className="text-gray-400 mb-6">No se pudo cargar tu perfil.</p>
+          <p className="text-muted-foreground mb-6">No se pudo cargar tu perfil.</p>
           <button
             onClick={() => router.push("/dashboard")}
             className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
@@ -172,7 +172,7 @@ export default function PerfilPage() {
 
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Header del perfil */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden mb-8">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden mb-8">
           {/* Banner */}
           <div className="h-32 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600" />
 
@@ -181,7 +181,7 @@ export default function PerfilPage() {
             <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-gray-800 border-4 border-gray-900 flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 rounded-full bg-muted border-4 border-gray-900 flex items-center justify-center overflow-hidden">
                   {profile.avatar_url ? (
                     <img
                       src={profile.avatar_url}
@@ -189,7 +189,7 @@ export default function PerfilPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-gray-500" />
+                    <User className="w-12 h-12 text-muted-foreground" />
                   )}
                 </div>
                 {profile.is_verified && (
@@ -209,13 +209,13 @@ export default function PerfilPage() {
                     <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                   )}
                 </div>
-                <p className="text-gray-400">@{profile.username}</p>
+                <p className="text-muted-foreground">@{profile.username}</p>
               </div>
 
               {/* Botón editar */}
               <Link
                 href="/configuracion"
-                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center gap-2 transition-colors"
+                className="px-4 py-2 bg-muted hover:bg-muted rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 Configuración
@@ -224,11 +224,11 @@ export default function PerfilPage() {
 
             {/* Bio */}
             {profile.bio && (
-              <p className="mt-4 text-gray-300">{profile.bio}</p>
+              <p className="mt-4 text-foreground">{profile.bio}</p>
             )}
 
             {/* Info adicional */}
-            <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-400">
+            <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Mail className="w-4 h-4" />
                 {profile.email}
@@ -249,7 +249,7 @@ export default function PerfilPage() {
           <div className={`rounded-xl p-4 text-center ${
             hasInfiniteCoins
               ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30'
-              : 'bg-gray-900 border border-gray-800'
+              : 'bg-card border border-border'
           }`}>
             {hasInfiniteCoins ? (
               <Infinity className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
@@ -259,84 +259,84 @@ export default function PerfilPage() {
             <p className="text-2xl font-bold">
               {hasInfiniteCoins ? '∞' : profile.ap_coins.toLocaleString()}
             </p>
-            <p className="text-sm text-gray-400">AP Coins</p>
+            <p className="text-sm text-muted-foreground">AP Coins</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <Trophy className="w-6 h-6 text-purple-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">Nivel {profile.level}</p>
-            <p className="text-sm text-gray-400">{profile.xp} XP</p>
+            <p className="text-sm text-muted-foreground">{profile.xp} XP</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <Target className="w-6 h-6 text-green-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats?.totalPredictions || 0}</p>
-            <p className="text-sm text-gray-400">Predicciones</p>
+            <p className="text-sm text-muted-foreground">Predicciones</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <TrendingUp className="w-6 h-6 text-blue-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{stats?.accuracy || 0}%</p>
-            <p className="text-sm text-gray-400">Precisión</p>
+            <p className="text-sm text-muted-foreground">Precisión</p>
           </div>
         </div>
 
         {/* Level progress */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-8">
+        <div className="bg-card border border-border rounded-xl p-4 mb-8">
           <div className="flex justify-between text-sm mb-2">
-            <span className="text-gray-400">Nivel {profile.level}</span>
-            <span className="text-gray-400">Nivel {profile.level + 1}</span>
+            <span className="text-muted-foreground">Nivel {profile.level}</span>
+            <span className="text-muted-foreground">Nivel {profile.level + 1}</span>
           </div>
-          <div className="h-3 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-3 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
               style={{ width: `${xpProgress}%` }}
             />
           </div>
-          <p className="text-center text-sm text-gray-400 mt-2">
+          <p className="text-center text-sm text-muted-foreground mt-2">
             {profile.xp % 1000} / 1000 XP para el siguiente nivel
           </p>
         </div>
 
         {/* Stats detallados */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Predicciones correctas</p>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground mb-1">Predicciones correctas</p>
             <p className="text-xl font-bold text-green-400">
               {stats?.correctPredictions || 0} / {stats?.totalPredictions || 0}
             </p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Ganancias totales</p>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground mb-1">Ganancias totales</p>
             <p className="text-xl font-bold text-yellow-400">
               {(stats?.totalEarnings || 0).toLocaleString()} AP
             </p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Escenarios creados</p>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground mb-1">Escenarios creados</p>
             <p className="text-xl font-bold text-purple-400">
               {stats?.scenariosCreated || 0}
             </p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Seguidores</p>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground mb-1">Seguidores</p>
             <p className="text-xl font-bold">{stats?.followersCount || 0}</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Siguiendo</p>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground mb-1">Siguiendo</p>
             <p className="text-xl font-bold">{stats?.followingCount || 0}</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-            <p className="text-sm text-gray-400 mb-1">Items en inventario</p>
+          <div className="bg-card border border-border rounded-xl p-4">
+            <p className="text-sm text-muted-foreground mb-1">Items en inventario</p>
             <p className="text-xl font-bold text-pink-400">{inventory.length}</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-gray-800 pb-4 overflow-x-auto">
+        <div className="flex gap-2 mb-6 border-b border-border pb-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab("overview")}
             className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "overview"
                 ? "bg-purple-500 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             Resumen
@@ -346,7 +346,7 @@ export default function PerfilPage() {
             className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap flex items-center gap-2 ${
               activeTab === "inventory"
                 ? "bg-purple-500 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             <Package className="w-4 h-4" />
@@ -357,7 +357,7 @@ export default function PerfilPage() {
             className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "predictions"
                 ? "bg-purple-500 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             Mis Predicciones ({predictions.length})
@@ -367,7 +367,7 @@ export default function PerfilPage() {
             className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
               activeTab === "scenarios"
                 ? "bg-purple-500 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
             }`}
           >
             Mis Escenarios ({scenarios.length})
@@ -378,10 +378,10 @@ export default function PerfilPage() {
         {activeTab === "overview" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Predicciones recientes */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="bg-card border border-border rounded-xl p-6">
               <h3 className="text-lg font-bold mb-4">Predicciones recientes</h3>
               {predictions.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">
+                <p className="text-muted-foreground text-center py-8">
                   No tienes predicciones aún
                 </p>
               ) : (
@@ -389,13 +389,13 @@ export default function PerfilPage() {
                   {predictions.slice(0, 5).map((pred) => (
                     <div
                       key={pred.id}
-                      className="flex items-center justify-between p-3 bg-gray-800 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
                     >
                       <div>
                         <p className="font-medium text-sm">
                           {pred.prediction === "YES" ? "SÍ" : "NO"}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-muted-foreground">
                           {pred.amount} AP
                         </p>
                       </div>
@@ -421,11 +421,11 @@ export default function PerfilPage() {
             </div>
 
             {/* Escenarios creados */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="bg-card border border-border rounded-xl p-6">
               <h3 className="text-lg font-bold mb-4">Escenarios creados</h3>
               {scenarios.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-400 mb-4">No has creado escenarios aún</p>
+                  <p className="text-muted-foreground mb-4">No has creado escenarios aún</p>
                   <Link
                     href="/crear"
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg inline-block"
@@ -439,12 +439,12 @@ export default function PerfilPage() {
                     <Link
                       key={scenario.id}
                       href={`/escenario/${scenario.id}`}
-                      className="block p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+                      className="block p-3 bg-muted rounded-lg hover:bg-muted transition-colors"
                     >
                       <p className="font-medium text-sm line-clamp-1">
                         {scenario.title}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-muted-foreground">
                         {scenario.total_pool} AP en juego
                       </p>
                     </Link>
@@ -457,7 +457,7 @@ export default function PerfilPage() {
 
         {/* Tab Inventario */}
         {activeTab === "inventory" && (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <div className="bg-card border border-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <Package className="w-5 h-5 text-purple-400" />
@@ -474,9 +474,9 @@ export default function PerfilPage() {
 
             {inventory.length === 0 ? (
               <div className="text-center py-12">
-                <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 mb-4">Tu inventario está vacío</p>
-                <p className="text-gray-500 text-sm mb-6">
+                <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">Tu inventario está vacío</p>
+                <p className="text-muted-foreground text-sm mb-6">
                   Compra items en la tienda para potenciar tus predicciones
                 </p>
                 <Link
@@ -517,8 +517,8 @@ export default function PerfilPage() {
 
                       {/* Icono */}
                       <div className="flex justify-center mb-3 mt-2">
-                        <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center text-2xl">
-                          {item.icon || <Icon className="w-7 h-7 text-gray-400" />}
+                        <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-2xl">
+                          {item.icon || <Icon className="w-7 h-7 text-muted-foreground" />}
                         </div>
                       </div>
 
@@ -530,7 +530,7 @@ export default function PerfilPage() {
                         <p className={`text-xs font-medium mb-2 ${rarityTextColors[rarity]}`}>
                           {rarity}
                         </p>
-                        <p className="text-xs text-gray-400 line-clamp-2">
+                        <p className="text-xs text-muted-foreground line-clamp-2">
                           {item.description}
                         </p>
                       </div>
@@ -554,10 +554,10 @@ export default function PerfilPage() {
         )}
 
         {activeTab === "predictions" && (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <div className="bg-card border border-border rounded-xl p-6">
             <h3 className="text-lg font-bold mb-4">Historial de predicciones</h3>
             {predictions.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">
+              <p className="text-muted-foreground text-center py-8">
                 No tienes predicciones aún. ¡Explora escenarios y haz tu primera predicción!
               </p>
             ) : (
@@ -565,16 +565,16 @@ export default function PerfilPage() {
                 {predictions.map((pred) => (
                   <div
                     key={pred.id}
-                    className="flex items-center justify-between p-4 bg-gray-800 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-muted rounded-lg"
                   >
                     <div>
                       <p className="font-medium">
                         Votaste: {pred.prediction === "YES" ? "SÍ" : "NO"}
                       </p>
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-muted-foreground">
                         Apostaste {pred.amount} AP Coins
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         {new Date(pred.created_at).toLocaleDateString("es-ES")}
                       </p>
                     </div>
@@ -603,7 +603,7 @@ export default function PerfilPage() {
         )}
 
         {activeTab === "scenarios" && (
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <div className="bg-card border border-border rounded-xl p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold">Mis escenarios</h3>
               <Link
@@ -614,7 +614,7 @@ export default function PerfilPage() {
               </Link>
             </div>
             {scenarios.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">
+              <p className="text-muted-foreground text-center py-8">
                 No has creado escenarios aún
               </p>
             ) : (
@@ -623,15 +623,15 @@ export default function PerfilPage() {
                   <Link
                     key={scenario.id}
                     href={`/escenario/${scenario.id}`}
-                    className="block p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="block p-4 bg-muted rounded-lg hover:bg-muted transition-colors"
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="font-medium">{scenario.title}</p>
-                        <p className="text-sm text-gray-400 line-clamp-1">
+                        <p className="text-sm text-muted-foreground line-clamp-1">
                           {scenario.description}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           Creado el {new Date(scenario.created_at).toLocaleDateString("es-ES")}
                         </p>
                       </div>
@@ -639,7 +639,7 @@ export default function PerfilPage() {
                         <p className="text-yellow-400 font-bold">
                           {scenario.total_pool} AP
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-muted-foreground">
                           {scenario.participant_count} participantes
                         </p>
                       </div>

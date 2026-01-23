@@ -45,7 +45,7 @@ export function PageLayout({
           {showBackButton && (
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 sm:mb-6 transition-colors"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 sm:mb-6 transition-colors"
             >
               <svg
                 className="w-4 h-4"
@@ -73,7 +73,7 @@ export function PageLayout({
                   </h1>
                 )}
                 {subtitle && (
-                  <p className="text-gray-400 mt-1 text-sm sm:text-base">
+                  <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                     {subtitle}
                   </p>
                 )}

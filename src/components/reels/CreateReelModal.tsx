@@ -97,7 +97,7 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
           Crear Reel
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-lg">
+      <DialogContent className="bg-card border-border max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Video className="w-5 h-5 text-purple-400" />
@@ -110,11 +110,11 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
           {!videoPreview ? (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-purple-500 transition-colors"
+              className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-purple-500 transition-colors"
             >
-              <Upload className="w-12 h-12 mx-auto mb-3 text-gray-500" />
-              <p className="text-gray-400 mb-1">Haz clic para subir un video</p>
-              <p className="text-xs text-gray-500">MP4, MOV hasta 100MB</p>
+              <Upload className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+              <p className="text-muted-foreground mb-1">Haz clic para subir un video</p>
+              <p className="text-xs text-muted-foreground">MP4, MOV hasta 100MB</p>
               <input
                 type="file"
                 ref={fileInputRef}
@@ -145,40 +145,40 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
 
           {/* Caption */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">Descripción</label>
+            <label className="text-sm text-muted-foreground mb-2 block">Descripción</label>
             <Textarea
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Escribe una descripción..."
-              className="bg-gray-800 border-gray-700"
+              className="bg-muted border-border"
               maxLength={300}
             />
-            <p className="text-xs text-gray-500 mt-1 text-right">
+            <p className="text-xs text-muted-foreground mt-1 text-right">
               {caption.length}/300
             </p>
           </div>
 
           {/* Tags */}
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Etiquetas (máx. 5)
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
                   placeholder="Agregar etiqueta"
-                  className="pl-9 bg-gray-800 border-gray-700"
+                  className="pl-9 bg-muted border-border"
                 />
               </div>
               <Button
                 type="button"
                 onClick={handleAddTag}
                 variant="outline"
-                className="border-gray-700"
+                className="border-border"
                 disabled={tags.length >= 5}
               >
                 Agregar
@@ -194,7 +194,7 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
                     #{tag}
                     <button
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-white"
+                      className="hover:text-foreground"
                     >
                       <X className="w-3 h-3" />
                     </button>

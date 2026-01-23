@@ -50,15 +50,15 @@ export function ShopManagement() {
       render: (i: ShopItem) => (
         <div className="space-y-1">
           <div className="text-white font-medium">{i.name}</div>
-          <div className="text-xs text-gray-500 line-clamp-1">{i.description}</div>
+          <div className="text-xs text-muted-foreground line-clamp-1">{i.description}</div>
         </div>
       ),
     },
     { key: 'type', header: 'Tipo' },
-    { key: 'price', header: 'Precio', render: (i: ShopItem) => <span className="text-gray-300">{i.price.toLocaleString()}</span> },
-    { key: 'stock', header: 'Stock', render: (i: ShopItem) => <span className="text-gray-300">{i.stock === null ? '∞' : i.stock}</span> },
-    { key: 'isActive', header: 'Activo', render: (i: ShopItem) => <span className={i.isActive ? 'text-green-300' : 'text-gray-500'}>{i.isActive ? 'Sí' : 'No'}</span> },
-    { key: 'totalSales', header: 'Ventas', render: (i: ShopItem) => <span className="text-gray-300">{i.totalSales.toLocaleString()}</span> },
+    { key: 'price', header: 'Precio', render: (i: ShopItem) => <span className="text-foreground">{i.price.toLocaleString()}</span> },
+    { key: 'stock', header: 'Stock', render: (i: ShopItem) => <span className="text-foreground">{i.stock === null ? '∞' : i.stock}</span> },
+    { key: 'isActive', header: 'Activo', render: (i: ShopItem) => <span className={i.isActive ? 'text-green-300' : 'text-muted-foreground'}>{i.isActive ? 'Sí' : 'No'}</span> },
+    { key: 'totalSales', header: 'Ventas', render: (i: ShopItem) => <span className="text-foreground">{i.totalSales.toLocaleString()}</span> },
   ] as const;
 
   const openNew = () => {
@@ -137,7 +137,7 @@ export function ShopManagement() {
           <div className="flex justify-end gap-2">
             <button
               onClick={() => openEdit(i)}
-              className="p-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+              className="p-2 rounded-lg bg-muted text-foreground hover:text-foreground hover:bg-muted"
               title="Editar"
             >
               <Pencil className="w-4 h-4" />
@@ -145,7 +145,7 @@ export function ShopManagement() {
 
             <button
               onClick={() => toggleShopItem(i.id, !i.isActive)}
-              className="p-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+              className="p-2 rounded-lg bg-muted text-foreground hover:text-foreground hover:bg-muted"
               title={i.isActive ? 'Desactivar' : 'Activar'}
             >
               <Power className="w-4 h-4" />
@@ -169,7 +169,7 @@ export function ShopManagement() {
         size="lg"
         footer={
           <>
-            <button onClick={() => setOpen(false)} className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700">
+            <button onClick={() => setOpen(false)} className="px-4 py-2 bg-muted text-gray-200 rounded-lg hover:bg-muted">
               Cancelar
             </button>
             <button onClick={save} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500">
@@ -178,31 +178,31 @@ export function ShopManagement() {
           </>
         }
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-foreground">
           <div className="sm:col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Nombre</div>
+            <div className="text-xs text-muted-foreground mb-1">Nombre</div>
             <input
               value={form.name}
               onChange={(e) => setForm(s => ({ ...s, name: e.target.value }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div className="sm:col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Descripción</div>
+            <div className="text-xs text-muted-foreground mb-1">Descripción</div>
             <textarea
               value={form.description}
               onChange={(e) => setForm(s => ({ ...s, description: e.target.value }))}
-              className="w-full min-h-[110px] px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full min-h-[110px] px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Tipo</div>
+            <div className="text-xs text-muted-foreground mb-1">Tipo</div>
             <select
               value={form.type}
               onChange={(e) => setForm(s => ({ ...s, type: e.target.value as any }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             >
               <option value="PROTECTION">PROTECTION</option>
               <option value="POWER">POWER</option>
@@ -213,32 +213,32 @@ export function ShopManagement() {
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Precio</div>
+            <div className="text-xs text-muted-foreground mb-1">Precio</div>
             <input
               type="number"
               value={form.price}
               onChange={(e) => setForm(s => ({ ...s, price: Number(e.target.value) }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Stock (vacío = infinito)</div>
+            <div className="text-xs text-muted-foreground mb-1">Stock (vacío = infinito)</div>
             <input
               type="number"
               value={form.stock ?? ''}
               onChange={(e) => setForm(s => ({ ...s, stock: e.target.value === '' ? null : Number(e.target.value) }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Máx por usuario (vacío = sin límite)</div>
+            <div className="text-xs text-muted-foreground mb-1">Máx por usuario (vacío = sin límite)</div>
             <input
               type="number"
               value={form.maxPerUser ?? ''}
               onChange={(e) => setForm(s => ({ ...s, maxPerUser: e.target.value === '' ? null : Number(e.target.value) }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
@@ -249,7 +249,7 @@ export function ShopManagement() {
               checked={form.isActive}
               onChange={(e) => setForm(s => ({ ...s, isActive: e.target.checked }))}
             />
-            <label htmlFor="active" className="text-sm text-gray-300">Item activo</label>
+            <label htmlFor="active" className="text-sm text-foreground">Item activo</label>
           </div>
         </div>
       </AdminModal>

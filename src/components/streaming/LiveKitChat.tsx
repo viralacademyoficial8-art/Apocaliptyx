@@ -119,11 +119,11 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="flex flex-col h-full bg-card rounded-xl border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+      <div className="p-3 border-b border-border flex items-center justify-between">
         <h3 className="font-semibold">Chat en vivo</h3>
-        <div className="flex items-center gap-1 text-sm text-gray-400">
+        <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <Users className="w-4 h-4" />
           {participants.length}
         </div>
@@ -132,7 +132,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[300px] max-h-[500px]">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500 text-sm">
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm">
             <span>No hay mensajes todavía</span>
             <span>¡Sé el primero en escribir!</span>
           </div>
@@ -166,11 +166,11 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
                       {msg.highlightAmount} AP
                     </span>
                   )}
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     {formatTime(msg.timestamp)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-300 break-words">{msg.content}</p>
+                <p className="text-sm text-foreground break-words">{msg.content}</p>
               </div>
             </div>
           ))
@@ -180,7 +180,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
 
       {/* Input */}
       {isLoggedIn ? (
-        <div className="p-3 border-t border-gray-800">
+        <div className="p-3 border-t border-border">
           {showHighlight && (
             <div className="flex items-center justify-between bg-yellow-500/20 p-2 rounded-lg mb-2">
               <div className="flex items-center gap-2 text-sm text-yellow-400">
@@ -189,7 +189,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
               </div>
               <button
                 onClick={() => setShowHighlight(false)}
-                className="text-gray-400 hover:text-white text-sm"
+                className="text-muted-foreground hover:text-foreground text-sm"
               >
                 Cancelar
               </button>
@@ -200,7 +200,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
               variant="outline"
               size="icon"
               onClick={() => setShowHighlight(!showHighlight)}
-              className={`border-gray-700 flex-shrink-0 ${
+              className={`border-border flex-shrink-0 ${
                 showHighlight ? 'bg-yellow-500/20 border-yellow-500' : ''
               }`}
               title="Super Chat"
@@ -212,7 +212,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
               placeholder="Envía un mensaje..."
-              className="flex-1 bg-gray-800 border-gray-700"
+              className="flex-1 bg-muted border-border"
               maxLength={200}
             />
             <Button
@@ -225,7 +225,7 @@ export function LiveKitChat({ streamId }: LiveKitChatProps) {
           </div>
         </div>
       ) : (
-        <div className="p-3 border-t border-gray-800 text-center text-sm text-gray-400">
+        <div className="p-3 border-t border-border text-center text-sm text-muted-foreground">
           Inicia sesión para chatear
         </div>
       )}

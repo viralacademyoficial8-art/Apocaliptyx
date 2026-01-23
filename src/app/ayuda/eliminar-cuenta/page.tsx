@@ -18,7 +18,7 @@ export default function EliminarCuentaPage() {
       <Navbar />
       
       <main className="container mx-auto px-4 py-12 max-w-3xl">
-        <Link href="/ayuda" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
+        <Link href="/ayuda" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Volver al Centro de Ayuda
         </Link>
@@ -28,7 +28,7 @@ export default function EliminarCuentaPage() {
             <Trash2 className="w-6 h-6 text-red-400" />
           </div>
           <h1 className="text-3xl font-bold mb-2">Eliminar mi cuenta</h1>
-          <p className="text-gray-400">Eliminar permanentemente tu cuenta de Apocaliptyx</p>
+          <p className="text-muted-foreground">Eliminar permanentemente tu cuenta de Apocaliptyx</p>
         </div>
 
         <div className="prose prose-invert max-w-none">
@@ -37,7 +37,7 @@ export default function EliminarCuentaPage() {
               <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-bold text-red-400 mb-2">⚠️ Esta acción es irreversible</h3>
-                <p className="text-gray-300">
+                <p className="text-foreground">
                   Al eliminar tu cuenta, perderás permanentemente todos tus AP Coins, historial de predicciones, insignias y datos asociados.
                 </p>
               </div>
@@ -55,16 +55,16 @@ export default function EliminarCuentaPage() {
               "Tus mensajes y publicaciones del foro",
               "Tus seguidores y seguidos",
             ].map((item) => (
-              <div key={item} className="flex items-center gap-3 bg-gray-900/50 border border-gray-800 rounded-lg p-3">
+              <div key={item} className="flex items-center gap-3 bg-card/50 border border-border rounded-lg p-3">
                 <XCircle className="w-5 h-5 text-red-400" />
-                <span className="text-gray-300">{item}</span>
+                <span className="text-foreground">{item}</span>
               </div>
             ))}
           </div>
 
           <h2 className="text-xl font-bold text-white mt-8 mb-4">Cómo eliminar tu cuenta</h2>
           
-          <ol className="space-y-2 mb-8 text-gray-300">
+          <ol className="space-y-2 mb-8 text-foreground">
             <li>1. Ve a Configuración &gt; Cuenta</li>
             <li>2. Baja hasta &quot;Zona de peligro&quot;</li>
             <li>3. Haz clic en &quot;Eliminar cuenta&quot;</li>
@@ -72,21 +72,21 @@ export default function EliminarCuentaPage() {
             <li>5. Confirma que entiendes las consecuencias</li>
           </ol>
 
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mt-8">
+          <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
             <h3 className="font-bold text-white mb-2">¿Solo quieres un descanso?</h3>
-            <p className="text-gray-400">
+            <p className="text-muted-foreground">
               En lugar de eliminar tu cuenta, puedes simplemente cerrar sesión. Tu cuenta y AP Coins estarán aquí cuando vuelvas.
             </p>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-800">
+        <div className="mt-12 pt-8 border-t border-border">
           <h3 className="font-bold text-white mb-4">Artículos relacionados</h3>
           <div className="grid gap-2">
-            <Link href="/ayuda/cambiar-password" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/cambiar-password" className="text-muted-foreground hover:text-foreground transition-colors">
               → Cambiar contraseña
             </Link>
-            <Link href="/politica-de-privacidad" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/politica-de-privacidad" className="text-muted-foreground hover:text-foreground transition-colors">
               → Política de Privacidad
             </Link>
           </div>

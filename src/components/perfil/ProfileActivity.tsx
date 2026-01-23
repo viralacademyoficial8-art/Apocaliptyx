@@ -24,15 +24,15 @@ function ActivityItemCard({ item }: { item: ActivityItem }) {
   };
 
   return (
-    <div className="flex items-start gap-4 py-4 border-b border-gray-800 last:border-0">
+    <div className="flex items-start gap-4 py-4 border-b border-border last:border-0">
       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl ${typeColors[item.type]}`}>
         {item.icon}
       </div>
       <div className="flex-1">
         <p className="text-white font-medium">{item.title}</p>
-        <p className="text-gray-400 text-sm">{item.description}</p>
+        <p className="text-muted-foreground text-sm">{item.description}</p>
       </div>
-      <span className="text-gray-500 text-sm whitespace-nowrap">{timeAgo(item.timestamp)}</span>
+      <span className="text-muted-foreground text-sm whitespace-nowrap">{timeAgo(item.timestamp)}</span>
     </div>
   );
 }
@@ -49,7 +49,7 @@ export function ProfileActivity() {
       </div>
 
       {/* List */}
-      <div className="bg-gray-900 rounded-xl border border-gray-800 divide-y divide-gray-800">
+      <div className="bg-card rounded-xl border border-border divide-y divide-gray-800">
         {activity.length > 0 ? (
           <div className="p-4">
             {activity.map((item) => (
@@ -58,8 +58,8 @@ export function ProfileActivity() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <Activity className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400">No hay actividad reciente</p>
+            <Activity className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground">No hay actividad reciente</p>
           </div>
         )}
       </div>

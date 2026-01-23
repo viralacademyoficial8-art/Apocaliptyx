@@ -18,7 +18,7 @@ export default function HistorialPage() {
         <div className="flex items-center justify-between mb-6">
           <Link
             href="/perfil"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver al perfil

@@ -32,16 +32,16 @@ export function ShopHero() {
             </span>
           </h1>
 
-          <p className="text-lg text-gray-300 mb-8">
+          <p className="text-lg text-foreground mb-8">
             {t('shop.heroSubtitle')}
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-2 bg-gray-900/50 px-4 py-2 rounded-lg">
+            <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-lg">
               <ShoppingBag className="w-5 h-5 text-purple-400" />
               <span className="text-white font-medium">{t('shop.exclusiveItems')}</span>
             </div>
-            <div className="flex items-center gap-2 bg-gray-900/50 px-4 py-2 rounded-lg">
+            <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-lg">
               <Percent className="w-5 h-5 text-green-400" />
               <span className="text-white font-medium">{t('shop.activeDiscounts')}</span>
             </div>

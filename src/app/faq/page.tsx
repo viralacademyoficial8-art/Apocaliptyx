@@ -98,7 +98,7 @@ export default function FAQPage() {
             <HelpCircle className="w-8 h-8 text-purple-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Preguntas Frecuentes</h1>
-          <p className="text-gray-400 text-lg">
+          <p className="text-muted-foreground text-lg">
             Encuentra respuestas rápidas a las dudas más comunes
           </p>
         </div>
@@ -111,13 +111,13 @@ export default function FAQPage() {
                 {section.questions.map((faq, index) => (
                   <details
                     key={index}
-                    className="group bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden"
+                    className="group bg-card/50 border border-border rounded-xl overflow-hidden"
                   >
-                    <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-800/50 transition-colors">
+                    <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
                       <span className="font-medium text-white pr-4">{faq.q}</span>
-                      <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0" />
+                      <ChevronDown className="w-5 h-5 text-muted-foreground group-open:rotate-180 transition-transform flex-shrink-0" />
                     </summary>
-                    <div className="px-4 pb-4 text-gray-400">
+                    <div className="px-4 pb-4 text-muted-foreground">
                       {faq.a}
                     </div>
                   </details>
@@ -129,7 +129,7 @@ export default function FAQPage() {
 
         <div className="mt-12 p-6 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl text-center">
           <h3 className="text-xl font-bold mb-2">¿No encontraste tu respuesta?</h3>
-          <p className="text-gray-400 mb-4">Nuestro equipo de soporte está listo para ayudarte</p>
+          <p className="text-muted-foreground mb-4">Nuestro equipo de soporte está listo para ayudarte</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/soporte"
@@ -139,7 +139,7 @@ export default function FAQPage() {
             </Link>
             <Link
               href="/ayuda"
-              className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
+              className="px-6 py-3 bg-muted hover:bg-muted rounded-lg font-medium transition-colors"
             >
               Centro de Ayuda
             </Link>

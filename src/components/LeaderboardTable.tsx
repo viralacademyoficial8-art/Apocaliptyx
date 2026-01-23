@@ -43,8 +43,8 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
       case 2:
         return (
           <div className="flex items-center gap-1">
-            <Medal className="w-5 h-5 text-gray-400" />
-            <span className="text-gray-400 font-bold">2°</span>
+            <Medal className="w-5 h-5 text-muted-foreground" />
+            <span className="text-muted-foreground font-bold">2°</span>
           </div>
         );
       case 3:
@@ -57,7 +57,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
       default:
         return (
           <div className="w-8 text-center">
-            <span className="text-gray-500 font-semibold">{position}°</span>
+            <span className="text-muted-foreground font-semibold">{position}°</span>
           </div>
         );
     }
@@ -76,7 +76,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
     if (position === 3) {
       return 'bg-gradient-to-r from-orange-400/10 to-transparent';
     }
-    return 'hover:bg-gray-800/50';
+    return 'hover:bg-muted/50';
   };
 
   const getSortLabel = () => {
@@ -113,14 +113,14 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-gray-800 text-left">
-            <th className="p-4 text-gray-400 font-semibold">Posición</th>
-            <th className="p-4 text-gray-400 font-semibold">Profeta</th>
-            <th className="p-4 text-gray-400 font-semibold">Nivel</th>
-            <th className="p-4 text-gray-400 font-semibold">
+          <tr className="border-b border-border text-left">
+            <th className="p-4 text-muted-foreground font-semibold">Posición</th>
+            <th className="p-4 text-muted-foreground font-semibold">Profeta</th>
+            <th className="p-4 text-muted-foreground font-semibold">Nivel</th>
+            <th className="p-4 text-muted-foreground font-semibold">
               {getSortLabel()}
             </th>
-            <th className="p-4 text-gray-400 font-semibold">Escenarios</th>
+            <th className="p-4 text-muted-foreground font-semibold">Escenarios</th>
           </tr>
         </thead>
         <tbody>
@@ -134,7 +134,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
                 key={user.id}
                 onClick={() => router.push(`/perfil/${user.username}`)}
                 className={`
-                  border-b border-gray-800/50 transition-all cursor-pointer
+                  border-b border-border/50 transition-all cursor-pointer
                   ${getRowStyle(position, isCurrentUser)}
                 `}
               >
@@ -156,7 +156,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
                 {/* Usuario */}
                 <td className="p-4">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10 border-2 border-gray-700">
+                    <Avatar className="w-10 h-10 border-2 border-border">
                       <AvatarImage src={user.avatarUrl} alt={user.username} />
                       <AvatarFallback className="text-sm bg-gradient-to-br from-purple-600 to-pink-600">
                         {user.username.substring(0, 2).toUpperCase()}
@@ -171,7 +171,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
                           </Badge>
                         )}
                       </div>
-                      <div className="text-sm text-gray-400">
+                      <div className="text-sm text-muted-foreground">
                         @{user.username}
                       </div>
                     </div>
@@ -182,7 +182,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
                 <td className="p-4">
                   <Badge
                     variant="outline"
-                    className={`${prophetLevel.color} border-gray-700`}
+                    className={`${prophetLevel.color} border-border`}
                   >
                     <Crown className="w-3 h-3 mr-1" />
                     {prophetLevel.name}
@@ -204,9 +204,9 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
                       <span className="font-semibold">
                         {user.scenariosWon}
                       </span>
-                      <span className="text-gray-500">ganados</span>
+                      <span className="text-muted-foreground">ganados</span>
                     </div>
-                    <div className="text-gray-500">
+                    <div className="text-muted-foreground">
                       {user.scenariosCreated} creados
                     </div>
                   </div>
@@ -220,7 +220,7 @@ export function LeaderboardTable({ users, sortBy }: LeaderboardTableProps) {
       {sortedUsers.length === 0 && (
         <div className="text-center py-20">
           <Trophy className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             No hay profetas en el leaderboard aún
           </p>
         </div>

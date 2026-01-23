@@ -61,7 +61,7 @@ interface Post {
 
 // Category display config
 const categoryConfig: Record<string, { label: string; icon: string; color: string }> = {
-  general: { label: 'General', icon: '💬', color: 'bg-gray-500/20 text-gray-400' },
+  general: { label: 'General', icon: '💬', color: 'bg-gray-500/20 text-muted-foreground' },
   predicciones: { label: 'Predicciones', icon: '🔮', color: 'bg-purple-500/20 text-purple-400' },
   ayuda: { label: 'Ayuda', icon: '❓', color: 'bg-blue-500/20 text-blue-400' },
   sugerencias: { label: 'Sugerencias', icon: '💡', color: 'bg-yellow-500/20 text-yellow-400' },
@@ -299,7 +299,7 @@ export function PostCard({
 
   return (
     <div
-      className={`bg-gray-900/50 border border-gray-800 rounded-xl p-4 ${
+      className={`bg-card/50 border border-border rounded-xl p-4 ${
         post.isPinned ? 'border-yellow-500/30' : ''
       }`}
     >
@@ -337,7 +337,7 @@ export function PostCard({
                 Lvl {post.author.level}
               </span>
             )}
-            <span className="text-gray-500 text-sm">
+            <span className="text-muted-foreground text-sm">
               {formatDistanceToNow(new Date(post.createdAt), {
                 addSuffix: true,
                 locale: es,
@@ -366,7 +366,7 @@ export function PostCard({
               <img
                 src={post.imageUrl}
                 alt=""
-                className="w-full max-h-[500px] object-contain bg-gray-800/50"
+                className="w-full max-h-[500px] object-contain bg-muted/50"
               />
             </div>
           )}
@@ -376,7 +376,7 @@ export function PostCard({
             <button
               onClick={() => onLike(post.id)}
               className={`flex items-center gap-1 ${
-                post.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'
+                post.isLiked ? 'text-red-400' : 'text-muted-foreground hover:text-red-400'
               } transition-colors`}
             >
               <Heart className={`w-5 h-5 ${post.isLiked ? 'fill-current' : ''}`} />
@@ -386,7 +386,7 @@ export function PostCard({
             <button
               onClick={handleToggleComments}
               className={`flex items-center gap-1 ${
-                showComments ? 'text-blue-400' : 'text-gray-400 hover:text-blue-400'
+                showComments ? 'text-blue-400' : 'text-muted-foreground hover:text-blue-400'
               } transition-colors`}
             >
               <MessageCircle className="w-5 h-5" />
@@ -397,16 +397,16 @@ export function PostCard({
             <div className="relative" ref={shareRef}>
               <button
                 onClick={() => setShowShareMenu(!showShareMenu)}
-                className="flex items-center gap-1 text-gray-400 hover:text-green-400 transition-colors"
+                className="flex items-center gap-1 text-muted-foreground hover:text-green-400 transition-colors"
               >
                 <Share2 className="w-5 h-5" />
               </button>
 
               {showShareMenu && (
-                <div className="absolute left-0 top-8 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20 min-w-[160px]">
+                <div className="absolute left-0 top-8 bg-muted border border-border rounded-lg shadow-xl z-20 min-w-[160px]">
                   <button
                     onClick={handleShare}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-lg transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-muted rounded-lg transition-colors"
                   >
                     {copied ? (
                       <>
@@ -431,17 +431,17 @@ export function PostCard({
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowMenu(!showMenu)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <MoreHorizontal className="w-5 h-5" />
                 </button>
 
                 {showMenu && (
-                  <div className="absolute right-0 top-8 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-20 min-w-[160px]">
+                  <div className="absolute right-0 top-8 bg-muted border border-border rounded-lg shadow-xl z-20 min-w-[160px]">
                     {canPin && (
                       <button
                         onClick={handleTogglePin}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 rounded-t-lg transition-colors"
+                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-muted rounded-t-lg transition-colors"
                       >
                         <Pin className="w-4 h-4" />
                         <span>{post.isPinned ? 'Desfijar' : 'Fijar'}</span>
@@ -449,7 +449,7 @@ export function PostCard({
                     )}
                     <button
                       onClick={handleDelete}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-700 rounded-b-lg transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-muted rounded-b-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Eliminar</span>
@@ -462,10 +462,10 @@ export function PostCard({
 
           {/* Comments Section */}
           {showComments && (
-            <div className="mt-4 pt-4 border-t border-gray-800">
+            <div className="mt-4 pt-4 border-t border-border">
               {loadingComments ? (
                 <div className="flex items-center justify-center py-4">
-                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                 </div>
               ) : (
                 <>
@@ -489,7 +489,7 @@ export function PostCard({
                               </div>
                             </Link>
                             <div className="flex-1 min-w-0">
-                              <div className="bg-gray-800 rounded-lg px-3 py-2">
+                              <div className="bg-muted rounded-lg px-3 py-2">
                                 <div className="flex items-center gap-2">
                                   <Link
                                     href={`/perfil/${comment.author?.username}`}
@@ -497,14 +497,14 @@ export function PostCard({
                                   >
                                     {comment.author?.displayName || comment.author?.username}
                                   </Link>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-muted-foreground">
                                     {formatDistanceToNow(new Date(comment.createdAt), {
                                       addSuffix: true,
                                       locale: es,
                                     })}
                                   </span>
                                 </div>
-                                <p className="text-sm text-gray-300 mt-1 break-words">
+                                <p className="text-sm text-foreground mt-1 break-words">
                                   {comment.content}
                                 </p>
                               </div>
@@ -512,7 +512,7 @@ export function PostCard({
                                 {isMember && isAuthenticated && (
                                   <button
                                     onClick={() => handleReplyClick(comment)}
-                                    className="text-xs text-gray-500 hover:text-purple-400 transition-colors flex items-center gap-1"
+                                    className="text-xs text-muted-foreground hover:text-purple-400 transition-colors flex items-center gap-1"
                                   >
                                     <Reply className="w-3 h-3" />
                                     Responder
@@ -521,7 +521,7 @@ export function PostCard({
                                 {(currentUserId === comment.authorId || canModerate) && (
                                   <button
                                     onClick={() => handleDeleteComment(comment.id)}
-                                    className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                                    className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
                                   >
                                     Eliminar
                                   </button>
@@ -532,7 +532,7 @@ export function PostCard({
 
                           {/* Replies to this comment */}
                           {getReplies(comment.id).length > 0 && (
-                            <div className="ml-10 mt-2 space-y-2 border-l-2 border-gray-800 pl-3">
+                            <div className="ml-10 mt-2 space-y-2 border-l-2 border-border pl-3">
                               {getReplies(comment.id).map((reply) => (
                                 <div key={reply.id} className="flex gap-2">
                                   <Link href={`/perfil/${reply.author?.username}`}>
@@ -548,7 +548,7 @@ export function PostCard({
                                     </div>
                                   </Link>
                                   <div className="flex-1 min-w-0">
-                                    <div className="bg-gray-800/50 rounded-lg px-2 py-1.5">
+                                    <div className="bg-muted/50 rounded-lg px-2 py-1.5">
                                       <div className="flex items-center gap-2">
                                         <Link
                                           href={`/perfil/${reply.author?.username}`}
@@ -557,19 +557,19 @@ export function PostCard({
                                           {reply.author?.displayName || reply.author?.username}
                                         </Link>
                                         {reply.replyToUsername && (
-                                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                                          <span className="text-xs text-muted-foreground flex items-center gap-1">
                                             <CornerDownRight className="w-3 h-3" />
                                             @{reply.replyToUsername}
                                           </span>
                                         )}
-                                        <span className="text-[10px] text-gray-500">
+                                        <span className="text-[10px] text-muted-foreground">
                                           {formatDistanceToNow(new Date(reply.createdAt), {
                                             addSuffix: true,
                                             locale: es,
                                           })}
                                         </span>
                                       </div>
-                                      <p className="text-xs text-gray-300 mt-0.5 break-words">
+                                      <p className="text-xs text-foreground mt-0.5 break-words">
                                         {reply.content}
                                       </p>
                                     </div>
@@ -577,7 +577,7 @@ export function PostCard({
                                       {isMember && isAuthenticated && (
                                         <button
                                           onClick={() => handleReplyClick(reply)}
-                                          className="text-[10px] text-gray-500 hover:text-purple-400 transition-colors flex items-center gap-1"
+                                          className="text-[10px] text-muted-foreground hover:text-purple-400 transition-colors flex items-center gap-1"
                                         >
                                           <Reply className="w-2.5 h-2.5" />
                                           Responder
@@ -586,7 +586,7 @@ export function PostCard({
                                       {(currentUserId === reply.authorId || canModerate) && (
                                         <button
                                           onClick={() => handleDeleteComment(reply.id)}
-                                          className="text-[10px] text-gray-500 hover:text-red-400 transition-colors"
+                                          className="text-[10px] text-muted-foreground hover:text-red-400 transition-colors"
                                         >
                                           Eliminar
                                         </button>
@@ -601,7 +601,7 @@ export function PostCard({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 text-center py-3">
+                    <p className="text-sm text-muted-foreground text-center py-3">
                       No hay comentarios aún
                     </p>
                   )}
@@ -611,14 +611,14 @@ export function PostCard({
                     <div className="space-y-2">
                       {/* Reply indicator */}
                       {replyingTo && (
-                        <div className="flex items-center justify-between bg-gray-800/50 rounded-lg px-3 py-2">
-                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <div className="flex items-center justify-between bg-muted/50 rounded-lg px-3 py-2">
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Reply className="w-3 h-3" />
                             Respondiendo a <span className="text-purple-400 font-medium">@{replyingTo.author?.username}</span>
                           </span>
                           <button
                             onClick={cancelReply}
-                            className="text-gray-500 hover:text-white transition-colors"
+                            className="text-muted-foreground hover:text-foreground transition-colors"
                           >
                             <X className="w-4 h-4" />
                           </button>
@@ -630,7 +630,7 @@ export function PostCard({
                           value={newComment}
                           onChange={(e) => setNewComment(e.target.value)}
                           placeholder={replyingTo ? `Responder a @${replyingTo.author?.username}...` : "Escribe un comentario..."}
-                          className="bg-gray-800 border-gray-700 text-sm"
+                          className="bg-muted border-border text-sm"
                           maxLength={500}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -659,7 +659,7 @@ export function PostCard({
                   )}
 
                   {!isMember && (
-                    <p className="text-sm text-gray-500 text-center">
+                    <p className="text-sm text-muted-foreground text-center">
                       Únete a la comunidad para comentar
                     </p>
                   )}
@@ -677,7 +677,7 @@ export function PostCard({
           onClick={() => setShowImageModal(false)}
         >
           <button
-            className="absolute top-4 right-4 p-2 text-white hover:text-gray-300 transition-colors z-10"
+            className="absolute top-4 right-4 p-2 text-white hover:text-foreground transition-colors z-10"
             onClick={() => setShowImageModal(false)}
           >
             <X className="w-8 h-8" />

@@ -52,7 +52,7 @@ export function AchievementsManager() {
             <span>{a.icon}</span>
             <span>{a.name}</span>
           </div>
-          <div className="text-xs text-gray-500 line-clamp-1">{a.description}</div>
+          <div className="text-xs text-muted-foreground line-clamp-1">{a.description}</div>
         </div>
       ),
     },
@@ -60,7 +60,7 @@ export function AchievementsManager() {
       key: 'requirement',
       header: 'Requisito',
       render: (a: Achievement) => (
-        <span className="text-gray-300 text-sm">
+        <span className="text-foreground text-sm">
           {a.requirement.type} ≥ {a.requirement.count}
         </span>
       ),
@@ -69,13 +69,13 @@ export function AchievementsManager() {
       key: 'reward',
       header: 'Recompensa',
       render: (a: Achievement) => (
-        <span className="text-gray-300 text-sm">
+        <span className="text-foreground text-sm">
           {a.rewardCoins.toLocaleString()} coins / {a.rewardXp.toLocaleString()} xp
         </span>
       ),
     },
-    { key: 'unlockedCount', header: 'Desbloqueos', render: (a: Achievement) => <span className="text-gray-300">{a.unlockedCount.toLocaleString()}</span> },
-    { key: 'isActive', header: 'Activo', render: (a: Achievement) => <span className={a.isActive ? 'text-green-300' : 'text-gray-500'}>{a.isActive ? 'Sí' : 'No'}</span> },
+    { key: 'unlockedCount', header: 'Desbloqueos', render: (a: Achievement) => <span className="text-foreground">{a.unlockedCount.toLocaleString()}</span> },
+    { key: 'isActive', header: 'Activo', render: (a: Achievement) => <span className={a.isActive ? 'text-green-300' : 'text-muted-foreground'}>{a.isActive ? 'Sí' : 'No'}</span> },
   ] as const;
 
   const openNew = () => {
@@ -144,7 +144,7 @@ export function AchievementsManager() {
           <div className="flex justify-end">
             <button
               onClick={() => openEdit(a)}
-              className="p-2 rounded-lg bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700"
+              className="p-2 rounded-lg bg-muted text-foreground hover:text-foreground hover:bg-muted"
               title="Editar"
             >
               <Pencil className="w-4 h-4" />
@@ -160,7 +160,7 @@ export function AchievementsManager() {
         size="lg"
         footer={
           <>
-            <button onClick={() => setOpen(false)} className="px-4 py-2 bg-gray-800 text-gray-200 rounded-lg hover:bg-gray-700">
+            <button onClick={() => setOpen(false)} className="px-4 py-2 bg-muted text-gray-200 rounded-lg hover:bg-muted">
               Cancelar
             </button>
             <button onClick={save} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500">
@@ -169,20 +169,20 @@ export function AchievementsManager() {
           </>
         }
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-300">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-foreground">
           <div>
-            <div className="text-xs text-gray-500 mb-1">Ícono</div>
+            <div className="text-xs text-muted-foreground mb-1">Ícono</div>
             <input
               value={form.icon}
               onChange={(e) => setForm(s => ({ ...s, icon: e.target.value }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
               placeholder="Ej: 🏆"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Activo</div>
-            <label className="flex items-center gap-2 bg-gray-800/40 border border-gray-700 rounded-lg px-3 py-2">
+            <div className="text-xs text-muted-foreground mb-1">Activo</div>
+            <label className="flex items-center gap-2 bg-muted/40 border border-border rounded-lg px-3 py-2">
               <input
                 type="checkbox"
                 checked={form.isActive}
@@ -193,60 +193,60 @@ export function AchievementsManager() {
           </div>
 
           <div className="sm:col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Nombre</div>
+            <div className="text-xs text-muted-foreground mb-1">Nombre</div>
             <input
               value={form.name}
               onChange={(e) => setForm(s => ({ ...s, name: e.target.value }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div className="sm:col-span-2">
-            <div className="text-xs text-gray-500 mb-1">Descripción</div>
+            <div className="text-xs text-muted-foreground mb-1">Descripción</div>
             <textarea
               value={form.description}
               onChange={(e) => setForm(s => ({ ...s, description: e.target.value }))}
-              className="w-full min-h-[110px] px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full min-h-[110px] px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Tipo requisito</div>
+            <div className="text-xs text-muted-foreground mb-1">Tipo requisito</div>
             <input
               value={form.requirementType}
               onChange={(e) => setForm(s => ({ ...s, requirementType: e.target.value }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
               placeholder="Ej: correct_predictions"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Cantidad</div>
+            <div className="text-xs text-muted-foreground mb-1">Cantidad</div>
             <input
               type="number"
               value={form.requirementCount}
               onChange={(e) => setForm(s => ({ ...s, requirementCount: Number(e.target.value) }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Reward coins</div>
+            <div className="text-xs text-muted-foreground mb-1">Reward coins</div>
             <input
               type="number"
               value={form.rewardCoins}
               onChange={(e) => setForm(s => ({ ...s, rewardCoins: Number(e.target.value) }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
 
           <div>
-            <div className="text-xs text-gray-500 mb-1">Reward XP</div>
+            <div className="text-xs text-muted-foreground mb-1">Reward XP</div>
             <input
               type="number"
               value={form.rewardXp}
               onChange={(e) => setForm(s => ({ ...s, rewardXp: Number(e.target.value) }))}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white"
             />
           </div>
         </div>

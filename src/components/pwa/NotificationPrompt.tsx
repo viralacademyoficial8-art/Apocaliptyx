@@ -59,11 +59,11 @@ export function NotificationPrompt() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-96 z-50 animate-slide-up">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl p-4 shadow-xl">
+      <div className="bg-card border border-border rounded-2xl p-4 shadow-xl">
         {/* Close button */}
         <button
           onClick={handleDismiss}
-          className="absolute top-3 right-3 p-1 text-gray-500 hover:text-white transition-colors"
+          className="absolute top-3 right-3 p-1 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -75,12 +75,12 @@ export function NotificationPrompt() {
           </div>
           <div className="flex-1">
             <h3 className="text-white font-bold mb-1">Activa las notificaciones</h3>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-muted-foreground text-sm mb-4">
               Recibe alertas cuando tus predicciones se resuelvan o te roben un escenario.
             </p>
 
             {/* Benefits */}
-            <ul className="space-y-1 mb-4 text-sm text-gray-400">
+            <ul className="space-y-1 mb-4 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-400" />
                 Resultados de predicciones
@@ -106,7 +106,7 @@ export function NotificationPrompt() {
               </button>
               <button
                 onClick={handleDismiss}
-                className="px-4 py-2.5 text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2.5 text-muted-foreground hover:text-foreground transition-colors"
               >
                 Ahora no
               </button>

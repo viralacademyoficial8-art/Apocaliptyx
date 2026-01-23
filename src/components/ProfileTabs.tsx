@@ -131,7 +131,7 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
         <TabsList
           className="
             w-full
-            bg-gray-900/70
+            bg-card/70
             rounded-xl
             p-1
             flex
@@ -148,7 +148,7 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
               text-xs sm:text-sm
               px-3 sm:px-4
               py-2
-              data-[state=active]:bg-gray-800
+              data-[state=active]:bg-muted
               data-[state=active]:text-white
             "
           >
@@ -161,7 +161,7 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
               text-xs sm:text-sm
               px-3 sm:px-4
               py-2
-              data-[state=active]:bg-gray-800
+              data-[state=active]:bg-muted
               data-[state=active]:text-white
             "
           >
@@ -175,7 +175,7 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
                 text-xs sm:text-sm
                 px-3 sm:px-4
                 py-2
-                data-[state=active]:bg-gray-800
+                data-[state=active]:bg-muted
                 data-[state=active]:text-white
               "
             >
@@ -187,11 +187,11 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
 
         <TabsContent value="activos" className="mt-6">
           {escenariosActivos.length === 0 ? (
-            <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 text-center">
-              <p className="text-sm text-gray-300 mb-1">
+            <div className="rounded-xl border border-border bg-card/60 p-6 text-center">
+              <p className="text-sm text-foreground mb-1">
                 Todavía no tienes escenarios activos.
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Crea tu primera profecía y empieza a jugar.
               </p>
             </div>
@@ -214,11 +214,11 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
 
         <TabsContent value="historial" className="mt-6">
           {escenariosHistorial.length === 0 ? (
-            <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 text-center">
-              <p className="text-sm text-gray-300 mb-1">
+            <div className="rounded-xl border border-border bg-card/60 p-6 text-center">
+              <p className="text-sm text-foreground mb-1">
                 Aún no tienes historial de escenarios.
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Cuando se vayan resolviendo, aparecerán aquí.
               </p>
             </div>
@@ -246,12 +246,12 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
                 <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
               </div>
             ) : bookmarks.length === 0 ? (
-              <div className="rounded-xl border border-gray-800 bg-gray-900/60 p-6 text-center">
-                <Bookmark className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p className="text-sm text-gray-300 mb-1">
+              <div className="rounded-xl border border-border bg-card/60 p-6 text-center">
+                <Bookmark className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-sm text-foreground mb-1">
                   No tienes publicaciones guardadas.
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Guarda publicaciones del foro usando el ícono de marcador.
                 </p>
                 <Link
@@ -266,7 +266,7 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
                 {bookmarks.map((post) => (
                   <div
                     key={post.id}
-                    className="rounded-xl border border-gray-800 bg-gray-900/60 p-4 hover:border-purple-500/50 transition-all"
+                    className="rounded-xl border border-border bg-card/60 p-4 hover:border-purple-500/50 transition-all"
                   >
                     <div className="flex items-start gap-3">
                       <Link
@@ -291,19 +291,19 @@ export function ProfileTabs({ user, isOwnProfile = false, currentUserId }: Profi
                             <span className="font-semibold text-white">
                               {post.author?.display_name || post.author?.username}
                             </span>
-                            <span className="text-gray-500">@{post.author?.username}</span>
-                            <span className="text-gray-600">•</span>
-                            <span className="text-gray-500 text-xs">
+                            <span className="text-muted-foreground">@{post.author?.username}</span>
+                            <span className="text-muted-foreground">•</span>
+                            <span className="text-muted-foreground text-xs">
                               {formatDistanceToNow(new Date(post.created_at), {
                                 addSuffix: true,
                                 locale: es,
                               })}
                             </span>
                           </div>
-                          <p className="text-gray-300 text-sm mt-1 line-clamp-2">
+                          <p className="text-foreground text-sm mt-1 line-clamp-2">
                             {post.content}
                           </p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Heart className="w-3.5 h-3.5" />
                               {Object.values(post.reactions_count || {}).reduce((a: number, b: unknown) => a + (typeof b === 'number' ? b : 0), 0)}

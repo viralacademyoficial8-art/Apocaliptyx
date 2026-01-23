@@ -151,12 +151,12 @@ export function EditProfileForm() {
     onChange: (v: PrivacySetting) => void;
     label: string;
   }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-800">
-      <span className="text-gray-300">{label}</span>
+    <div className="flex items-center justify-between py-3 border-b border-border">
+      <span className="text-foreground">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value as PrivacySetting)}
-        className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm"
+        className="px-3 py-1.5 bg-muted border border-border rounded-lg text-white text-sm"
       >
         <option value="PUBLIC">🌍 Público</option>
         <option value="FOLLOWERS">👥 Seguidores</option>
@@ -184,7 +184,7 @@ export function EditProfileForm() {
       )}
 
       {/* Section: Avatar */}
-      <section className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+      <section className="bg-card rounded-xl border border-border p-6">
         <h2 className="text-lg font-bold text-white mb-6">Foto de Perfil</h2>
         <AvatarUploader
           currentAvatar={currentProfile?.avatarUrl || null}
@@ -194,25 +194,25 @@ export function EditProfileForm() {
       </section>
 
       {/* Section: Basic Info */}
-      <section className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+      <section className="bg-card rounded-xl border border-border p-6">
         <h2 className="text-lg font-bold text-white mb-6">Información Básica</h2>
         
         <div className="space-y-4">
           {/* Display Name */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm text-muted-foreground mb-1">
               Nombre para mostrar
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
                 value={formData.displayName}
                 onChange={(e) => handleChange('displayName', e.target.value)}
                 placeholder="Tu nombre público"
                 maxLength={50}
-                className={`w-full pl-10 pr-4 py-2.5 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  errors.displayName ? 'border-red-500' : 'border-gray-700'
+                className={`w-full pl-10 pr-4 py-2.5 bg-muted border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  errors.displayName ? 'border-red-500' : 'border-border'
                 }`}
               />
             </div>
@@ -220,7 +220,7 @@ export function EditProfileForm() {
               {errors.displayName && (
                 <span className="text-red-400 text-xs">{errors.displayName}</span>
               )}
-              <span className="text-gray-500 text-xs ml-auto">
+              <span className="text-muted-foreground text-xs ml-auto">
                 {formData.displayName.length}/50
               </span>
             </div>
@@ -228,38 +228,38 @@ export function EditProfileForm() {
 
           {/* Username (read-only) */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm text-muted-foreground mb-1">
               Nombre de usuario
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">@</span>
               <input
                 type="text"
                 value={formData.username}
                 disabled
-                className="w-full pl-8 pr-4 py-2.5 bg-gray-800/50 border border-gray-700 rounded-lg text-gray-400 cursor-not-allowed"
+                className="w-full pl-8 pr-4 py-2.5 bg-muted/50 border border-border rounded-lg text-muted-foreground cursor-not-allowed"
               />
             </div>
-            <p className="text-gray-500 text-xs mt-1">
+            <p className="text-muted-foreground text-xs mt-1">
               El nombre de usuario no se puede cambiar
             </p>
           </div>
 
           {/* Bio */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
+            <label className="block text-sm text-muted-foreground mb-1">
               Biografía
             </label>
             <div className="relative">
-              <FileText className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
+              <FileText className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
               <textarea
                 value={formData.bio}
                 onChange={(e) => handleChange('bio', e.target.value)}
                 placeholder="Cuéntanos sobre ti..."
                 maxLength={300}
                 rows={4}
-                className={`w-full pl-10 pr-4 py-2.5 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none ${
-                  errors.bio ? 'border-red-500' : 'border-gray-700'
+                className={`w-full pl-10 pr-4 py-2.5 bg-muted border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none ${
+                  errors.bio ? 'border-red-500' : 'border-border'
                 }`}
               />
             </div>
@@ -267,7 +267,7 @@ export function EditProfileForm() {
               {errors.bio && (
                 <span className="text-red-400 text-xs">{errors.bio}</span>
               )}
-              <span className="text-gray-500 text-xs ml-auto">
+              <span className="text-muted-foreground text-xs ml-auto">
                 {formData.bio.length}/300
               </span>
             </div>
@@ -300,23 +300,23 @@ export function EditProfileForm() {
       </section>
 
       {/* Section: Social Links */}
-      <section className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+      <section className="bg-card rounded-xl border border-border p-6">
         <h2 className="text-lg font-bold text-white mb-6">Redes Sociales</h2>
         
         <div className="space-y-4">
           {/* Twitter */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Twitter</label>
+            <label className="block text-sm text-muted-foreground mb-1">Twitter</label>
             <div className="relative">
-              <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-              <span className="absolute left-10 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+              <Twitter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <span className="absolute left-10 top-1/2 -translate-y-1/2 text-muted-foreground">@</span>
               <input
                 type="text"
                 value={formData.twitter}
                 onChange={(e) => handleChange('twitter', e.target.value)}
                 placeholder="tu_usuario"
-                className={`w-full pl-16 pr-4 py-2.5 bg-gray-800 border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                  errors.twitter ? 'border-red-500' : 'border-gray-700'
+                className={`w-full pl-16 pr-4 py-2.5 bg-muted border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                  errors.twitter ? 'border-red-500' : 'border-border'
                 }`}
               />
             </div>
@@ -327,7 +327,7 @@ export function EditProfileForm() {
 
           {/* Discord */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Discord</label>
+            <label className="block text-sm text-muted-foreground mb-1">Discord</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl">💬</span>
               <input
@@ -335,23 +335,23 @@ export function EditProfileForm() {
                 value={formData.discord}
                 onChange={(e) => handleChange('discord', e.target.value)}
                 placeholder="usuario#1234"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full pl-10 pr-4 py-2.5 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
           </div>
 
           {/* Instagram */}
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Instagram</label>
+            <label className="block text-sm text-muted-foreground mb-1">Instagram</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xl">📸</span>
-              <span className="absolute left-10 top-1/2 -translate-y-1/2 text-gray-500">@</span>
+              <span className="absolute left-10 top-1/2 -translate-y-1/2 text-muted-foreground">@</span>
               <input
                 type="text"
                 value={formData.instagram}
                 onChange={(e) => handleChange('instagram', e.target.value)}
                 placeholder="tu_usuario"
-                className="w-full pl-16 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full pl-16 pr-4 py-2.5 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
           </div>
@@ -359,9 +359,9 @@ export function EditProfileForm() {
       </section>
 
       {/* Section: Privacy */}
-      <section className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+      <section className="bg-card rounded-xl border border-border p-6">
         <h2 className="text-lg font-bold text-white mb-2">Privacidad</h2>
-        <p className="text-gray-400 text-sm mb-4">
+        <p className="text-muted-foreground text-sm mb-4">
           Controla quién puede ver tu información
         </p>
         
@@ -389,7 +389,7 @@ export function EditProfileForm() {
         <button
           type="button"
           onClick={handleCancel}
-          className="flex items-center gap-2 px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+          className="flex items-center gap-2 px-6 py-2.5 bg-muted hover:bg-muted text-white rounded-lg transition-colors"
         >
           <X className="w-4 h-4" />
           Cancelar

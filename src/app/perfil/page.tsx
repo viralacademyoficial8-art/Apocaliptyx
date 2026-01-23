@@ -37,7 +37,7 @@ export default function PerfilPage() {
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-        <p className="text-gray-400">Cargando perfil...</p>
+        <p className="text-muted-foreground">Cargando perfil...</p>
       </div>
     </div>
   );

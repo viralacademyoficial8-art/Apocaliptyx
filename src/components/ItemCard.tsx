@@ -84,7 +84,7 @@ export function ItemCard({ item }: ItemCardProps) {
           <div className="text-6xl">{item.icon}</div>
 
           {('durationHours' in item) && (item as any).durationHours && (
-            <Badge variant="outline" className="bg-gray-800/50 text-yellow-400 border-yellow-500/30">
+            <Badge variant="outline" className="bg-muted/50 text-yellow-400 border-yellow-500/30">
               <Clock className="w-3 h-3 mr-1" />
               {(item as any).durationHours}h
             </Badge>
@@ -96,19 +96,19 @@ export function ItemCard({ item }: ItemCardProps) {
           <h3 className="text-xl font-bold mb-2 group-hover:text-yellow-400 transition-colors">
             {item.name}
           </h3>
-          <p className="text-gray-400 text-sm leading-relaxed min-h-[60px]">
+          <p className="text-muted-foreground text-sm leading-relaxed min-h-[60px]">
             {item.description}
           </p>
         </div>
 
         {/* Price & Button */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+        <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center gap-2">
             <Flame className="w-5 h-5 text-yellow-500" />
             <span className="text-2xl font-bold text-yellow-400">
               {item.priceApCoins}
             </span>
-            <span className="text-sm text-gray-400">AP Coins</span>
+            <span className="text-sm text-muted-foreground">AP Coins</span>
           </div>
 
           <Button
@@ -117,7 +117,7 @@ export function ItemCard({ item }: ItemCardProps) {
             className={`${
               canAfford
                 ? 'bg-yellow-600 hover:bg-yellow-700 text-black'
-                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                : 'bg-muted text-muted-foreground cursor-not-allowed'
             } font-bold transition-all`}
           >
             {isLoading ? (

@@ -363,7 +363,7 @@ export default function AdminMisionesPage() {
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${DIFFICULTY_COLORS[mission.difficulty] || 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${DIFFICULTY_COLORS[mission.difficulty] || 'bg-gray-500/20 text-muted-foreground'}`}>
                             {mission.difficulty}
                           </span>
                         </td>
@@ -388,7 +388,7 @@ export default function AdminMisionesPage() {
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${mission.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${mission.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>
                             {mission.is_active ? 'Activa' : 'Inactiva'}
                           </span>
                         </td>

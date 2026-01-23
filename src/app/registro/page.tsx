@@ -236,7 +236,7 @@ export default function RegistroPage() {
       <div className="relative z-10 p-4 sm:p-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm group"
+          className="inline-flex items-center gap-2 text-zinc-400 hover:text-foreground transition-colors text-sm group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Volver al inicio

@@ -341,9 +341,9 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
   return (
     <div className="space-y-6">
       {/* Main Card */}
-      <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-b border-gray-800 p-6">
+        <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-b border-border p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               {/* Category & Status */}
@@ -373,7 +373,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
                 className="flex items-center gap-2 cursor-pointer hover:opacity-80"
                 onClick={() => router.push(`/perfil/${creatorUsername}`)}
               >
-                <span className="text-gray-400">Creado por</span>
+                <span className="text-muted-foreground">Creado por</span>
                 <Avatar className="w-6 h-6">
                   <AvatarImage src={scenario.creatorAvatar} />
                   <AvatarFallback className="text-xs bg-purple-600">
@@ -391,7 +391,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               variant="outline"
               size="icon"
               onClick={handleShare}
-              className="border-gray-700 hover:bg-gray-800"
+              className="border-border hover:bg-muted"
             >
               <Share2 className="w-5 h-5" />
             </Button>
@@ -402,7 +402,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
         <div className="p-6">
           {/* Description */}
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-400 mb-2">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-2">
               Descripción
             </h3>
             <p className="text-gray-200 whitespace-pre-wrap">
@@ -413,8 +413,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {/* Due Date */}
-            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-              <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+            <div className="bg-muted/50 rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                 <Calendar className="w-4 h-4" />
                 Fecha Límite
               </div>
@@ -429,8 +429,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
             </div>
 
             {/* Current Price */}
-            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-              <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+            <div className="bg-muted/50 rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                 <Flame className="w-4 h-4" />
                 Precio Actual
               </div>
@@ -440,8 +440,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
             </div>
 
             {/* Total Pot */}
-            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-              <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+            <div className="bg-muted/50 rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                 <Trophy className="w-4 h-4" />
                 Bolsa Total
               </div>
@@ -451,8 +451,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
             </div>
 
             {/* Transfer Count */}
-            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-              <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+            <div className="bg-muted/50 rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
                 <TrendingUp className="w-4 h-4" />
                 Veces Robado
               </div>
@@ -466,7 +466,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               <div className="flex items-center gap-3">
                 <Crown className="w-6 h-6 text-yellow-400" />
                 <div>
-                  <div className="text-sm text-gray-400">Holder Actual</div>
+                  <div className="text-sm text-muted-foreground">Holder Actual</div>
                   <div
                     className="flex items-center gap-2 cursor-pointer hover:opacity-80"
                     onClick={() => router.push(`/perfil/${holderUsername}`)}
@@ -503,8 +503,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
           </div>
 
           {/* Voting Section */}
-          <div className="bg-gray-800/50 rounded-lg p-4 mb-6 border border-gray-700">
-            <h3 className="text-sm font-semibold text-gray-400 mb-3 flex items-center gap-2">
+          <div className="bg-muted/50 rounded-lg p-4 mb-6 border border-border">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
               <Target className="w-4 h-4" />
               ¿Crees que se cumplirá?
             </h3>
@@ -514,11 +514,11 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-green-400 font-semibold">Sí</span>
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm text-muted-foreground">
                     {loadingVotes ? '...' : `${votesYes} votos`}
                   </span>
                 </div>
-                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full bg-green-500 transition-all duration-500"
                     style={{ width: `${yesPct}%` }}
@@ -528,11 +528,11 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-red-400 font-semibold">No</span>
-                  <span className="text-sm text-gray-400">
+                  <span className="text-sm text-muted-foreground">
                     {loadingVotes ? '...' : `${votesNo} votos`}
                   </span>
                 </div>
-                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full bg-red-500 transition-all duration-500"
                     style={{ width: `${noPct}%` }}
@@ -584,13 +584,13 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               </div>
             ) : (
               // Escenario no activo
-              <div className="text-center text-gray-500 py-2">
+              <div className="text-center text-muted-foreground py-2">
                 Este escenario ya no acepta votos
               </div>
             )}
 
             {!user && scenario.status === 'active' && (
-              <p className="text-center text-gray-500 text-sm mt-3">
+              <p className="text-center text-muted-foreground text-sm mt-3">
                 <button 
                   onClick={() => router.push('/login')}
                   className="text-purple-400 hover:underline"
@@ -647,13 +647,13 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
 
           {/* Shield Modal */}
           <Dialog open={showShieldModal} onOpenChange={setShowShieldModal}>
-            <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+            <DialogContent className="bg-card border-border max-w-md">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-xl">
                   <Shield className="w-6 h-6 text-blue-400" />
                   Proteger Escenario
                 </DialogTitle>
-                <DialogDescription className="text-gray-400">
+                <DialogDescription className="text-muted-foreground">
                   Activa un escudo para proteger tu escenario de robos temporalmente
                 </DialogDescription>
               </DialogHeader>
@@ -662,7 +662,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
                 {getShieldTypes().map((shield) => (
                   <div
                     key={shield.id}
-                    className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors"
+                    className="bg-muted/50 border border-border rounded-lg p-4 hover:border-blue-500/50 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
@@ -670,7 +670,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
                           <span className="text-xl">{shield.icon}</span>
                           <span className="font-bold text-white">{shield.name}</span>
                         </div>
-                        <p className="text-sm text-gray-400 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           {shield.description}
                         </p>
                         <div className="flex items-center gap-2 text-sm">
@@ -707,8 +707,8 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
               </div>
 
               {user && (
-                <div className="mt-4 pt-4 border-t border-gray-700 text-center">
-                  <span className="text-sm text-gray-400">Tu balance: </span>
+                <div className="mt-4 pt-4 border-t border-border text-center">
+                  <span className="text-sm text-muted-foreground">Tu balance: </span>
                   <span className="font-bold text-yellow-400">{user.apCoins || 0} AP</span>
                 </div>
               )}

@@ -64,7 +64,7 @@ const platformColors: Record<string, string> = {
   twitter: 'hover:text-blue-400 hover:border-blue-400',
   youtube: 'hover:text-red-500 hover:border-red-500',
   twitch: 'hover:text-purple-500 hover:border-purple-500',
-  tiktok: 'hover:text-white hover:border-white',
+  tiktok: 'hover:text-foreground hover:border-white',
   discord: 'hover:text-indigo-400 hover:border-indigo-400',
   website: 'hover:text-green-400 hover:border-green-400',
 };
@@ -106,7 +106,7 @@ export function SocialLinks({
           href={link.url}
           target="_blank"
           rel="noopener noreferrer"
-          className={`group relative flex items-center gap-2 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 transition-all ${platformColors[link.platform] || ''}`}
+          className={`group relative flex items-center gap-2 px-3 py-2 bg-muted border border-border rounded-lg text-muted-foreground transition-all ${platformColors[link.platform] || ''}`}
         >
           {platformIcons[link.platform] || <Globe className="w-5 h-5" />}
           <span className="text-sm">{platformNames[link.platform] || link.platform}</span>
@@ -132,26 +132,26 @@ export function SocialLinks({
             <Button
               variant="outline"
               size="sm"
-              className="border-dashed border-gray-600 text-gray-400 hover:text-white hover:border-gray-500"
+              className="border-dashed border-border text-muted-foreground hover:text-foreground hover:border-gray-500"
             >
               <Plus className="w-4 h-4 mr-1" />
               Agregar red social
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-gray-800">
+          <DialogContent className="bg-card border-border">
             <DialogHeader>
               <DialogTitle>Agregar red social</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-4">
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-muted-foreground mb-2 block">
                   Plataforma
                 </label>
                 <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-                  <SelectTrigger className="bg-gray-800 border-gray-700">
+                  <SelectTrigger className="bg-muted border-border">
                     <SelectValue placeholder="Selecciona una plataforma" />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectContent className="bg-muted border-border">
                     {Object.keys(platformNames).map((platform) => (
                       <SelectItem key={platform} value={platform}>
                         <div className="flex items-center gap-2">
@@ -164,14 +164,14 @@ export function SocialLinks({
                 </Select>
               </div>
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-muted-foreground mb-2 block">
                   URL
                 </label>
                 <Input
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://..."
-                  className="bg-gray-800 border-gray-700"
+                  className="bg-muted border-border"
                 />
               </div>
               <Button onClick={handleAddLink} className="w-full bg-purple-600 hover:bg-purple-700">

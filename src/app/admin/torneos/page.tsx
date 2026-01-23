@@ -73,7 +73,7 @@ interface TournamentParticipant {
 const STATUS_COLORS: Record<string, string> = {
   upcoming: 'bg-blue-500/20 text-blue-400',
   active: 'bg-green-500/20 text-green-400',
-  ended: 'bg-gray-500/20 text-gray-400',
+  ended: 'bg-gray-500/20 text-muted-foreground',
   cancelled: 'bg-red-500/20 text-red-400',
 };
 
@@ -406,7 +406,7 @@ export default function AdminTorneosPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[tournament.status] || 'bg-gray-500/20 text-gray-400'}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[tournament.status] || 'bg-gray-500/20 text-muted-foreground'}`}>
                           {tournament.status}
                         </span>
                       </td>

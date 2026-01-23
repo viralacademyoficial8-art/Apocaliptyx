@@ -29,7 +29,7 @@ export function RankDisplay({
   const xpProgress = (xp / xpToNextLevel) * 100;
 
   return (
-    <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-4">
+    <div className="bg-muted/50 rounded-xl border border-border p-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div
@@ -39,14 +39,14 @@ export function RankDisplay({
             {rankIcon}
           </div>
           <div>
-            <p className="text-sm text-gray-400">Rango actual</p>
+            <p className="text-sm text-muted-foreground">Rango actual</p>
             <h3 className="font-bold text-lg" style={{ color: rankColor }}>
               {rankNameEs}
             </h3>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-sm text-gray-400">Nivel</p>
+          <p className="text-sm text-muted-foreground">Nivel</p>
           <p className="text-2xl font-bold">{level}</p>
         </div>
       </div>
@@ -54,8 +54,8 @@ export function RankDisplay({
       {/* XP Progress */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-400">Experiencia</span>
-          <span className="text-gray-300">
+          <span className="text-muted-foreground">Experiencia</span>
+          <span className="text-foreground">
             {xp.toLocaleString()} / {xpToNextLevel.toLocaleString()} XP
           </span>
         </div>
@@ -64,13 +64,13 @@ export function RankDisplay({
 
       {/* Next Rank Preview */}
       {nextRankName && nextRankLevel && (
-        <div className="mt-4 pt-4 border-t border-gray-700">
+        <div className="mt-4 pt-4 border-t border-border">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">Próximo rango</span>
+            <span className="text-muted-foreground">Próximo rango</span>
             <div className="flex items-center gap-2">
-              <span className="text-gray-300">{nextRankName}</span>
-              <span className="text-gray-500">Nivel {nextRankLevel}</span>
-              <ChevronRight className="w-4 h-4 text-gray-500" />
+              <span className="text-foreground">{nextRankName}</span>
+              <span className="text-muted-foreground">Nivel {nextRankLevel}</span>
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>
           </div>
         </div>

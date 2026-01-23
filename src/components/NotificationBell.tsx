@@ -41,7 +41,7 @@ export function NotificationBell() {
         className={`p-2 rounded-lg transition-colors ${
           subscribed 
             ? 'bg-green-500/20 text-green-400' 
-            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            : 'bg-muted text-muted-foreground hover:bg-muted hover:text-foreground'
         }`}
         title={subscribed ? 'Notificaciones activas' : 'Activar notificaciones'}
       >
@@ -56,7 +56,7 @@ export function NotificationBell() {
 
       {/* Tooltip */}
       {showTooltip && (
-        <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap z-50">
+        <div className="absolute top-full right-0 mt-2 px-3 py-2 bg-muted text-white text-xs rounded-lg whitespace-nowrap z-50">
           ✅ Notificaciones ya activas
         </div>
       )}

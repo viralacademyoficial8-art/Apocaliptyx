@@ -46,7 +46,7 @@ const CATEGORY_ICONS: Record<string, any> = {
 const CATEGORY_COLORS: Record<string, string> = {
   USER: 'bg-blue-500/20 text-blue-400',
   SCENARIO: 'bg-purple-500/20 text-purple-400',
-  SYSTEM: 'bg-gray-500/20 text-gray-400',
+  SYSTEM: 'bg-gray-500/20 text-muted-foreground',
   SHOP: 'bg-yellow-500/20 text-yellow-400',
   MODERATION: 'bg-red-500/20 text-red-400',
 };
@@ -160,7 +160,7 @@ export default function AdminLogsPage() {
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gray-500/20 rounded-lg">
-                <Settings className="w-5 h-5 text-gray-400" />
+                <Settings className="w-5 h-5 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{statsByCategory['SYSTEM'] || 0}</p>
@@ -218,7 +218,7 @@ export default function AdminLogsPage() {
                           {formatDistanceToNow(new Date(log.created_at), { addSuffix: true, locale: es })}
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[log.category] || 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[log.category] || 'bg-gray-500/20 text-muted-foreground'}`}>
                             <IconComponent className="w-3 h-3" />
                             {log.category}
                           </span>

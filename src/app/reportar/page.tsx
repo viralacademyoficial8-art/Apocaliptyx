@@ -58,7 +58,7 @@ const reportTypes = [
     title: "Otro Problema",
     description: "Cualquier otro problema no listado anteriormente",
     href: "/soporte?type=other",
-    color: "text-gray-400",
+    color: "text-muted-foreground",
     bgColor: "bg-gray-500/20",
   },
 ];
@@ -74,7 +74,7 @@ export default function ReportarPage() {
             <AlertTriangle className="w-8 h-8 text-red-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Reportar un Problema</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Selecciona el tipo de problema que deseas reportar para que podamos ayudarte de la mejor manera.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function ReportarPage() {
               <Link
                 key={type.title}
                 href={type.href}
-                className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-gray-700 hover:bg-gray-900/70 transition-all group"
+                className="p-6 bg-card/50 border border-border rounded-xl hover:border-border hover:bg-card/70 transition-all group"
               >
                 <div className="flex items-start gap-4">
                   <div className={`p-3 ${type.bgColor} rounded-lg group-hover:scale-110 transition-transform`}>
@@ -94,7 +94,7 @@ export default function ReportarPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-white mb-1">{type.title}</h3>
-                    <p className="text-sm text-gray-400">{type.description}</p>
+                    <p className="text-sm text-muted-foreground">{type.description}</p>
                   </div>
                 </div>
               </Link>
@@ -102,9 +102,9 @@ export default function ReportarPage() {
           })}
         </div>
 
-        <div className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl mb-8">
+        <div className="p-6 bg-card/50 border border-border rounded-xl mb-8">
           <h2 className="text-xl font-bold mb-4">Antes de reportar</h2>
-          <ul className="space-y-3 text-gray-400">
+          <ul className="space-y-3 text-muted-foreground">
             <li className="flex items-start gap-2">
               <span className="text-purple-400">•</span>
               Verifica que el problema no sea de tu conexión a internet
@@ -125,7 +125,7 @@ export default function ReportarPage() {
         </div>
 
         <div className="text-center">
-          <p className="text-gray-400 mb-4">
+          <p className="text-muted-foreground mb-4">
             Para reportes urgentes de seguridad, contacta directamente a:
           </p>
           <a

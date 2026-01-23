@@ -67,7 +67,7 @@ export function ProfileHeader({
         {/* Avatar */}
         <div className="absolute -top-16 sm:-top-20 left-6">
           <div
-            className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gray-800 ${getAvatarFrame()} overflow-hidden relative`}
+            className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-muted ${getAvatarFrame()} overflow-hidden relative`}
           >
             {profile.avatarUrl ? (
               <Image
@@ -91,14 +91,14 @@ export function ProfileHeader({
             <>
               <Link
                 href="/perfil/editar"
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted text-white rounded-lg transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 <span className="hidden sm:inline">Editar perfil</span>
               </Link>
               <button
                 onClick={copyProfileLink}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted text-white rounded-lg transition-colors"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
               </button>
@@ -108,7 +108,7 @@ export function ProfileHeader({
               {profile.isFollowing ? (
                 <button
                   onClick={onUnfollow}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-red-600 text-white rounded-lg transition-colors group"
+                  className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-red-600 text-white rounded-lg transition-colors group"
                 >
                   <UserMinus className="w-4 h-4" />
                   <span className="group-hover:hidden">Siguiendo</span>
@@ -123,10 +123,10 @@ export function ProfileHeader({
                   Seguir
                 </button>
               )}
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
+              <button className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted text-white rounded-lg transition-colors">
                 <MessageCircle className="w-4 h-4" />
               </button>
-              <button className="p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
+              <button className="p-2 bg-muted hover:bg-muted text-white rounded-lg transition-colors">
                 <MoreHorizontal className="w-5 h-5" />
               </button>
             </>
@@ -153,9 +153,9 @@ export function ProfileHeader({
             )}
           </div>
 
-          <p className="text-gray-400 mt-1">@{profile.username}</p>
+          <p className="text-muted-foreground mt-1">@{profile.username}</p>
 
-          {profile.bio && <p className="text-gray-300 mt-4 max-w-2xl">{profile.bio}</p>}
+          {profile.bio && <p className="text-foreground mt-4 max-w-2xl">{profile.bio}</p>}
 
           {profile.badges.length > 0 && (
             <div className="mt-4">
@@ -166,16 +166,16 @@ export function ProfileHeader({
           <div className="flex flex-wrap items-center gap-6 mt-6">
             <div className="flex items-center gap-1">
               <span className="text-white font-bold">{profile.followersCount.toLocaleString()}</span>
-              <span className="text-gray-400">seguidores</span>
+              <span className="text-muted-foreground">seguidores</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-white font-bold">{profile.followingCount.toLocaleString()}</span>
-              <span className="text-gray-400">siguiendo</span>
+              <span className="text-muted-foreground">siguiendo</span>
             </div>
             {isOwnProfile && profile.apCoins !== undefined && (
               <div className="flex items-center gap-1">
                 <span className="text-yellow-400 font-bold">{profile.apCoins.toLocaleString()}</span>
-                <span className="text-gray-400">AP Coins</span>
+                <span className="text-muted-foreground">AP Coins</span>
               </div>
             )}
             <Link
@@ -183,7 +183,7 @@ export function ProfileHeader({
               className="flex items-center gap-1 hover:bg-purple-500/20 px-2 py-1 rounded-lg transition-colors cursor-pointer"
             >
               <span className="text-purple-400 font-bold">#{profile.stats.rank}</span>
-              <span className="text-gray-400">ranking</span>
+              <span className="text-muted-foreground">ranking</span>
             </Link>
           </div>
 
@@ -198,14 +198,14 @@ export function ProfileHeader({
                   href={`https://twitter.com/${profile.socialLinks.twitter}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-400 hover:text-blue-400 transition-colors"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-blue-400 transition-colors"
                 >
                   <Twitter className="w-4 h-4" />
                   <span className="text-sm">@{profile.socialLinks.twitter}</span>
                 </a>
               )}
               {profile.socialLinks.discord && (
-                <span className="flex items-center gap-2 text-gray-400">
+                <span className="flex items-center gap-2 text-muted-foreground">
                   <span className="text-lg">💬</span>
                   <span className="text-sm">{profile.socialLinks.discord}</span>
                 </span>

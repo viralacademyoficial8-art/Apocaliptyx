@@ -84,14 +84,14 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
   return (
     <div className="space-y-4">
       {/* Stats Header */}
-      <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-4">
+      <div className="bg-muted/50 rounded-xl border border-border p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-yellow-500/20 rounded-xl">
               <Trophy className="w-6 h-6 text-yellow-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-400">Puntos de logro</p>
+              <p className="text-sm text-muted-foreground">Puntos de logro</p>
               <p className="text-2xl font-bold text-yellow-400">
                 {totalPoints.toLocaleString()}
               </p>
@@ -100,13 +100,13 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
           <div className="flex items-center gap-4">
             <div className="text-center">
               <p className="text-2xl font-bold">{unlockedCount}</p>
-              <p className="text-xs text-gray-400">Desbloqueados</p>
+              <p className="text-xs text-muted-foreground">Desbloqueados</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-500">
+              <p className="text-2xl font-bold text-muted-foreground">
                 {achievements.length - unlockedCount}
               </p>
-              <p className="text-xs text-gray-400">Bloqueados</p>
+              <p className="text-xs text-muted-foreground">Bloqueados</p>
             </div>
           </div>
         </div>
@@ -115,10 +115,10 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-[150px] bg-gray-800 border-gray-700">
+          <SelectTrigger className="w-[150px] bg-muted border-border">
             <SelectValue placeholder="Categoría" />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-700">
+          <SelectContent className="bg-muted border-border">
             <SelectItem value="all">Todas</SelectItem>
             {categories
               .filter((c) => c !== 'all')
@@ -131,10 +131,10 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
         </Select>
 
         <Select value={selectedRarity} onValueChange={setSelectedRarity}>
-          <SelectTrigger className="w-[150px] bg-gray-800 border-gray-700">
+          <SelectTrigger className="w-[150px] bg-muted border-border">
             <SelectValue placeholder="Rareza" />
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 border-gray-700">
+          <SelectContent className="bg-muted border-border">
             <SelectItem value="all">Todas</SelectItem>
             {Object.entries(rarityLabels).map(([key, label]) => (
               <SelectItem key={key} value={key}>
@@ -149,7 +149,7 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
           className={`px-3 py-2 rounded-lg border text-sm transition-colors ${
             showUnlockedOnly
               ? 'bg-purple-600 border-purple-500 text-white'
-              : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'
+              : 'bg-muted border-border text-muted-foreground hover:text-foreground'
           }`}
         >
           Solo desbloqueados
@@ -164,15 +164,15 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
             className={`relative rounded-xl border p-4 transition-all hover:scale-[1.02] ${
               achievement.isUnlocked
                 ? rarityColors[achievement.rarity]
-                : 'border-gray-700 bg-gray-800/30 opacity-60'
+                : 'border-border bg-muted/30 opacity-60'
             }`}
           >
             {/* Secret Achievement Overlay */}
             {achievement.isSecret && !achievement.isUnlocked && (
-              <div className="absolute inset-0 bg-gray-900/80 rounded-xl flex items-center justify-center">
+              <div className="absolute inset-0 bg-card/80 rounded-xl flex items-center justify-center">
                 <div className="text-center">
-                  <Lock className="w-8 h-8 text-gray-500 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Logro secreto</p>
+                  <Lock className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Logro secreto</p>
                 </div>
               </div>
             )}
@@ -199,7 +199,7 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
                     {rarityLabels[achievement.rarity]}
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 mb-2 line-clamp-2">
+                <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
                   {achievement.descriptionEs}
                 </p>
 
@@ -210,7 +210,7 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
                       value={(achievement.progress / achievement.progressMax) * 100}
                       className="h-1"
                     />
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       {achievement.progress} / {achievement.progressMax}
                     </p>
                   </div>
@@ -230,7 +230,7 @@ export function AchievementsGrid({ achievements, totalPoints }: AchievementsGrid
       </div>
 
       {filteredAchievements.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-muted-foreground">
           <Trophy className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p>No se encontraron logros</p>
         </div>

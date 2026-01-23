@@ -162,7 +162,7 @@ export function CommunityCard({
 
   return (
     <>
-      <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden hover:border-gray-600 transition-colors group relative">
+      <div className="bg-muted/50 rounded-xl border border-border overflow-hidden hover:border-border transition-colors group relative">
         {/* Banner */}
         <div
           className="h-24 relative"
@@ -178,11 +178,11 @@ export function CommunityCard({
               <img
                 src={community.iconUrl}
                 alt={community.name}
-                className="w-14 h-14 rounded-xl border-4 border-gray-800 object-cover"
+                className="w-14 h-14 rounded-xl border-4 border-border object-cover"
               />
             ) : (
               <div
-                className="w-14 h-14 rounded-xl border-4 border-gray-800 flex items-center justify-center text-2xl font-bold"
+                className="w-14 h-14 rounded-xl border-4 border-border flex items-center justify-center text-2xl font-bold"
                 style={{ backgroundColor: community.themeColor }}
               >
                 {community.name.charAt(0)}
@@ -193,7 +193,7 @@ export function CommunityCard({
           {/* Badges */}
           <div className="absolute top-2 right-12 flex gap-1">
             {!community.isPublic && (
-              <span className="bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded text-xs flex items-center gap-1">
+              <span className="bg-card/80 backdrop-blur-sm px-2 py-1 rounded text-xs flex items-center gap-1">
                 <Lock className="w-3 h-3" />
                 Privada
               </span>
@@ -214,17 +214,17 @@ export function CommunityCard({
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="bg-gray-900/80 backdrop-blur-sm p-1.5 rounded hover:bg-gray-800 transition-colors"
+              className="bg-card/80 backdrop-blur-sm p-1.5 rounded hover:bg-muted transition-colors"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
 
             {/* Dropdown Menu */}
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-[180px] py-1">
+              <div className="absolute right-0 top-full mt-1 bg-muted border border-border rounded-lg shadow-xl z-50 min-w-[180px] py-1">
                 <button
                   onClick={handleCopyLink}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
                 >
                   <Link2 className="w-4 h-4" />
                   Copiar enlace
@@ -234,7 +234,7 @@ export function CommunityCard({
                 <div className="relative">
                   <button
                     onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
                   >
                     <Share2 className="w-4 h-4" />
                     Compartir
@@ -242,31 +242,31 @@ export function CommunityCard({
                   </button>
 
                   {showShareMenu && (
-                    <div className="absolute left-full top-0 ml-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl min-w-[150px] py-1">
+                    <div className="absolute left-full top-0 ml-1 bg-muted border border-border rounded-lg shadow-xl min-w-[150px] py-1">
                       <button
                         onClick={() => handleShare('twitter')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
                       >
                         <TwitterIcon />
                         X (Twitter)
                       </button>
                       <button
                         onClick={() => handleShare('facebook')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
                       >
                         <FacebookIcon />
                         Facebook
                       </button>
                       <button
                         onClick={() => handleShare('whatsapp')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
                       >
                         <WhatsAppIcon />
                         WhatsApp
                       </button>
                       <button
                         onClick={() => handleShare('telegram')}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2"
                       >
                         <TelegramIcon />
                         Telegram
@@ -275,14 +275,14 @@ export function CommunityCard({
                   )}
                 </div>
 
-                <div className="border-t border-gray-700 my-1" />
+                <div className="border-t border-border my-1" />
 
                 <button
                   onClick={() => {
                     setShowReportModal(true);
                     setShowMenu(false);
                   }}
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-gray-700 flex items-center gap-2 text-red-400"
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex items-center gap-2 text-red-400"
                 >
                   <Flag className="w-4 h-4" />
                   Reportar comunidad
@@ -297,7 +297,7 @@ export function CommunityCard({
           <h3 className="font-bold text-lg mb-1 group-hover:text-purple-400 transition-colors">
             {community.name}
           </h3>
-          <p className="text-sm text-gray-400 line-clamp-2 mb-3">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {community.description}
           </p>
 
@@ -307,7 +307,7 @@ export function CommunityCard({
               {community.categories.slice(0, 3).map((cat) => (
                 <span
                   key={cat}
-                  className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300"
+                  className="px-2 py-0.5 bg-muted rounded text-xs text-foreground"
                 >
                   {cat}
                 </span>
@@ -316,7 +316,7 @@ export function CommunityCard({
           )}
 
           {/* Stats */}
-          <div className="flex items-center gap-4 text-sm text-gray-400 mb-4">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
               {community.membersCount.toLocaleString()} miembros
@@ -338,7 +338,7 @@ export function CommunityCard({
                   <Button
                     variant="outline"
                     onClick={() => onLeave(community.id)}
-                    className="border-gray-600"
+                    className="border-border"
                   >
                     Salir
                   </Button>
@@ -368,7 +368,7 @@ export function CommunityCard({
             ) : (
               <Button
                 onClick={handleJoinClick}
-                className="w-full bg-gray-700 hover:bg-gray-600"
+                className="w-full bg-muted hover:bg-muted"
               >
                 Unirse
               </Button>
@@ -380,7 +380,7 @@ export function CommunityCard({
       {/* Report Modal */}
       {showReportModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-xl max-w-md w-full p-6">
+          <div className="bg-muted rounded-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <Flag className="w-5 h-5 text-red-400" />
@@ -388,13 +388,13 @@ export function CommunityCard({
               </h3>
               <button
                 onClick={() => setShowReportModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               ¿Por qué quieres reportar &quot;{community.name}&quot;?
             </p>
 
@@ -411,7 +411,7 @@ export function CommunityCard({
                   className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                     reportReason === option.value
                       ? 'bg-red-500/20 border border-red-500'
-                      : 'bg-gray-700 hover:bg-gray-600 border border-transparent'
+                      : 'bg-muted hover:bg-muted border border-transparent'
                   }`}
                 >
                   <input
@@ -442,14 +442,14 @@ export function CommunityCard({
               value={reportDescription}
               onChange={(e) => setReportDescription(e.target.value)}
               placeholder="Describe el problema (opcional)..."
-              className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm resize-none h-24 mb-4"
+              className="w-full bg-muted border border-border rounded-lg p-3 text-sm resize-none h-24 mb-4"
             />
 
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowReportModal(false)}
-                className="flex-1 border-gray-600"
+                className="flex-1 border-border"
               >
                 Cancelar
               </Button>

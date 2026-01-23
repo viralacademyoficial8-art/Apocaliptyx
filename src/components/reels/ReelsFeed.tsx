@@ -126,8 +126,8 @@ export function ReelsFeed({
 
   if (reels.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[600px] bg-gray-900 rounded-xl">
-        <p className="text-gray-400">No hay reels disponibles</p>
+      <div className="flex items-center justify-center h-[600px] bg-card rounded-xl">
+        <p className="text-muted-foreground">No hay reels disponibles</p>
       </div>
     );
   }

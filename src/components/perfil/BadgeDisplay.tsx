@@ -12,7 +12,7 @@ interface BadgeDisplayProps {
 }
 
 const rarityColors: Record<string, string> = {
-  COMMON: 'bg-gray-700 border-gray-600',
+  COMMON: 'bg-muted border-border',
   RARE: 'bg-blue-900/50 border-blue-500/50',
   EPIC: 'bg-purple-900/50 border-purple-500/50',
   LEGENDARY: 'bg-yellow-900/50 border-yellow-500/50 shadow-lg shadow-yellow-500/20',
@@ -41,9 +41,9 @@ export function BadgeDisplay({ badges, maxVisible = 5, size = 'md' }: BadgeDispl
           <span>{badge.icon}</span>
           
           {/* Tooltip */}
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-card border border-border rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
             <p className="text-white font-medium text-sm">{badge.name}</p>
-            <p className="text-gray-400 text-xs">{badge.description}</p>
+            <p className="text-muted-foreground text-xs">{badge.description}</p>
           </div>
         </div>
       ))}
@@ -51,7 +51,7 @@ export function BadgeDisplay({ badges, maxVisible = 5, size = 'md' }: BadgeDispl
       {!showAll && hiddenCount > 0 && (
         <button
           onClick={() => setShowAll(true)}
-          className={`${sizes[size]} rounded-full bg-gray-800 border-2 border-gray-700 flex items-center justify-center text-gray-400 hover:text-white hover:border-gray-600 transition-colors text-sm font-medium`}
+          className={`${sizes[size]} rounded-full bg-muted border-2 border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors text-sm font-medium`}
         >
           +{hiddenCount}
         </button>

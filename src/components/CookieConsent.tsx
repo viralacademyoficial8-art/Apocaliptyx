@@ -65,9 +65,9 @@ export function CookieConsent() {
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-end justify-center sm:items-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+      <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
-        <div className="p-6 pb-4 border-b border-gray-800">
+        <div className="p-6 pb-4 border-b border-border">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-purple-500/20 rounded-xl">
@@ -75,12 +75,12 @@ export function CookieConsent() {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">Tu Privacidad Importa</h2>
-                <p className="text-sm text-gray-400 mt-0.5">Configuracion de cookies</p>
+                <p className="text-sm text-muted-foreground mt-0.5">Configuracion de cookies</p>
               </div>
             </div>
             <button
               onClick={() => setShowBanner(false)}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
               aria-label="Cerrar"
             >
               <X className="w-5 h-5" />
@@ -90,7 +90,7 @@ export function CookieConsent() {
 
         {/* Content */}
         <div className="p-6">
-          <p className="text-gray-300 text-sm leading-relaxed mb-4">
+          <p className="text-foreground text-sm leading-relaxed mb-4">
             Usamos cookies para mejorar tu experiencia, analizar el trafico y personalizar contenido.
             Puedes aceptar todas las cookies, solo las necesarias, o personalizar tu seleccion.
           </p>
@@ -126,31 +126,31 @@ export function CookieConsent() {
                     className={cn(
                       'p-4 rounded-xl border transition-all duration-200',
                       isEnabled
-                        ? 'bg-gray-800/50 border-purple-500/30'
-                        : 'bg-gray-800/30 border-gray-700'
+                        ? 'bg-muted/50 border-purple-500/30'
+                        : 'bg-muted/30 border-border'
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
                         <div className={cn(
                           'p-2 rounded-lg',
-                          isEnabled ? 'bg-purple-500/20' : 'bg-gray-700/50'
+                          isEnabled ? 'bg-purple-500/20' : 'bg-muted/50'
                         )}>
                           <Icon className={cn(
                             'w-4 h-4',
-                            isEnabled ? 'text-purple-400' : 'text-gray-500'
+                            isEnabled ? 'text-purple-400' : 'text-muted-foreground'
                           )} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <h3 className="font-medium text-white text-sm">{type.title}</h3>
                             {type.required && (
-                              <span className="px-2 py-0.5 text-xs bg-gray-700 text-gray-300 rounded-full">
+                              <span className="px-2 py-0.5 text-xs bg-muted text-foreground rounded-full">
                                 Requerida
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">{type.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{type.description}</p>
                         </div>
                       </div>
 
@@ -161,7 +161,7 @@ export function CookieConsent() {
                         className={cn(
                           'relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0',
                           type.required && 'cursor-not-allowed opacity-60',
-                          isEnabled ? 'bg-purple-500' : 'bg-gray-600'
+                          isEnabled ? 'bg-purple-500' : 'bg-muted'
                         )}
                       >
                         <span
@@ -182,7 +182,7 @@ export function CookieConsent() {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={acceptNecessary}
-              className="flex-1 px-4 py-3 text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-xl transition-colors"
+              className="flex-1 px-4 py-3 text-sm font-medium text-foreground bg-muted hover:bg-muted border border-border rounded-xl transition-colors"
             >
               Solo Necesarias
             </button>
@@ -204,7 +204,7 @@ export function CookieConsent() {
           </div>
 
           {/* Privacy Policy Link */}
-          <p className="text-center text-xs text-gray-500 mt-4">
+          <p className="text-center text-xs text-muted-foreground mt-4">
             Al continuar navegando, aceptas nuestros{' '}
             <a href="/terminos-y-condiciones" className="text-purple-400 hover:text-purple-300 underline">
               Terminos de Servicio

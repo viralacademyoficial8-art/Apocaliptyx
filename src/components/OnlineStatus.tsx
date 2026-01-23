@@ -53,7 +53,7 @@ export function OnlineStatus({ userId, showText = false, size = 'md' }: OnlineSt
         <span className={`text-xs ${
           presence.status === 'online' ? 'text-green-400' :
           presence.status === 'away' ? 'text-yellow-400' :
-          'text-gray-400'
+          'text-muted-foreground'
         }`}>
           {statusText}
         </span>

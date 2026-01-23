@@ -53,11 +53,11 @@ const statusConfig: Record<string, { label: string; color: string; icon: typeof 
   open: { label: "Abierto", color: "text-blue-400 bg-blue-500/20 border-blue-500/30", icon: Clock },
   in_progress: { label: "En progreso", color: "text-yellow-400 bg-yellow-500/20 border-yellow-500/30", icon: AlertCircle },
   resolved: { label: "Resuelto", color: "text-green-400 bg-green-500/20 border-green-500/30", icon: CheckCircle },
-  closed: { label: "Cerrado", color: "text-gray-400 bg-gray-500/20 border-gray-500/30", icon: X },
+  closed: { label: "Cerrado", color: "text-muted-foreground bg-gray-500/20 border-gray-500/30", icon: X },
 };
 
 const priorityConfig: Record<string, { label: string; color: string }> = {
-  low: { label: "Baja", color: "text-gray-400" },
+  low: { label: "Baja", color: "text-muted-foreground" },
   normal: { label: "Normal", color: "text-blue-400" },
   high: { label: "Alta", color: "text-orange-400" },
   urgent: { label: "Urgente", color: "text-red-400" },
@@ -232,15 +232,15 @@ export default function AdminSoportePage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Centro de Soporte</h1>
-          <p className="text-gray-400">Gestiona los tickets de soporte</p>
+          <p className="text-muted-foreground">Gestiona los tickets de soporte</p>
         </div>
         
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-gray-400" />
+          <Filter className="w-5 h-5 text-muted-foreground" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="px-4 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="all">Todos</option>
             <option value="open">Abiertos</option>
@@ -253,10 +253,10 @@ export default function AdminSoportePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-220px)]">
         {/* Lista de tickets */}
-        <div className="lg:col-span-1 bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+        <div className="lg:col-span-1 bg-card/50 border border-border rounded-xl overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="font-semibold">Tickets ({tickets.length})</h2>
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-muted-foreground">
               {tickets.filter(t => t.unread_count > 0).length} sin leer
             </span>
           </div>
@@ -264,10 +264,10 @@ export default function AdminSoportePage() {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="p-8 text-center">
-                <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-500" />
+                <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted-foreground" />
               </div>
             ) : tickets.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-muted-foreground">
                 <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No hay tickets</p>
               </div>
@@ -279,14 +279,14 @@ export default function AdminSoportePage() {
                   <button
                     key={ticket.id}
                     onClick={() => setSelectedTicket(ticket)}
-                    className={`w-full p-4 text-left border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${
-                      selectedTicket?.id === ticket.id ? "bg-gray-800/50" : ""
+                    className={`w-full p-4 text-left border-b border-border hover:bg-muted/50 transition-colors ${
+                      selectedTicket?.id === ticket.id ? "bg-muted/50" : ""
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-white line-clamp-1">{ticket.subject}</p>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {ticket.user?.username || ticket.guest_name || "Invitado"}
                         </p>
                       </div>
@@ -303,7 +303,7 @@ export default function AdminSoportePage() {
                       <span className={`text-xs ${ticketPriority.color}`}>
                         {ticketPriority.label}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(ticket.updated_at), { 
                           addSuffix: true, 
                           locale: es 
@@ -318,14 +318,14 @@ export default function AdminSoportePage() {
         </div>
 
         {/* Chat */}
-        <div className="lg:col-span-2 bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
+        <div className="lg:col-span-2 bg-card/50 border border-border rounded-xl overflow-hidden flex flex-col">
           {selectedTicket ? (
             <>
-              <div className="p-4 border-b border-gray-800">
+              <div className="p-4 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="font-semibold">{selectedTicket.subject}</h2>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       {selectedTicket.user?.username || selectedTicket.guest_email || "Invitado"}
                     </p>
                   </div>
@@ -340,13 +340,13 @@ export default function AdminSoportePage() {
                     </button>
                     
                     {showStatusMenu && (
-                      <div className="absolute right-0 top-full mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 overflow-hidden">
+                      <div className="absolute right-0 top-full mt-2 bg-muted border border-border rounded-lg shadow-xl z-10 overflow-hidden">
                         {Object.entries(statusConfig).map(([key, config]) => (
                           <button
                             key={key}
                             onClick={() => handleStatusChange(key)}
-                            className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-700 ${
-                              selectedTicket.status === key ? "bg-gray-700" : ""
+                            className={`w-full px-4 py-2 text-left text-sm hover:bg-muted ${
+                              selectedTicket.status === key ? "bg-muted" : ""
                             }`}
                           >
                             <span className={config.color.split(" ")[0]}>{config.label}</span>
@@ -366,7 +366,7 @@ export default function AdminSoportePage() {
                   if (isSystem) {
                     return (
                       <div key={message.id} className="text-center">
-                        <span className="px-3 py-1 bg-gray-800 text-gray-400 text-sm rounded-full">
+                        <span className="px-3 py-1 bg-muted text-muted-foreground text-sm rounded-full">
                           {message.content}
                         </span>
                       </div>
@@ -391,11 +391,11 @@ export default function AdminSoportePage() {
                         className={`max-w-[70%] px-4 py-2 rounded-2xl ${
                           isAgent
                             ? "bg-blue-600 text-white rounded-br-sm"
-                            : "bg-gray-800 text-gray-100 rounded-bl-sm"
+                            : "bg-muted text-gray-100 rounded-bl-sm"
                         }`}
                       >
                         <p className="whitespace-pre-wrap">{message.content}</p>
-                        <p className={`text-xs mt-1 ${isAgent ? "text-blue-200" : "text-gray-500"}`}>
+                        <p className={`text-xs mt-1 ${isAgent ? "text-blue-200" : "text-muted-foreground"}`}>
                           {message.sender?.username || "Usuario"} · {formatDistanceToNow(new Date(message.created_at), { 
                             addSuffix: true, 
                             locale: es 
@@ -409,7 +409,7 @@ export default function AdminSoportePage() {
               </div>
 
               {selectedTicket.status !== "closed" && (
-                <div className="p-4 border-t border-gray-800">
+                <div className="p-4 border-t border-border">
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
@@ -417,12 +417,12 @@ export default function AdminSoportePage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
                       placeholder="Escribe tu respuesta..."
-                      className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-4 py-3 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim() || sending}
-                      className="p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg transition-colors"
+                      className="p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-muted disabled:cursor-not-allowed rounded-lg transition-colors"
                     >
                       {sending ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
@@ -435,7 +435,7 @@ export default function AdminSoportePage() {
               )}
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-gray-500">
+            <div className="flex-1 flex items-center justify-center text-muted-foreground">
               <div className="text-center">
                 <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <p>Selecciona un ticket para responder</p>

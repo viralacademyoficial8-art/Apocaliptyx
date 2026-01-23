@@ -20,10 +20,10 @@ export function StatCard({
   iconBg = 'bg-purple-500/20',
 }: StatCardProps) {
   return (
-    <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
+    <div className="bg-card rounded-xl border border-border p-6">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-gray-400 mb-1">{title}</p>
+          <p className="text-sm text-muted-foreground mb-1">{title}</p>
           <p className="text-2xl font-bold text-white">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
@@ -36,7 +36,7 @@ export function StatCard({
             >
               {change.type === 'increase' ? '+' : '-'}
               {Math.abs(change.value)}%
-              <span className="text-gray-500 ml-1">vs ayer</span>
+              <span className="text-muted-foreground ml-1">vs ayer</span>
             </p>
           )}
         </div>

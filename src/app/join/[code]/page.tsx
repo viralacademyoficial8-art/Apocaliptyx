@@ -74,7 +74,7 @@ export default function JoinGroupPage() {
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-purple-500 mx-auto mb-4" />
-          <p className="text-gray-400">Procesando invitación...</p>
+          <p className="text-muted-foreground">Procesando invitación...</p>
         </div>
       </div>
     );
@@ -84,13 +84,13 @@ export default function JoinGroupPage() {
   if (status === 'unauthenticated') {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 max-w-md w-full text-center">
+        <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <Users className="w-10 h-10 text-white" />
           </div>
 
           <h1 className="text-2xl font-bold mb-2">Invitación a grupo</h1>
-          <p className="text-gray-400 mb-6">
+          <p className="text-muted-foreground mb-6">
             Inicia sesión para unirte a este grupo
           </p>
 
@@ -102,7 +102,7 @@ export default function JoinGroupPage() {
             Iniciar sesión
           </Link>
 
-          <p className="text-xs text-gray-500 mt-4">
+          <p className="text-xs text-muted-foreground mt-4">
             ¿No tienes cuenta?{' '}
             <Link href={`/register?callbackUrl=/join/${code}`} className="text-purple-400 hover:underline">
               Regístrate
@@ -117,15 +117,15 @@ export default function JoinGroupPage() {
   if (result) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-8 max-w-md w-full text-center">
+        <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full text-center">
           {result.success ? (
             <>
               <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
               <h1 className="text-2xl font-bold mb-2 text-green-400">¡Bienvenido!</h1>
-              <p className="text-gray-400 mb-6">{result.message}</p>
-              <p className="text-sm text-gray-500">Redirigiendo al chat...</p>
+              <p className="text-muted-foreground mb-6">{result.message}</p>
+              <p className="text-sm text-muted-foreground">Redirigiendo al chat...</p>
             </>
           ) : (
             <>
@@ -133,7 +133,7 @@ export default function JoinGroupPage() {
                 <XCircle className="w-10 h-10 text-red-500" />
               </div>
               <h1 className="text-2xl font-bold mb-2 text-red-400">Error</h1>
-              <p className="text-gray-400 mb-6">{result.message}</p>
+              <p className="text-muted-foreground mb-6">{result.message}</p>
               <Link
                 href="/mensajes"
                 className="inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors font-medium"

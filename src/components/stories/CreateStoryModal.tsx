@@ -188,13 +188,13 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-      <div className="bg-gray-900 rounded-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-card rounded-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-800">
+        <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-white font-semibold text-lg">Crear Story</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -241,8 +241,8 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                 )}>
                   {linkPreview.siteName && (
                     <div className="flex items-center gap-2 mb-2">
-                      <Globe className="w-4 h-4 text-gray-300" />
-                      <span className="text-sm text-gray-300">{linkPreview.siteName}</span>
+                      <Globe className="w-4 h-4 text-foreground" />
+                      <span className="text-sm text-foreground">{linkPreview.siteName}</span>
                     </div>
                   )}
                   {linkPreview.title && (
@@ -251,7 +251,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                     </h3>
                   )}
                   {linkPreview.description && !linkPreview.image && (
-                    <p className="text-gray-300 text-sm line-clamp-3">
+                    <p className="text-foreground text-sm line-clamp-3">
                       {linkPreview.description}
                     </p>
                   )}
@@ -273,26 +273,26 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                 <p className="text-2xl leading-relaxed break-words">{content}</p>
               </div>
             ) : (
-              <p className="text-gray-500 text-center">Vista previa de tu story</p>
+              <p className="text-muted-foreground text-center">Vista previa de tu story</p>
             )}
           </div>
         </div>
 
         {/* Text input */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-border">
           {mode === 'link' ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <LinkIcon className="w-4 h-4 text-gray-400" />
+                <LinkIcon className="w-4 h-4 text-muted-foreground" />
                 <input
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="Pega un link de YouTube, Twitter, etc..."
-                  className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 bg-muted text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               {loadingPreview && (
-                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground text-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Cargando vista previa...
                 </div>
@@ -301,11 +301,11 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Añade un comentario (opcional)..."
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-muted text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
                 rows={2}
                 maxLength={200}
               />
-              <p className="text-gray-500 text-xs text-right">{content.length}/200</p>
+              <p className="text-muted-foreground text-xs text-right">{content.length}/200</p>
             </div>
           ) : (
             <>
@@ -313,17 +313,17 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Escribe tu story..."
-                className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-muted text-white rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
                 rows={2}
                 maxLength={500}
               />
-              <p className="text-gray-500 text-xs text-right mt-1">{content.length}/500</p>
+              <p className="text-muted-foreground text-xs text-right mt-1">{content.length}/500</p>
             </>
           )}
         </div>
 
         {/* Tools */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-border">
           <div className="flex items-center gap-2 mb-4 flex-wrap">
             {/* Mode toggles */}
             <button
@@ -336,7 +336,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
               }}
               className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
-                mode === 'text' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                mode === 'text' ? 'bg-purple-600 text-white' : 'bg-muted text-muted-foreground hover:text-foreground'
               )}
             >
               <Type className="w-4 h-4" />
@@ -347,7 +347,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
               onClick={() => fileInputRef.current?.click()}
               className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
-                mode === 'media' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                mode === 'media' ? 'bg-purple-600 text-white' : 'bg-muted text-muted-foreground hover:text-foreground'
               )}
             >
               <ImageIcon className="w-4 h-4" />
@@ -367,7 +367,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
               }}
               className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors cursor-pointer select-none',
-                mode === 'link' ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                mode === 'link' ? 'bg-purple-600 text-white' : 'bg-muted text-muted-foreground hover:text-foreground'
               )}
             >
               <LinkIcon className="w-4 h-4" />
@@ -384,7 +384,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
             {/* Color picker toggle */}
             <button
               onClick={() => setShowColorPicker(prev => !prev)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-800 text-gray-400 hover:text-white transition-colors ml-auto"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-muted-foreground hover:text-foreground transition-colors ml-auto"
             >
               <Palette className="w-4 h-4" />
               Colores
@@ -396,7 +396,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
             <div className="space-y-4 mb-4">
               {/* Background colors */}
               <div>
-                <p className="text-gray-400 text-sm mb-2">Fondo</p>
+                <p className="text-muted-foreground text-sm mb-2">Fondo</p>
                 <div className="flex flex-wrap gap-2">
                   {BACKGROUND_COLORS.map((color, i) => (
                     <button
@@ -416,7 +416,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
 
               {/* Text colors */}
               <div>
-                <p className="text-gray-400 text-sm mb-2">Color de texto</p>
+                <p className="text-muted-foreground text-sm mb-2">Color de texto</p>
                 <div className="flex flex-wrap gap-2">
                   {TEXT_COLORS.map((color, i) => (
                     <button
@@ -424,7 +424,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                       onClick={() => setTextColor(color)}
                       className={cn(
                         'w-8 h-8 rounded-full border-2 transition-transform hover:scale-110',
-                        textColor === color ? 'border-purple-500 scale-110' : 'border-gray-600'
+                        textColor === color ? 'border-purple-500 scale-110' : 'border-border'
                       )}
                       style={{ backgroundColor: color }}
                     />
@@ -434,7 +434,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
 
               {/* Font styles */}
               <div>
-                <p className="text-gray-400 text-sm mb-2">Estilo de fuente</p>
+                <p className="text-muted-foreground text-sm mb-2">Estilo de fuente</p>
                 <div className="flex gap-2">
                   {FONT_STYLES.map((style) => (
                     <button
@@ -445,7 +445,7 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
                         style.className,
                         fontStyle === style.id
                           ? 'bg-purple-600 text-white'
-                          : 'bg-gray-800 text-gray-400 hover:text-white'
+                          : 'bg-muted text-muted-foreground hover:text-foreground'
                       )}
                     >
                       {style.label}
@@ -458,14 +458,14 @@ export function CreateStoryModal({ onClose, onSuccess }: CreateStoryModalProps) 
         </div>
 
         {/* Submit button */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-border">
           <button
             onClick={handleSubmit}
             disabled={isUploading || (!content && !mediaFile && !linkPreview)}
             className={cn(
               'w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors',
               isUploading || (!content && !mediaFile && !linkPreview)
-                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
                 : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-500 hover:to-pink-500'
             )}
           >

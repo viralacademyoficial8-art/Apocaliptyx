@@ -41,7 +41,7 @@ interface Title {
 }
 
 const RARITY_COLORS: Record<string, string> = {
-  common: 'bg-gray-500/20 text-gray-400',
+  common: 'bg-gray-500/20 text-muted-foreground',
   rare: 'bg-blue-500/20 text-blue-400',
   epic: 'bg-purple-500/20 text-purple-400',
   legendary: 'bg-yellow-500/20 text-yellow-400',
@@ -316,7 +316,7 @@ export default function AdminTitulosPage() {
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${RARITY_COLORS[title.rarity] || 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium capitalize ${RARITY_COLORS[title.rarity] || 'bg-gray-500/20 text-muted-foreground'}`}>
                             {title.rarity}
                           </span>
                         </td>
@@ -325,7 +325,7 @@ export default function AdminTitulosPage() {
                           <span className="text-foreground font-medium ml-1">≥ {condValue}</span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${title.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${title.is_active ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-muted-foreground'}`}>
                             {title.is_active ? 'Activo' : 'Inactivo'}
                           </span>
                         </td>

@@ -39,7 +39,7 @@ interface TournamentCardProps {
 const statusColors = {
   upcoming: 'bg-blue-500/20 text-blue-400',
   active: 'bg-green-500/20 text-green-400',
-  ended: 'bg-gray-500/20 text-gray-400',
+  ended: 'bg-gray-500/20 text-muted-foreground',
   cancelled: 'bg-red-500/20 text-red-400',
 };
 
@@ -90,7 +90,7 @@ export function TournamentCard({
     : null;
 
   return (
-    <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden hover:border-purple-500/50 transition-colors">
+    <div className="bg-muted/50 rounded-xl border border-border overflow-hidden hover:border-purple-500/50 transition-colors">
       {/* Banner */}
       <div
         className="h-32 relative"
@@ -111,14 +111,14 @@ export function TournamentCard({
 
         {/* Category Badge */}
         {tournament.categoryName && (
-          <div className="absolute top-3 right-3 bg-gray-900/80 backdrop-blur-sm px-2 py-1 rounded text-xs">
+          <div className="absolute top-3 right-3 bg-card/80 backdrop-blur-sm px-2 py-1 rounded text-xs">
             {tournament.categoryIcon} {tournament.categoryName}
           </div>
         )}
 
         {/* Prize Pool */}
         <div className="absolute bottom-3 left-3">
-          <div className="flex items-center gap-2 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-2 bg-card/80 backdrop-blur-sm px-3 py-1.5 rounded-lg">
             <Trophy className="w-5 h-5 text-yellow-400" />
             <span className="text-lg font-bold text-yellow-400">
               {tournament.prizePool.toLocaleString()} AP
@@ -132,25 +132,25 @@ export function TournamentCard({
         <h3 className="font-bold text-lg mb-2">{tournament.name}</h3>
 
         {tournament.description && (
-          <p className="text-sm text-gray-400 line-clamp-2 mb-3">
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
             {tournament.description}
           </p>
         )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="w-4 h-4" />
             <span>
               {tournament.participantsCount}
               {tournament.maxParticipants && ` / ${tournament.maxParticipants}`}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Coins className="w-4 h-4" />
             <span>Entrada: {tournament.entryFee > 0 ? `${tournament.entryFee} AP` : 'Gratis'}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Calendar className="w-4 h-4" />
             <span>{formatDate(startDate)} - {formatDate(endDate)}</span>
           </div>
@@ -165,7 +165,7 @@ export function TournamentCard({
         {/* Spots Progress */}
         {tournament.maxParticipants && (
           <div className="mb-4">
-            <div className="flex justify-between text-xs text-gray-400 mb-1">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1">
               <span>Plazas</span>
               <span>{spotsLeft} disponibles</span>
             </div>
@@ -190,7 +190,7 @@ export function TournamentCard({
                     : 'bg-orange-500/20 border border-orange-500/50'
                 }`}
               >
-                <p className="text-xs text-gray-400">#{prize.position}</p>
+                <p className="text-xs text-muted-foreground">#{prize.position}</p>
                 <p className="font-bold text-sm">{prize.amount.toLocaleString()} AP</p>
               </div>
             ))}
@@ -201,7 +201,7 @@ export function TournamentCard({
         {tournament.status !== 'ended' && tournament.status !== 'cancelled' && (
           <div className="flex gap-2">
             <Link href={`/torneos/${tournament.id}`} className="flex-1">
-              <Button variant="outline" className="w-full border-gray-600">
+              <Button variant="outline" className="w-full border-border">
                 Ver detalles
               </Button>
             </Link>

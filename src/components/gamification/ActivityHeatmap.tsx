@@ -52,7 +52,7 @@ export function ActivityHeatmap({ data, year = new Date().getFullYear() }: Activ
   }, [data, year]);
 
   const getColor = (count: number) => {
-    if (count === 0) return 'bg-gray-800';
+    if (count === 0) return 'bg-muted';
     const intensity = Math.min(count / Math.max(maxCount, 1), 1);
     if (intensity < 0.25) return 'bg-purple-900/50';
     if (intensity < 0.5) return 'bg-purple-700/60';
@@ -67,13 +67,13 @@ export function ActivityHeatmap({ data, year = new Date().getFullYear() }: Activ
   const activeDays = data.filter((d) => d.count > 0).length;
 
   return (
-    <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-4">
+    <div className="bg-muted/50 rounded-xl border border-border p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Calendar className="w-5 h-5 text-purple-400" />
           Actividad {year}
         </h3>
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span>{totalActivity.toLocaleString()} actividades</span>
           <span>{activeDays} días activo</span>
         </div>
@@ -87,7 +87,7 @@ export function ActivityHeatmap({ data, year = new Date().getFullYear() }: Activ
             {months.map((month, i) => (
               <div
                 key={month}
-                className="text-xs text-gray-500"
+                className="text-xs text-muted-foreground"
                 style={{ width: `${100 / 12}%` }}
               >
                 {month}
@@ -102,7 +102,7 @@ export function ActivityHeatmap({ data, year = new Date().getFullYear() }: Activ
               {days.map((day, i) => (
                 <div
                   key={day}
-                  className="text-[10px] text-gray-500 h-[12px] flex items-center"
+                  className="text-[10px] text-muted-foreground h-[12px] flex items-center"
                   style={{ visibility: i % 2 === 1 ? 'visible' : 'hidden' }}
                 >
                   {day}
@@ -130,10 +130,10 @@ export function ActivityHeatmap({ data, year = new Date().getFullYear() }: Activ
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-end gap-2 mt-4 text-xs text-gray-500">
+          <div className="flex items-center justify-end gap-2 mt-4 text-xs text-muted-foreground">
             <span>Menos</span>
             <div className="flex gap-1">
-              <div className="w-3 h-3 rounded-sm bg-gray-800" />
+              <div className="w-3 h-3 rounded-sm bg-muted" />
               <div className="w-3 h-3 rounded-sm bg-purple-900/50" />
               <div className="w-3 h-3 rounded-sm bg-purple-700/60" />
               <div className="w-3 h-3 rounded-sm bg-purple-600/80" />

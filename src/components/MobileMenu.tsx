@@ -267,7 +267,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     `}>
                       <Icon className="w-4 h-4 text-white" />
                     </div>
-                    <span className={`font-medium ${isActive ? "text-white" : "text-foreground group-hover:text-white"}`}>
+                    <span className={`font-medium ${isActive ? "text-white" : "text-foreground group-hover:text-foreground"}`}>
                       {item.label}
                     </span>
                     {isActive && <Zap className="w-4 h-4 text-yellow-300 ml-auto" />}
@@ -309,7 +309,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                         `}>
                           <Icon className="w-4 h-4 text-white" />
                         </div>
-                        <span className={`font-medium ${isActive ? "text-white" : "text-foreground group-hover:text-white"}`}>
+                        <span className={`font-medium ${isActive ? "text-white" : "text-foreground group-hover:text-foreground"}`}>
                           {item.label}
                         </span>
                         {item.badge && (
@@ -330,7 +330,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Link
                   href={`/perfil/${currentUser.username}`}
                   onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-muted hover:text-white transition-all touch-target"
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all touch-target"
                 >
                   <div className="p-2 rounded-lg bg-muted">
                     <User className="w-4 h-4" />
@@ -341,7 +341,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 <Link
                   href="/configuracion"
                   onClick={onClose}
-                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-muted hover:text-white transition-all touch-target"
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-all touch-target"
                 >
                   <div className="p-2 rounded-lg bg-muted">
                     <Settings className="w-4 h-4" />

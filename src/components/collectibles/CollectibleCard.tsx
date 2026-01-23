@@ -75,7 +75,7 @@ export function CollectibleCard({
 
   return (
     <div
-      className={`relative bg-gray-800/50 rounded-xl border-2 overflow-hidden transition-all duration-300 ${
+      className={`relative bg-muted/50 rounded-xl border-2 overflow-hidden transition-all duration-300 ${
         rarityBorders[collectible.rarity]
       } ${isHovered ? 'scale-105 shadow-lg' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
@@ -131,7 +131,7 @@ export function CollectibleCard({
       {/* Info */}
       <div className="relative p-3 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-400">{typeLabels[collectible.type]}</span>
+          <span className="text-xs text-muted-foreground">{typeLabels[collectible.type]}</span>
           <span
             className={`text-xs px-1.5 py-0.5 rounded bg-gradient-to-r ${
               rarityColors[collectible.rarity]
@@ -145,7 +145,7 @@ export function CollectibleCard({
 
         {/* Supply */}
         {collectible.isLimited && collectible.maxSupply && (
-          <div className="text-xs text-gray-400">
+          <div className="text-xs text-muted-foreground">
             {collectible.currentSupply} / {collectible.maxSupply} disponibles
           </div>
         )}
@@ -157,7 +157,7 @@ export function CollectibleCard({
               🪙 {collectible.apCost.toLocaleString()}
             </span>
           ) : (
-            <span className="text-xs text-gray-500">No disponible</span>
+            <span className="text-xs text-muted-foreground">No disponible</span>
           )}
 
           {collectible.isOwned ? (
@@ -167,7 +167,7 @@ export function CollectibleCard({
               className={
                 collectible.isEquipped
                   ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-gray-600 hover:bg-gray-500'
+                  : 'bg-muted hover:bg-gray-500'
               }
             >
               {collectible.isEquipped ? 'Equipado' : 'Equipar'}

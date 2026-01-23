@@ -11,7 +11,7 @@ export function ShopCart() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/tienda" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+        <Link href="/tienda" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" /> Volver a tienda
         </Link>
 
@@ -21,8 +21,8 @@ export function ShopCart() {
         </div>
 
         {cart.length === 0 ? (
-          <div className="mt-10 bg-gray-900 border border-gray-800 rounded-2xl p-10 text-center">
-            <p className="text-gray-400">Tu carrito está vacío.</p>
+          <div className="mt-10 bg-card border border-border rounded-2xl p-10 text-center">
+            <p className="text-muted-foreground">Tu carrito está vacío.</p>
             <Link href="/tienda" className="inline-block mt-4 px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl">
               Ir a tienda
             </Link>
@@ -30,8 +30,8 @@ export function ShopCart() {
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-4">
             {cart.map(({ item, quantity }) => (
-              <div key={item.id} className="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex items-center gap-4">
-                <div className="w-14 h-14 bg-gray-800 rounded-xl flex items-center justify-center text-2xl">
+              <div key={item.id} className="bg-card border border-border rounded-2xl p-5 flex items-center gap-4">
+                <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center text-2xl">
                   {item.type === 'PROTECTION' && '🛡️'}
                   {item.type === 'BOOST' && '⚡'}
                   {item.type === 'POWER' && '✨'}
@@ -47,7 +47,7 @@ export function ShopCart() {
                   <div className="mt-2 flex items-center gap-2">
                     <button
                       onClick={() => updateCartQuantity(item.id, quantity - 1)}
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                      className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors"
                     >
                       <Minus className="w-4 h-4 text-gray-200" />
                     </button>
@@ -55,22 +55,22 @@ export function ShopCart() {
                     <button
                       onClick={() => updateCartQuantity(item.id, quantity + 1)}
                       disabled={item.maxPerUser ? quantity >= item.maxPerUser : false}
-                      className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
                     >
                       <Plus className="w-4 h-4 text-gray-200" />
                     </button>
                   </div>
                 </div>
 
-                <button onClick={() => removeFromCart(item.id)} className="p-2 text-gray-500 hover:text-red-400 transition-colors">
+                <button onClick={() => removeFromCart(item.id)} className="p-2 text-muted-foreground hover:text-red-400 transition-colors">
                   <Trash2 className="w-6 h-6" />
                 </button>
               </div>
             ))}
 
-            <div className="mt-2 bg-gray-900 border border-gray-800 rounded-2xl p-6">
+            <div className="mt-2 bg-card border border-border rounded-2xl p-6">
               <div className="flex items-center justify-between">
-                <span className="text-gray-400">Total</span>
+                <span className="text-muted-foreground">Total</span>
                 <span className="text-3xl font-bold text-yellow-400">{total.toLocaleString()} AP</span>
               </div>
 
@@ -90,7 +90,7 @@ export function ShopCart() {
                   )}
                 </button>
 
-                <button onClick={clearCart} className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 text-white font-bold rounded-xl transition-colors">
+                <button onClick={clearCart} className="flex-1 py-3 bg-muted hover:bg-muted text-white font-bold rounded-xl transition-colors">
                   Vaciar carrito
                 </button>
               </div>

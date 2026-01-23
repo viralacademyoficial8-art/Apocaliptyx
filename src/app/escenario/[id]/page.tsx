@@ -449,7 +449,7 @@ export default function EscenarioPage() {
         <Navbar />
         <div className="flex items-center justify-center py-32">
           <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-          <span className="ml-3 text-gray-400">Cargando escenario...</span>
+          <span className="ml-3 text-muted-foreground">Cargando escenario...</span>
         </div>
       </div>
     );
@@ -462,12 +462,12 @@ export default function EscenarioPage() {
         <div className="flex flex-col items-center justify-center py-32">
           <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
           <h1 className="text-2xl font-bold mb-2">Escenario no encontrado</h1>
-          <p className="text-gray-400 mb-6">El escenario que buscas no existe o ha sido eliminado.</p>
+          <p className="text-muted-foreground mb-6">El escenario que buscas no existe o ha sido eliminado.</p>
           <div className="flex gap-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg flex items-center gap-2"
+              className="px-4 py-2 bg-muted hover:bg-muted rounded-lg flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Volver
@@ -494,7 +494,7 @@ export default function EscenarioPage() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Volver
@@ -519,14 +519,14 @@ export default function EscenarioPage() {
             <span className={`text-xs px-3 py-1 rounded-full ${
               scenario.status === "ACTIVE" 
                 ? "bg-green-500/20 text-green-400"
-                : "bg-gray-500/20 text-gray-400"
+                : "bg-gray-500/20 text-muted-foreground"
             }`}>
               {scenario.status === "ACTIVE" ? "Activo" : scenario.status}
             </span>
           </div>
           
           <h1 className="text-3xl font-bold mb-4">{scenario.title}</h1>
-          <p className="text-gray-400 text-lg mb-4">{scenario.description}</p>
+          <p className="text-muted-foreground text-lg mb-4">{scenario.description}</p>
 
           {/* Creator & Owner Tags */}
           <div className="flex flex-wrap gap-3">
@@ -555,25 +555,25 @@ export default function EscenarioPage() {
 
         {/* Stats cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <Flame className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{scenario.total_pool.toLocaleString()}</p>
-            <p className="text-sm text-gray-400">AP en juego</p>
+            <p className="text-sm text-muted-foreground">AP en juego</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <Users className="w-6 h-6 text-purple-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{scenario.participant_count}</p>
-            <p className="text-sm text-gray-400">Participantes</p>
+            <p className="text-sm text-muted-foreground">Participantes</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <Clock className="w-6 h-6 text-blue-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{daysLeft > 0 ? daysLeft : 0}</p>
-            <p className="text-sm text-gray-400">Días restantes</p>
+            <p className="text-sm text-muted-foreground">Días restantes</p>
           </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-4 text-center">
             <TrendingUp className="w-6 h-6 text-green-500 mx-auto mb-2" />
             <p className="text-2xl font-bold">{yesPercent}%</p>
-            <p className="text-sm text-gray-400">Dicen SÍ</p>
+            <p className="text-sm text-muted-foreground">Dicen SÍ</p>
           </div>
         </div>
 
@@ -584,7 +584,7 @@ export default function EscenarioPage() {
             <div className="flex items-center gap-4">
               <Crown className="w-8 h-8 text-yellow-400" />
               <div>
-                <p className="text-sm text-gray-400">Holder Actual</p>
+                <p className="text-sm text-muted-foreground">Holder Actual</p>
                 <p className="text-xl font-bold text-yellow-400">
                   @{scenario.holder_username || scenario.creator_username || 'creador'}
                   {isOwner && <span className="ml-2 text-xs bg-yellow-500 text-black px-2 py-0.5 rounded">Tú</span>}
@@ -596,15 +596,15 @@ export default function EscenarioPage() {
             <div className="flex gap-6 text-center">
               <div>
                 <p className="text-2xl font-bold text-green-400">{theftPool} AP</p>
-                <p className="text-xs text-gray-400">Pool acumulado</p>
+                <p className="text-xs text-muted-foreground">Pool acumulado</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-purple-400">{currentPrice} AP</p>
-                <p className="text-xs text-gray-400">Precio para robar</p>
+                <p className="text-xs text-muted-foreground">Precio para robar</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-orange-400">{stealCount}</p>
-                <p className="text-xs text-gray-400">Veces robado</p>
+                <p className="text-xs text-muted-foreground">Veces robado</p>
               </div>
             </div>
           </div>
@@ -624,9 +624,9 @@ export default function EscenarioPage() {
           {/* Steal & Shield Buttons */}
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             {isExpired ? (
-              <div className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-gray-700/50 border border-gray-600 rounded-xl">
-                <Clock className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-400 font-semibold">Escenario vencido - No se puede robar ni proteger</span>
+              <div className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-muted/50 border border-border rounded-xl">
+                <Clock className="w-5 h-5 text-muted-foreground" />
+                <span className="text-muted-foreground font-semibold">Escenario vencido - No se puede robar ni proteger</span>
               </div>
             ) : (
               <>
@@ -638,7 +638,7 @@ export default function EscenarioPage() {
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 ${
                       balanceLoadError || (!currentUser && balanceLoadAttempted)
                         ? 'bg-yellow-600 hover:bg-yellow-700'
-                        : 'bg-red-600 hover:bg-red-700 disabled:bg-gray-700'
+                        : 'bg-red-600 hover:bg-red-700 disabled:bg-muted'
                     } disabled:cursor-not-allowed rounded-xl font-bold text-lg transition-colors`}
                   >
                     {isStealing ? (
@@ -693,7 +693,7 @@ export default function EscenarioPage() {
           </div>
 
           {!isLoggedIn && scenario.status === "ACTIVE" && (
-            <p className="text-center text-gray-500 text-sm mt-4">
+            <p className="text-center text-muted-foreground text-sm mt-4">
               <button
                 type="button"
                 onClick={() => router.push('/login')}
@@ -707,7 +707,7 @@ export default function EscenarioPage() {
         </div>
 
         {/* Voting section */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
+        <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-bold mb-6">¿Qué opinas?</h2>
           
           {userPrediction ? (
@@ -724,18 +724,18 @@ export default function EscenarioPage() {
                 )}
                 Opinaste: {userPrediction.prediction === "YES" ? "Me gusta" : "No me gusta"}
               </div>
-              <p className="text-gray-400 mt-3">
+              <p className="text-muted-foreground mt-3">
                 Tu opinión ha sido registrada
               </p>
             </div>
           ) : isExpired ? (
             <div className="text-center py-8">
-              <Clock className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-              <p className="text-gray-400">Este escenario ha vencido y ya no acepta opiniones</p>
+              <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Este escenario ha vencido y ya no acepta opiniones</p>
             </div>
           ) : scenario.status !== "ACTIVE" ? (
             <div className="text-center py-8">
-              <p className="text-gray-400">Este escenario ya no está activo</p>
+              <p className="text-muted-foreground">Este escenario ya no está activo</p>
             </div>
           ) : (
             <>
@@ -747,14 +747,14 @@ export default function EscenarioPage() {
                   className={`p-6 rounded-xl border-2 transition-all ${
                     selectedVote === "YES"
                       ? "border-green-500 bg-green-500/20"
-                      : "border-gray-700 hover:border-green-500/50"
+                      : "border-border hover:border-green-500/50"
                   }`}
                 >
                   <ThumbsUp className={`w-8 h-8 mx-auto mb-2 ${
-                    selectedVote === "YES" ? "text-green-500" : "text-gray-500"
+                    selectedVote === "YES" ? "text-green-500" : "text-muted-foreground"
                   }`} />
                   <p className="text-xl font-bold">Me gusta</p>
-                  <p className="text-sm text-gray-400">{yesPercent}% opina igual</p>
+                  <p className="text-sm text-muted-foreground">{yesPercent}% opina igual</p>
                 </button>
 
                 <button
@@ -763,14 +763,14 @@ export default function EscenarioPage() {
                   className={`p-6 rounded-xl border-2 transition-all ${
                     selectedVote === "NO"
                       ? "border-red-500 bg-red-500/20"
-                      : "border-gray-700 hover:border-red-500/50"
+                      : "border-border hover:border-red-500/50"
                   }`}
                 >
                   <ThumbsDown className={`w-8 h-8 mx-auto mb-2 ${
-                    selectedVote === "NO" ? "text-red-500" : "text-gray-500"
+                    selectedVote === "NO" ? "text-red-500" : "text-muted-foreground"
                   }`} />
                   <p className="text-xl font-bold">No me gusta</p>
-                  <p className="text-sm text-gray-400">{noPercent}% opina igual</p>
+                  <p className="text-sm text-muted-foreground">{noPercent}% opina igual</p>
                 </button>
               </div>
 
@@ -795,13 +795,13 @@ export default function EscenarioPage() {
         </div>
 
         {/* Progress bar */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-8">
+        <div className="bg-card border border-border rounded-2xl p-6 mb-8">
           <h2 className="text-xl font-bold mb-4">Distribución de opiniones</h2>
           <div className="flex justify-between text-sm mb-2">
             <span className="text-green-400 font-medium">Me gusta: {scenario.yes_pool} ({yesPercent}%)</span>
             <span className="text-red-400 font-medium">No me gusta: {scenario.no_pool} ({noPercent}%)</span>
           </div>
-          <div className="h-4 bg-gray-800 rounded-full overflow-hidden flex">
+          <div className="h-4 bg-muted rounded-full overflow-hidden flex">
             <div 
               className="bg-gradient-to-r from-green-500 to-green-400 transition-all"
               style={{ width: `${yesPercent}%` }}
@@ -818,7 +818,7 @@ export default function EscenarioPage() {
           <button
             type="button"
             onClick={handleShare}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted rounded-lg transition-colors"
           >
             <Share2 className="w-4 h-4" />
             Compartir
@@ -826,7 +826,7 @@ export default function EscenarioPage() {
           <button
             type="button"
             onClick={() => setShowReportModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors text-gray-400"
+            className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors text-muted-foreground"
           >
             <Flag className="w-4 h-4" />
             Reportar
@@ -837,7 +837,7 @@ export default function EscenarioPage() {
       {/* Modal de Reporte */}
       {showReportModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6">
+          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Flag className="w-5 h-5 text-red-400" />
@@ -846,7 +846,7 @@ export default function EscenarioPage() {
               <button
                 type="button"
                 onClick={() => setShowReportModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -854,7 +854,7 @@ export default function EscenarioPage() {
             
             <div className="space-y-4">
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-muted-foreground mb-2 block">
                   ¿Por qué quieres reportar este escenario?
                 </label>
                 <div className="space-y-2">
@@ -866,7 +866,7 @@ export default function EscenarioPage() {
                       className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
                         reportReason === reason.id
                           ? 'bg-purple-500/20 border-purple-500 text-purple-400'
-                          : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                          : 'bg-muted border-border hover:border-border'
                       }`}
                     >
                       {reason.label}
@@ -876,7 +876,7 @@ export default function EscenarioPage() {
               </div>
               
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">
+                <label className="text-sm text-muted-foreground mb-2 block">
                   Detalles adicionales (opcional)
                 </label>
                 <textarea
@@ -884,10 +884,10 @@ export default function EscenarioPage() {
                   onChange={(e) => setReportDescription(e.target.value)}
                   placeholder="Proporciona más información sobre el problema..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                   maxLength={500}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {reportDescription.length}/500 caracteres
                 </p>
               </div>
@@ -900,7 +900,7 @@ export default function EscenarioPage() {
                     setReportReason('');
                     setReportDescription('');
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+                  className="flex-1 px-4 py-2 bg-muted hover:bg-muted rounded-lg transition-colors"
                 >
                   Cancelar
                 </button>
@@ -928,7 +928,7 @@ export default function EscenarioPage() {
       {/* Modal de Escudos */}
       {showShieldModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl max-w-md w-full p-6">
+          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Shield className="w-5 h-5 text-blue-400" />
@@ -937,13 +937,13 @@ export default function EscenarioPage() {
               <button
                 type="button"
                 onClick={() => setShowShieldModal(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-muted-foreground text-sm mb-4">
               Activa un escudo para proteger tu escenario de robos temporalmente
             </p>
 
@@ -951,7 +951,7 @@ export default function EscenarioPage() {
               {getShieldTypes().map((shield) => (
                 <div
                   key={shield.id}
-                  className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-blue-500/50 transition-colors"
+                  className="bg-muted/50 border border-border rounded-lg p-4 hover:border-blue-500/50 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
@@ -959,7 +959,7 @@ export default function EscenarioPage() {
                         <span className="text-xl">{shield.icon}</span>
                         <span className="font-bold text-white">{shield.name}</span>
                       </div>
-                      <p className="text-sm text-gray-400 mb-2">
+                      <p className="text-sm text-muted-foreground mb-2">
                         {shield.description}
                       </p>
                       <div className="flex items-center gap-2 text-sm">
@@ -977,7 +977,7 @@ export default function EscenarioPage() {
                         !user ||
                         (currentUser?.apCoins || 0) < shield.price
                       }
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-muted disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
                     >
                       {applyingShield === shield.id ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -996,8 +996,8 @@ export default function EscenarioPage() {
             </div>
 
             {isLoggedIn && (
-              <div className="mt-4 pt-4 border-t border-gray-700 text-center">
-                <span className="text-sm text-gray-400">Tu balance: </span>
+              <div className="mt-4 pt-4 border-t border-border text-center">
+                <span className="text-sm text-muted-foreground">Tu balance: </span>
                 <span className="font-bold text-yellow-400">{currentUser?.apCoins || 0} AP</span>
               </div>
             )}

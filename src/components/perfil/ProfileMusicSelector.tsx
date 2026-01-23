@@ -75,13 +75,13 @@ export function ProfileMusicSelector({
         <Button
           variant="outline"
           size="sm"
-          className="border-gray-700 text-gray-400 hover:text-white"
+          className="border-border text-muted-foreground hover:text-foreground"
         >
           <Music className="w-4 h-4 mr-2" />
           {currentMusic ? 'Cambiar música' : 'Agregar música'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-md">
+      <DialogContent className="bg-card border-border max-w-md">
         <DialogHeader>
           <DialogTitle>Música del perfil</DialogTitle>
         </DialogHeader>
@@ -89,14 +89,14 @@ export function ProfileMusicSelector({
         <div className="space-y-4 mt-4">
           {/* Current Music */}
           {currentMusic && (
-            <div className="flex items-center justify-between bg-gray-800 rounded-lg p-3 border border-gray-700">
+            <div className="flex items-center justify-between bg-muted rounded-lg p-3 border border-border">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-purple-600/20 rounded-lg flex items-center justify-center">
                   <Music className="w-5 h-5 text-purple-400" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">{currentMusic.title}</p>
-                  <p className="text-xs text-gray-400">{currentMusic.artist}</p>
+                  <p className="text-xs text-muted-foreground">{currentMusic.artist}</p>
                 </div>
               </div>
               <Button
@@ -112,38 +112,38 @@ export function ProfileMusicSelector({
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar canciones..."
-              className="pl-10 bg-gray-800 border-gray-700"
+              className="pl-10 bg-muted border-border"
             />
           </div>
 
           {/* Popular Tracks */}
           <div className="space-y-2 max-h-48 overflow-y-auto">
-            <label className="text-sm text-gray-400 block">Canciones populares</label>
+            <label className="text-sm text-muted-foreground block">Canciones populares</label>
             {filteredTracks.map((track, index) => (
               <button
                 key={index}
                 onClick={() => handleSelectTrack(track)}
-                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-gray-800 transition-colors text-left"
+                className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors text-left"
               >
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded flex items-center justify-center">
                   <Music className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-sm font-medium">{track.title}</p>
-                  <p className="text-xs text-gray-400">{track.artist}</p>
+                  <p className="text-xs text-muted-foreground">{track.artist}</p>
                 </div>
               </button>
             ))}
           </div>
 
           {/* Upload Custom */}
-          <div className="border-t border-gray-800 pt-4">
-            <label className="text-sm text-gray-400 mb-2 block">
+          <div className="border-t border-border pt-4">
+            <label className="text-sm text-muted-foreground mb-2 block">
               Subir tu propia música
             </label>
             <div className="space-y-2">
@@ -152,13 +152,13 @@ export function ProfileMusicSelector({
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="Título"
-                  className="bg-gray-800 border-gray-700"
+                  className="bg-muted border-border"
                 />
                 <Input
                   value={customArtist}
                   onChange={(e) => setCustomArtist(e.target.value)}
                   placeholder="Artista"
-                  className="bg-gray-800 border-gray-700"
+                  className="bg-muted border-border"
                 />
               </div>
               <input
@@ -171,7 +171,7 @@ export function ProfileMusicSelector({
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 variant="outline"
-                className="w-full border-gray-700"
+                className="w-full border-border"
               >
                 <Upload className="w-4 h-4 mr-2" />
                 Seleccionar archivo de audio

@@ -65,11 +65,11 @@ export function StreamChat({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div className="flex flex-col h-full bg-card rounded-xl border border-border overflow-hidden">
       {/* Header */}
-      <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+      <div className="p-3 border-b border-border flex items-center justify-between">
         <h3 className="font-semibold">Chat en vivo</h3>
-        <div className="flex items-center gap-1 text-sm text-gray-400">
+        <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <Users className="w-4 h-4" />
           {viewersCount.toLocaleString()}
         </div>
@@ -122,9 +122,9 @@ export function StreamChat({
                     {msg.highlightAmount} AP
                   </span>
                 )}
-                <span className="text-xs text-gray-500">{formatTime(msg.createdAt)}</span>
+                <span className="text-xs text-muted-foreground">{formatTime(msg.createdAt)}</span>
               </div>
-              <p className="text-sm text-gray-300 break-words">{msg.content}</p>
+              <p className="text-sm text-foreground break-words">{msg.content}</p>
             </div>
           </div>
         ))}
@@ -133,7 +133,7 @@ export function StreamChat({
 
       {/* Input */}
       {isLive && currentUserId ? (
-        <div className="p-3 border-t border-gray-800">
+        <div className="p-3 border-t border-border">
           {showHighlight && (
             <div className="flex items-center justify-between bg-yellow-500/20 p-2 rounded-lg mb-2">
               <div className="flex items-center gap-2 text-sm text-yellow-400">
@@ -142,7 +142,7 @@ export function StreamChat({
               </div>
               <button
                 onClick={() => setShowHighlight(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -153,7 +153,7 @@ export function StreamChat({
               variant="outline"
               size="icon"
               onClick={() => setShowHighlight(!showHighlight)}
-              className={`border-gray-700 ${
+              className={`border-border ${
                 showHighlight ? 'bg-yellow-500/20 border-yellow-500' : ''
               }`}
             >
@@ -164,7 +164,7 @@ export function StreamChat({
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Envía un mensaje..."
-              className="flex-1 bg-gray-800 border-gray-700"
+              className="flex-1 bg-muted border-border"
               maxLength={200}
             />
             <Button
@@ -177,7 +177,7 @@ export function StreamChat({
           </div>
         </div>
       ) : (
-        <div className="p-3 border-t border-gray-800 text-center text-sm text-gray-400">
+        <div className="p-3 border-t border-border text-center text-sm text-muted-foreground">
           {!isLive ? 'El stream ha terminado' : 'Inicia sesión para chatear'}
         </div>
       )}

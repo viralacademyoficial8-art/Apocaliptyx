@@ -23,7 +23,7 @@ export default function ContactoPage() {
             <Mail className="w-8 h-8 text-blue-400" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Contacto</h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             ¿Tienes alguna pregunta, sugerencia o necesitas ayuda? Estamos aquí para ti.
           </p>
         </div>
@@ -31,17 +31,17 @@ export default function ContactoPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Información de contacto */}
           <div className="space-y-6">
-            <div className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+            <div className="p-6 bg-card/50 border border-border rounded-xl">
               <div className="flex items-center gap-4 mb-4">
                 <div className="p-3 bg-purple-500/20 rounded-lg">
                   <MessageCircle className="w-6 h-6 text-purple-400" />
                 </div>
                 <div>
                   <h3 className="font-bold text-white">Chat en Vivo</h3>
-                  <p className="text-sm text-gray-400">Respuesta inmediata</p>
+                  <p className="text-sm text-muted-foreground">Respuesta inmediata</p>
                 </div>
               </div>
-              <p className="text-gray-400 mb-4">
+              <p className="text-muted-foreground mb-4">
                 La forma más rápida de obtener ayuda. Nuestro equipo responde en minutos.
               </p>
               <Link
@@ -53,17 +53,17 @@ export default function ContactoPage() {
               </Link>
             </div>
 
-            <div className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+            <div className="p-6 bg-card/50 border border-border rounded-xl">
               <div className="flex items-center gap-4 mb-4">
                 <div className="p-3 bg-blue-500/20 rounded-lg">
                   <Mail className="w-6 h-6 text-blue-400" />
                 </div>
                 <div>
                   <h3 className="font-bold text-white">Email</h3>
-                  <p className="text-sm text-gray-400">Respuesta en 24-48h</p>
+                  <p className="text-sm text-muted-foreground">Respuesta en 24-48h</p>
                 </div>
               </div>
-              <p className="text-gray-400 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Para consultas detalladas o temas que requieran documentación.
               </p>
               <a
@@ -74,34 +74,34 @@ export default function ContactoPage() {
               </a>
             </div>
 
-            <div className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+            <div className="p-6 bg-card/50 border border-border rounded-xl">
               <div className="flex items-center gap-4 mb-4">
                 <div className="p-3 bg-green-500/20 rounded-lg">
                   <Clock className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
                   <h3 className="font-bold text-white">Horario de Atención</h3>
-                  <p className="text-sm text-gray-400">Zona horaria CST</p>
+                  <p className="text-sm text-muted-foreground">Zona horaria CST</p>
                 </div>
               </div>
-              <div className="space-y-2 text-gray-400">
+              <div className="space-y-2 text-muted-foreground">
                 <p><span className="text-white">Lunes - Viernes:</span> 9:00 AM - 6:00 PM</p>
                 <p><span className="text-white">Sábado:</span> 10:00 AM - 2:00 PM</p>
                 <p><span className="text-white">Domingo:</span> Cerrado</p>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+            <div className="p-6 bg-card/50 border border-border rounded-xl">
               <div className="flex items-center gap-4 mb-4">
                 <div className="p-3 bg-yellow-500/20 rounded-lg">
                   <MapPin className="w-6 h-6 text-yellow-400" />
                 </div>
                 <div>
                   <h3 className="font-bold text-white">Ubicación</h3>
-                  <p className="text-sm text-gray-400">Oficinas centrales</p>
+                  <p className="text-sm text-muted-foreground">Oficinas centrales</p>
                 </div>
               </div>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 Ciudad de México, México<br />
                 Operamos de forma remota a nivel global
               </p>
@@ -109,38 +109,38 @@ export default function ContactoPage() {
           </div>
 
           {/* Formulario de contacto */}
-          <div className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+          <div className="p-6 bg-card/50 border border-border rounded-xl">
             <h2 className="text-xl font-bold mb-6">Envíanos un mensaje</h2>
             
             <form className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
                     Nombre
                   </label>
                   <input
                     type="text"
                     placeholder="Tu nombre"
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     placeholder="tu@email.com"
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Asunto
                 </label>
-                <select className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <select className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
                   <option value="">Selecciona un tema</option>
                   <option value="general">Consulta general</option>
                   <option value="soporte">Soporte técnico</option>
@@ -153,13 +153,13 @@ export default function ContactoPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Mensaje
                 </label>
                 <textarea
                   rows={5}
                   placeholder="Escribe tu mensaje aquí..."
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 />
               </div>
 
@@ -172,7 +172,7 @@ export default function ContactoPage() {
               </button>
             </form>
 
-            <p className="text-sm text-gray-500 mt-4 text-center">
+            <p className="text-sm text-muted-foreground mt-4 text-center">
               Al enviar este formulario, aceptas nuestra{" "}
               <Link href="/politica-de-privacidad" className="text-purple-400 hover:text-purple-300">
                 Política de Privacidad
@@ -185,24 +185,24 @@ export default function ContactoPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Link
             href="/ayuda"
-            className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-gray-700 transition-colors text-center"
+            className="p-4 bg-card/50 border border-border rounded-xl hover:border-border transition-colors text-center"
           >
             <h3 className="font-bold text-white mb-1">Centro de Ayuda</h3>
-            <p className="text-sm text-gray-400">Artículos y guías</p>
+            <p className="text-sm text-muted-foreground">Artículos y guías</p>
           </Link>
           <Link
             href="/faq"
-            className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-gray-700 transition-colors text-center"
+            className="p-4 bg-card/50 border border-border rounded-xl hover:border-border transition-colors text-center"
           >
             <h3 className="font-bold text-white mb-1">FAQ</h3>
-            <p className="text-sm text-gray-400">Preguntas frecuentes</p>
+            <p className="text-sm text-muted-foreground">Preguntas frecuentes</p>
           </Link>
           <Link
             href="/soporte"
-            className="p-4 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-gray-700 transition-colors text-center"
+            className="p-4 bg-card/50 border border-border rounded-xl hover:border-border transition-colors text-center"
           >
             <h3 className="font-bold text-white mb-1">Soporte Técnico</h3>
-            <p className="text-sm text-gray-400">Chat en tiempo real</p>
+            <p className="text-sm text-muted-foreground">Chat en tiempo real</p>
           </Link>
         </div>
       </main>

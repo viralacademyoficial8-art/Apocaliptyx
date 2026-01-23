@@ -10,7 +10,7 @@ interface AchievementCardProps {
 }
 
 const rarityColors: Record<string, { bg: string; border: string; text: string }> = {
-  COMMON: { bg: 'bg-gray-800', border: 'border-gray-700', text: 'text-gray-400' },
+  COMMON: { bg: 'bg-muted', border: 'border-border', text: 'text-muted-foreground' },
   RARE: { bg: 'bg-blue-900/30', border: 'border-blue-500/30', text: 'text-blue-400' },
   EPIC: { bg: 'bg-purple-900/30', border: 'border-purple-500/30', text: 'text-purple-400' },
   LEGENDARY: { bg: 'bg-yellow-900/30', border: 'border-yellow-500/30', text: 'text-yellow-400' },
@@ -29,7 +29,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
       {/* Lock overlay for locked achievements */}
       {!achievement.isUnlocked && (
         <div className="absolute top-3 right-3">
-          <Lock className="w-4 h-4 text-gray-500" />
+          <Lock className="w-4 h-4 text-muted-foreground" />
         </div>
       )}
 
@@ -47,17 +47,17 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
 
       {/* Name & Description */}
       <h3 className="text-white font-bold mb-1">{achievement.name}</h3>
-      <p className="text-gray-400 text-sm mb-3">{achievement.description}</p>
+      <p className="text-muted-foreground text-sm mb-3">{achievement.description}</p>
 
       {/* Progress */}
       <div className="mb-3">
         <div className="flex items-center justify-between text-sm mb-1">
-          <span className="text-gray-400">Progreso</span>
+          <span className="text-muted-foreground">Progreso</span>
           <span className={achievement.isUnlocked ? 'text-green-400' : 'text-white'}>
             {achievement.progress} / {achievement.maxProgress}
           </span>
         </div>
-        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-all ${
               achievement.isUnlocked

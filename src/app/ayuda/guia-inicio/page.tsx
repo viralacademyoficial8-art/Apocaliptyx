@@ -19,7 +19,7 @@ export default function GuiaInicioPage() {
       
       <main className="container mx-auto px-4 py-12 max-w-3xl">
         {/* Breadcrumb */}
-        <Link href="/ayuda" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
+        <Link href="/ayuda" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Volver al Centro de Ayuda
         </Link>
@@ -30,13 +30,13 @@ export default function GuiaInicioPage() {
             <Rocket className="w-6 h-6 text-green-400" />
           </div>
           <h1 className="text-3xl font-bold mb-2">Guía de inicio rápido</h1>
-          <p className="text-gray-400">Aprende a usar Apocaliptyx en 5 minutos</p>
+          <p className="text-muted-foreground">Aprende a usar Apocaliptyx en 5 minutos</p>
         </div>
 
         {/* Content */}
         <div className="prose prose-invert max-w-none">
           <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 mb-8">
-            <p className="text-gray-300 leading-relaxed text-lg">
+            <p className="text-foreground leading-relaxed text-lg">
               ¡Bienvenido a Apocaliptyx! Esta guía te llevará paso a paso desde crear tu cuenta hasta hacer tu primera predicción.
             </p>
           </div>
@@ -52,8 +52,8 @@ export default function GuiaInicioPage() {
                 <h2 className="text-xl font-bold text-white">Crea tu cuenta</h2>
               </div>
             </div>
-            <div className="ml-16 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-              <ol className="space-y-2 text-gray-300">
+            <div className="ml-16 bg-card/50 border border-border rounded-lg p-4">
+              <ol className="space-y-2 text-foreground">
                 <li>1. Ve a <Link href="/registro" className="text-purple-400 hover:text-purple-300">/registro</Link></li>
                 <li>2. Elige registrarte con email, Google o Discord</li>
                 <li>3. Completa tu información</li>
@@ -73,8 +73,8 @@ export default function GuiaInicioPage() {
                 <h2 className="text-xl font-bold text-white">Explora los escenarios</h2>
               </div>
             </div>
-            <div className="ml-16 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-              <ol className="space-y-2 text-gray-300">
+            <div className="ml-16 bg-card/50 border border-border rounded-lg p-4">
+              <ol className="space-y-2 text-foreground">
                 <li>1. Ve al <Link href="/dashboard" className="text-purple-400 hover:text-purple-300">Dashboard</Link></li>
                 <li>2. Navega por las categorías: Deportes, Economía, Entretenimiento, etc.</li>
                 <li>3. Usa los filtros para encontrar escenarios que te interesen</li>
@@ -94,8 +94,8 @@ export default function GuiaInicioPage() {
                 <h2 className="text-xl font-bold text-white">Haz tu primera predicción</h2>
               </div>
             </div>
-            <div className="ml-16 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-              <ol className="space-y-2 text-gray-300">
+            <div className="ml-16 bg-card/50 border border-border rounded-lg p-4">
+              <ol className="space-y-2 text-foreground">
                 <li>1. Selecciona un escenario que te interese</li>
                 <li>2. Elige la opción que crees que ocurrirá</li>
                 <li>3. Decide cuántos AP Coins quieres apostar</li>
@@ -121,8 +121,8 @@ export default function GuiaInicioPage() {
                 <h2 className="text-xl font-bold text-white">Gana y sube en el ranking</h2>
               </div>
             </div>
-            <div className="ml-16 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-              <ul className="space-y-2 text-gray-300">
+            <div className="ml-16 bg-card/50 border border-border rounded-lg p-4">
+              <ul className="space-y-2 text-foreground">
                 <li>🏆 Cuando aciertas, ganas AP Coins proporcionales al pool</li>
                 <li>📈 Cada predicción correcta suma puntos a tu perfil</li>
                 <li>⭐ Sube de nivel y desbloquea insignias</li>
@@ -142,8 +142,8 @@ export default function GuiaInicioPage() {
                 <h2 className="text-xl font-bold text-white">Personaliza tu experiencia</h2>
               </div>
             </div>
-            <div className="ml-16 bg-gray-900/50 border border-gray-800 rounded-lg p-4">
-              <ul className="space-y-2 text-gray-300">
+            <div className="ml-16 bg-card/50 border border-border rounded-lg p-4">
+              <ul className="space-y-2 text-foreground">
                 <li>👤 Personaliza tu perfil con avatar y biografía</li>
                 <li>🔔 Configura tus notificaciones</li>
                 <li>👥 Sigue a otros profetas</li>
@@ -154,26 +154,26 @@ export default function GuiaInicioPage() {
           </div>
 
           {/* Quick Tips */}
-          <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 mt-8">
+          <div className="bg-card/50 border border-border rounded-xl p-6 mt-8">
             <h3 className="font-bold text-white mb-4">🎯 Consejos para empezar</h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-foreground">
                 <span className="text-green-400">✓</span>
                 <span>No apuestes todo en un solo escenario - diversifica</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-foreground">
                 <span className="text-green-400">✓</span>
                 <span>Inicia sesión diariamente para recibir bonos</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-foreground">
                 <span className="text-green-400">✓</span>
                 <span>Lee las reglas de cada escenario antes de participar</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-foreground">
                 <span className="text-green-400">✓</span>
                 <span>Sigue a los mejores profetas para aprender de ellos</span>
               </li>
-              <li className="flex items-start gap-2 text-gray-300">
+              <li className="flex items-start gap-2 text-foreground">
                 <span className="text-green-400">✓</span>
                 <span>Participa en el foro para obtener insights</span>
               </li>
@@ -182,7 +182,7 @@ export default function GuiaInicioPage() {
 
           <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-6 mt-8 text-center">
             <h3 className="font-bold text-green-400 mb-2">🚀 ¡Estás listo!</h3>
-            <p className="text-gray-300 mb-4">
+            <p className="text-foreground mb-4">
               Ya tienes todo lo necesario para comenzar. ¡Demuestra que puedes ver el futuro!
             </p>
             <Link
@@ -195,16 +195,16 @@ export default function GuiaInicioPage() {
         </div>
 
         {/* Related Articles */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
+        <div className="mt-12 pt-8 border-t border-border">
           <h3 className="font-bold text-white mb-4">Artículos relacionados</h3>
           <div className="grid gap-2">
-            <Link href="/ayuda/ap-coins" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/ap-coins" className="text-muted-foreground hover:text-foreground transition-colors">
               → ¿Qué son los AP Coins?
             </Link>
-            <Link href="/ayuda/crear-escenario" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/crear-escenario" className="text-muted-foreground hover:text-foreground transition-colors">
               → ¿Cómo crear un escenario?
             </Link>
-            <Link href="/ayuda/leaderboard" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/ayuda/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
               → ¿Cómo funciona el leaderboard?
             </Link>
           </div>

@@ -12,8 +12,8 @@ export default function OfflinePage() {
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
       <div className="text-center max-w-md">
         {/* Icon */}
-        <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-          <WifiOff className="w-12 h-12 text-gray-500" />
+        <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+          <WifiOff className="w-12 h-12 text-muted-foreground" />
         </div>
 
         {/* Title */}
@@ -22,7 +22,7 @@ export default function OfflinePage() {
         </h1>
 
         {/* Description */}
-        <p className="text-gray-400 mb-8">
+        <p className="text-muted-foreground mb-8">
           Parece que no tienes conexión a internet. Verifica tu conexión e intenta de nuevo.
         </p>
 
@@ -36,9 +36,9 @@ export default function OfflinePage() {
         </button>
 
         {/* Tips */}
-        <div className="mt-12 text-left bg-gray-900 rounded-xl p-6 border border-gray-800">
+        <div className="mt-12 text-left bg-card rounded-xl p-6 border border-border">
           <h2 className="text-white font-medium mb-3">Mientras tanto puedes:</h2>
-          <ul className="space-y-2 text-gray-400 text-sm">
+          <ul className="space-y-2 text-muted-foreground text-sm">
             <li>• Verificar tu conexión WiFi o datos móviles</li>
             <li>• Activar y desactivar el modo avión</li>
             <li>• Acercarte a tu router</li>

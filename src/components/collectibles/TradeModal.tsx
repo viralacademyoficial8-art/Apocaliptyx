@@ -92,7 +92,7 @@ export function TradeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-900 border-gray-800 max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowLeftRight className="w-5 h-5 text-purple-400" />
@@ -103,8 +103,8 @@ export function TradeModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {/* My Side */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg">
-              <User className="w-5 h-5 text-gray-400" />
+            <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+              <User className="w-5 h-5 text-muted-foreground" />
               <span className="font-medium">Tú ofreces</span>
             </div>
 
@@ -117,7 +117,7 @@ export function TradeModal({
                   className={`relative p-2 rounded-lg border-2 transition-colors ${
                     selectedMyItems.includes(item.id)
                       ? 'border-purple-500 bg-purple-500/10'
-                      : 'border-gray-700 hover:border-gray-600'
+                      : 'border-border hover:border-border'
                   }`}
                 >
                   <img
@@ -143,7 +143,7 @@ export function TradeModal({
                 min={0}
                 value={myApCoins}
                 onChange={(e) => setMyApCoins(parseInt(e.target.value) || 0)}
-                className="bg-gray-800 border-gray-700"
+                className="bg-muted border-border"
                 placeholder="AP Coins a ofrecer"
               />
             </div>
@@ -151,7 +151,7 @@ export function TradeModal({
 
           {/* Their Side */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
               <Avatar className="w-6 h-6">
                 <AvatarImage src={targetUser.avatarUrl} />
                 <AvatarFallback>{targetUser.username[0]}</AvatarFallback>
@@ -168,7 +168,7 @@ export function TradeModal({
                   className={`relative p-2 rounded-lg border-2 transition-colors ${
                     selectedTheirItems.includes(item.id)
                       ? 'border-green-500 bg-green-500/10'
-                      : 'border-gray-700 hover:border-gray-600'
+                      : 'border-border hover:border-border'
                   }`}
                 >
                   <img
@@ -194,7 +194,7 @@ export function TradeModal({
                 min={0}
                 value={theirApCoins}
                 onChange={(e) => setTheirApCoins(parseInt(e.target.value) || 0)}
-                className="bg-gray-800 border-gray-700"
+                className="bg-muted border-border"
                 placeholder="AP Coins a solicitar"
               />
             </div>
@@ -202,15 +202,15 @@ export function TradeModal({
         </div>
 
         {/* Trade Summary */}
-        <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+        <div className="mt-4 p-4 bg-muted/50 rounded-lg border border-border">
           <h4 className="font-medium mb-2">Resumen del intercambio</h4>
           <div className="flex items-center justify-between text-sm">
-            <div className="text-gray-400">
+            <div className="text-muted-foreground">
               <p>Ofreces: {selectedMyItems.length} items</p>
               {myApCoins > 0 && <p>+ {myApCoins.toLocaleString()} AP</p>}
             </div>
             <ArrowLeftRight className="w-5 h-5 text-purple-400" />
-            <div className="text-gray-400 text-right">
+            <div className="text-muted-foreground text-right">
               <p>Recibes: {selectedTheirItems.length} items</p>
               {theirApCoins > 0 && <p>+ {theirApCoins.toLocaleString()} AP</p>}
             </div>
@@ -223,7 +223,7 @@ export function TradeModal({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Mensaje opcional..."
-            className="bg-gray-800 border-gray-700"
+            className="bg-muted border-border"
             rows={2}
           />
         </div>
@@ -233,7 +233,7 @@ export function TradeModal({
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 border-gray-700"
+            className="flex-1 border-border"
           >
             Cancelar
           </Button>

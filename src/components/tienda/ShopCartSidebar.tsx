@@ -17,8 +17,8 @@ export function ShopCartSidebar() {
     <>
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setCartOpen(false)} />
 
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-gray-900 border-l border-gray-800 z-50 flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-card border-l border-border z-50 flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <ShoppingCart className="w-6 h-6 text-purple-400" />
             <h2 className="text-xl font-bold text-white">{t('shop.cart.title')}</h2>
@@ -26,7 +26,7 @@ export function ShopCartSidebar() {
           </div>
           <button
             onClick={() => setCartOpen(false)}
-            className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -36,12 +36,12 @@ export function ShopCartSidebar() {
           {cart.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingCart className="w-16 h-16 text-gray-700 mx-auto mb-4" />
-              <p className="text-gray-400">{t('shop.cart.empty')}</p>
+              <p className="text-muted-foreground">{t('shop.cart.empty')}</p>
             </div>
           ) : (
             cart.map(({ item, quantity }) => (
-              <div key={item.id} className="bg-gray-800 rounded-lg p-4 flex gap-4">
-                <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center text-2xl">
+              <div key={item.id} className="bg-muted rounded-lg p-4 flex gap-4">
+                <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-2xl">
                   {item.type === 'PROTECTION' && '🛡️'}
                   {item.type === 'BOOST' && '⚡'}
                   {item.type === 'POWER' && '✨'}
@@ -57,24 +57,24 @@ export function ShopCartSidebar() {
                   <div className="flex items-center gap-2 mt-2">
                     <button
                       onClick={() => updateCartQuantity(item.id, quantity - 1)}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors"
+                      className="p-1 bg-muted hover:bg-muted rounded transition-colors"
                     >
-                      <Minus className="w-4 h-4 text-gray-400" />
+                      <Minus className="w-4 h-4 text-muted-foreground" />
                     </button>
                     <span className="text-white w-8 text-center">{quantity}</span>
                     <button
                       onClick={() => updateCartQuantity(item.id, quantity + 1)}
                       disabled={item.maxPerUser ? quantity >= item.maxPerUser : false}
-                      className="p-1 bg-gray-700 hover:bg-gray-600 rounded transition-colors disabled:opacity-50"
+                      className="p-1 bg-muted hover:bg-muted rounded transition-colors disabled:opacity-50"
                     >
-                      <Plus className="w-4 h-4 text-gray-400" />
+                      <Plus className="w-4 h-4 text-muted-foreground" />
                     </button>
                   </div>
                 </div>
 
                 <button
                   onClick={() => removeFromCart(item.id)}
-                  className="p-2 text-gray-500 hover:text-red-400 transition-colors self-start"
+                  className="p-2 text-muted-foreground hover:text-red-400 transition-colors self-start"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -84,9 +84,9 @@ export function ShopCartSidebar() {
         </div>
 
         {cart.length > 0 && (
-          <div className="border-t border-gray-800 p-4 space-y-4">
+          <div className="border-t border-border p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-gray-400">Total</span>
+              <span className="text-muted-foreground">Total</span>
               <span className="text-2xl font-bold text-yellow-400">{total.toLocaleString()} AP</span>
             </div>
 
@@ -105,7 +105,7 @@ export function ShopCartSidebar() {
                   </>
                 )}
               </button>
-              <button onClick={clearCart} className="w-full py-2 text-gray-400 hover:text-red-400 transition-colors text-sm">
+              <button onClick={clearCart} className="w-full py-2 text-muted-foreground hover:text-red-400 transition-colors text-sm">
                 {t('shop.clearCart')}
               </button>
             </div>

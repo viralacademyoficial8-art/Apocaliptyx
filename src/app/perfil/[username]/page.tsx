@@ -554,7 +554,7 @@ export default function PublicProfilePage() {
       <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <div className="flex flex-col items-center justify-center py-32">
-          <User className="w-16 h-16 text-gray-600 mb-4" />
+          <User className="w-16 h-16 text-muted-foreground mb-4" />
           <h1 className="text-2xl font-bold mb-2">Usuario no encontrado</h1>
           <p className="text-muted-foreground mb-6">@{username} no existe</p>
           <Link
@@ -620,7 +620,7 @@ export default function PublicProfilePage() {
             {isOwnProfile ? (
               <Link
                 href="/configuracion"
-                className="px-4 py-2 bg-muted hover:bg-gray-700 rounded-lg flex items-center gap-2 transition-colors"
+                className="px-4 py-2 bg-muted hover:bg-muted rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Settings className="w-4 h-4" />
                 Editar perfil
@@ -653,7 +653,7 @@ export default function PublicProfilePage() {
                 <button 
                   onClick={handleStartChat}
                   disabled={chatLoading || isBlocked}
-                  className="p-2 bg-muted hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                  className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
                   title={isBlocked ? 'Usuario bloqueado' : 'Enviar mensaje'}
                 >
                   {chatLoading ? (
@@ -666,7 +666,7 @@ export default function PublicProfilePage() {
                 {/* Menú de opciones */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="p-2 bg-muted hover:bg-gray-700 rounded-lg transition-colors">
+                    <button className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors">
                       <MoreHorizontal className="w-5 h-5" />
                     </button>
                   </DropdownMenuTrigger>
@@ -862,7 +862,7 @@ export default function PublicProfilePage() {
             <p className="text-2xl font-bold">{profile.total_earnings.toLocaleString()}</p>
             <p className="text-sm text-muted-foreground">AP Ganadas</p>
           </div>
-          <div className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 text-center">
+          <div className="bg-card/50 border border-red-500/30 rounded-xl p-4 text-center">
             <Crown className="w-6 h-6 text-red-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-red-400">{scenariosHeldCount}</p>
             <p className="text-sm text-muted-foreground">Holder Actual</p>
@@ -1091,7 +1091,7 @@ export default function PublicProfilePage() {
                       <Link
                         key={scenario.id}
                         href={`/escenario/${scenario.id}`}
-                        className="bg-gray-900/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
+                        className="bg-card/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
@@ -1135,7 +1135,7 @@ export default function PublicProfilePage() {
                   {scenariosHeld.length > HOLDER_INITIAL_SHOW && (
                     <button
                       onClick={() => setHolderExpanded(!holderExpanded)}
-                      className="w-full py-3 mt-4 bg-gray-900/50 border border-border hover:border-red-500/50 rounded-xl text-purple-400 hover:text-red-400 transition-all flex items-center justify-center gap-2"
+                      className="w-full py-3 mt-4 bg-card/50 border border-border hover:border-red-500/50 rounded-xl text-purple-400 hover:text-red-400 transition-all flex items-center justify-center gap-2"
                     >
                       <ChevronDown className={`w-5 h-5 transition-transform ${holderExpanded ? 'rotate-180' : ''}`} />
                       {holderExpanded
@@ -1191,7 +1191,7 @@ export default function PublicProfilePage() {
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="font-medium">{post.author?.display_name || post.author?.username}</span>
                             <span className="text-muted-foreground">@{post.author?.username}</span>
-                            <span className="text-gray-600">·</span>
+                            <span className="text-muted-foreground">·</span>
                             <span className="text-muted-foreground text-sm">
                               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: es })}
                             </span>

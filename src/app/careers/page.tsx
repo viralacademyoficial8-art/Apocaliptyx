@@ -86,28 +86,28 @@ export default function CareersPage() {
               <Briefcase className="w-8 h-8 text-purple-400" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Trabaja con Nosotros</h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Únete a un equipo apasionado que está construyendo el futuro de las predicciones digitales.
             </p>
           </div>
         </section>
 
         {/* Por qué trabajar aquí */}
-        <section className="py-16 bg-gray-900/30">
+        <section className="py-16 bg-card/30">
           <div className="container mx-auto px-4 max-w-6xl">
             <h2 className="text-3xl font-bold mb-8 text-center">¿Por qué Apocaliptyx?</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {benefits.map((benefit) => {
                 const Icon = benefit.icon;
                 return (
-                  <div key={benefit.title} className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl">
+                  <div key={benefit.title} className="p-6 bg-card/50 border border-border rounded-xl">
                     <div className="flex items-center gap-4 mb-3">
                       <div className="p-2 bg-purple-500/20 rounded-lg">
                         <Icon className="w-5 h-5 text-purple-400" />
                       </div>
                       <h3 className="font-bold text-white">{benefit.title}</h3>
                     </div>
-                    <p className="text-gray-400 text-sm">{benefit.description}</p>
+                    <p className="text-muted-foreground text-sm">{benefit.description}</p>
                   </div>
                 );
               })}
@@ -122,7 +122,7 @@ export default function CareersPage() {
               <div className="p-8 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl">
                 <Users className="w-10 h-10 text-purple-400 mb-4" />
                 <h2 className="text-2xl font-bold mb-4">Nuestra Cultura</h2>
-                <p className="text-gray-300">
+                <p className="text-foreground">
                   Somos un equipo pequeño pero poderoso. Valoramos la autonomía, la comunicación 
                   clara y la pasión por crear algo extraordinario. No tenemos burocracia innecesaria 
                   - si tienes una idea, puedes hacerla realidad.
@@ -131,7 +131,7 @@ export default function CareersPage() {
               <div className="p-8 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl">
                 <Zap className="w-10 h-10 text-blue-400 mb-4" />
                 <h2 className="text-2xl font-bold mb-4">Lo que Buscamos</h2>
-                <p className="text-gray-300">
+                <p className="text-foreground">
                   Personas curiosas, autodidactas y con mentalidad de startup. Que les emocione 
                   construir productos que impacten a miles de usuarios. No necesitas título 
                   universitario - lo que importa es lo que puedes hacer.
@@ -142,18 +142,18 @@ export default function CareersPage() {
         </section>
 
         {/* Posiciones abiertas */}
-        <section className="py-16 bg-gray-900/30">
+        <section className="py-16 bg-card/30">
           <div className="container mx-auto px-4 max-w-4xl">
             <h2 className="text-3xl font-bold mb-8 text-center">Posiciones Abiertas</h2>
             
             {openPositions.length > 0 ? (
               <div className="space-y-4">
                 {openPositions.map((position) => (
-                  <div key={position.id} className="p-6 bg-gray-900/50 border border-gray-800 rounded-xl hover:border-purple-500/50 transition-colors">
+                  <div key={position.id} className="p-6 bg-card/50 border border-border rounded-xl hover:border-purple-500/50 transition-colors">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
                         <h3 className="text-xl font-bold text-white mb-2">{position.title}</h3>
-                        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-3">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
                           <span className="flex items-center gap-1">
                             <Briefcase className="w-4 h-4" />
                             {position.department}
@@ -167,7 +167,7 @@ export default function CareersPage() {
                             {position.type}
                           </span>
                         </div>
-                        <p className="text-gray-400">{position.description}</p>
+                        <p className="text-muted-foreground">{position.description}</p>
                       </div>
                       <a
                         href={`mailto:careers@apocaliptyx.com?subject=Aplicación: ${position.title}`}
@@ -180,9 +180,9 @@ export default function CareersPage() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 bg-gray-900/50 border border-gray-800 rounded-xl text-center">
-                <Briefcase className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400 mb-4">
+              <div className="p-8 bg-card/50 border border-border rounded-xl text-center">
+                <Briefcase className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">
                   No tenemos posiciones abiertas en este momento, pero siempre nos interesa conocer talento.
                 </p>
               </div>
@@ -194,13 +194,13 @@ export default function CareersPage() {
         <section className="py-16">
           <div className="container mx-auto px-4 max-w-2xl text-center">
             <h2 className="text-2xl font-bold mb-4">¿No encuentras tu posición ideal?</h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-muted-foreground mb-6">
               Si crees que puedes aportar algo único a Apocaliptyx, nos encantaría saber de ti. 
               Envíanos tu CV y cuéntanos por qué deberíamos trabajar juntos.
             </p>
             <a
               href="mailto:careers@apocaliptyx.com?subject=Aplicación espontánea"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-muted hover:bg-muted rounded-lg font-medium transition-colors"
             >
               Enviar Aplicación Espontánea
             </a>
