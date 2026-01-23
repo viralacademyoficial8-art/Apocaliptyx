@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
         total_pool,
         created_at,
         creator_id,
-        users!scenarios_creator_id_fkey (
+        users:creator_id (
           id,
           username,
           display_name,
@@ -102,18 +102,15 @@ export async function GET(request: NextRequest) {
         description,
         created_at,
         user_id,
-        scenario_id,
-        users!transactions_user_id_fkey (
+        reference_id,
+        reference_type,
+        users (
           id,
           username,
           display_name,
           avatar_url,
           level,
           is_verified
-        ),
-        scenarios!transactions_scenario_id_fkey (
-          id,
-          title
         )
       `)
       .eq('type', 'STEAL')
@@ -121,9 +118,24 @@ export async function GET(request: NextRequest) {
       .limit(20);
 
     if (steals) {
+      // Get scenario IDs from steals
+      const stealScenarioIds = steals
+        .filter(s => s.reference_id && s.reference_type === 'scenario')
+        .map(s => s.reference_id as string);
+
+      // Fetch scenarios in bulk
+      const { data: stealScenarios } = stealScenarioIds.length > 0
+        ? await supabase
+            .from('scenarios')
+            .select('id, title')
+            .in('id', stealScenarioIds)
+        : { data: [] };
+
+      const scenarioMap = new Map((stealScenarios || []).map(s => [s.id, s]));
+
       for (const steal of steals) {
         const user = steal.users as any;
-        const scenario = steal.scenarios as any;
+        const scenario = scenarioMap.get(steal.reference_id as string);
         if (user && scenario) {
           feedItems.push({
             id: `steal_${steal.id}`,
@@ -159,18 +171,15 @@ export async function GET(request: NextRequest) {
         description,
         created_at,
         user_id,
-        scenario_id,
-        users!transactions_user_id_fkey (
+        reference_id,
+        reference_type,
+        users (
           id,
           username,
           display_name,
           avatar_url,
           level,
           is_verified
-        ),
-        scenarios!transactions_scenario_id_fkey (
-          id,
-          title
         )
       `)
       .eq('type', 'PROTECT')
@@ -178,9 +187,24 @@ export async function GET(request: NextRequest) {
       .limit(20);
 
     if (protects) {
+      // Get scenario IDs from protects
+      const protectScenarioIds = protects
+        .filter(p => p.reference_id && p.reference_type === 'scenario')
+        .map(p => p.reference_id as string);
+
+      // Fetch scenarios in bulk
+      const { data: protectScenarios } = protectScenarioIds.length > 0
+        ? await supabase
+            .from('scenarios')
+            .select('id, title')
+            .in('id', protectScenarioIds)
+        : { data: [] };
+
+      const protectScenarioMap = new Map((protectScenarios || []).map(s => [s.id, s]));
+
       for (const protect of protects) {
         const user = protect.users as any;
-        const scenario = protect.scenarios as any;
+        const scenario = protectScenarioMap.get(protect.reference_id as string);
         if (user && scenario) {
           feedItems.push({
             id: `protect_${protect.id}`,
@@ -217,7 +241,7 @@ export async function GET(request: NextRequest) {
         created_at,
         user_id,
         scenario_id,
-        users!predictions_user_id_fkey (
+        users (
           id,
           username,
           display_name,
@@ -225,7 +249,7 @@ export async function GET(request: NextRequest) {
           level,
           is_verified
         ),
-        scenarios!predictions_scenario_id_fkey (
+        scenarios (
           id,
           title
         )
@@ -275,7 +299,7 @@ export async function GET(request: NextRequest) {
         resolved_at,
         total_pool,
         creator_id,
-        users!scenarios_creator_id_fkey (
+        users:creator_id (
           id,
           username,
           display_name,
@@ -328,7 +352,7 @@ export async function GET(request: NextRequest) {
         unlocked_at,
         user_id,
         achievement_id,
-        users!user_achievements_user_id_fkey (
+        users (
           id,
           username,
           display_name,
@@ -381,7 +405,7 @@ export async function GET(request: NextRequest) {
         started_at,
         created_at,
         user_id,
-        users!live_streams_user_id_fkey (
+        users (
           id,
           username,
           display_name,
