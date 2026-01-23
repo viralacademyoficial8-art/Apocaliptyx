@@ -101,6 +101,9 @@ export default function PublicProfilePage() {
   const [bookmarks, setBookmarks] = useState<ForumPost[]>([]);
   const [bookmarksLoading, setBookmarksLoading] = useState(false);
 
+  // Estado para escenarios en posesión (Holder Actual)
+  const [scenariosHeldCount, setScenariosHeldCount] = useState(0);
+
   // Estados para modales de seguidores/siguiendo
   const [showFollowersModal, setShowFollowersModal] = useState(false);
   const [showFollowingModal, setShowFollowingModal] = useState(false);
@@ -369,6 +372,31 @@ export default function PublicProfilePage() {
       setLoading(false);
     }
   }, [username, currentUser?.id, isOwnProfile]);
+
+  // Cargar conteo de escenarios en posesión (Holder Actual)
+  const loadScenariosHeldCount = useCallback(async (userId: string) => {
+    try {
+      // Contar escenarios donde el usuario es el holder actual (creados o robados que aún posee)
+      const { count, error } = await supabase
+        .from('scenarios')
+        .select('*', { count: 'exact', head: true })
+        .eq('current_holder_id', userId)
+        .eq('status', 'ACTIVE');
+
+      if (!error && count !== null) {
+        setScenariosHeldCount(count);
+      }
+    } catch (error) {
+      console.error('Error loading scenarios held count:', error);
+    }
+  }, [supabase]);
+
+  // Efecto para cargar el conteo cuando se carga el perfil
+  useEffect(() => {
+    if (profile?.id) {
+      loadScenariosHeldCount(profile.id);
+    }
+  }, [profile?.id, loadScenariosHeldCount]);
 
   // Cargar datos adicionales según tab
   const loadTabData = useCallback(async () => {
@@ -782,7 +810,7 @@ export default function PublicProfilePage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 sm:px-6 py-6 border-t border-gray-800">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 px-4 sm:px-6 py-6 border-t border-gray-800">
           <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-4 text-center">
             <Target className="w-6 h-6 text-blue-400 mx-auto mb-2" />
             <p className="text-2xl font-bold">{profile.total_predictions}</p>
@@ -802,6 +830,11 @@ export default function PublicProfilePage() {
             <Flame className="w-6 h-6 text-yellow-400 mx-auto mb-2" />
             <p className="text-2xl font-bold">{profile.total_earnings.toLocaleString()}</p>
             <p className="text-sm text-gray-400">AP Ganadas</p>
+          </div>
+          <div className="bg-gray-900/50 border border-orange-500/30 rounded-xl p-4 text-center">
+            <Crown className="w-6 h-6 text-orange-400 mx-auto mb-2" />
+            <p className="text-2xl font-bold">{scenariosHeldCount}</p>
+            <p className="text-sm text-gray-400">Holder Actual</p>
           </div>
         </div>
 
