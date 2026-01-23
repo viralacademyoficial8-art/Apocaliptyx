@@ -211,9 +211,12 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
         type: n.type as any,
         title: n.title,
         message: n.message,
+        linkUrl: n.link_url || undefined,
+        link_url: n.link_url || undefined,
         relatedScenarioId: n.link_url?.includes('escenario') ? n.link_url.split('/').pop() : undefined,
         relatedUserId: undefined,
         read: n.is_read,
+        isRead: n.is_read,
         createdAt: new Date(n.created_at),
       }));
 
