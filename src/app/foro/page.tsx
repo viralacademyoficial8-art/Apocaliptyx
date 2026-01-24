@@ -3249,9 +3249,9 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
         return `Protegí mi escenario con un escudo 🛡️\n\n"${scenarioTitle}"`;
       case 'scenario_vote':
         if (isYesVote) {
-          return `Aposté ${amount.toLocaleString()} AP a que SÍ sucederá 👍\n\n"${scenarioTitle}"`;
+          return `Predije que SÍ sucederá 👍 con ${amount.toLocaleString()} AP\n\n"${scenarioTitle}"`;
         } else {
-          return `Aposté ${amount.toLocaleString()} AP a que NO sucederá 👎\n\n"${scenarioTitle}"`;
+          return `Predije que NO sucederá 👎 con ${amount.toLocaleString()} AP\n\n"${scenarioTitle}"`;
         }
       case 'scenario_resolved':
         const outcome = item.metadata?.outcome;
