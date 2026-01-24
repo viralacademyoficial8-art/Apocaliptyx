@@ -861,6 +861,163 @@ function ForoContent() {
     }
   }, [activeTab, loadFeedItems]);
 
+  // Real-time subscriptions for feed activities
+  useEffect(() => {
+    if (activeTab !== 'feed') return;
+
+    const supabaseClient = supabase;
+
+    // Helper function to fetch user data
+    const fetchUserData = async (userId: string) => {
+      const { data } = await supabaseClient
+        .from('users')
+        .select('id, username, display_name, avatar_url, level, is_verified')
+        .eq('id', userId)
+        .single();
+      return data;
+    };
+
+    // Helper function to fetch scenario data
+    const fetchScenarioData = async (scenarioId: string) => {
+      const { data } = await supabaseClient
+        .from('scenarios')
+        .select('id, title, total_pool')
+        .eq('id', scenarioId)
+        .single();
+      return data;
+    };
+
+    // Subscribe to new scenarios
+    const scenariosChannel = supabaseClient
+      .channel('feed-scenarios')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'scenarios' },
+        async (payload) => {
+          const scenario = payload.new as any;
+          const user = await fetchUserData(scenario.creator_id);
+          if (user) {
+            const newItem: FeedItem = {
+              id: `scenario_created_${scenario.id}_${Date.now()}`,
+              type: 'scenario_created',
+              title: 'Nuevo escenario creado',
+              description: scenario.title,
+              timestamp: scenario.created_at,
+              user: {
+                id: user.id,
+                username: user.username,
+                displayName: user.display_name,
+                avatarUrl: user.avatar_url,
+                level: user.level || 1,
+                isVerified: user.is_verified || false,
+              },
+              metadata: {
+                scenarioId: scenario.id,
+                scenarioTitle: scenario.title,
+                amount: scenario.total_pool,
+              },
+            };
+            setFeedItems((prev) => [newItem, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to new predictions (votes)
+    const predictionsChannel = supabaseClient
+      .channel('feed-predictions')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'predictions' },
+        async (payload) => {
+          const prediction = payload.new as any;
+          const [user, scenario] = await Promise.all([
+            fetchUserData(prediction.user_id),
+            fetchScenarioData(prediction.scenario_id),
+          ]);
+          if (user && scenario) {
+            const isYesVote = prediction.prediction === 'YES' || prediction.prediction === true;
+            const newItem: FeedItem = {
+              id: `prediction_${prediction.id}_${Date.now()}`,
+              type: 'scenario_vote',
+              title: isYesVote ? 'Votó SÍ' : 'Votó NO',
+              description: `${user.display_name || user.username} predijo ${isYesVote ? 'SÍ' : 'NO'} en "${scenario.title}"`,
+              timestamp: prediction.created_at,
+              user: {
+                id: user.id,
+                username: user.username,
+                displayName: user.display_name,
+                avatarUrl: user.avatar_url,
+                level: user.level || 1,
+                isVerified: user.is_verified || false,
+              },
+              metadata: {
+                scenarioId: scenario.id,
+                scenarioTitle: scenario.title,
+                amount: prediction.amount,
+                voteType: isYesVote ? 'YES' : 'NO',
+              },
+            };
+            setFeedItems((prev) => [newItem, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to transactions (steals and protects)
+    const transactionsChannel = supabaseClient
+      .channel('feed-transactions')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'transactions' },
+        async (payload) => {
+          const transaction = payload.new as any;
+
+          // Only process STEAL and PROTECT transactions
+          if (transaction.type !== 'STEAL' && transaction.type !== 'PROTECT') return;
+          if (transaction.reference_type !== 'scenario') return;
+
+          const [user, scenario] = await Promise.all([
+            fetchUserData(transaction.user_id),
+            fetchScenarioData(transaction.reference_id),
+          ]);
+
+          if (user && scenario) {
+            const isSteal = transaction.type === 'STEAL';
+            const newItem: FeedItem = {
+              id: `${isSteal ? 'steal' : 'protect'}_${transaction.id}_${Date.now()}`,
+              type: isSteal ? 'scenario_stolen' : 'scenario_protected',
+              title: isSteal ? '¡Escenario robado!' : '¡Escenario protegido!',
+              description: `${user.display_name || user.username} ${isSteal ? 'robó' : 'protegió'} "${scenario.title}"`,
+              timestamp: transaction.created_at,
+              user: {
+                id: user.id,
+                username: user.username,
+                displayName: user.display_name,
+                avatarUrl: user.avatar_url,
+                level: user.level || 1,
+                isVerified: user.is_verified || false,
+              },
+              metadata: {
+                scenarioId: scenario.id,
+                scenarioTitle: scenario.title,
+                amount: transaction.amount,
+              },
+            };
+            setFeedItems((prev) => [newItem, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscriptions on unmount or tab change
+    return () => {
+      supabaseClient.removeChannel(scenariosChannel);
+      supabaseClient.removeChannel(predictionsChannel);
+      supabaseClient.removeChannel(transactionsChannel);
+    };
+  }, [activeTab, supabase]);
+
   // Search mentions
   const searchMentions = useCallback(async (query: string) => {
     if (query.length < 1) {
