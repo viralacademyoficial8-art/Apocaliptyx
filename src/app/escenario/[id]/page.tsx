@@ -557,7 +557,7 @@ export default function EscenarioPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-card border border-border rounded-xl p-4 text-center">
             <Flame className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold">{scenario.total_pool.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{theftPool.toLocaleString()}</p>
             <p className="text-sm text-muted-foreground">AP en juego</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-4 text-center">
