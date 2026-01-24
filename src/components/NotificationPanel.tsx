@@ -220,13 +220,11 @@ export function NotificationPanel() {
     // Obtener el link de navegación
     const link = getNotificationLink(notification);
 
-    // Cerrar el dropdown y navegar
+    // Navegar directamente
     if (link) {
       setIsOpen(false);
-      // Pequeño delay para asegurar que el dropdown se cierre antes de navegar
-      setTimeout(() => {
-        router.push(link);
-      }, 100);
+      // Usar window.location para navegación directa y confiable
+      window.location.href = link;
     }
   };
 
