@@ -156,11 +156,28 @@ export function NotificationPanel() {
 
   // Construir link de navegación (con fallback a data si link_url es null)
   const getNotificationLink = (notification: Notification): string | null => {
+    // Primero intentar con link_url
     if (notification.link_url) return notification.link_url;
 
     // Fallback: construir link desde data para notificaciones antiguas
-    const data = notification.data;
+    let data = notification.data;
+
+    // Si data es un string, parsearlo
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch {
+        return null;
+      }
+    }
+
     if (!data) return null;
+
+    // Obtener scenario_id (puede venir como string o UUID)
+    const scenarioId = data.scenario_id?.toString();
+    const userId = data.user_id?.toString();
+    const communityId = data.community_id?.toString();
+    const conversationId = data.conversation_id?.toString();
 
     switch (notification.type) {
       case 'scenario_stolen':
@@ -170,19 +187,20 @@ export function NotificationPanel() {
       case 'prediction_lost':
       case 'scenario_resolved':
       case 'scenario_vote':
-        if (data.scenario_id) return `/escenario/${data.scenario_id}`;
+      case 'scenario_expiring':
+        if (scenarioId) return `/escenario/${scenarioId}`;
         break;
       case 'new_follower':
-        if (data.user_id) return `/perfil/${data.user_id}`;
+        if (userId) return `/perfil/${userId}`;
         break;
       case 'community_post':
       case 'community_comment':
       case 'community_like':
-        if (data.community_id) return `/foro/comunidad/${data.community_id}`;
+        if (communityId) return `/foro/comunidad/${communityId}`;
         break;
       case 'message_received':
       case 'message_reaction':
-        if (data.conversation_id) return `/mensajes?conv=${data.conversation_id}`;
+        if (conversationId) return `/mensajes?conv=${conversationId}`;
         break;
     }
     return null;
@@ -317,7 +335,7 @@ export function NotificationPanel() {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
+                  className={`group p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
                     !notification.is_read ? 'bg-purple-500/5' : ''
                   }`}
                 >
