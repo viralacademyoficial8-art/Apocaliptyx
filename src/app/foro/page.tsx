@@ -635,19 +635,35 @@ function ForoContent() {
   // Cargar actividades del feed (escenarios creados, robados, protegidos, votos, etc.)
   const loadFeedItems = useCallback(async () => {
     setFeedLoading(true);
+    console.log('[Feed] Loading feed items...');
     try {
       // Agregar timestamp para evitar caché del navegador
-      const response = await fetch(`/api/feed?limit=30&_t=${Date.now()}`, {
+      const url = `/api/feed?limit=30&_t=${Date.now()}&_r=${Math.random()}`;
+      console.log('[Feed] Fetching URL:', url);
+      const response = await fetch(url, {
+        method: 'GET',
         cache: 'no-store',
+        next: { revalidate: 0 },
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
+      console.log('[Feed] Response received:', {
+        itemsCount: data.items?.length || 0,
+        total: data.total,
+        debug: data._debug,
+        generatedAt: response.headers.get('X-Generated-At'),
+      });
+      if (data.items?.length > 0) {
+        console.log('[Feed] First item:', data.items[0]);
+      }
       setFeedItems(data.items || []);
     } catch (error) {
-      console.error('Error loading feed items:', error);
+      console.error('[Feed] Error loading feed items:', error);
     } finally {
       setFeedLoading(false);
     }
@@ -900,8 +916,10 @@ function ForoContent() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'scenarios' },
         async (payload) => {
+          console.log('[Feed Realtime] New scenario inserted:', payload.new);
           const scenario = payload.new as any;
           const user = await fetchUserData(scenario.creator_id);
+          console.log('[Feed Realtime] User data fetched:', user);
           if (user) {
             const newItem: FeedItem = {
               id: `scenario_created_${scenario.id}_${Date.now()}`,
@@ -923,6 +941,7 @@ function ForoContent() {
                 amount: scenario.total_pool,
               },
             };
+            console.log('[Feed Realtime] Adding new item to feed:', newItem);
             setFeedItems((prev) => [newItem, ...prev]);
           }
         }
