@@ -636,7 +636,12 @@ function ForoContent() {
   const loadFeedItems = useCallback(async () => {
     setFeedLoading(true);
     try {
-      const response = await fetch(`/api/feed?limit=30`);
+      const response = await fetch(`/api/feed?limit=30`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       setFeedItems(data.items || []);

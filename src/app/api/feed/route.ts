@@ -454,13 +454,22 @@ export async function GET(request: NextRequest) {
     // Aplicar paginación
     const paginatedItems = feedItems.slice(offset, offset + limit);
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       items: paginatedItems,
       total: feedItems.length,
       hasMore: offset + limit < feedItems.length,
     });
+
+    // Prevent browser caching to ensure fresh data on reload
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
     console.error('Error fetching feed:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const errorResponse = NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    errorResponse.headers.set('Cache-Control', 'no-store');
+    return errorResponse;
   }
 }
