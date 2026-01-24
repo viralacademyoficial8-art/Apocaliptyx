@@ -481,7 +481,9 @@ export default function ExplorarPage() {
                         {t('common.filter')}
                       </button>
                       <button
-                        onClick={() => setShowAllFeatured(true)}
+                        onClick={() => {
+                          document.getElementById('todos-los-escenarios')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
                       >
                         {t('common.viewAll')} <ArrowRight className="w-4 h-4" />
@@ -587,7 +589,7 @@ export default function ExplorarPage() {
         )}
 
         {/* All Scenarios Section - Con filtros aplicados */}
-        <section className="mt-8">
+        <section id="todos-los-escenarios" className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Flame className="w-5 h-5 text-orange-400" />
