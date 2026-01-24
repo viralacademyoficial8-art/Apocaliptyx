@@ -1,7 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 
 import { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -636,10 +634,11 @@ function ForoContent() {
   const loadFeedItems = useCallback(async () => {
     setFeedLoading(true);
     try {
-      const response = await fetch(`/api/feed?limit=30`, {
+      const response = await fetch(`/api/feed?limit=30&_t=${Date.now()}`, {
         cache: 'no-store',
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
       });
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
