@@ -159,7 +159,7 @@ export const predictionsService = {
     return { yes, no };
   },
 
-  // Calcular pools sumando los montos apostados (para estadística "AP en juego")
+  // Calcular pools sumando los montos apostados o contando votos si amount=0
   async calculatePools(scenarioId: string): Promise<{ yesPool: number; noPool: number; totalPool: number; participantCount: number }> {
     const supabase = getSupabaseClient();
 
@@ -175,11 +175,17 @@ export const predictionsService = {
     let yesPool = 0;
     let noPool = 0;
 
+    // Si todos los votos tienen amount=0, contamos votos en lugar de sumar amounts
+    const hasAmounts = data.some((p: { amount: number }) => p.amount > 0);
+
     data.forEach((p: { prediction: string; amount: number }) => {
+      // Si hay amounts, sumamos amounts. Si no, contamos cada voto como 1
+      const value = hasAmounts ? (p.amount || 0) : 1;
+
       if (p.prediction === 'YES') {
-        yesPool += p.amount || 0;
+        yesPool += value;
       } else if (p.prediction === 'NO') {
-        noPool += p.amount || 0;
+        noPool += value;
       }
     });
 
