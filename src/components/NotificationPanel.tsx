@@ -234,9 +234,13 @@ export function NotificationPanel() {
     // Navegar directamente
     if (link) {
       setIsOpen(false);
-      window.location.href = link;
+      // Small timeout to ensure dropdown closes first
+      setTimeout(() => {
+        window.location.href = link;
+      }, 100);
     } else {
       console.warn('No link found for notification:', notification.id);
+      alert('No se encontró link para esta notificación. Revisa la consola para más detalles.');
     }
   };
 

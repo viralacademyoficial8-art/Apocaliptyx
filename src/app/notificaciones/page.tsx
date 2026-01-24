@@ -311,10 +311,19 @@ export default function NotificacionesPage() {
   };
 
   const handleNotificationClick = (notification: Notification) => {
+    console.log('Notification clicked:', notification);
+    console.log('link_url:', notification.link_url);
+    console.log('data:', notification.data);
+
     handleMarkAsRead(notification);
     const link = getNotificationLink(notification);
+
+    console.log('Final link:', link);
+
     if (link) {
-      router.push(link);
+      window.location.href = link;
+    } else {
+      console.warn('No link found for notification:', notification.id);
     }
   };
 
