@@ -3303,7 +3303,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
       : null;
 
   return (
-    <div className="bg-card/50 border border-border rounded-xl p-5 hover:border-border transition-all">
+    <div className="bg-card border border-border rounded-xl p-5 hover:border-purple-500/30 transition-all shadow-sm">
       {/* Header - IGUAL que PostCard */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -3318,7 +3318,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <Link href={`/perfil/${item.user.username}`} className="font-semibold hover:text-purple-400 transition-colors">
+              <Link href={`/perfil/${item.user.username}`} className="font-semibold text-foreground hover:text-purple-500 transition-colors">
                 {item.user.displayName || item.user.username}
               </Link>
               {item.user.level && (
@@ -3340,7 +3340,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
 
       {/* Contenido - como un post normal */}
       <div className="mb-4">
-        <p className="text-gray-200 whitespace-pre-wrap break-words">
+        <p className="text-foreground whitespace-pre-wrap break-words">
           {getPostContent()}
         </p>
       </div>
@@ -3349,7 +3349,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
       {scenarioLink && (
         <Link
           href={scenarioLink}
-          className="block mb-4 p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/50 transition-colors"
+          className="block mb-4 p-4 bg-muted/50 border border-border rounded-xl hover:bg-muted/70 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-2xl">
@@ -3362,7 +3362,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
               <p className="text-sm text-muted-foreground">
                 {item.type === 'live_stream' ? 'Transmisión en vivo' : 'Escenario de predicción'}
                 {item.metadata?.amount && item.metadata.amount > 0 && (
-                  <span className="ml-2 text-yellow-500">• {item.metadata.amount.toLocaleString()} AP</span>
+                  <span className="ml-2 text-yellow-600 dark:text-yellow-500">• {item.metadata.amount.toLocaleString()} AP</span>
                 )}
               </p>
             </div>
@@ -3392,7 +3392,7 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
         {scenarioLink && (
           <Link
             href={scenarioLink}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg text-sm font-medium hover:bg-purple-500/30 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600 transition-colors"
           >
             {item.type === 'live_stream' ? 'Ver transmisión' : 'Ver escenario'}
             <ExternalLink className="w-3.5 h-3.5" />
