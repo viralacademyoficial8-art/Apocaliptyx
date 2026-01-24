@@ -156,47 +156,77 @@ export function NotificationPanel() {
 
   // Construir link de navegación (con fallback a data si link_url es null)
   const getNotificationLink = (notification: Notification): string | null => {
+    // Primero intentar con link_url
     if (notification.link_url) return notification.link_url;
 
     // Fallback: construir link desde data para notificaciones antiguas
-    const data = notification.data;
-    if (!data) return null;
+    let data = notification.data as Record<string, unknown> | string | null | undefined;
 
-    switch (notification.type) {
-      case 'scenario_stolen':
-      case 'scenario_created':
-      case 'scenario_recovered':
-      case 'prediction_won':
-      case 'prediction_lost':
-      case 'scenario_resolved':
-      case 'scenario_vote':
-        if (data.scenario_id) return `/escenario/${data.scenario_id}`;
-        break;
-      case 'new_follower':
-        if (data.user_id) return `/perfil/${data.user_id}`;
-        break;
-      case 'community_post':
-      case 'community_comment':
-      case 'community_like':
-        if (data.community_id) return `/foro/comunidad/${data.community_id}`;
-        break;
-      case 'message_received':
-      case 'message_reaction':
-        if (data.conversation_id) return `/mensajes?conv=${data.conversation_id}`;
-        break;
+    // Si data es un string, parsearlo
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data) as Record<string, unknown>;
+      } catch {
+        return null;
+      }
     }
+
+    if (!data || typeof data !== 'object') return null;
+
+    // Obtener scenario_id (puede venir como string, UUID, o en diferentes formatos)
+    const scenarioId = (data.scenario_id || data.scenarioId || data.scenario)?.toString();
+    const usrId = (data.user_id || data.userId)?.toString();
+    const commId = (data.community_id || data.communityId)?.toString();
+    const convId = (data.conversation_id || data.conversationId)?.toString();
+
+    // Para notificaciones de escenarios
+    const scenarioTypes = [
+      'scenario_stolen',
+      'scenario_created',
+      'scenario_recovered',
+      'prediction_won',
+      'prediction_lost',
+      'scenario_resolved',
+      'scenario_vote',
+      'scenario_expiring'
+    ];
+
+    if (scenarioTypes.includes(notification.type) && scenarioId) {
+      return `/escenario/${scenarioId}`;
+    }
+
+    if (notification.type === 'new_follower' && usrId) {
+      return `/perfil/${usrId}`;
+    }
+
+    if (['community_post', 'community_comment', 'community_like'].includes(notification.type) && commId) {
+      return `/foro/comunidad/${commId}`;
+    }
+
+    if (['message_received', 'message_reaction'].includes(notification.type) && convId) {
+      return `/mensajes?conv=${convId}`;
+    }
+
     return null;
   };
 
   // Click en notificación
   const handleNotificationClick = (notification: Notification) => {
+    // Marcar como leída primero
     if (!notification.is_read) {
       markAsRead(notification.id);
     }
+
+    // Obtener el link de navegación
     const link = getNotificationLink(notification);
+
+    // Cerrar el dropdown y navegar
     if (link) {
-      router.push(link);
       setIsOpen(false);
+      // Pequeño delay para asegurar que el dropdown se cierre antes de navegar
+      setTimeout(() => {
+        router.push(link);
+      }, 100);
     }
   };
 
@@ -317,7 +347,7 @@ export function NotificationPanel() {
                 <div
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
-                  className={`p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
+                  className={`group p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
                     !notification.is_read ? 'bg-purple-500/5' : ''
                   }`}
                 >
