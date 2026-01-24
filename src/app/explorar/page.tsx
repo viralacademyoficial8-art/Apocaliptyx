@@ -466,9 +466,6 @@ export default function ExplorarPage() {
                     <h2 className="text-lg font-semibold flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-purple-400" />
                       {t('dashboard.featuredScenarios')}
-                      <span className="text-sm font-normal text-muted-foreground">
-                        ({filteredScenarios.length} {t('explore.scenariosFound')})
-                      </span>
                     </h2>
                     <div className="flex items-center gap-2">
                       {/* Filter button */}
@@ -550,56 +547,108 @@ export default function ExplorarPage() {
                     </div>
                   )}
 
-                  {/* Grid de escenarios filtrados y ordenados según los filtros seleccionados */}
-                  {filteredScenarios.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <Search className="w-12 h-12 text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground mb-2">{t('explore.noScenarios')}</p>
-                      <p className="text-muted-foreground text-sm mb-4">
-                        {hasActiveFilters ? t('explore.tryOtherFilters') : t('explore.beFirstToCreate')}
-                      </p>
-                      {hasActiveFilters && (
-                        <button
-                          onClick={clearFilters}
-                          className="px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg"
-                        >
-                          {t('explore.clearFilters')}
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    (() => {
-                      const visibleScenarios = showAllFeatured ? filteredScenarios : filteredScenarios.slice(0, 6);
-                      const remainingCount = filteredScenarios.length - 6;
+                  {/* Grid de escenarios destacados - ordenados por más interactuados */}
+                  {(() => {
+                    const sortedScenarios = [...scenarios].sort((a, b) => {
+                      // Algoritmo: prioridad a los más robados, luego los más votados
+                      const scoreA = (a.steal_count || 0) * 2 + a.participant_count;
+                      const scoreB = (b.steal_count || 0) * 2 + b.participant_count;
+                      return scoreB - scoreA;
+                    });
+                    const visibleScenarios = showAllFeatured ? sortedScenarios : sortedScenarios.slice(0, 6);
+                    const remainingCount = sortedScenarios.length - 6;
 
-                      return (
-                        <>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {visibleScenarios.map((scenario) => (
-                              <ScenarioCard key={scenario.id} scenario={scenario} />
-                            ))}
-                          </div>
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {visibleScenarios.map((scenario) => (
+                            <ScenarioCard key={scenario.id} scenario={scenario} />
+                          ))}
+                        </div>
 
-                          {/* Botón Ver más / Ver menos */}
-                          {filteredScenarios.length > 6 && (
-                            <button
-                              onClick={() => setShowAllFeatured(!showAllFeatured)}
-                              className="w-full mt-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-purple-500/50 transition-all flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300"
-                            >
-                              <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAllFeatured ? 'rotate-180' : ''}`} />
-                              {showAllFeatured ? 'Ver menos' : `Ver ${remainingCount} más`}
-                            </button>
-                          )}
-                        </>
-                      );
-                    })()
-                  )}
+                        {/* Botón Ver más / Ver menos */}
+                        {sortedScenarios.length > 6 && (
+                          <button
+                            onClick={() => setShowAllFeatured(!showAllFeatured)}
+                            className="w-full mt-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-purple-500/50 transition-all flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300"
+                          >
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAllFeatured ? 'rotate-180' : ''}`} />
+                            {showAllFeatured ? 'Ver menos' : `Ver ${remainingCount} más`}
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
                 </section>
               )}
 
             </div>
           </FadeInView>
         )}
+
+        {/* All Scenarios Section - Con filtros aplicados */}
+        <section className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Flame className="w-5 h-5 text-orange-400" />
+              Todos los Escenarios
+              <span className="text-sm font-normal text-muted-foreground">
+                ({filteredScenarios.length} {t('explore.scenariosFound')})
+              </span>
+            </h2>
+          </div>
+
+          {/* Grid de todos los escenarios filtrados */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+              <span className="ml-3 text-muted-foreground">{t('dashboard.loadingScenarios')}</span>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
+              <p className="text-red-400 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
+              >
+                {t('errors.serverError.retry')}
+              </button>
+            </div>
+          ) : filteredScenarios.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <Search className="w-12 h-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground mb-2">{t('explore.noScenarios')}</p>
+              <p className="text-muted-foreground text-sm mb-4">
+                {hasActiveFilters
+                  ? t('explore.tryOtherFilters')
+                  : t('explore.beFirstToCreate')
+                }
+              </p>
+              {hasActiveFilters ? (
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg"
+                >
+                  {t('explore.clearFilters')}
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push('/crear')}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
+                >
+                  {t('scenarios.createScenario')}
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredScenarios.map((scenario) => (
+                <ScenarioCard key={scenario.id} scenario={scenario} />
+              ))}
+            </div>
+          )}
+        </section>
 
       </main>
 
