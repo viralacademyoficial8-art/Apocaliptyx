@@ -2,12 +2,21 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/supabase';
 
+interface ScenarioRow {
+  id: string;
+}
+
+interface PredictionRow {
+  prediction: string;
+  amount: number;
+}
+
 export async function POST() {
   try {
     const supabase = getSupabaseClient();
 
     // Get all active scenarios
-    const { data: scenarios, error: scenariosError } = await supabase
+    const { data: scenariosData, error: scenariosError } = await supabase
       .from('scenarios')
       .select('id')
       .eq('status', 'ACTIVE');
@@ -15,6 +24,8 @@ export async function POST() {
     if (scenariosError) {
       return NextResponse.json({ error: scenariosError.message }, { status: 500 });
     }
+
+    const scenarios = scenariosData as ScenarioRow[] | null;
 
     if (!scenarios || scenarios.length === 0) {
       return NextResponse.json({ message: 'No scenarios to update', updated: 0 });
@@ -25,14 +36,16 @@ export async function POST() {
     // For each scenario, recalculate the pools
     for (const scenario of scenarios) {
       // Get all predictions for this scenario
-      const { data: predictions, error: predictionsError } = await supabase
+      const { data: predictionsData, error: predictionsError } = await supabase
         .from('predictions')
         .select('prediction, amount')
         .eq('scenario_id', scenario.id);
 
-      if (predictionsError || !predictions) {
+      if (predictionsError || !predictionsData) {
         continue;
       }
+
+      const predictions = predictionsData as PredictionRow[];
 
       // Calculate pools - count votes if all amounts are 0
       const hasAmounts = predictions.some((p) => (p.amount || 0) > 0);
@@ -61,7 +74,7 @@ export async function POST() {
           total_pool: totalPool,
           participant_count: predictions.length,
           updated_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', scenario.id);
 
       if (!updateError) {
