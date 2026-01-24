@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Bell, Check, Trash2, Inbox, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -357,24 +358,12 @@ export function NotificationPanel() {
             </div>
           ) : (
             <div className="divide-y divide-gray-800">
-              {filteredNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  role="button"
-                  tabIndex={0}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    handleNotificationClick(notification);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleNotificationClick(notification);
-                    }
-                  }}
-                  className={`group p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
-                    !notification.is_read ? 'bg-purple-500/5' : ''
-                  }`}
-                >
+              {filteredNotifications.map((notification) => {
+                // Obtener el link directamente
+                const notificationLink = notification.link_url || getNotificationLink(notification);
+
+                // Contenido interno de la notificación
+                const notificationContent = (
                   <div className="flex items-start gap-3">
                     {/* Indicador no leído */}
                     <div className="mt-1.5">
@@ -406,6 +395,7 @@ export function NotificationPanel() {
                     {/* Botón eliminar */}
                     <button
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         deleteNotification(notification.id);
                       }}
@@ -414,8 +404,41 @@ export function NotificationPanel() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
-              ))}
+                );
+
+                // Si hay link, usar anchor tag nativo
+                if (notificationLink) {
+                  return (
+                    <a
+                      key={notification.id}
+                      href={notificationLink}
+                      onClick={() => {
+                        if (!notification.is_read) {
+                          markAsRead(notification.id);
+                        }
+                        setIsOpen(false);
+                      }}
+                      className={`group block p-4 hover:bg-muted/50 transition-colors cursor-pointer no-underline ${
+                        !notification.is_read ? 'bg-purple-500/5' : ''
+                      }`}
+                    >
+                      {notificationContent}
+                    </a>
+                  );
+                }
+
+                // Sin link, usar div
+                return (
+                  <div
+                    key={notification.id}
+                    className={`group p-4 hover:bg-muted/50 transition-colors ${
+                      !notification.is_read ? 'bg-purple-500/5' : ''
+                    }`}
+                  >
+                    {notificationContent}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
