@@ -1,9 +1,6 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
-
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Navbar } from '@/components/Navbar';
@@ -201,25 +198,47 @@ export default function ExplorarPage() {
     loadUserStats();
   }, [isLoggedIn, currentUser?.id]);
 
-  // Cargar escenarios de Supabase
-  useEffect(() => {
-    async function loadScenarios() {
-      try {
-        setLoading(true);
-        const data = await scenariosService.getActive(50);
-        setScenarios(data);
-        setFilteredScenarios(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error loading scenarios:', err);
-        setError(t('explore.loadError'));
-      } finally {
-        setLoading(false);
-      }
+  // Función para cargar escenarios de Supabase
+  const loadScenarios = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await scenariosService.getActive(50);
+      setScenarios(data);
+      setFilteredScenarios(data);
+      setError(null);
+    } catch (err) {
+      console.error('Error loading scenarios:', err);
+      setError(t('explore.loadError'));
+    } finally {
+      setLoading(false);
     }
+  }, [t]);
 
+  // Cargar escenarios al montar y cuando la página vuelve a ser visible
+  useEffect(() => {
+    // Cargar al montar
     loadScenarios();
-  }, []);
+
+    // Recargar cuando el usuario vuelve a la pestaña/página
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadScenarios();
+      }
+    };
+
+    // Recargar cuando el usuario navega de vuelta (popstate/focus)
+    const handleFocus = () => {
+      loadScenarios();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [loadScenarios]);
 
   // Filtrar y ordenar escenarios
   useEffect(() => {
