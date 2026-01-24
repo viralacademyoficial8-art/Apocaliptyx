@@ -360,7 +360,17 @@ export function NotificationPanel() {
               {filteredNotifications.map((notification) => (
                 <div
                   key={notification.id}
-                  onClick={() => handleNotificationClick(notification)}
+                  role="button"
+                  tabIndex={0}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    handleNotificationClick(notification);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleNotificationClick(notification);
+                    }
+                  }}
                   className={`group p-4 hover:bg-muted/50 transition-colors cursor-pointer ${
                     !notification.is_read ? 'bg-purple-500/5' : ''
                   }`}
