@@ -126,8 +126,7 @@ class ScenariosService {
         .from("scenarios")
         .select("*")
         .eq("status", "ACTIVE")
-        .order("steal_count", { ascending: false, nullsFirst: false })
-        .order("yes_pool", { ascending: false });
+        .order("created_at", { ascending: false });
 
       if (limit) {
         query = query.limit(limit);

@@ -107,7 +107,8 @@ export default function ExplorarPage() {
   ];
 
   const SORT_OPTIONS = [
-    { value: 'recent', label: '🔥 Tendencias' },
+    { value: 'newest', label: '🆕 Más recientes' },
+    { value: 'trending', label: '🔥 Tendencias' },
     { value: 'mostStolen', label: '⚔️ Más robados' },
     { value: 'mostVoted', label: '🗳️ Más votados' },
     { value: 'popular', label: '👥 Más populares' },
@@ -131,7 +132,7 @@ export default function ExplorarPage() {
   // Filtros
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
-  const [sortBy, setSortBy] = useState('recent');
+  const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [showAllFeatured, setShowAllFeatured] = useState(false);
 
@@ -246,6 +247,20 @@ export default function ExplorarPage() {
 
     // Ordenar
     switch (sortBy) {
+      case 'newest':
+        // Ordenar por más recientes (fecha de creación)
+        result.sort((a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        break;
+      case 'trending':
+        // Ordenamiento tendencias: 1) Más robados, 2) Más votados
+        result.sort((a, b) => {
+          const stealDiff = (b.steal_count || 0) - (a.steal_count || 0);
+          if (stealDiff !== 0) return stealDiff;
+          return b.participant_count - a.participant_count;
+        });
+        break;
       case 'mostStolen':
         // Ordenar solo por más robados
         result.sort((a, b) => (b.steal_count || 0) - (a.steal_count || 0));
@@ -265,14 +280,11 @@ export default function ExplorarPage() {
           new Date(a.resolution_date).getTime() - new Date(b.resolution_date).getTime()
         );
         break;
-      case 'recent':
       default:
-        // Ordenamiento por defecto: 1) Más robados, 2) Más votados
-        result.sort((a, b) => {
-          const stealDiff = (b.steal_count || 0) - (a.steal_count || 0);
-          if (stealDiff !== 0) return stealDiff;
-          return b.participant_count - a.participant_count;
-        });
+        // Por defecto, ordenar por más recientes
+        result.sort((a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
     }
 
     setFilteredScenarios(result);
@@ -282,10 +294,10 @@ export default function ExplorarPage() {
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedCategory('Todos');
-    setSortBy('recent');
+    setSortBy('newest');
   };
 
-  const hasActiveFilters = searchQuery || selectedCategory !== 'Todos' || sortBy !== 'recent';
+  const hasActiveFilters = searchQuery || selectedCategory !== 'Todos' || sortBy !== 'newest';
 
   // Cargar búsquedas recientes al montar
   useEffect(() => {
@@ -535,11 +547,11 @@ export default function ExplorarPage() {
                       </div>
 
                       {/* Clear filters */}
-                      {(selectedCategory !== 'Todos' || sortBy !== 'recent') && (
+                      {(selectedCategory !== 'Todos' || sortBy !== 'newest') && (
                         <button
                           onClick={() => {
                             setSelectedCategory('Todos');
-                            setSortBy('recent');
+                            setSortBy('newest');
                           }}
                           className="text-sm text-purple-400 hover:text-purple-300"
                         >
