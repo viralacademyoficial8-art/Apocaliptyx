@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     const feedItems: FeedItem[] = [];
 
     // 1. Escenarios creados recientemente
-    const { data: scenarios } = await supabase
+    const { data: scenarios, error: scenariosError } = await supabase
       .from('scenarios')
       .select(`
         id,
@@ -64,32 +64,35 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(20);
 
+    if (scenariosError) {
+      console.error('Error fetching scenarios:', scenariosError);
+    }
+
     if (scenarios) {
       for (const scenario of scenarios) {
         const user = scenario.users as any;
-        if (user) {
-          feedItems.push({
-            id: `scenario_created_${scenario.id}`,
-            type: 'scenario_created',
-            title: 'Nuevo escenario creado',
-            description: scenario.title,
-            icon: '🎯',
-            timestamp: scenario.created_at,
-            user: {
-              id: user.id,
-              username: user.username,
-              displayName: user.display_name,
-              avatarUrl: user.avatar_url,
-              level: user.level || 1,
-              isVerified: user.is_verified || false,
-            },
-            metadata: {
-              scenarioId: scenario.id,
-              scenarioTitle: scenario.title,
-              amount: scenario.total_pool,
-            },
-          });
-        }
+        // Incluir escenario aunque no tenga datos de usuario completos
+        feedItems.push({
+          id: `scenario_created_${scenario.id}`,
+          type: 'scenario_created',
+          title: 'Nuevo escenario creado',
+          description: scenario.title,
+          icon: '🎯',
+          timestamp: scenario.created_at,
+          user: {
+            id: user?.id || scenario.creator_id,
+            username: user?.username || 'Usuario',
+            displayName: user?.display_name || null,
+            avatarUrl: user?.avatar_url || null,
+            level: user?.level || 1,
+            isVerified: user?.is_verified || false,
+          },
+          metadata: {
+            scenarioId: scenario.id,
+            scenarioTitle: scenario.title,
+            amount: scenario.total_pool,
+          },
+        });
       }
     }
 
@@ -448,11 +451,21 @@ export async function GET(request: NextRequest) {
     // Aplicar paginación
     const paginatedItems = feedItems.slice(offset, offset + limit);
 
-    return NextResponse.json({
-      items: paginatedItems,
-      total: feedItems.length,
-      hasMore: offset + limit < feedItems.length,
-    });
+    // Agregar headers para evitar caché
+    return NextResponse.json(
+      {
+        items: paginatedItems,
+        total: feedItems.length,
+        hasMore: offset + limit < feedItems.length,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching feed:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
