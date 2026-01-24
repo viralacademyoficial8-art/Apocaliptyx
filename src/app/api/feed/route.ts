@@ -1,6 +1,4 @@
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const fetchCache = 'force-no-store';
 
 // src/app/api/feed/route.ts
 // API para obtener el feed de actividad global de la plataforma
@@ -34,27 +32,15 @@ export interface FeedItem {
 }
 
 export async function GET(request: NextRequest) {
-  const requestTime = new Date().toISOString();
-  console.log(`[Feed API] Request received at ${requestTime}`);
-
   try {
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
-    const following = searchParams.get('following') === 'true';
-    const userId = searchParams.get('userId');
 
     const supabase = getSupabaseAdmin();
     const feedItems: FeedItem[] = [];
 
-    // Quick count to verify database connection
-    const { count: totalScenariosCount } = await supabase
-      .from('scenarios')
-      .select('*', { count: 'exact', head: true });
-    console.log(`[Feed API] Total scenarios in database: ${totalScenariosCount}`);
-
     // 1. Escenarios creados recientemente
-    console.log('[Feed API] Fetching scenarios...');
     const { data: scenarios, error: scenariosError } = await supabase
       .from('scenarios')
       .select(`
@@ -75,15 +61,6 @@ export async function GET(request: NextRequest) {
       `)
       .order('created_at', { ascending: false })
       .limit(20);
-
-    console.log(`[Feed API] Scenarios fetched: ${scenarios?.length || 0} items`);
-    if (scenarios && scenarios.length > 0) {
-      console.log(`[Feed API] Most recent scenario: ${scenarios[0].title} (created: ${scenarios[0].created_at})`);
-    }
-
-    if (scenariosError) {
-      console.error('Error fetching scenarios:', scenariosError);
-    }
 
     if (scenarios) {
       for (const scenario of scenarios) {
@@ -468,31 +445,11 @@ export async function GET(request: NextRequest) {
     // Aplicar paginación
     const paginatedItems = feedItems.slice(offset, offset + limit);
 
-    console.log(`[Feed API] Returning ${paginatedItems.length} items (total: ${feedItems.length}) at ${new Date().toISOString()}`);
-
-    // Agregar headers para evitar caché
-    return NextResponse.json(
-      {
-        items: paginatedItems,
-        total: feedItems.length,
-        hasMore: offset + limit < feedItems.length,
-        _debug: {
-          generatedAt: new Date().toISOString(),
-          totalFeedItems: feedItems.length,
-          scenariosCount: scenarios?.length || 0,
-          totalScenariosInDB: totalScenariosCount,
-        },
-      },
-      {
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-          'Surrogate-Control': 'no-store',
-          'X-Generated-At': new Date().toISOString(),
-        },
-      }
-    );
+    return NextResponse.json({
+      items: paginatedItems,
+      total: feedItems.length,
+      hasMore: offset + limit < feedItems.length,
+    });
   } catch (error) {
     console.error('Error fetching feed:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
