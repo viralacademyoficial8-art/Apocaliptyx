@@ -6,7 +6,17 @@ export const fetchCache = 'force-no-store';
 // API para obtener el feed de actividad global de la plataforma
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase-server';
+import { createClient } from '@supabase/supabase-js';
+
+// Crear cliente fresco para cada petición (sin caché)
+function createFreshSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  return createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false },
+    db: { schema: 'public' },
+  });
+}
 
 export interface FeedItem {
   id: string;
@@ -44,7 +54,8 @@ export async function GET(request: NextRequest) {
     const following = searchParams.get('following') === 'true';
     const userId = searchParams.get('userId');
 
-    const supabase = getSupabaseAdmin();
+    // Crear cliente fresco para cada petición
+    const supabase = createFreshSupabaseClient();
     const feedItems: FeedItem[] = [];
 
     // Quick count to verify database connection
