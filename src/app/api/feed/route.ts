@@ -1,4 +1,6 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 // src/app/api/feed/route.ts
 // API para obtener el feed de actividad global de la plataforma
@@ -44,6 +46,12 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     const feedItems: FeedItem[] = [];
+
+    // Quick count to verify database connection
+    const { count: totalScenariosCount } = await supabase
+      .from('scenarios')
+      .select('*', { count: 'exact', head: true });
+    console.log(`[Feed API] Total scenarios in database: ${totalScenariosCount}`);
 
     // 1. Escenarios creados recientemente
     console.log('[Feed API] Fetching scenarios...');
@@ -472,6 +480,7 @@ export async function GET(request: NextRequest) {
           generatedAt: new Date().toISOString(),
           totalFeedItems: feedItems.length,
           scenariosCount: scenarios?.length || 0,
+          totalScenariosInDB: totalScenariosCount,
         },
       },
       {

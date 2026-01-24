@@ -638,13 +638,16 @@ function ForoContent() {
     console.log('[Feed] Loading feed items...');
     try {
       // Agregar timestamp para evitar caché del navegador
-      const url = `/api/feed?limit=30&_t=${Date.now()}`;
+      const url = `/api/feed?limit=30&_t=${Date.now()}&_r=${Math.random()}`;
       console.log('[Feed] Fetching URL:', url);
       const response = await fetch(url, {
+        method: 'GET',
         cache: 'no-store',
+        next: { revalidate: 0 },
         headers: {
-          'Cache-Control': 'no-cache',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
+          'Expires': '0',
         },
       });
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
