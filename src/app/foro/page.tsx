@@ -3200,6 +3200,7 @@ function ForoContent() {
 }
 
 // Componente de tarjeta de actividad (escenarios creados, robados, votos, etc.)
+// Diseñado para verse EXACTAMENTE como un post normal del feed
 interface ActivityCardProps {
   item: {
     id: string;
@@ -3230,73 +3231,59 @@ interface ActivityCardProps {
 
 function ActivityCard({ item, dateLocale }: ActivityCardProps) {
   const router = useRouter();
-  const { t } = useTranslation();
 
   const isYesVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'YES';
   const isNoVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'NO';
 
-  // Estilos del badge según el tipo de actividad
-  const getActivityBadgeStyles = () => {
-    if (isYesVote) return { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' };
-    if (isNoVote) return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+  // Generar el contenido del "post" basado en el tipo de actividad
+  const getPostContent = () => {
+    const scenarioTitle = item.metadata?.scenarioTitle || '';
+    const amount = item.metadata?.amount || 0;
 
     switch (item.type) {
       case 'scenario_created':
-        return { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' };
+        return `Acabo de crear un nuevo escenario de predicción 🎯\n\n"${scenarioTitle}"`;
       case 'scenario_stolen':
-        return { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/30' };
+        return `¡Robé un escenario! 🦹‍♂️⚔️\n\n"${scenarioTitle}"`;
       case 'scenario_protected':
-        return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+        return `Protegí mi escenario con un escudo 🛡️\n\n"${scenarioTitle}"`;
+      case 'scenario_vote':
+        if (isYesVote) {
+          return `Predije que SÍ sucederá 👍 con ${amount.toLocaleString()} AP\n\n"${scenarioTitle}"`;
+        } else {
+          return `Predije que NO sucederá 👎 con ${amount.toLocaleString()} AP\n\n"${scenarioTitle}"`;
+        }
       case 'scenario_resolved':
-        return { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30' };
+        const outcome = item.metadata?.outcome;
+        return `¡El escenario se ha resuelto! ${outcome ? '✅ SÍ sucedió' : '❌ NO sucedió'}\n\n"${scenarioTitle}"`;
       case 'scenario_closed':
-        return { bg: 'bg-gray-500/20', text: 'text-muted-foreground', border: 'border-gray-500/30' };
+        return `El escenario ha sido cerrado 🔒\n\n"${scenarioTitle}"`;
       case 'live_stream':
-        return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+        return `¡Estoy en vivo ahora! 🔴\n\n${item.description || 'Transmitiendo en vivo'}`;
       case 'achievement':
-        return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
+        return `¡Desbloqueé un nuevo logro! 🏆\n\n${item.description}`;
       default:
-        return { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' };
+        return item.description;
     }
   };
 
-  // Icono según el tipo de actividad
-  const getActivityIcon = () => {
-    if (isYesVote) return <ThumbsUp className="w-4 h-4" />;
-    if (isNoVote) return <ThumbsDown className="w-4 h-4" />;
-
+  // Obtener el emoji para el tipo de actividad (para el indicador sutil)
+  const getActivityEmoji = () => {
+    if (isYesVote) return '👍';
+    if (isNoVote) return '👎';
     switch (item.type) {
-      case 'scenario_created': return <Target className="w-4 h-4" />;
-      case 'scenario_stolen': return <Swords className="w-4 h-4" />;
-      case 'scenario_protected': return <Shield className="w-4 h-4" />;
-      case 'scenario_resolved': return <CheckCircle className="w-4 h-4" />;
-      case 'scenario_closed': return <Lock className="w-4 h-4" />;
-      case 'live_stream': return <Radio className="w-4 h-4" />;
-      case 'achievement': return <Trophy className="w-4 h-4" />;
-      default: return <Target className="w-4 h-4" />;
+      case 'scenario_created': return '🎯';
+      case 'scenario_stolen': return '⚔️';
+      case 'scenario_protected': return '🛡️';
+      case 'scenario_resolved': return '✅';
+      case 'scenario_closed': return '🔒';
+      case 'live_stream': return '🔴';
+      case 'achievement': return '🏆';
+      default: return '📌';
     }
   };
 
-  // Texto de la acción
-  const getActionText = () => {
-    if (isYesVote) return 'Me gusta';
-    if (isNoVote) return 'No me gusta';
-
-    switch (item.type) {
-      case 'scenario_created': return 'Escenario creado';
-      case 'scenario_stolen': return 'Escenario robado';
-      case 'scenario_protected': return 'Escenario protegido';
-      case 'scenario_resolved': return 'Escenario cumplido';
-      case 'scenario_closed': return 'Escenario cerrado';
-      case 'live_stream': return 'En vivo';
-      case 'achievement': return 'Logro desbloqueado';
-      default: return item.title;
-    }
-  };
-
-  const badgeStyles = getActivityBadgeStyles();
-
-  const handleClick = () => {
+  const handleCardClick = () => {
     if (item.type === 'live_stream' && item.metadata?.streamId) {
       router.push(`/streaming/${item.metadata.streamId}`);
     } else if (item.metadata?.scenarioId) {
@@ -3309,30 +3296,31 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
     router.push(`/perfil/${item.user.username}`);
   };
 
+  const scenarioLink = item.metadata?.scenarioId
+    ? `/escenario/${item.metadata.scenarioId}`
+    : item.type === 'live_stream' && item.metadata?.streamId
+      ? `/streaming/${item.metadata.streamId}`
+      : null;
+
   return (
-    <div
-      className="bg-card/50 border border-border rounded-xl p-5 hover:border-border transition-all cursor-pointer"
-      onClick={handleClick}
-    >
-      {/* Header - mismo estilo que PostCard */}
+    <div className="bg-card/50 border border-border rounded-xl p-5 hover:border-border transition-all">
+      {/* Header - IGUAL que PostCard */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <button type="button" onClick={handleUserClick} className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold hover:ring-2 hover:ring-purple-500 transition-all">
-              {item.user.avatarUrl ? (
-                <img src={item.user.avatarUrl} alt={item.user.username} className="w-full h-full object-cover" />
-              ) : (
-                (item.user.displayName || item.user.username || 'U')[0].toUpperCase()
-              )}
+          <Link href={`/perfil/${item.user.username}`}>
+            <div
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+              style={item.user.avatarUrl ? { background: `url(${item.user.avatarUrl}) center/cover` } : undefined}
+            >
+              {!item.user.avatarUrl && (item.user.displayName || item.user.username || 'U')[0].toUpperCase()}
             </div>
-          </button>
-
+          </Link>
           <div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={handleUserClick} className="font-semibold text-white hover:text-purple-400 transition-colors">
+              <Link href={`/perfil/${item.user.username}`} className="font-semibold hover:text-purple-400 transition-colors">
                 {item.user.displayName || item.user.username}
-              </button>
+              </Link>
               {item.user.level && (
                 <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded">
                   Lvl {item.user.level}
@@ -3340,57 +3328,76 @@ function ActivityCard({ item, dateLocale }: ActivityCardProps) {
               )}
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <button type="button" onClick={handleUserClick} className="hover:text-purple-400 transition-colors">
+              <Link href={`/perfil/${item.user.username}`} className="hover:text-purple-400 transition-colors">
                 @{item.user.username}
-              </button>
+              </Link>
               <span>•</span>
               <span>{formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: dateLocale })}</span>
             </div>
           </div>
         </div>
-
-        {/* Badge de tipo de actividad */}
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${badgeStyles.bg} ${badgeStyles.text} ${badgeStyles.border}`}>
-          {getActivityIcon()}
-          <span className="hidden sm:inline">{getActionText()}</span>
-        </span>
       </div>
 
-      {/* Contenido principal */}
-      <div className="mb-3">
-        {item.type === 'live_stream' ? (
-          <div className="flex items-center gap-2 text-foreground">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            <span className="font-medium">{item.description || 'Transmitiendo en vivo'}</span>
-          </div>
-        ) : (
-          <p className="text-foreground whitespace-pre-wrap break-words">
-            {item.description || item.metadata?.scenarioTitle || item.title}
-          </p>
-        )}
+      {/* Contenido - como un post normal */}
+      <div className="mb-4">
+        <p className="text-gray-200 whitespace-pre-wrap break-words">
+          {getPostContent()}
+        </p>
       </div>
 
-      {/* Footer con información adicional */}
-      <div className="flex items-center justify-between pt-3 border-t border-border">
-        {/* Amount si existe */}
-        {item.metadata?.amount && item.metadata.amount > 0 ? (
-          <div className="flex items-center gap-1.5 text-yellow-500">
-            <Flame className="w-4 h-4" />
-            <span className="text-sm font-medium">{item.metadata.amount.toLocaleString()} AP</span>
-          </div>
-        ) : (
-          <div></div>
-        )}
-
-        {/* Botón para ver más */}
-        <button
-          type="button"
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${badgeStyles.bg} ${badgeStyles.text} hover:opacity-80`}
-          onClick={handleClick}
+      {/* Preview del escenario/stream como una tarjeta embebida */}
+      {scenarioLink && (
+        <Link
+          href={scenarioLink}
+          className="block mb-4 p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/50 transition-colors"
         >
-          {item.type === 'live_stream' ? 'Ver transmisión' : 'Ver escenario'}
-          <ExternalLink className="w-3 h-3" />
-        </button>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-2xl">
+              {getActivityEmoji()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-foreground truncate">
+                {item.metadata?.scenarioTitle || item.description || 'Ver más'}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {item.type === 'live_stream' ? 'Transmisión en vivo' : 'Escenario de predicción'}
+                {item.metadata?.amount && item.metadata.amount > 0 && (
+                  <span className="ml-2 text-yellow-500">• {item.metadata.amount.toLocaleString()} AP</span>
+                )}
+              </p>
+            </div>
+            <ExternalLink className="w-5 h-5 text-muted-foreground" />
+          </div>
+        </Link>
+      )}
+
+      {/* Actions - IGUAL que PostCard pero simplificado */}
+      <div className="flex items-center justify-between pt-3 border-t border-border">
+        {/* Indicador de actividad con emoji */}
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <span className="text-lg">{getActivityEmoji()}</span>
+          <span className="text-sm">
+            {item.type === 'scenario_vote' ? (isYesVote ? 'Votó Sí' : 'Votó No') :
+             item.type === 'scenario_created' ? 'Nuevo escenario' :
+             item.type === 'scenario_stolen' ? 'Escenario robado' :
+             item.type === 'scenario_protected' ? 'Escenario protegido' :
+             item.type === 'scenario_resolved' ? 'Resuelto' :
+             item.type === 'scenario_closed' ? 'Cerrado' :
+             item.type === 'live_stream' ? 'En vivo' :
+             item.type === 'achievement' ? 'Logro' : ''}
+          </span>
+        </div>
+
+        {/* Botón Ver más */}
+        {scenarioLink && (
+          <Link
+            href={scenarioLink}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg text-sm font-medium hover:bg-purple-500/30 transition-colors"
+          >
+            {item.type === 'live_stream' ? 'Ver transmisión' : 'Ver escenario'}
+            <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
+        )}
       </div>
     </div>
   );
