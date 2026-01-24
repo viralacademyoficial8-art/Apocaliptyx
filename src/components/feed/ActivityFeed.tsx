@@ -315,7 +315,13 @@ export function ActivityFeed() {
       }
 
       const currentOffset = reset ? 0 : offset;
-      const res = await fetch(`/api/feed?limit=50&offset=${currentOffset}`);
+      const res = await fetch(`/api/feed?limit=50&offset=${currentOffset}&_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
 
       if (!res.ok) throw new Error('Error al cargar el feed');
 
