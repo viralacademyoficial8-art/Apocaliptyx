@@ -43,6 +43,8 @@ interface ScenarioData {
   creator_username?: string;
   holder_username?: string;
   steal_count?: number;
+  theft_pool?: number;
+  current_price?: number;
 }
 
 // Tipo para stats del usuario
@@ -662,6 +664,11 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
   // Determinar si fue robado (holder diferente al creador)
   const wasStolen = scenario.current_holder_id && scenario.current_holder_id !== scenario.creator_id;
 
+  // Calcular el valor AP correcto: theft_pool si existe, sino total_pool, sino current_price
+  const displayPool = (scenario.theft_pool && scenario.theft_pool > 0)
+    ? scenario.theft_pool
+    : (scenario.total_pool > 0 ? scenario.total_pool : (scenario.current_price || 0));
+
   return (
     <div
       onClick={() => router.push(`/escenario/${scenario.id}`)}
@@ -744,7 +751,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
       <div className="flex items-center justify-between text-sm text-muted-foreground pt-3 border-t border-border">
         <div className="flex items-center gap-1">
           <Flame className="w-4 h-4 text-yellow-500" />
-          <span>{scenario.total_pool.toLocaleString()} AP</span>
+          <span>{displayPool.toLocaleString()} AP</span>
         </div>
         <div className="flex items-center gap-1">
           <Users className="w-4 h-4" />
