@@ -212,21 +212,35 @@ export function NotificationPanel() {
 
   // Click en notificación
   const handleNotificationClick = (notification: Notification) => {
+    console.log('Notification clicked:', notification);
+    console.log('link_url:', notification.link_url);
+    console.log('data:', notification.data);
+
     // Marcar como leída primero
     if (!notification.is_read) {
       markAsRead(notification.id);
     }
 
-    // Obtener el link de navegación
-    const link = getNotificationLink(notification);
+    // Intentar obtener link directamente de link_url primero
+    let link = notification.link_url;
 
-    // Cerrar el dropdown y navegar
+    // Si no hay link_url, intentar construirlo desde data
+    if (!link) {
+      link = getNotificationLink(notification);
+    }
+
+    console.log('Final link:', link);
+
+    // Navegar directamente
     if (link) {
       setIsOpen(false);
-      // Pequeño delay para asegurar que el dropdown se cierre antes de navegar
+      // Small timeout to ensure dropdown closes first
       setTimeout(() => {
-        router.push(link);
+        window.location.href = link;
       }, 100);
+    } else {
+      console.warn('No link found for notification:', notification.id);
+      alert('No se encontró link para esta notificación. Revisa la consola para más detalles.');
     }
   };
 
