@@ -97,6 +97,13 @@ export interface CreateNotificationInput {
   message: string;
   imageUrl?: string;
   linkUrl?: string;
+  data?: {
+    scenario_id?: string;
+    user_id?: string;
+    community_id?: string;
+    conversation_id?: string;
+    [key: string]: unknown;
+  };
 }
 
 export const notificationsService = {
@@ -230,6 +237,7 @@ export const notificationsService = {
       message: input.message,
       image_url: input.imageUrl || null,
       link_url: input.linkUrl || null,
+      data: input.data || null,
       is_read: false,
     };
 
@@ -415,6 +423,7 @@ export const notificationsService = {
       title: '¡Escenario Creado! 📝',
       message: `Tu escenario "${scenarioTitle}" ha sido publicado. ¡Espera las predicciones!`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -426,6 +435,7 @@ export const notificationsService = {
       title: '¡Te robaron un escenario! 😱',
       message: `@${thiefUsername} robó tu escenario "${scenarioTitle}". ¡Usa un escudo para protegerte!`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -437,6 +447,7 @@ export const notificationsService = {
       title: '¡Escenario Recuperado! 🛡️',
       message: `Has recuperado el escenario "${scenarioTitle}". ¡Protégelo!`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -448,6 +459,7 @@ export const notificationsService = {
       title: '¡Predicción Correcta! 🏆',
       message: `Tu predicción en "${scenarioTitle}" fue correcta. Ganaste ${coinsWon.toLocaleString()} AP Coins.`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -459,6 +471,7 @@ export const notificationsService = {
       title: 'Predicción Incorrecta 😔',
       message: `Tu predicción en "${scenarioTitle}" no se cumplió. Perdiste ${coinsLost.toLocaleString()} AP Coins. ¡Sigue intentando!`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -470,6 +483,7 @@ export const notificationsService = {
       title: 'Escenario Resuelto 📊',
       message: `El escenario "${scenarioTitle}" ha sido resuelto. Resultado: ${result}.`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -481,6 +495,7 @@ export const notificationsService = {
       title: '⏰ Escenario por Expirar',
       message: `Tu escenario "${scenarioTitle}" expira en ${hoursLeft} horas. ¡Asegúrate de resolverlo!`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
@@ -493,6 +508,7 @@ export const notificationsService = {
       title: 'Nueva Predicción 🎯',
       message: `@${voterUsername} predijo "${voteText}" en tu escenario "${scenarioTitle}".`,
       linkUrl: `/escenario/${scenarioId}`,
+      data: { scenario_id: scenarioId },
     });
   },
 
