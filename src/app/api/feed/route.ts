@@ -38,6 +38,10 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
 
     const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase client not initialized' }, { status: 500 });
+    }
+
     const feedItems: FeedItem[] = [];
 
     // 1. Escenarios creados recientemente
@@ -61,6 +65,11 @@ export async function GET(request: NextRequest) {
       `)
       .order('created_at', { ascending: false })
       .limit(20);
+
+    if (scenariosError) {
+      console.error('Error fetching scenarios:', scenariosError);
+      return NextResponse.json({ error: 'Error fetching scenarios', details: scenariosError.message }, { status: 500 });
+    }
 
     if (scenarios) {
       for (const scenario of scenarios) {
