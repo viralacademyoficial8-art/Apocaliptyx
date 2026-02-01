@@ -362,44 +362,44 @@ export function ActivityFeed() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Setup Supabase Realtime subscriptions
+  // Setup Supabase Realtime subscription to feed_activities table
   useEffect(() => {
     const channel = supabase
       .channel('activity-feed')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'scenarios' }, (payload) => {
-        console.log('New scenario created:', payload);
+      // Subscribe to new activities in feed_activities table
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'feed_activities' }, (payload) => {
+        const activity = payload.new as any;
+        console.log('New feed activity:', activity);
         setNewItemsCount(prev => prev + 1);
-        toast('🎯 ¡Nuevo escenario creado!', { icon: '🆕', style: { background: '#1f2937', color: '#fff' } });
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' }, (payload) => {
-        const type = (payload.new as any)?.type;
-        if (type === 'STEAL') {
-          setNewItemsCount(prev => prev + 1);
-          toast('🦹 ¡Escenario robado!', { icon: '⚔️', style: { background: '#1f2937', color: '#fff' } });
-        } else if (type === 'PROTECT') {
-          setNewItemsCount(prev => prev + 1);
-          toast('🛡️ ¡Escenario protegido!', { icon: '✨', style: { background: '#1f2937', color: '#fff' } });
+
+        // Show toast based on activity type
+        const toastStyle = { background: '#1f2937', color: '#fff' };
+        switch (activity.type) {
+          case 'scenario_created':
+            toast('🎯 ¡Nuevo escenario creado!', { icon: '🆕', style: toastStyle });
+            break;
+          case 'scenario_stolen':
+            toast('🦹 ¡Escenario robado!', { icon: '⚔️', style: toastStyle });
+            break;
+          case 'scenario_protected':
+            toast('🛡️ ¡Escenario protegido!', { icon: '✨', style: toastStyle });
+            break;
+          case 'scenario_vote':
+            toast('🎲 ¡Nueva prediccion!', { icon: '💰', style: toastStyle });
+            break;
+          case 'scenario_resolved':
+            toast('✅ ¡Escenario resuelto!', { icon: '🏆', style: toastStyle });
+            break;
+          case 'scenario_closed':
+            toast('🔒 Escenario cerrado', { icon: '📝', style: toastStyle });
+            break;
+          case 'achievement':
+            toast('🏆 ¡Nuevo logro desbloqueado!', { icon: '🎉', style: toastStyle });
+            break;
+          case 'live_stream':
+            toast('🔴 ¡Nueva transmision en vivo!', { icon: '📺', style: toastStyle });
+            break;
         }
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'predictions' }, (payload) => {
-        setNewItemsCount(prev => prev + 1);
-        toast('🎲 ¡Nueva predicción!', { icon: '💰', style: { background: '#1f2937', color: '#fff' } });
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'scenarios' }, (payload) => {
-        const newData = payload.new as any;
-        const oldData = payload.old as any;
-        if (newData.resolved_at && !oldData?.resolved_at) {
-          setNewItemsCount(prev => prev + 1);
-          toast('✅ ¡Escenario resuelto!', { icon: '🏆', style: { background: '#1f2937', color: '#fff' } });
-        }
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'user_achievements' }, (payload) => {
-        setNewItemsCount(prev => prev + 1);
-        toast('🏆 ¡Nuevo logro desbloqueado!', { icon: '🎉', style: { background: '#1f2937', color: '#fff' } });
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'live_streams' }, (payload) => {
-        setNewItemsCount(prev => prev + 1);
-        toast('🔴 ¡Nueva transmisión en vivo!', { icon: '📺', style: { background: '#1f2937', color: '#fff' } });
       })
       .subscribe((status) => {
         setIsConnected(status === 'SUBSCRIBED');
