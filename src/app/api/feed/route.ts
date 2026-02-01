@@ -212,43 +212,35 @@ async function getLegacyFeed(supabase: any, limit: number, offset: number) {
     }
   }
 
-  // 2. Transacciones de robo (STEAL)
+  // 2. Historial de robos (scenario_steal_history)
   const { data: steals } = await supabase
-    .from('transactions')
+    .from('scenario_steal_history')
     .select(`
       id,
-      amount,
-      created_at,
-      user_id,
-      reference_id,
-      reference_type,
-      users (
+      scenario_id,
+      price_paid,
+      stolen_at,
+      thief_id,
+      users:thief_id (
         id,
         username,
         display_name,
         avatar_url,
         level,
         is_verified
+      ),
+      scenarios (
+        id,
+        title
       )
     `)
-    .eq('type', 'STEAL')
-    .order('created_at', { ascending: false })
+    .order('stolen_at', { ascending: false })
     .limit(20);
 
   if (steals) {
-    const stealScenarioIds = steals
-      .filter((s: any) => s.reference_id && s.reference_type === 'scenario')
-      .map((s: any) => s.reference_id as string);
-
-    const { data: stealScenarios } = stealScenarioIds.length > 0
-      ? await supabase.from('scenarios').select('id, title').in('id', stealScenarioIds)
-      : { data: [] };
-
-    const scenarioMap = new Map((stealScenarios || []).map((s: any) => [s.id, s]));
-
     for (const steal of steals) {
       const user = steal.users as any;
-      const scenario = scenarioMap.get(steal.reference_id as string);
+      const scenario = steal.scenarios as any;
       if (user && scenario) {
         feedItems.push({
           id: `steal_${steal.id}`,
@@ -256,7 +248,7 @@ async function getLegacyFeed(supabase: any, limit: number, offset: number) {
           title: 'Escenario robado',
           description: scenario.title,
           icon: '🦹',
-          timestamp: steal.created_at,
+          timestamp: steal.stolen_at,
           user: {
             id: user.id,
             username: user.username,
@@ -268,23 +260,22 @@ async function getLegacyFeed(supabase: any, limit: number, offset: number) {
           metadata: {
             scenarioId: scenario.id,
             scenarioTitle: scenario.title,
-            amount: steal.amount,
+            amount: steal.price_paid,
           },
         });
       }
     }
   }
 
-  // 3. Transacciones de protección (PROTECT)
-  const { data: protects } = await supabase
-    .from('transactions')
+  // 3. Escudos de proteccion (scenario_shields)
+  const { data: shields } = await supabase
+    .from('scenario_shields')
     .select(`
       id,
-      amount,
-      created_at,
+      scenario_id,
+      price_paid,
+      activated_at,
       user_id,
-      reference_id,
-      reference_type,
       users (
         id,
         username,
@@ -292,34 +283,27 @@ async function getLegacyFeed(supabase: any, limit: number, offset: number) {
         avatar_url,
         level,
         is_verified
+      ),
+      scenarios (
+        id,
+        title
       )
     `)
-    .eq('type', 'PROTECT')
-    .order('created_at', { ascending: false })
+    .order('activated_at', { ascending: false })
     .limit(20);
 
-  if (protects) {
-    const protectScenarioIds = protects
-      .filter((p: any) => p.reference_id && p.reference_type === 'scenario')
-      .map((p: any) => p.reference_id as string);
-
-    const { data: protectScenarios } = protectScenarioIds.length > 0
-      ? await supabase.from('scenarios').select('id, title').in('id', protectScenarioIds)
-      : { data: [] };
-
-    const protectScenarioMap = new Map((protectScenarios || []).map((s: any) => [s.id, s]));
-
-    for (const protect of protects) {
-      const user = protect.users as any;
-      const scenario = protectScenarioMap.get(protect.reference_id as string);
+  if (shields) {
+    for (const shield of shields) {
+      const user = shield.users as any;
+      const scenario = shield.scenarios as any;
       if (user && scenario) {
         feedItems.push({
-          id: `protect_${protect.id}`,
+          id: `protect_${shield.id}`,
           type: 'scenario_protected',
           title: 'Escenario protegido',
           description: scenario.title,
           icon: '🛡️',
-          timestamp: protect.created_at,
+          timestamp: shield.activated_at,
           user: {
             id: user.id,
             username: user.username,
@@ -331,7 +315,7 @@ async function getLegacyFeed(supabase: any, limit: number, offset: number) {
           metadata: {
             scenarioId: scenario.id,
             scenarioTitle: scenario.title,
-            amount: protect.amount,
+            amount: shield.price_paid,
           },
         });
       }

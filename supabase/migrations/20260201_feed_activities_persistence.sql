@@ -81,40 +81,21 @@ CREATE TRIGGER feed_on_scenario_created
   EXECUTE FUNCTION trigger_feed_scenario_created();
 
 -- =====================================================
--- 3. TRIGGER: Scenario Stolen/Protected (Transactions)
+-- 3. TRIGGER: Scenario Stolen (from scenario_steal_history)
 -- =====================================================
-CREATE OR REPLACE FUNCTION trigger_feed_transaction()
+CREATE OR REPLACE FUNCTION trigger_feed_scenario_stolen()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
   v_scenario scenarios;
-  v_activity_type TEXT;
-  v_title TEXT;
-  v_icon TEXT;
 BEGIN
-  -- Only process STEAL and PROTECT transactions with scenario reference
-  IF NEW.type NOT IN ('STEAL', 'PROTECT') OR NEW.reference_type != 'scenario' THEN
-    RETURN NEW;
-  END IF;
-
   -- Get scenario info
-  SELECT * INTO v_scenario FROM scenarios WHERE id = NEW.reference_id;
+  SELECT * INTO v_scenario FROM scenarios WHERE id = NEW.scenario_id;
 
   IF v_scenario IS NULL THEN
     RETURN NEW;
-  END IF;
-
-  -- Set activity details based on transaction type
-  IF NEW.type = 'STEAL' THEN
-    v_activity_type := 'scenario_stolen';
-    v_title := 'Escenario robado';
-    v_icon := '🦹';
-  ELSE
-    v_activity_type := 'scenario_protected';
-    v_title := 'Escenario protegido';
-    v_icon := '🛡️';
   END IF;
 
   INSERT INTO feed_activities (
@@ -128,26 +109,76 @@ BEGIN
     amount,
     created_at
   ) VALUES (
-    v_activity_type,
-    v_title,
+    'scenario_stolen',
+    'Escenario robado',
     v_scenario.title,
-    v_icon,
-    NEW.user_id,
+    '🦹',
+    NEW.thief_id,
     v_scenario.id,
     v_scenario.title,
-    NEW.amount,
-    NEW.created_at
+    NEW.price_paid,
+    NEW.stolen_at
   );
 
   RETURN NEW;
 END;
 $$;
 
-DROP TRIGGER IF EXISTS feed_on_transaction ON transactions;
-CREATE TRIGGER feed_on_transaction
-  AFTER INSERT ON transactions
+DROP TRIGGER IF EXISTS feed_on_scenario_stolen ON scenario_steal_history;
+CREATE TRIGGER feed_on_scenario_stolen
+  AFTER INSERT ON scenario_steal_history
   FOR EACH ROW
-  EXECUTE FUNCTION trigger_feed_transaction();
+  EXECUTE FUNCTION trigger_feed_scenario_stolen();
+
+-- =====================================================
+-- 3b. TRIGGER: Scenario Protected (from scenario_shields)
+-- =====================================================
+CREATE OR REPLACE FUNCTION trigger_feed_scenario_protected()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_scenario scenarios;
+BEGIN
+  -- Get scenario info
+  SELECT * INTO v_scenario FROM scenarios WHERE id = NEW.scenario_id;
+
+  IF v_scenario IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  INSERT INTO feed_activities (
+    type,
+    title,
+    description,
+    icon,
+    user_id,
+    scenario_id,
+    scenario_title,
+    amount,
+    created_at
+  ) VALUES (
+    'scenario_protected',
+    'Escenario protegido',
+    v_scenario.title,
+    '🛡️',
+    NEW.user_id,
+    v_scenario.id,
+    v_scenario.title,
+    NEW.price_paid,
+    NEW.activated_at
+  );
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS feed_on_scenario_protected ON scenario_shields;
+CREATE TRIGGER feed_on_scenario_protected
+  AFTER INSERT ON scenario_shields
+  FOR EACH ROW
+  EXECUTE FUNCTION trigger_feed_scenario_protected();
 
 -- =====================================================
 -- 4. TRIGGER: Prediction/Vote Created
@@ -433,29 +464,51 @@ WHERE p.created_at > NOW() - INTERVAL '7 days'
   )
 ON CONFLICT DO NOTHING;
 
--- Backfill steal/protect transactions (last 7 days)
+-- Backfill steal history (last 7 days)
 INSERT INTO feed_activities (type, title, description, icon, user_id, scenario_id, scenario_title, amount, created_at)
 SELECT
-  CASE WHEN t.type = 'STEAL' THEN 'scenario_stolen' ELSE 'scenario_protected' END,
-  CASE WHEN t.type = 'STEAL' THEN 'Escenario robado' ELSE 'Escenario protegido' END,
+  'scenario_stolen',
+  'Escenario robado',
   s.title,
-  CASE WHEN t.type = 'STEAL' THEN '🦹' ELSE '🛡️' END,
-  t.user_id,
+  '🦹',
+  ssh.thief_id,
   s.id,
   s.title,
-  t.amount,
-  t.created_at
-FROM transactions t
-JOIN scenarios s ON s.id = t.reference_id
-WHERE t.type IN ('STEAL', 'PROTECT')
-  AND t.reference_type = 'scenario'
-  AND t.created_at > NOW() - INTERVAL '7 days'
+  ssh.price_paid,
+  ssh.stolen_at
+FROM scenario_steal_history ssh
+JOIN scenarios s ON s.id = ssh.scenario_id
+WHERE ssh.stolen_at > NOW() - INTERVAL '7 days'
   AND NOT EXISTS (
     SELECT 1 FROM feed_activities fa
     WHERE fa.scenario_id = s.id
-      AND fa.user_id = t.user_id
-      AND fa.type = CASE WHEN t.type = 'STEAL' THEN 'scenario_stolen' ELSE 'scenario_protected' END
-      AND fa.created_at = t.created_at
+      AND fa.user_id = ssh.thief_id
+      AND fa.type = 'scenario_stolen'
+      AND fa.created_at = ssh.stolen_at
+  )
+ON CONFLICT DO NOTHING;
+
+-- Backfill shield/protect history (last 7 days)
+INSERT INTO feed_activities (type, title, description, icon, user_id, scenario_id, scenario_title, amount, created_at)
+SELECT
+  'scenario_protected',
+  'Escenario protegido',
+  s.title,
+  '🛡️',
+  ss.user_id,
+  s.id,
+  s.title,
+  ss.price_paid,
+  ss.activated_at
+FROM scenario_shields ss
+JOIN scenarios s ON s.id = ss.scenario_id
+WHERE ss.activated_at > NOW() - INTERVAL '7 days'
+  AND NOT EXISTS (
+    SELECT 1 FROM feed_activities fa
+    WHERE fa.scenario_id = s.id
+      AND fa.user_id = ss.user_id
+      AND fa.type = 'scenario_protected'
+      AND fa.created_at = ss.activated_at
   )
 ON CONFLICT DO NOTHING;
 
