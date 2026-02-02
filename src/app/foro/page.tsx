@@ -1911,8 +1911,26 @@ function ForoContent() {
                     }))
                   ];
 
+                  // Debug: Log timestamps before sorting
+                  if (combinedItems.length > 0) {
+                    const sample = combinedItems.slice(0, 5);
+                    console.log('[Foro Sort] Sample items before sort:', sample.map(i => ({
+                      type: i.type,
+                      rawTimestamp: i.type === 'post' ? (i.data as any).created_at : (i.data as any).timestamp,
+                      parsedTimestamp: i.timestamp.toISOString(),
+                      getTime: i.timestamp.getTime()
+                    })));
+                  }
+
                   // Ordenar por fecha descendente (más reciente primero)
                   combinedItems.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+                  // Debug: Log first 5 items after sort
+                  console.log('[Foro Sort] First 5 after sort:', combinedItems.slice(0, 5).map(i => ({
+                    type: i.type,
+                    timestamp: i.timestamp.toISOString(),
+                    title: i.type === 'post' ? (i.data as any).content?.substring(0, 30) : (i.data as any).title
+                  })));
 
                   return combinedItems.map((item) => {
                     if (item.type === 'post') {
