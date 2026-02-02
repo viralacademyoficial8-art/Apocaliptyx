@@ -633,6 +633,7 @@ function ForoContent() {
   // Cargar actividades del feed (escenarios creados, robados, protegidos, votos, etc.)
   const loadFeedItems = useCallback(async () => {
     setFeedLoading(true);
+    console.log('[Foro] Loading feed items...');
     try {
       const response = await fetch(`/api/feed?limit=30&_t=${Date.now()}`, {
         cache: 'no-store',
@@ -643,9 +644,10 @@ function ForoContent() {
       });
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
+      console.log('[Foro] Feed API response:', { itemCount: data.items?.length, items: data.items });
       setFeedItems(data.items || []);
     } catch (error) {
-      console.error('Error loading feed items:', error);
+      console.error('[Foro] Error loading feed items:', error);
     } finally {
       setFeedLoading(false);
     }
@@ -1885,6 +1887,8 @@ function ForoContent() {
                   type CombinedItem =
                     | { type: 'post'; data: ForumPost; timestamp: Date }
                     | { type: 'activity'; data: typeof feedItems[0]; timestamp: Date };
+
+                  console.log('[Foro Render] posts count:', posts.length, 'feedItems count:', feedItems.length);
 
                   const combinedItems: CombinedItem[] = [
                     ...posts.map(post => ({
