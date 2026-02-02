@@ -1934,6 +1934,7 @@ function ForoContent() {
                         />
                       );
                     } else {
+                      console.log('[Foro] Rendering ActivityCard:', item.data.id, item.data.type);
                       return (
                         <ActivityCard
                           key={`activity-${item.data.id}`}
@@ -3402,6 +3403,7 @@ interface ActivityCardProps {
 }
 
 function ActivityCard({ item, dateLocale }: ActivityCardProps) {
+  console.log('[ActivityCard] Rendering activity:', item.id, item.type, item.user?.username);
   const router = useRouter();
 
   const isYesVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'YES';
