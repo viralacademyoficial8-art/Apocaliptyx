@@ -38,6 +38,21 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
     const filterType = searchParams.get('type'); // Optional type filter
+    const debug = searchParams.get('debug') === 'true';
+
+    // Check environment variables
+    const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const hasSupabaseUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    if (debug) {
+      console.log('[Feed API] Debug info:', {
+        hasServiceKey,
+        hasSupabaseUrl,
+        limit,
+        offset,
+        filterType,
+      });
+    }
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
@@ -200,11 +215,24 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    const response = NextResponse.json({
+    const responseData: any = {
       items: feedItems,
       total,
       hasMore: offset + limit < total,
-    });
+    };
+
+    // Add debug info when requested
+    if (debug) {
+      responseData._debug = {
+        source: 'feed_activities',
+        rawCount: activities?.length || 0,
+        transformedCount: feedItems.length,
+        hasServiceKey,
+        hasSupabaseUrl,
+      };
+    }
+
+    const response = NextResponse.json(responseData);
 
     // Prevent browser caching to ensure fresh data on reload
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
