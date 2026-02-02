@@ -432,11 +432,6 @@ function ForoContent() {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(false);
 
-  // Debug: Log feedItems changes
-  useEffect(() => {
-    console.log('[Foro] feedItems state changed:', feedItems.length, 'items', feedItems.slice(0, 2));
-  }, [feedItems]);
-
   // Función para ordenar posts respetando el orden de los hilos
   const sortPostsRespectingThreads = useCallback((posts: ForumPost[]): ForumPost[] => {
     // Agrupar posts por thread_id
@@ -638,7 +633,6 @@ function ForoContent() {
   // Cargar actividades del feed (escenarios creados, robados, protegidos, votos, etc.)
   const loadFeedItems = useCallback(async () => {
     setFeedLoading(true);
-    console.log('[Foro] Loading feed items...');
     try {
       const response = await fetch(`/api/feed?limit=30&_t=${Date.now()}`, {
         cache: 'no-store',
@@ -649,10 +643,9 @@ function ForoContent() {
       });
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
-      console.log('[Foro] Feed API response:', { itemCount: data.items?.length, items: data.items });
       setFeedItems(data.items || []);
     } catch (error) {
-      console.error('[Foro] Error loading feed items:', error);
+      console.error('Error loading feed items:', error);
     } finally {
       setFeedLoading(false);
     }
@@ -867,9 +860,7 @@ function ForoContent() {
 
   // Load feed activities when feed tab is active
   useEffect(() => {
-    console.log('[Foro] activeTab effect running, activeTab:', activeTab);
     if (activeTab === 'feed') {
-      console.log('[Foro] Calling loadFeedItems...');
       loadFeedItems();
     }
   }, [activeTab, loadFeedItems]);
@@ -1895,42 +1886,33 @@ function ForoContent() {
                     | { type: 'post'; data: ForumPost; timestamp: Date }
                     | { type: 'activity'; data: typeof feedItems[0]; timestamp: Date };
 
-                  console.log('[Foro Render] posts count:', posts.length, 'feedItems count:', feedItems.length);
-
-                  const combinedItems: CombinedItem[] = [
-                    ...posts.map(post => ({
+                  // Convertir posts a items con timestamp
+                  const postItems = posts.map(post => {
+                    const ts = new Date(post.created_at);
+                    return {
                       type: 'post' as const,
                       data: post,
-                      timestamp: new Date(post.created_at)
-                    })),
-                    // Filtrar actividades de tipo live_stream ya que se muestran en sección separada
-                    ...feedItems.filter(item => item.type !== 'live_stream').map(item => ({
-                      type: 'activity' as const,
-                      data: item,
-                      timestamp: new Date(item.timestamp)
-                    }))
-                  ];
+                      timestamp: ts,
+                      sortTime: ts.getTime()
+                    };
+                  });
 
-                  // Debug: Log timestamps before sorting
-                  if (combinedItems.length > 0) {
-                    const sample = combinedItems.slice(0, 5);
-                    console.log('[Foro Sort] Sample items before sort:', sample.map(i => ({
-                      type: i.type,
-                      rawTimestamp: i.type === 'post' ? (i.data as any).created_at : (i.data as any).timestamp,
-                      parsedTimestamp: i.timestamp.toISOString(),
-                      getTime: i.timestamp.getTime()
-                    })));
-                  }
+                  // Convertir actividades a items con timestamp
+                  const activityItems = feedItems
+                    .filter(item => item.type !== 'live_stream')
+                    .map(item => {
+                      const ts = new Date(item.timestamp);
+                      return {
+                        type: 'activity' as const,
+                        data: item,
+                        timestamp: ts,
+                        sortTime: ts.getTime()
+                      };
+                    });
 
-                  // Ordenar por fecha descendente (más reciente primero)
-                  combinedItems.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-                  // Debug: Log first 5 items after sort
-                  console.log('[Foro Sort] First 5 after sort:', combinedItems.slice(0, 5).map(i => ({
-                    type: i.type,
-                    timestamp: i.timestamp.toISOString(),
-                    title: i.type === 'post' ? (i.data as any).content?.substring(0, 30) : (i.data as any).title
-                  })));
+                  // Combinar y ordenar por sortTime (más reciente primero)
+                  const combinedItems: (CombinedItem & { sortTime: number })[] = [...postItems, ...activityItems];
+                  combinedItems.sort((a, b) => b.sortTime - a.sortTime);
 
                   return combinedItems.map((item) => {
                     if (item.type === 'post') {
@@ -1952,7 +1934,6 @@ function ForoContent() {
                         />
                       );
                     } else {
-                      console.log('[Foro] Rendering ActivityCard:', item.data.id, item.data.type);
                       return (
                         <ActivityCard
                           key={`activity-${item.data.id}`}
@@ -3421,7 +3402,6 @@ interface ActivityCardProps {
 }
 
 function ActivityCard({ item, dateLocale }: ActivityCardProps) {
-  console.log('[ActivityCard] Rendering activity:', item.id, item.type, item.user?.username);
   const router = useRouter();
 
   const isYesVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'YES';
