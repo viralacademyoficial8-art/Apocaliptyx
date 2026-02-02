@@ -432,6 +432,11 @@ function ForoContent() {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(false);
 
+  // Debug: Log feedItems changes
+  useEffect(() => {
+    console.log('[Foro] feedItems state changed:', feedItems.length, 'items', feedItems.slice(0, 2));
+  }, [feedItems]);
+
   // Función para ordenar posts respetando el orden de los hilos
   const sortPostsRespectingThreads = useCallback((posts: ForumPost[]): ForumPost[] => {
     // Agrupar posts por thread_id
@@ -862,7 +867,9 @@ function ForoContent() {
 
   // Load feed activities when feed tab is active
   useEffect(() => {
+    console.log('[Foro] activeTab effect running, activeTab:', activeTab);
     if (activeTab === 'feed') {
+      console.log('[Foro] Calling loadFeedItems...');
       loadFeedItems();
     }
   }, [activeTab, loadFeedItems]);
