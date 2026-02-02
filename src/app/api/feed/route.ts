@@ -154,7 +154,11 @@ export async function GET(request: NextRequest) {
           users: userMap.get(a.user_id) || null,
         }));
       } else {
-        activities = simpleActivities;
+        // Add null users to match expected type
+        activities = (simpleActivities || []).map((a: any) => ({
+          ...a,
+          users: null,
+        }));
       }
     }
 
