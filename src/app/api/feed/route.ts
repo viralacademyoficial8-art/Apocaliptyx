@@ -41,10 +41,11 @@ export async function GET(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
+      console.error('[Feed API] Supabase client not initialized');
       return NextResponse.json({ error: 'Supabase client not initialized' }, { status: 500 });
     }
 
-    // Query feed_activities table with user data
+    // First try to query feed_activities with user join
     let query = supabase
       .from('feed_activities')
       .select(`
@@ -85,13 +86,70 @@ export async function GET(request: NextRequest) {
     // Apply pagination
     query = query.range(offset, offset + limit - 1);
 
-    const { data: activities, error: activitiesError } = await query;
+    let { data: activities, error: activitiesError } = await query;
 
+    // If join fails, try without the join and fetch users separately
     if (activitiesError) {
-      console.error('Error fetching feed activities:', activitiesError);
-      // Fallback to legacy method if feed_activities table doesn't exist
+      console.error('[Feed API] Error with user join, trying without join:', activitiesError.message);
+
+      // Query without user join
+      let simpleQuery = supabase
+        .from('feed_activities')
+        .select('id, type, title, description, icon, user_id, scenario_id, scenario_title, amount, vote_type, outcome, created_at')
+        .order('created_at', { ascending: false });
+
+      if (filterType && filterType !== 'all') {
+        if (filterType === 'votes_yes') {
+          simpleQuery = simpleQuery.eq('type', 'scenario_vote').eq('vote_type', 'YES');
+        } else if (filterType === 'votes_no') {
+          simpleQuery = simpleQuery.eq('type', 'scenario_vote').eq('vote_type', 'NO');
+        } else {
+          simpleQuery = simpleQuery.eq('type', filterType);
+        }
+      }
+
+      simpleQuery = simpleQuery.range(offset, offset + limit - 1);
+
+      const { data: simpleActivities, error: simpleError } = await simpleQuery;
+
+      if (simpleError) {
+        console.error('[Feed API] Error fetching feed_activities:', simpleError.message);
+        // Fallback to legacy method
+        return await getLegacyFeed(supabase, limit, offset);
+      }
+
+      // Fetch users separately
+      if (simpleActivities && simpleActivities.length > 0) {
+        const userIds = [...new Set(simpleActivities.map((a: any) => a.user_id).filter(Boolean))];
+        const { data: users } = await supabase
+          .from('users')
+          .select('id, username, display_name, avatar_url, level, is_verified')
+          .in('id', userIds);
+
+        const userMap = new Map<string, any>();
+        if (users) {
+          for (const user of users) {
+            userMap.set(user.id, user);
+          }
+        }
+
+        // Attach users to activities
+        activities = simpleActivities.map((a: any) => ({
+          ...a,
+          users: userMap.get(a.user_id) || null,
+        }));
+      } else {
+        activities = simpleActivities;
+      }
+    }
+
+    // If still no activities, try legacy as final fallback
+    if (!activities || activities.length === 0) {
+      console.log('[Feed API] No activities found in feed_activities table, trying legacy...');
       return await getLegacyFeed(supabase, limit, offset);
     }
+
+    console.log(`[Feed API] Found ${activities?.length || 0} activities from feed_activities table`);
 
     // Get total count for pagination
     let countQuery = supabase
@@ -108,8 +166,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const { count } = await countQuery;
-    const total = count || 0;
+    const { count, error: countError } = await countQuery;
+    if (countError) {
+      console.error('[Feed API] Error getting count:', countError.message);
+    }
+    const total = count || activities?.length || 0;
 
     // Transform activities to FeedItem format
     const feedItems: FeedItem[] = (activities || []).map((activity: any) => {
