@@ -27,7 +27,7 @@ import {
   MessageCircle,
   Share2,
   Bookmark,
-  BookmarkCheck,
+  BookMarked,
   Eye,
   Send,
   X,
@@ -444,7 +444,7 @@ function FeedItemCard({
           }`}
         >
           {item.user_bookmarked ? (
-            <BookmarkCheck className="w-4 h-4" />
+            <BookMarked className="w-4 h-4" />
           ) : (
             <Bookmark className="w-4 h-4" />
           )}
