@@ -25,25 +25,25 @@ export function ShopHero() {
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
             {t('shop.heroTitle')}{' '}
             <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">
               {t('shop.heroTitleHighlight')}
             </span>
           </h1>
 
-          <p className="text-lg text-foreground mb-8">
+          <p className="text-lg text-muted-foreground mb-8">
             {t('shop.heroSubtitle')}
           </p>
 
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-lg">
               <ShoppingBag className="w-5 h-5 text-purple-400" />
-              <span className="text-white font-medium">{t('shop.exclusiveItems')}</span>
+              <span className="text-foreground font-medium">{t('shop.exclusiveItems')}</span>
             </div>
             <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-lg">
               <Percent className="w-5 h-5 text-green-400" />
-              <span className="text-white font-medium">{t('shop.activeDiscounts')}</span>
+              <span className="text-foreground font-medium">{t('shop.activeDiscounts')}</span>
             </div>
           </div>
         </div>

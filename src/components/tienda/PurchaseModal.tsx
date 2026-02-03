@@ -106,11 +106,11 @@ export function PurchaseModal() {
               >
                 {item.rarity}
               </span>
-              <h2 className="text-2xl font-bold text-white mt-2">{item.name}</h2>
+              <h2 className="text-2xl font-bold text-foreground mt-2">{item.name}</h2>
             </div>
             <div className="flex items-center gap-1 text-sm">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              <span className="text-white font-medium">{item.rating}</span>
+              <span className="text-foreground font-medium">{item.rating}</span>
               <span className="text-muted-foreground">({item.reviews} {t('shop.reviews')})</span>
             </div>
           </div>
@@ -124,7 +124,7 @@ export function PurchaseModal() {
                 {item.effects.map((effect, i) => (
                   <div key={i} className="flex items-center gap-3 bg-muted rounded-lg p-3">
                     <Check className="w-5 h-5 text-green-400" />
-                    <span className="text-white">{effect.description}</span>
+                    <span className="text-foreground">{effect.description}</span>
                     {effect.duration && <span className="ml-auto text-muted-foreground text-sm">({effect.duration}h)</span>}
                   </div>
                 ))}
@@ -138,17 +138,17 @@ export function PurchaseModal() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors"
+                  className="p-2 bg-muted hover:bg-muted/80 rounded-lg transition-colors"
                 >
-                  <Minus className="w-4 h-4 text-white" />
+                  <Minus className="w-4 h-4 text-foreground" />
                 </button>
-                <span className="text-xl font-bold text-white w-12 text-center">{quantity}</span>
+                <span className="text-xl font-bold text-foreground w-12 text-center">{quantity}</span>
                 <button
                   onClick={() => setQuantity((q) => Math.min(Math.max(1, maxCanBuy), q + 1))}
                   disabled={quantity >= maxCanBuy}
-                  className="p-2 bg-muted hover:bg-muted rounded-lg transition-colors disabled:opacity-50"
+                  className="p-2 bg-muted hover:bg-muted/80 rounded-lg transition-colors disabled:opacity-50"
                 >
-                  <Plus className="w-4 h-4 text-white" />
+                  <Plus className="w-4 h-4 text-foreground" />
                 </button>
               </div>
               {item.maxPerUser && <p className="text-xs text-muted-foreground mt-1">{t('shop.maxPerUser')}: {item.maxPerUser}</p>}
@@ -175,7 +175,7 @@ export function PurchaseModal() {
             <button
               onClick={handleAddToCart}
               disabled={maxCanBuy <= 0}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-muted hover:bg-muted text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-muted hover:bg-muted/80 text-foreground font-medium rounded-lg transition-colors disabled:opacity-50"
             >
               <ShoppingCart className="w-5 h-5" />
               {t('shop.addToCart')}

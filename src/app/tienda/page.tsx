@@ -54,7 +54,7 @@ export default function TiendaPage() {
         </div>
 
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-white mb-6">{t('shop.allItems')}</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">{t('shop.allItems')}</h2>
 
           <div className="mb-6">
             <CategoryTabs />

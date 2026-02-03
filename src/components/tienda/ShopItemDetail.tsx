@@ -26,7 +26,7 @@ export function ShopItemDetail({ item }: { item: ShopItem }) {
 
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="rounded-2xl border border-border bg-card overflow-hidden">
-            <div className="h-64 flex items-center justify-center bg-gradient-to-br from-purple-900/40 via-gray-900 to-black">
+            <div className="h-64 flex items-center justify-center bg-gradient-to-br from-purple-900/40 via-background to-background">
               <span className="text-8xl">{typeIcons[item.type]}</span>
             </div>
             <div className="p-5 border-t border-border">
@@ -56,7 +56,7 @@ export function ShopItemDetail({ item }: { item: ShopItem }) {
                     setSelectedItem(item);
                     setPurchaseModalOpen(true);
                   }}
-                  className="flex-1 py-3 bg-muted hover:bg-muted text-white font-bold rounded-xl transition-colors"
+                  className="flex-1 py-3 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl transition-colors"
                 >
                   Ver detalle
                 </button>
@@ -65,15 +65,15 @@ export function ShopItemDetail({ item }: { item: ShopItem }) {
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-6">
-            <h1 className="text-3xl font-bold text-white">{item.name}</h1>
+            <h1 className="text-3xl font-bold text-foreground">{item.name}</h1>
             <p className="mt-2 text-muted-foreground">{item.longDescription || item.description}</p>
 
             {item.effects && item.effects.length > 0 && (
               <div className="mt-6">
-                <h2 className="text-white font-bold mb-3">Efectos</h2>
+                <h2 className="text-foreground font-bold mb-3">Efectos</h2>
                 <div className="space-y-2">
                   {item.effects.map((e, idx) => (
-                    <div key={idx} className="bg-muted border border-border rounded-xl p-4 text-gray-200">
+                    <div key={idx} className="bg-muted border border-border rounded-xl p-4 text-foreground">
                       <div className="font-semibold">{e.description}</div>
                       {e.duration ? <div className="text-sm text-muted-foreground mt-1">Duración: {e.duration} horas</div> : null}
                     </div>
@@ -84,23 +84,23 @@ export function ShopItemDetail({ item }: { item: ShopItem }) {
 
             <div className="mt-6 grid grid-cols-2 gap-3 text-sm">
               <div className="bg-muted border border-border rounded-xl p-4 text-foreground">
-                Rareza: <span className="text-white font-semibold">{item.rarity}</span>
+                Rareza: <span className="text-foreground font-semibold">{item.rarity}</span>
               </div>
               <div className="bg-muted border border-border rounded-xl p-4 text-foreground">
-                Tipo: <span className="text-white font-semibold">{item.type}</span>
+                Tipo: <span className="text-foreground font-semibold">{item.type}</span>
               </div>
               <div className="bg-muted border border-border rounded-xl p-4 text-foreground">
                 Stock:{' '}
-                <span className="text-white font-semibold">{item.stock === null ? 'Ilimitado' : item.stock}</span>
+                <span className="text-foreground font-semibold">{item.stock === null ? 'Ilimitado' : item.stock}</span>
               </div>
               <div className="bg-muted border border-border rounded-xl p-4 text-foreground">
                 Máx/usuario:{' '}
-                <span className="text-white font-semibold">{item.maxPerUser === null ? 'Sin límite' : item.maxPerUser}</span>
+                <span className="text-foreground font-semibold">{item.maxPerUser === null ? 'Sin límite' : item.maxPerUser}</span>
               </div>
             </div>
 
             <div className="mt-6 text-muted-foreground text-sm">
-              Tags: <span className="text-gray-200">{item.tags.join(', ')}</span>
+              Tags: <span className="text-foreground">{item.tags.join(', ')}</span>
             </div>
           </div>
         </div>

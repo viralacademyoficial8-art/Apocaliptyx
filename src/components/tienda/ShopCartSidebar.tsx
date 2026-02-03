@@ -21,7 +21,7 @@ export function ShopCartSidebar() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             <ShoppingCart className="w-6 h-6 text-purple-400" />
-            <h2 className="text-xl font-bold text-white">{t('shop.cart.title')}</h2>
+            <h2 className="text-xl font-bold text-foreground">{t('shop.cart.title')}</h2>
             <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-sm rounded-full">{cart.length}</span>
           </div>
           <button
@@ -51,7 +51,7 @@ export function ShopCartSidebar() {
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="text-white font-medium line-clamp-1">{item.name}</h3>
+                  <h3 className="text-foreground font-medium line-clamp-1">{item.name}</h3>
                   <p className="text-yellow-400 font-bold">{item.price.toLocaleString()} AP</p>
 
                   <div className="flex items-center gap-2 mt-2">
@@ -61,7 +61,7 @@ export function ShopCartSidebar() {
                     >
                       <Minus className="w-4 h-4 text-muted-foreground" />
                     </button>
-                    <span className="text-white w-8 text-center">{quantity}</span>
+                    <span className="text-foreground w-8 text-center">{quantity}</span>
                     <button
                       onClick={() => updateCartQuantity(item.id, quantity + 1)}
                       disabled={item.maxPerUser ? quantity >= item.maxPerUser : false}

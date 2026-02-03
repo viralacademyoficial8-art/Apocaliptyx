@@ -105,7 +105,7 @@ export function ShopItemCard({ item, onViewDetails }: ShopItemCardProps) {
           </div>
         </div>
 
-        <h3 className="text-white font-bold mb-1 line-clamp-1">{item.name}</h3>
+        <h3 className="text-foreground font-bold mb-1 line-clamp-1">{item.name}</h3>
         <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{item.description}</p>
 
         {item.effects && item.effects.length > 0 && (
