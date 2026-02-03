@@ -1886,22 +1886,33 @@ function ForoContent() {
                     | { type: 'post'; data: ForumPost; timestamp: Date }
                     | { type: 'activity'; data: typeof feedItems[0]; timestamp: Date };
 
-                  const combinedItems: CombinedItem[] = [
-                    ...posts.map(post => ({
+                  // Convertir posts a items con timestamp
+                  const postItems = posts.map(post => {
+                    const ts = new Date(post.created_at);
+                    return {
                       type: 'post' as const,
                       data: post,
-                      timestamp: new Date(post.created_at)
-                    })),
-                    // Filtrar actividades de tipo live_stream ya que se muestran en sección separada
-                    ...feedItems.filter(item => item.type !== 'live_stream').map(item => ({
-                      type: 'activity' as const,
-                      data: item,
-                      timestamp: new Date(item.timestamp)
-                    }))
-                  ];
+                      timestamp: ts,
+                      sortTime: ts.getTime()
+                    };
+                  });
 
-                  // Ordenar por fecha descendente (más reciente primero)
-                  combinedItems.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+                  // Convertir actividades a items con timestamp
+                  const activityItems = feedItems
+                    .filter(item => item.type !== 'live_stream')
+                    .map(item => {
+                      const ts = new Date(item.timestamp);
+                      return {
+                        type: 'activity' as const,
+                        data: item,
+                        timestamp: ts,
+                        sortTime: ts.getTime()
+                      };
+                    });
+
+                  // Combinar y ordenar por sortTime (más reciente primero)
+                  const combinedItems: (CombinedItem & { sortTime: number })[] = [...postItems, ...activityItems];
+                  combinedItems.sort((a, b) => b.sortTime - a.sortTime);
 
                   return combinedItems.map((item) => {
                     if (item.type === 'post') {
