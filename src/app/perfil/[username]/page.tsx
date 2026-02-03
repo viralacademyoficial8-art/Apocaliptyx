@@ -1025,7 +1025,10 @@ export default function PublicProfilePage() {
                       </span>
                       <h4 className="font-medium mt-2 line-clamp-2">{scenario.title}</h4>
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>{scenario.total_pool?.toLocaleString() || 0} AP</span>
+                        <span className="flex items-center gap-1 text-yellow-500">
+                          <Flame className="w-4 h-4" />
+                          {scenario.total_pool?.toLocaleString() || 0} AP
+                        </span>
                         <span>{scenario.participant_count || 0} participantes</span>
                       </div>
                     </Link>
