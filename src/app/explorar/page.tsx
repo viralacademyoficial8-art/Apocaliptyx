@@ -413,11 +413,11 @@ export default function ExplorarPage() {
             <div className="space-y-6">
               {/* Welcome Header */}
               <section>
-                <p className="text-xs text-zinc-400">{t('dashboard.welcomeBack')}</p>
-                <h1 className="text-2xl font-bold text-zinc-50">
+                <p className="text-xs text-muted-foreground">{t('dashboard.welcomeBack')}</p>
+                <h1 className="text-2xl font-bold text-foreground">
                   {currentUser.displayName || currentUser.username}
                 </h1>
-                <p className="text-xs text-zinc-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {t('dashboard.memberSince')} {formatDate(userCreatedAt || new Date(currentUser.createdAt))}
                 </p>
               </section>
@@ -430,12 +430,12 @@ export default function ExplorarPage() {
                     className={`rounded-xl border p-4 flex items-center gap-3 cursor-pointer transition-all ${
                       hasInfiniteCoins
                         ? 'border-yellow-500/50 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 hover:from-yellow-500/20 hover:to-orange-500/20'
-                        : 'border-zinc-800 bg-zinc-900/60 hover:border-orange-500/50 hover:bg-zinc-900'
+                        : 'border-border bg-card/60 hover:border-orange-500/50 hover:bg-card'
                     }`}
                   >
                     <Flame className="w-6 h-6 text-orange-400" />
                     <div>
-                      <p className="text-xs text-zinc-400">{t('dashboard.apCoins')}</p>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.apCoins')}</p>
                       {hasInfiniteCoins ? (
                         <div className="flex items-center gap-1">
                           <Infinity className="w-6 h-6 text-yellow-400" />
@@ -453,11 +453,11 @@ export default function ExplorarPage() {
                 <StaggerItem>
                   <div
                     onClick={() => router.push('/perfil/historial')}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-yellow-500/50 hover:bg-zinc-900 transition-all"
+                    className="rounded-xl border border-border bg-card/60 p-4 flex items-center gap-3 cursor-pointer hover:border-yellow-500/50 hover:bg-card transition-all"
                   >
                     <Trophy className="w-6 h-6 text-yellow-400" />
                     <div>
-                      <p className="text-xs text-zinc-400">{t('dashboard.scenariosWon')}</p>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.scenariosWon')}</p>
                       <p className="text-xl font-bold">{userStats.scenariosWon}</p>
                     </div>
                   </div>
@@ -466,11 +466,11 @@ export default function ExplorarPage() {
                 <StaggerItem>
                   <div
                     onClick={() => router.push(`/perfil/${currentUser.username}`)}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 hover:bg-zinc-900 transition-all"
+                    className="rounded-xl border border-border bg-card/60 p-4 flex items-center gap-3 cursor-pointer hover:border-emerald-500/50 hover:bg-card transition-all"
                   >
                     <ShoppingBag className="w-6 h-6 text-emerald-400" />
                     <div>
-                      <p className="text-xs text-zinc-400">{t('dashboard.scenariosCreated')}</p>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.scenariosCreated')}</p>
                       <p className="text-xl font-bold">{userStats.scenariosCreated}</p>
                     </div>
                   </div>
@@ -479,11 +479,11 @@ export default function ExplorarPage() {
                 <StaggerItem>
                   <div
                     onClick={() => currentUser?.username && router.push(`/perfil/${currentUser.username}/escenarios-robados`)}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 flex items-center gap-3 cursor-pointer hover:border-red-500/50 hover:bg-zinc-900 transition-all"
+                    className="rounded-xl border border-border bg-card/60 p-4 flex items-center gap-3 cursor-pointer hover:border-red-500/50 hover:bg-card transition-all"
                   >
                     <Swords className="w-6 h-6 text-red-400" />
                     <div>
-                      <p className="text-xs text-zinc-400">{t('dashboard.scenariosStolen')}</p>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.scenariosStolen')}</p>
                       <p className="text-xl font-bold">{userStats.scenariosStolen}</p>
                     </div>
                   </div>
@@ -524,10 +524,10 @@ export default function ExplorarPage() {
 
                   {/* Filters panel */}
                   {showFilters && (
-                    <div className="mb-4 p-4 bg-zinc-900 border border-zinc-800 rounded-xl space-y-4">
+                    <div className="mb-4 p-4 bg-card border border-border rounded-xl space-y-4">
                       {/* Categories */}
                       <div>
-                        <label className="text-sm text-zinc-400 mb-2 block">{t('scenarios.create.category')}</label>
+                        <label className="text-sm text-muted-foreground mb-2 block">{t('scenarios.create.category')}</label>
                         <div className="flex flex-wrap gap-2">
                           {CATEGORIES.map((cat) => (
                             <button
@@ -536,7 +536,7 @@ export default function ExplorarPage() {
                               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                 selectedCategory === cat.value
                                   ? 'bg-purple-500 text-white'
-                                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
                               }`}
                             >
                               {cat.label}
@@ -547,7 +547,7 @@ export default function ExplorarPage() {
 
                       {/* Sort */}
                       <div>
-                        <label className="text-sm text-zinc-400 mb-2 block">{t('leaderboard.sortByLabel')}</label>
+                        <label className="text-sm text-muted-foreground mb-2 block">{t('leaderboard.sortByLabel')}</label>
                         <div className="flex flex-wrap gap-2">
                           {SORT_OPTIONS.map((option) => (
                             <button
@@ -556,7 +556,7 @@ export default function ExplorarPage() {
                               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                 sortBy === option.value
                                   ? 'bg-purple-500 text-white'
-                                  : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
                               }`}
                             >
                               {option.label}
@@ -580,16 +580,16 @@ export default function ExplorarPage() {
 
                       {/* Filtered Results - Show right below filters when filter is active */}
                       {(selectedCategory !== 'Todos' || sortBy !== 'newest') && (
-                        <div className="pt-4 border-t border-zinc-700">
-                          <h3 className="text-sm font-medium text-zinc-300 mb-3 flex items-center gap-2">
+                        <div className="pt-4 border-t border-border">
+                          <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                             <Flame className="w-4 h-4 text-orange-400" />
                             Resultados ({filteredScenarios.length} {t('explore.scenariosFound')})
                           </h3>
                           {filteredScenarios.length === 0 ? (
                             <div className="text-center py-8">
-                              <Search className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-                              <p className="text-zinc-500 text-sm">{t('explore.noScenarios')}</p>
-                              <p className="text-zinc-600 text-xs mt-1">{t('explore.tryOtherFilters')}</p>
+                              <Search className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                              <p className="text-muted-foreground text-sm">{t('explore.noScenarios')}</p>
+                              <p className="text-muted-foreground/70 text-xs mt-1">{t('explore.tryOtherFilters')}</p>
                             </div>
                           ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -626,7 +626,7 @@ export default function ExplorarPage() {
                         {sortedScenarios.length > 6 && (
                           <button
                             onClick={() => setShowAllFeatured(!showAllFeatured)}
-                            className="w-full mt-4 py-3 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/70 hover:border-purple-500/50 transition-all flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300"
+                            className="w-full mt-4 py-3 rounded-xl border border-border bg-card/50 hover:bg-muted hover:border-purple-500/50 transition-all flex items-center justify-center gap-2 text-sm text-purple-500 dark:text-purple-400 hover:text-purple-600 dark:hover:text-purple-300"
                           >
                             <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAllFeatured ? 'rotate-180' : ''}`} />
                             {showAllFeatured ? 'Ver menos' : `Ver ${remainingCount} más`}
