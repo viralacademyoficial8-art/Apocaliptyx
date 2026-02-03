@@ -2767,7 +2767,7 @@ function ForoContent() {
 
       {/* Create Post Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-bold mb-4">{t('forum.createModal.title')}</h2>
 
           {/* Post Type Selector */}
@@ -3117,7 +3117,7 @@ function ForoContent() {
 
       {/* Comments Modal */}
       <Dialog open={!!selectedPostId} onOpenChange={() => setSelectedPostId(null)}>
-        <DialogContent className="bg-card border-border max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <h2 className="text-xl font-bold mb-4">{t('forum.comments.title')}</h2>
 
           {selectedPost && (
@@ -3342,7 +3342,7 @@ function ForoContent() {
 
       {/* Repost Modal */}
       <Dialog open={repostModalOpen} onOpenChange={setRepostModalOpen}>
-        <DialogContent className="bg-card border-border max-w-lg">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Repeat2 className="w-5 h-5 text-green-400" />
             {t('forum.actions.sharePost')}
@@ -3406,7 +3406,7 @@ function ForoContent() {
 
       {/* Award Modal */}
       <Dialog open={awardModalOpen} onOpenChange={setAwardModalOpen}>
-        <DialogContent className="bg-card border-border max-w-lg">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-yellow-400" />
             {t('forum.actions.giveAward')}

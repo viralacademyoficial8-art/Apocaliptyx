@@ -1688,7 +1688,7 @@ function MensajesContent() {
           </div>
 
           {/* Modal container with gradient border */}
-          <div className="relative w-full max-w-md">
+          <div className="relative w-full sm:max-w-md">
             <div className="absolute -inset-[1px] bg-gradient-to-br from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-75" />
             <div className="relative bg-[#0d0d14] rounded-2xl overflow-hidden">
               {/* Header */}
@@ -1794,7 +1794,7 @@ function MensajesContent() {
       {/* ============================================ */}
       {showAddMembers && selectedConversation?.type === 'group' && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+          <div className="bg-card border border-border rounded-xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
             <div className="p-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-purple-400" />
@@ -1881,7 +1881,7 @@ function MensajesContent() {
       {/* ============================================ */}
       {showInviteLink && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md">
+          <div className="bg-card border border-border rounded-xl w-full sm:max-w-md">
             <div className="p-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Link2 className="w-5 h-5 text-purple-400" />
@@ -1957,7 +1957,7 @@ function MensajesContent() {
       {/* ============================================ */}
       {showInvitations && pendingInvitations.length > 0 && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+          <div className="bg-card border border-border rounded-xl w-full sm:max-w-md max-h-[80vh] flex flex-col">
             <div className="p-4 border-b border-border flex items-center justify-between">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <Users className="w-5 h-5 text-purple-400" />
