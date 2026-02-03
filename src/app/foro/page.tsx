@@ -439,6 +439,27 @@ function ForoContent() {
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(false);
 
+  // Activity comments modal state
+  interface ActivityComment {
+    id: string;
+    content: string;
+    created_at: string;
+    user_id: string;
+    users: {
+      id: string;
+      username: string;
+      display_name: string | null;
+      avatar_url: string | null;
+      level: number;
+    };
+  }
+  const [activityCommentsModalOpen, setActivityCommentsModalOpen] = useState(false);
+  const [activityCommentsId, setActivityCommentsId] = useState<string | null>(null);
+  const [activityComments, setActivityComments] = useState<ActivityComment[]>([]);
+  const [loadingActivityComments, setLoadingActivityComments] = useState(false);
+  const [newActivityComment, setNewActivityComment] = useState('');
+  const [submittingActivityComment, setSubmittingActivityComment] = useState(false);
+
   // Función para ordenar posts respetando el orden de los hilos
   const sortPostsRespectingThreads = useCallback((posts: ForumPost[]): ForumPost[] => {
     // Agrupar posts por thread_id
@@ -1464,13 +1485,65 @@ function ForoContent() {
     }
   };
 
-  const handleActivityOpenComments = (activityId: string) => {
-    const item = feedItems.find(i => i.id === activityId);
-    if (item?.metadata?.scenarioId) {
-      router.push(`/escenario/${item.metadata.scenarioId}#comments`);
-    } else {
-      toast('Comentarios no disponibles para esta actividad');
+  const handleActivityOpenComments = async (activityId: string) => {
+    setActivityCommentsId(activityId);
+    setActivityCommentsModalOpen(true);
+    setLoadingActivityComments(true);
+    setActivityComments([]);
+
+    try {
+      const res = await fetch(`/api/feed/activities/${activityId}/comments`);
+      if (res.ok) {
+        const data = await res.json();
+        setActivityComments(data.comments || []);
+      }
+    } catch (error) {
+      console.error('Error loading activity comments:', error);
+      toast.error('Error al cargar comentarios');
+    } finally {
+      setLoadingActivityComments(false);
     }
+  };
+
+  const handleSubmitActivityComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newActivityComment.trim() || !activityCommentsId || submittingActivityComment) return;
+
+    setSubmittingActivityComment(true);
+    try {
+      const res = await fetch(`/api/feed/activities/${activityCommentsId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newActivityComment.trim() }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setActivityComments(prev => [...prev, data.comment]);
+        setNewActivityComment('');
+        // Update comments count in the feed item
+        setFeedItems(prev => prev.map(item =>
+          item.id === activityCommentsId
+            ? { ...item, comments_count: (item.comments_count || 0) + 1 }
+            : item
+        ));
+        toast.success('Comentario publicado');
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Error al publicar');
+      }
+    } catch (error) {
+      toast.error('Error al publicar comentario');
+    } finally {
+      setSubmittingActivityComment(false);
+    }
+  };
+
+  const closeActivityCommentsModal = () => {
+    setActivityCommentsModalOpen(false);
+    setActivityCommentsId(null);
+    setActivityComments([]);
+    setNewActivityComment('');
   };
 
   // Open repost modal
@@ -3440,6 +3513,93 @@ function ForoContent() {
             setStoriesKey(prev => prev + 1);
           }}
         />
+      )}
+
+      {/* Activity Comments Modal */}
+      {activityCommentsModalOpen && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-card w-full sm:max-w-md sm:rounded-xl rounded-t-xl border border-border max-h-[80vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <MessageCircle className="w-5 h-5 text-purple-400" />
+                Comentarios
+              </h3>
+              <button
+                type="button"
+                onClick={closeActivityCommentsModal}
+                className="p-1 rounded-full hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Comments List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px]">
+              {loadingActivityComments ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+                </div>
+              ) : activityComments.length > 0 ? (
+                activityComments.map((comment) => (
+                  <div key={comment.id} className="flex gap-3">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0">
+                      {comment.users?.avatar_url ? (
+                        <img src={comment.users.avatar_url} alt={comment.users.username} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white text-xs font-bold">
+                          {comment.users?.username?.[0]?.toUpperCase() || '?'}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-white text-sm">
+                          {comment.users?.display_name || comment.users?.username || 'Usuario'}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-foreground mt-0.5">{comment.content}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <MessageCircle className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
+                  <p className="text-muted-foreground text-sm">No hay comentarios aún</p>
+                  <p className="text-muted-foreground text-xs mt-1">¡Sé el primero en comentar!</p>
+                </div>
+              )}
+            </div>
+
+            {/* Comment Input */}
+            <form onSubmit={handleSubmitActivityComment} className="p-4 border-t border-border">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newActivityComment}
+                  onChange={(e) => setNewActivityComment(e.target.value)}
+                  placeholder="Escribe un comentario..."
+                  maxLength={500}
+                  className="flex-1 bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                />
+                <button
+                  type="submit"
+                  disabled={!newActivityComment.trim() || submittingActivityComment}
+                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:bg-purple-500/50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-colors flex items-center gap-1"
+                >
+                  {submittingActivityComment ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
