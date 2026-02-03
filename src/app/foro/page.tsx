@@ -3517,10 +3517,10 @@ function ForoContent() {
 
       {/* Activity Comments Modal */}
       {activityCommentsModalOpen && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-card w-full sm:max-w-2xl sm:rounded-xl rounded-t-xl border border-border max-h-[80vh] flex flex-col">
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-card w-full sm:max-w-2xl sm:rounded-xl rounded-t-xl border border-border max-h-[calc(100vh-100px)] sm:max-h-[80vh] flex flex-col mb-16 sm:mb-0">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
               <h3 className="text-xl font-bold text-white">Comentarios</h3>
               <button
                 type="button"
@@ -3536,30 +3536,30 @@ function ForoContent() {
               const activity = feedItems.find(i => i.id === activityCommentsId);
               if (!activity) return null;
               return (
-                <div className="bg-muted/50 rounded-lg p-4 mx-4 mt-4 border border-border">
+                <div className="bg-muted/50 rounded-lg p-3 sm:p-4 mx-3 sm:mx-4 mt-3 sm:mt-4 border border-border flex-shrink-0">
                   <div className="flex items-center gap-2 mb-2">
                     <div
-                      className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                      className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden flex-shrink-0"
                       style={activity.user.avatarUrl ? { background: `url(${activity.user.avatarUrl}) center/cover` } : undefined}
                     >
                       {!activity.user.avatarUrl && (activity.user.displayName || activity.user.username || 'U')[0].toUpperCase()}
                     </div>
-                    <div>
-                      <span className="font-semibold text-white">
+                    <div className="min-w-0">
+                      <span className="font-semibold text-white text-sm sm:text-base">
                         {activity.user.displayName || activity.user.username}
                       </span>
-                      <span className="text-muted-foreground text-sm ml-2">
+                      <span className="text-muted-foreground text-xs sm:text-sm ml-1 sm:ml-2">
                         @{activity.user.username}
                       </span>
                     </div>
                   </div>
-                  <p className="text-foreground">{activity.description}</p>
+                  <p className="text-foreground text-sm sm:text-base line-clamp-2">{activity.description}</p>
                 </div>
               );
             })()}
 
             {/* Comments List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px]">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-[100px]">
               {loadingActivityComments ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
@@ -3568,9 +3568,9 @@ function ForoContent() {
                 <div className="space-y-3">
                   {activityComments.map((comment) => (
                     <div key={comment.id} className="bg-muted/30 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <div
-                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden flex-shrink-0"
                           style={comment.users?.avatar_url ? { background: `url(${comment.users.avatar_url}) center/cover` } : undefined}
                         >
                           {!comment.users?.avatar_url && (comment.users?.display_name || comment.users?.username || 'U')[0].toUpperCase()}
@@ -3578,7 +3578,7 @@ function ForoContent() {
                         <span className="font-medium text-sm text-white">
                           {comment.users?.display_name || comment.users?.username}
                         </span>
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-muted-foreground text-xs sm:text-sm hidden sm:inline">
                           @{comment.users?.username}
                         </span>
                         <span className="text-muted-foreground text-xs">
@@ -3597,7 +3597,7 @@ function ForoContent() {
             </div>
 
             {/* Comment Input */}
-            <div className="p-4 border-t border-border">
+            <div className="p-3 sm:p-4 border-t border-border flex-shrink-0 bg-card">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -3606,13 +3606,13 @@ function ForoContent() {
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitActivityComment(e)}
                   placeholder="Escribe un comentario..."
                   maxLength={500}
-                  className="flex-1 px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 px-3 py-2.5 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
                 />
                 <button
                   type="button"
                   onClick={handleSubmitActivityComment}
                   disabled={!newActivityComment.trim() || submittingActivityComment}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors flex items-center"
+                  className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors flex items-center"
                 >
                   {submittingActivityComment ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
