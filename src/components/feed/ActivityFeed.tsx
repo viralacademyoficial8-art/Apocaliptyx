@@ -975,6 +975,7 @@ export function ActivityFeed() {
             </div>
           </div>
         </div>
+      )}
     </div>
   );
 }
