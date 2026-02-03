@@ -206,29 +206,35 @@ export default function CrearPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen bg-gradient-to-b from-amber-50/50 via-background to-background dark:from-background dark:via-background text-foreground">
       <Navbar />
       <section className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-foreground">
-          {t('create.title')}
-        </h1>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {t('create.subtitle')}
-        </p>
+        {/* Header with gradient accent */}
+        <div className="relative mb-8">
+          <div className="absolute -top-4 -left-4 w-24 h-24 bg-gradient-to-br from-amber-400/30 to-orange-400/20 dark:from-amber-500/10 dark:to-orange-500/5 rounded-full blur-2xl" />
+          <div className="relative">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-600 via-orange-500 to-red-500 dark:from-amber-400 dark:via-orange-400 dark:to-red-400 bg-clip-text text-transparent">
+              {t('create.title')}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('create.subtitle')}
+            </p>
+          </div>
+        </div>
 
         <form
           onSubmit={handleSubmit}
-          className="mt-6 space-y-4 rounded-2xl border border-border bg-card p-4 text-sm"
+          className="space-y-5 rounded-2xl border border-amber-200/50 dark:border-border bg-white dark:bg-card p-6 text-sm shadow-xl shadow-amber-500/5 dark:shadow-none"
         >
           {/* Título */}
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">{t('create.scenarioTitle')}</label>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-700 dark:text-muted-foreground uppercase tracking-wide">{t('create.scenarioTitle')}</label>
             <div className="relative">
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isLoading}
-                className="w-full rounded-lg border border-border bg-muted px-3 py-2 pr-10 text-sm text-foreground outline-none ring-0 placeholder:text-muted-foreground focus:border-amber-500 disabled:opacity-50"
+                className="w-full rounded-xl border-2 border-gray-200 dark:border-border bg-gray-50 dark:bg-muted px-4 py-3 pr-10 text-sm text-foreground outline-none placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:border-amber-500 focus:bg-white dark:focus:bg-muted focus:shadow-lg focus:shadow-amber-500/10 transition-all disabled:opacity-50"
                 placeholder={t('create.titlePlaceholder')}
               />
               {checkingDuplicates && (
@@ -427,33 +433,35 @@ export default function CrearPage() {
 
           {/* Indicador de que pasó la verificación */}
           {title.length >= 10 && !checkingDuplicates && similarScenarios.length === 0 && (
-            <div className="flex items-center gap-2 text-green-500 dark:text-green-400 text-xs">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              {t('create.uniqueTitle')}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20">
+              <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                <span className="text-white text-xs">✓</span>
+              </div>
+              <span className="text-green-700 dark:text-green-400 text-xs font-medium">{t('create.uniqueTitle')}</span>
             </div>
           )}
 
           {/* Descripción */}
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">{t('scenarios.create.description')}</label>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-700 dark:text-muted-foreground uppercase tracking-wide">{t('scenarios.create.description')}</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={isLoading}
-              className="min-h-[120px] w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none ring-0 placeholder:text-muted-foreground focus:border-amber-500 disabled:opacity-50"
+              className="min-h-[140px] w-full rounded-xl border-2 border-gray-200 dark:border-border bg-gray-50 dark:bg-muted px-4 py-3 text-sm text-foreground outline-none placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:border-amber-500 focus:bg-white dark:focus:bg-muted focus:shadow-lg focus:shadow-amber-500/10 transition-all disabled:opacity-50 resize-none"
               placeholder={t('create.descriptionPlaceholder')}
             />
           </div>
 
           {/* Categoría y fecha límite */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">{t('scenarios.create.category')}</label>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-700 dark:text-muted-foreground uppercase tracking-wide">{t('scenarios.create.category')}</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ScenarioCategory)}
                 disabled={isLoading}
-                className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
+                className="w-full rounded-xl border-2 border-gray-200 dark:border-border bg-gray-50 dark:bg-muted px-4 py-3 text-sm text-foreground outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-muted focus:shadow-lg focus:shadow-amber-500/10 transition-all disabled:opacity-50 cursor-pointer"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -463,8 +471,8 @@ export default function CrearPage() {
               </select>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-gray-700 dark:text-muted-foreground uppercase tracking-wide">
                 {t('create.deadlineLabel')}
               </label>
               <input
@@ -473,45 +481,58 @@ export default function CrearPage() {
                 onChange={handleDateChange}
                 disabled={isLoading}
                 min={getMinDate()}
-                className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
+                className="w-full rounded-xl border-2 border-gray-200 dark:border-border bg-gray-50 dark:bg-muted px-4 py-3 text-sm text-foreground outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-muted focus:shadow-lg focus:shadow-amber-500/10 transition-all disabled:opacity-50 cursor-pointer"
               />
-              <p className="mt-1 text-[10px] text-muted-foreground">
+              <p className="text-[11px] text-gray-500 dark:text-muted-foreground">
                 {t('create.deadlineHint')}
               </p>
             </div>
           </div>
 
           {/* Info del costo */}
-          <div className="rounded-xl border border-amber-500/30 dark:border-amber-500/20 bg-amber-100 dark:bg-gradient-to-r dark:from-amber-500/10 dark:via-amber-500/5 dark:to-transparent px-3 py-3 text-xs text-amber-800 dark:text-amber-100">
-            <p className="font-medium">
-              {t('create.creationCost')}:{" "}
-              <span className="font-semibold">{t('create.freeForNow')}</span>
-            </p>
-            <p className="mt-1 text-[11px] text-amber-700 dark:text-amber-100/80">
-              {t('create.rewardInfo')}
-            </p>
+          <div className="relative overflow-hidden rounded-xl border border-amber-300 dark:border-amber-500/20 bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 dark:from-amber-500/10 dark:via-amber-500/5 dark:to-transparent px-4 py-4">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-200/50 to-transparent dark:from-amber-500/10 rounded-bl-full" />
+            <div className="relative flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 dark:from-amber-500/30 dark:to-orange-500/30 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <span className="text-lg">✨</span>
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-amber-900 dark:text-amber-100">
+                  {t('create.creationCost')}:{" "}
+                  <span className="text-green-600 dark:text-green-400">{t('create.freeForNow')}</span>
+                </p>
+                <p className="mt-1 text-xs text-amber-700 dark:text-amber-100/80">
+                  {t('create.rewardInfo')}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Botón enviar */}
-          <button
-            type="submit"
-            disabled={isLoading || !title || !description || !dueDate || isDuplicate}
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-500/30 transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {t('create.creating')}
-              </>
-            ) : checkingDuplicates ? (
-              <>
-                <Search className="w-4 h-4 mr-2 animate-pulse" />
-                {t('create.verifying')}
-              </>
-            ) : (
-              t('create.launchScenario')
-            )}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isLoading || !title || !description || !dueDate || isDuplicate}
+              className="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-8 py-3.5 text-base font-bold text-white shadow-xl shadow-orange-500/30 hover:shadow-orange-500/40 transition-all hover:scale-[1.02] hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  {t('create.creating')}
+                </>
+              ) : checkingDuplicates ? (
+                <>
+                  <Search className="w-5 h-5 mr-2 animate-pulse" />
+                  {t('create.verifying')}
+                </>
+              ) : (
+                <>
+                  <span className="mr-2">🚀</span>
+                  {t('create.launchScenario')}
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </section>
     </main>
