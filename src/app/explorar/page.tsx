@@ -202,7 +202,7 @@ export default function ExplorarPage() {
   const loadScenarios = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await scenariosService.getActive(50);
+      const data = await scenariosService.getActive(); // Sin límite - obtiene todos
       setScenarios(data);
       setFilteredScenarios(data);
       setError(null);
