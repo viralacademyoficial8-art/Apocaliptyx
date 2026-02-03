@@ -21,7 +21,7 @@ export function FeaturedItems() {
             <Star className="w-6 h-6 text-yellow-400" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">{t('shop.featuredItems')}</h2>
+            <h2 className="text-2xl font-bold text-foreground">{t('shop.featuredItems')}</h2>
             <p className="text-muted-foreground text-sm">{t('shop.mostPopular')}</p>
           </div>
         </div>

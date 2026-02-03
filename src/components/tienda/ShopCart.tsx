@@ -17,7 +17,7 @@ export function ShopCart() {
 
         <div className="mt-6 flex items-center gap-3">
           <ShoppingCart className="w-7 h-7 text-purple-400" />
-          <h1 className="text-3xl font-bold text-white">Tu carrito</h1>
+          <h1 className="text-3xl font-bold text-foreground">Tu carrito</h1>
         </div>
 
         {cart.length === 0 ? (
@@ -41,7 +41,7 @@ export function ShopCart() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="text-white font-semibold truncate">{item.name}</div>
+                  <div className="text-foreground font-semibold truncate">{item.name}</div>
                   <div className="text-yellow-400 font-bold">{item.price.toLocaleString()} AP</div>
 
                   <div className="mt-2 flex items-center gap-2">
@@ -51,7 +51,7 @@ export function ShopCart() {
                     >
                       <Minus className="w-4 h-4 text-gray-200" />
                     </button>
-                    <span className="text-white w-10 text-center font-bold">{quantity}</span>
+                    <span className="text-foreground w-10 text-center font-bold">{quantity}</span>
                     <button
                       onClick={() => updateCartQuantity(item.id, quantity + 1)}
                       disabled={item.maxPerUser ? quantity >= item.maxPerUser : false}
@@ -90,7 +90,7 @@ export function ShopCart() {
                   )}
                 </button>
 
-                <button onClick={clearCart} className="flex-1 py-3 bg-muted hover:bg-muted text-white font-bold rounded-xl transition-colors">
+                <button onClick={clearCart} className="flex-1 py-3 bg-muted hover:bg-muted/80 text-foreground font-bold rounded-xl transition-colors">
                   Vaciar carrito
                 </button>
               </div>
