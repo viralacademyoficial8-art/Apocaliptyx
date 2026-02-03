@@ -577,6 +577,29 @@ export default function ExplorarPage() {
                           {t('explore.clearFilters')}
                         </button>
                       )}
+
+                      {/* Filtered Results - Show right below filters when filter is active */}
+                      {(selectedCategory !== 'Todos' || sortBy !== 'newest') && (
+                        <div className="pt-4 border-t border-zinc-700">
+                          <h3 className="text-sm font-medium text-zinc-300 mb-3 flex items-center gap-2">
+                            <Flame className="w-4 h-4 text-orange-400" />
+                            Resultados ({filteredScenarios.length} {t('explore.scenariosFound')})
+                          </h3>
+                          {filteredScenarios.length === 0 ? (
+                            <div className="text-center py-8">
+                              <Search className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
+                              <p className="text-zinc-500 text-sm">{t('explore.noScenarios')}</p>
+                              <p className="text-zinc-600 text-xs mt-1">{t('explore.tryOtherFilters')}</p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {filteredScenarios.map((scenario) => (
+                                <ScenarioCard key={scenario.id} scenario={scenario} />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
 
