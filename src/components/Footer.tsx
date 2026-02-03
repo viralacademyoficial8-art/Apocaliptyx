@@ -5,12 +5,10 @@ import Image from 'next/image';
 import { useMemo, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
-  Skull,
   Twitter,
   Instagram,
   Youtube,
   MessageCircle,
-  MapPin,
   Flame,
   Users,
   Target,
@@ -583,42 +581,16 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Copyright - Mejorado */}
+      {/* Copyright - Simplificado */}
       <div className="border-t border-border bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Copyright */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>© {currentYear}</span>
-              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                Apocaliptyx
-              </Link>
-              <span className="hidden sm:inline">•</span>
-              <span className="hidden sm:inline">{t.labels.rights}</span>
-            </div>
-
-            {/* Centro */}
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">{t.labels.madeWith}</span>
-              <Image
-                src="/apocaliptyx-logo.png"
-                alt="Apocaliptyx"
-                width={24}
-                height={24}
-                className="h-5 w-auto"
-              />
-              <span className="text-muted-foreground">{t.labels.global}</span>
-            </div>
-
-            {/* Derecha */}
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex items-center gap-1.5 text-muted-foreground">
-                <MapPin className="w-3.5 h-3.5" />
-                <span>CDMX, México</span>
-              </div>
-              <span className="text-muted-foreground/50">•</span>
-              <span className="text-muted-foreground font-mono text-xs">{t.labels.version}</span>
-            </div>
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <span>© {currentYear}</span>
+            <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              Apocaliptyx
+            </Link>
+            <span>•</span>
+            <span>{t.labels.rights}</span>
           </div>
         </div>
       </div>
