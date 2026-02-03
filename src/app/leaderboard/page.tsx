@@ -197,25 +197,25 @@ export default function LeaderboardPage() {
 
         {/* User Position Card */}
         {user && currentPosition > 0 && (
-          <section className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-xl p-4 sm:p-6">
+          <section className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 dark:from-yellow-500/20 dark:to-orange-500/20 border border-yellow-500/30 rounded-xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3 sm:gap-4">
-                <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-400 flex-shrink-0" />
+                <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
                 <div>
-                  <div className="text-xs sm:text-sm text-gray-200/80">
+                  <div className="text-xs sm:text-sm text-amber-700 dark:text-gray-200/80">
                     {t('leaderboard.yourPosition')}
                   </div>
-                  <div className="text-2xl sm:text-3xl font-bold text-yellow-400">
+                  <div className="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                     #{currentPosition}
                   </div>
-                  <p className="text-xs text-gray-200/80 mt-1">
+                  <p className="text-xs text-amber-700 dark:text-gray-200/80 mt-1">
                     {t('leaderboard.keepWinning')} 🔥
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => router.push(`/perfil/${user.username}`)}
-                className="px-4 py-2 border border-yellow-500/30 hover:bg-yellow-500/10 rounded-lg text-sm"
+                className="px-4 py-2 border border-yellow-600/50 dark:border-yellow-500/30 hover:bg-yellow-500/10 rounded-lg text-sm text-yellow-700 dark:text-foreground"
               >
                 {t('leaderboard.viewMyProfile')}
               </button>
@@ -374,7 +374,7 @@ export default function LeaderboardPage() {
                     ${option.bgColor} ${option.borderColor}
                     border-2 rounded-xl p-3 sm:p-4 transition-all text-left relative overflow-hidden
                     ${isActive
-                      ? 'scale-[1.02] sm:scale-105 shadow-lg ring-2 ring-offset-2 ring-offset-gray-950'
+                      ? 'scale-[1.02] sm:scale-105 shadow-lg ring-2 ring-offset-2 ring-offset-background'
                       : 'opacity-80 hover:opacity-100 hover:scale-[1.01]'
                     }
                     ${isActive ? option.borderColor.replace('border-', 'ring-').replace('/30', '/50') : ''}
@@ -492,7 +492,7 @@ export default function LeaderboardPage() {
                   border: 'border-border',
                   ring: '',
                   glow: '',
-                  avatar: 'ring-2 ring-gray-700',
+                  avatar: 'ring-2 ring-gray-300 dark:ring-gray-700',
                   badge: 'bg-muted text-foreground',
                 };
               };
