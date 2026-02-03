@@ -457,7 +457,7 @@ export default function PublicProfilePage() {
         return;
       }
 
-      // Paso 2: Obtener datos ACTUALES de los escenarios
+      // Paso 2: Obtener datos ACTUALES de los escenarios (consulta separada sin caché)
       const scenarioIds = steals.map(s => s.scenario_id);
       const { data: scenarios, error: scenariosError } = await supabase
         .from('scenarios')
@@ -468,26 +468,49 @@ export default function PublicProfilePage() {
         console.error('Error fetching scenario details:', scenariosError);
       }
 
-      // Combinar datos
+      // Combinar datos con los valores actuales
       const combinedData = steals.map(steal => ({
         ...steal,
         scenario: scenarios?.find(s => s.id === steal.scenario_id) || null
       }));
 
+      console.log('Loaded stolen scenarios with fresh data:', combinedData);
       setStolenScenarios(combinedData);
     }
     if (activeTab === 'scenarios') {
-      const data = await publicProfileService.getCreatedScenarios(profile.id);
-      setScenarios(data);
+      // Consulta directa para datos frescos
+      const { data, error } = await supabase
+        .from('scenarios')
+        .select('*')
+        .eq('creator_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (!error) {
+        console.log('Loaded created scenarios with fresh data:', data);
+        setScenarios(data || []);
+      }
     }
     if (activeTab === 'activity') {
       const data = await publicProfileService.getActivity(profile.id);
       setActivity(data);
     }
     if (activeTab === 'holder') {
-      loadScenariosHeld(profile.id);
+      // Consulta directa para datos frescos
+      const { data, error } = await supabase
+        .from('scenarios')
+        .select('*')
+        .eq('current_holder_id', profile.id)
+        .eq('status', 'ACTIVE')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        console.log('Loaded holder scenarios with fresh data:', data);
+        setScenariosHeld(data);
+      }
+      setScenariosHeldLoading(false);
     }
-  }, [profile?.id, activeTab, loadScenariosHeld, supabase]);
+  }, [profile?.id, activeTab, supabase]);
 
   useEffect(() => {
     loadProfile();
