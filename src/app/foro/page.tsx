@@ -3518,13 +3518,10 @@ function ForoContent() {
       {/* Activity Comments Modal */}
       {activityCommentsModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-card w-full sm:max-w-md sm:rounded-xl rounded-t-xl border border-border max-h-[80vh] flex flex-col">
+          <div className="bg-card w-full sm:max-w-2xl sm:rounded-xl rounded-t-xl border border-border max-h-[80vh] flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
-              <h3 className="font-semibold text-white flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-purple-400" />
-                Comentarios
-              </h3>
+              <h3 className="text-xl font-bold text-white">Comentarios</h3>
               <button
                 type="button"
                 onClick={closeActivityCommentsModal}
@@ -3534,61 +3531,88 @@ function ForoContent() {
               </button>
             </div>
 
+            {/* Activity original */}
+            {(() => {
+              const activity = feedItems.find(i => i.id === activityCommentsId);
+              if (!activity) return null;
+              return (
+                <div className="bg-muted/50 rounded-lg p-4 mx-4 mt-4 border border-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                      style={activity.user.avatarUrl ? { background: `url(${activity.user.avatarUrl}) center/cover` } : undefined}
+                    >
+                      {!activity.user.avatarUrl && (activity.user.displayName || activity.user.username || 'U')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">
+                        {activity.user.displayName || activity.user.username}
+                      </span>
+                      <span className="text-muted-foreground text-sm ml-2">
+                        @{activity.user.username}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-foreground">{activity.description}</p>
+                </div>
+              );
+            })()}
+
             {/* Comments List */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px]">
               {loadingActivityComments ? (
-                <div className="flex items-center justify-center py-8">
+                <div className="flex justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
                 </div>
               ) : activityComments.length > 0 ? (
-                activityComments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500 flex-shrink-0">
-                      {comment.users?.avatar_url ? (
-                        <img src={comment.users.avatar_url} alt={comment.users.username} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-white text-xs font-bold">
-                          {comment.users?.username?.[0]?.toUpperCase() || '?'}
+                <div className="space-y-3">
+                  {activityComments.map((comment) => (
+                    <div key={comment.id} className="bg-muted/30 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div
+                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                          style={comment.users?.avatar_url ? { background: `url(${comment.users.avatar_url}) center/cover` } : undefined}
+                        >
+                          {!comment.users?.avatar_url && (comment.users?.display_name || comment.users?.username || 'U')[0].toUpperCase()}
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-white text-sm">
-                          {comment.users?.display_name || comment.users?.username || 'Usuario'}
+                        <span className="font-medium text-sm text-white">
+                          {comment.users?.display_name || comment.users?.username}
                         </span>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-muted-foreground text-sm">
+                          @{comment.users?.username}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
                           {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}
                         </span>
                       </div>
-                      <p className="text-sm text-foreground mt-0.5">{comment.content}</p>
+                      <p className="text-foreground text-sm ml-8">{comment.content}</p>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8">
-                  <MessageCircle className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
-                  <p className="text-muted-foreground text-sm">No hay comentarios aún</p>
-                  <p className="text-muted-foreground text-xs mt-1">¡Sé el primero en comentar!</p>
+                  ))}
                 </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-8">
+                  No hay comentarios. ¡Sé el primero!
+                </p>
               )}
             </div>
 
             {/* Comment Input */}
-            <form onSubmit={handleSubmitActivityComment} className="p-4 border-t border-border">
+            <div className="p-4 border-t border-border">
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={newActivityComment}
                   onChange={(e) => setNewActivityComment(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitActivityComment(e)}
                   placeholder="Escribe un comentario..."
                   maxLength={500}
-                  className="flex-1 bg-muted border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="flex-1 px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleSubmitActivityComment}
                   disabled={!newActivityComment.trim() || submittingActivityComment}
-                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 disabled:bg-purple-500/50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium transition-colors flex items-center gap-1"
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors flex items-center"
                 >
                   {submittingActivityComment ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -3597,7 +3621,7 @@ function ForoContent() {
                   )}
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
