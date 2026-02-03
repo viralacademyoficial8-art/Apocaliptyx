@@ -1,4 +1,6 @@
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 // src/app/api/feed/route.ts
 // API para obtener el feed de actividad global de la plataforma
