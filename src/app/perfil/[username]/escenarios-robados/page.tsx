@@ -231,12 +231,12 @@ function AccordionItem({
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
                 <p className="text-lg font-bold text-foreground">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
-                <p className="text-xs text-muted-foreground">Pool Sí</p>
+                <p className="text-xs text-muted-foreground">Me gusta Sí</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-red-400 mx-auto mb-1 rotate-180" />
                 <p className="text-lg font-bold text-foreground">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
-                <p className="text-xs text-muted-foreground">Pool No</p>
+                <p className="text-xs text-muted-foreground">No Me gusta</p>
               </div>
             </div>
           </div>
