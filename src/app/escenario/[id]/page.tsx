@@ -836,8 +836,8 @@ export default function EscenarioPage() {
 
       {/* Modal de Reporte */}
       {showReportModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-card border border-border rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[85vh] overflow-y-auto p-4 sm:p-6 mb-0 sm:mb-0">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Flag className="w-5 h-5 text-red-400" />
@@ -927,8 +927,8 @@ export default function EscenarioPage() {
 
       {/* Modal de Escudos */}
       {showShieldModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="bg-card border border-border rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[85vh] overflow-y-auto p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Shield className="w-5 h-5 text-blue-400" />

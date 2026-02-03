@@ -237,7 +237,7 @@ export default function StreamingPage() {
           />
 
           {/* Modal */}
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full sm:max-w-lg">
             {/* Glow effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-red-600 via-purple-600 to-pink-600 rounded-2xl blur-lg opacity-50 animate-pulse" />
 

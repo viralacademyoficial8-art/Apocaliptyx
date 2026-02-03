@@ -1222,7 +1222,7 @@ export default function PublicProfilePage() {
 
       {/* Modal de Reporte */}
       <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-        <DialogContent className="bg-card border-border max-w-md">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-md max-h-[85vh] overflow-y-auto">
           <div className="mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Flag className="w-5 h-5 text-red-400" />
@@ -1302,7 +1302,7 @@ export default function PublicProfilePage() {
 
       {/* Modal de Seguidores */}
       <Dialog open={showFollowersModal} onOpenChange={setShowFollowersModal}>
-        <DialogContent className="bg-card border-border max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-md max-h-[80vh] overflow-hidden flex flex-col">
           <div className="mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-400" />
@@ -1354,7 +1354,7 @@ export default function PublicProfilePage() {
 
       {/* Modal de Siguiendo */}
       <Dialog open={showFollowingModal} onOpenChange={setShowFollowingModal}>
-        <DialogContent className="bg-card border-border max-w-md max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-md max-h-[80vh] overflow-hidden flex flex-col">
           <div className="mb-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Users className="w-5 h-5 text-purple-400" />
