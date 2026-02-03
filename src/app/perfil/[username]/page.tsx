@@ -426,11 +426,11 @@ export default function PublicProfilePage() {
     }
   }, [profile?.id, loadScenariosHeldCount]);
 
-  // Cargar datos adicionales según tab
+  // Cargar datos adicionales según tab - siempre carga datos frescos
   const loadTabData = useCallback(async () => {
     if (!profile?.id) return;
 
-    if (activeTab === 'stolen' && stolenScenarios.length === 0) {
+    if (activeTab === 'stolen') {
       // Obtener escenarios robados desde scenario_steal_history
       const { data: steals, error } = await supabase
         .from('scenario_steal_history')
@@ -458,18 +458,18 @@ export default function PublicProfilePage() {
       }
       setStolenScenarios(steals || []);
     }
-    if (activeTab === 'scenarios' && scenarios.length === 0) {
+    if (activeTab === 'scenarios') {
       const data = await publicProfileService.getCreatedScenarios(profile.id);
       setScenarios(data);
     }
-    if (activeTab === 'activity' && activity.length === 0) {
+    if (activeTab === 'activity') {
       const data = await publicProfileService.getActivity(profile.id);
       setActivity(data);
     }
-    if (activeTab === 'holder' && scenariosHeld.length === 0) {
+    if (activeTab === 'holder') {
       loadScenariosHeld(profile.id);
     }
-  }, [profile?.id, activeTab, stolenScenarios.length, scenarios.length, activity.length, scenariosHeld.length, loadScenariosHeld]);
+  }, [profile?.id, activeTab, loadScenariosHeld, supabase]);
 
   useEffect(() => {
     loadProfile();
