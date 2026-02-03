@@ -182,7 +182,7 @@ function AccordionItem({
           <div className="grid grid-cols-3 gap-3 p-4 border-b border-border/50">
             <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-lg p-3 text-center">
               <Coins className="w-5 h-5 text-yellow-400 mx-auto mb-1" />
-              <p className="text-xl font-bold text-white">{steal.steal_price?.toLocaleString() || 0}</p>
+              <p className="text-xl font-bold text-foreground">{steal.steal_price?.toLocaleString() || 0}</p>
               <p className="text-xs text-yellow-400/80">Valor del Robo</p>
             </div>
             <Link
@@ -220,22 +220,22 @@ function AccordionItem({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <Users className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-                <p className="text-lg font-bold text-white">{steal.scenario?.participant_count || 0}</p>
+                <p className="text-lg font-bold text-foreground">{steal.scenario?.participant_count || 0}</p>
                 <p className="text-xs text-muted-foreground">Participantes</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-                <p className="text-lg font-bold text-white">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
+                <p className="text-lg font-bold text-foreground">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
                 <p className="text-xs text-muted-foreground">Pool Total</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
-                <p className="text-lg font-bold text-white">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
+                <p className="text-lg font-bold text-foreground">{steal.scenario?.yes_pool?.toLocaleString() || 0}</p>
                 <p className="text-xs text-muted-foreground">Pool Sí</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-red-400 mx-auto mb-1 rotate-180" />
-                <p className="text-lg font-bold text-white">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
+                <p className="text-lg font-bold text-foreground">{steal.scenario?.no_pool?.toLocaleString() || 0}</p>
                 <p className="text-xs text-muted-foreground">Pool No</p>
               </div>
             </div>
@@ -440,7 +440,7 @@ export default function EscenariosRobadosPage() {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-gray-950 to-purple-900/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-red-900/20 via-background to-purple-900/20" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
 
@@ -497,7 +497,7 @@ export default function EscenariosRobadosPage() {
                 </div>
                 <span className="text-sm text-muted-foreground">Total Robados</span>
               </div>
-              <p className="text-3xl font-bold text-white">{stats.totalStolen}</p>
+              <p className="text-3xl font-bold text-foreground">{stats.totalStolen}</p>
             </div>
 
             <div className="bg-card/80 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4 hover:border-yellow-500/60 transition-all cursor-default">
@@ -507,7 +507,7 @@ export default function EscenariosRobadosPage() {
                 </div>
                 <span className="text-sm text-muted-foreground">Valor Total</span>
               </div>
-              <p className="text-3xl font-bold text-white">{stats.totalValue.toLocaleString()} <span className="text-lg text-yellow-400">AP</span></p>
+              <p className="text-3xl font-bold text-foreground">{stats.totalValue.toLocaleString()} <span className="text-lg text-yellow-400">AP</span></p>
             </div>
 
             <div className="bg-card/80 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4 hover:border-purple-500/60 transition-all cursor-default">
@@ -517,7 +517,7 @@ export default function EscenariosRobadosPage() {
                 </div>
                 <span className="text-sm text-muted-foreground">Víctimas</span>
               </div>
-              <p className="text-3xl font-bold text-white">{stats.uniqueVictims}</p>
+              <p className="text-3xl font-bold text-foreground">{stats.uniqueVictims}</p>
             </div>
 
             <div className="bg-card/80 backdrop-blur-sm border border-orange-500/30 rounded-xl p-4 hover:border-orange-500/60 transition-all cursor-default">
@@ -527,7 +527,7 @@ export default function EscenariosRobadosPage() {
                 </div>
                 <span className="text-sm text-muted-foreground">Mayor Golpe</span>
               </div>
-              <p className="text-3xl font-bold text-white">{stats.biggestHeist.toLocaleString()} <span className="text-lg text-orange-400">AP</span></p>
+              <p className="text-3xl font-bold text-foreground">{stats.biggestHeist.toLocaleString()} <span className="text-lg text-orange-400">AP</span></p>
             </div>
           </div>
         </div>
