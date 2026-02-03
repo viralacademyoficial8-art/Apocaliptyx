@@ -987,8 +987,8 @@ export default function PublicProfilePage() {
                       </div>
                       <h4 className="font-medium mt-2 line-clamp-2">{steal.scenario?.title || 'Escenario eliminado'}</h4>
                       <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Flame className="w-4 h-4 text-yellow-500" />
+                        <span className="flex items-center gap-1 text-emerald-400">
+                          <Flame className="w-4 h-4" />
                           {steal.scenario?.total_pool?.toLocaleString() || 0} AP
                         </span>
                         <span>{steal.scenario?.participant_count || 0} participantes</span>
@@ -1025,7 +1025,7 @@ export default function PublicProfilePage() {
                       </span>
                       <h4 className="font-medium mt-2 line-clamp-2">{scenario.title}</h4>
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1 text-yellow-500">
+                        <span className="flex items-center gap-1 text-emerald-400">
                           <Flame className="w-4 h-4" />
                           {scenario.total_pool?.toLocaleString() || 0} AP
                         </span>
@@ -1115,8 +1115,8 @@ export default function PublicProfilePage() {
                         </div>
                         <h4 className="font-semibold text-foreground mb-2 line-clamp-2">{scenario.title}</h4>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Flame className="w-4 h-4 text-yellow-400" />
+                          <span className="flex items-center gap-1 text-emerald-400">
+                            <Flame className="w-4 h-4" />
                             {scenario.total_pool?.toLocaleString() || 0} AP
                           </span>
                           <span className="flex items-center gap-1">
