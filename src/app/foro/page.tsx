@@ -2188,11 +2188,11 @@ function ForoContent() {
             </div>
 
             {/* Rules */}
-            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-6">
-              <h3 className="text-lg font-semibold mb-3 text-yellow-400">
+            <div className="bg-amber-100 dark:bg-yellow-500/10 border border-amber-300 dark:border-yellow-500/30 rounded-xl p-6">
+              <h3 className="text-lg font-semibold mb-3 text-amber-700 dark:text-yellow-400">
                 📜 {t('forum.sidebar.rules')}
               </h3>
-              <ul className="space-y-2 text-sm text-yellow-200/80">
+              <ul className="space-y-2 text-sm text-amber-800 dark:text-yellow-200/80">
                 <li>• {t('forum.sidebar.rule1')}</li>
                 <li>• {t('forum.sidebar.rule2')}</li>
                 <li>• {t('forum.sidebar.rule3')}</li>
