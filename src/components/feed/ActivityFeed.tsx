@@ -461,6 +461,20 @@ function FeedItemCard({
   );
 }
 
+interface Comment {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  users: {
+    id: string;
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    level: number;
+  };
+}
+
 export function ActivityFeed() {
   const supabase = getSupabaseBrowser();
   const router = useRouter();
@@ -476,6 +490,14 @@ export function ActivityFeed() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const channelRef = useRef<any>(null);
+
+  // Comments modal state
+  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
+  const [commentsActivityId, setCommentsActivityId] = useState<string | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   const fetchFeed = useCallback(async (reset = false, silent = false) => {
     try {
@@ -651,14 +673,65 @@ export function ActivityFeed() {
     }
   };
 
-  const handleOpenComments = (activityId: string) => {
-    // For now, navigate to scenario if available
-    const item = items.find(i => i.id === activityId);
-    if (item?.metadata?.scenarioId) {
-      router.push(`/escenario/${item.metadata.scenarioId}#comments`);
-    } else {
-      toast('Comentarios no disponibles para esta actividad');
+  const handleOpenComments = async (activityId: string) => {
+    setCommentsActivityId(activityId);
+    setCommentsModalOpen(true);
+    setLoadingComments(true);
+    setComments([]);
+
+    try {
+      const res = await fetch(`/api/feed/activities/${activityId}/comments`);
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data.comments || []);
+      }
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      toast.error('Error al cargar comentarios');
+    } finally {
+      setLoadingComments(false);
     }
+  };
+
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || !commentsActivityId || submittingComment) return;
+
+    setSubmittingComment(true);
+    try {
+      const res = await fetch(`/api/feed/activities/${commentsActivityId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newComment.trim() }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setComments(prev => [...prev, data.comment]);
+        setNewComment('');
+        // Update comments count in the feed item
+        setItems(prev => prev.map(item =>
+          item.id === commentsActivityId
+            ? { ...item, comments_count: (item.comments_count || 0) + 1 }
+            : item
+        ));
+        toast.success('Comentario publicado');
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Error al publicar');
+      }
+    } catch (error) {
+      toast.error('Error al publicar comentario');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const closeCommentsModal = () => {
+    setCommentsModalOpen(false);
+    setCommentsActivityId(null);
+    setComments([]);
+    setNewComment('');
   };
 
   if (loading) {
@@ -792,6 +865,117 @@ export function ActivityFeed() {
           </button>
         )}
       </div>
+
+      {/* Comments Modal */}
+      {commentsModalOpen && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-card w-full sm:max-w-2xl sm:rounded-xl rounded-t-xl border border-border max-h-[80vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="text-xl font-bold text-white">Comentarios</h3>
+              <button
+                type="button"
+                onClick={closeCommentsModal}
+                className="p-1 rounded-full hover:bg-muted transition-colors"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Activity original */}
+            {(() => {
+              const activity = items.find(i => i.id === commentsActivityId);
+              if (!activity) return null;
+              return (
+                <div className="bg-muted/50 rounded-lg p-4 mx-4 mt-4 border border-border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div
+                      className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                      style={activity.user.avatarUrl ? { background: `url(${activity.user.avatarUrl}) center/cover` } : undefined}
+                    >
+                      {!activity.user.avatarUrl && (activity.user.displayName || activity.user.username || 'U')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="font-semibold text-white">
+                        {activity.user.displayName || activity.user.username}
+                      </span>
+                      <span className="text-muted-foreground text-sm ml-2">
+                        @{activity.user.username}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-foreground">{activity.description}</p>
+                </div>
+              );
+            })()}
+
+            {/* Comments List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px]">
+              {loadingComments ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+                </div>
+              ) : comments.length > 0 ? (
+                <div className="space-y-3">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="bg-muted/30 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div
+                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-bold cursor-pointer hover:ring-2 hover:ring-purple-500 transition-all overflow-hidden"
+                          style={comment.users?.avatar_url ? { background: `url(${comment.users.avatar_url}) center/cover` } : undefined}
+                        >
+                          {!comment.users?.avatar_url && (comment.users?.display_name || comment.users?.username || 'U')[0].toUpperCase()}
+                        </div>
+                        <span className="font-medium text-sm text-white">
+                          {comment.users?.display_name || comment.users?.username}
+                        </span>
+                        <span className="text-muted-foreground text-sm">
+                          @{comment.users?.username}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: es })}
+                        </span>
+                      </div>
+                      <p className="text-foreground text-sm ml-8">{comment.content}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-8">
+                  No hay comentarios. ¡Sé el primero!
+                </p>
+              )}
+            </div>
+
+            {/* Comment Input */}
+            <div className="p-4 border-t border-border">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSubmitComment(e)}
+                  placeholder="Escribe un comentario..."
+                  maxLength={500}
+                  className="flex-1 px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleSubmitComment}
+                  disabled={!newComment.trim() || submittingComment}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed rounded-lg text-white font-medium transition-colors flex items-center"
+                >
+                  {submittingComment ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
