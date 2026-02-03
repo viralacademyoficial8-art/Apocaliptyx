@@ -23,6 +23,14 @@ import {
   Bell,
   ChevronDown,
   ChevronUp,
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  BookMarked,
+  Eye,
+  Send,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -53,6 +61,14 @@ interface FeedItem {
     outcome?: boolean;
     previousHolder?: string;
   };
+  // Interaction counts
+  likes_count?: number;
+  comments_count?: number;
+  bookmarks_count?: number;
+  views_count?: number;
+  // User state
+  user_liked?: boolean;
+  user_bookmarked?: boolean;
 }
 
 type FilterType = 'all' | 'scenario_created' | 'scenario_stolen' | 'scenario_protected' | 'votes_yes' | 'votes_no' | 'live_stream' | 'scenario_closed' | 'scenario_resolved';
@@ -198,9 +214,24 @@ function CompactFeedItem({ item, onClick }: { item: FeedItem; onClick: () => voi
   );
 }
 
-// Full Feed Item Card
-function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
+// Full Feed Item Card with Interactions
+function FeedItemCard({
+  item,
+  isNew,
+  onLike,
+  onBookmark,
+  onShare,
+  onOpenComments,
+}: {
+  item: FeedItem;
+  isNew?: boolean;
+  onLike?: (id: string) => void;
+  onBookmark?: (id: string) => void;
+  onShare?: (item: FeedItem) => void;
+  onOpenComments?: (id: string) => void;
+}) {
   const router = useRouter();
+  const [showShareMenu, setShowShareMenu] = useState(false);
   const isYesVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'YES';
   const isNoVote = item.type === 'scenario_vote' && item.metadata?.voteType === 'NO';
 
@@ -239,53 +270,192 @@ function FeedItemCard({ item, isNew }: { item: FeedItem; isNew?: boolean }) {
     }
   };
 
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLike?.(item.id);
+  };
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onBookmark?.(item.id);
+  };
+
+  const handleShareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowShareMenu(!showShareMenu);
+  };
+
+  const handleCommentsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onOpenComments?.(item.id);
+  };
+
+  const shareToClipboard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = item.metadata?.scenarioId
+      ? `${window.location.origin}/escenario/${item.metadata.scenarioId}`
+      : window.location.href;
+    navigator.clipboard.writeText(url);
+    toast.success('Enlace copiado');
+    setShowShareMenu(false);
+  };
+
+  const shareToTwitter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const text = `${item.user.displayName || item.user.username} ${item.title}: "${item.description}"`;
+    const url = item.metadata?.scenarioId
+      ? `${window.location.origin}/escenario/${item.metadata.scenarioId}`
+      : window.location.href;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    setShowShareMenu(false);
+  };
+
+  const shareToWhatsApp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const text = `${item.user.displayName || item.user.username} ${item.title}: "${item.description}"`;
+    const url = item.metadata?.scenarioId
+      ? `${window.location.origin}/escenario/${item.metadata.scenarioId}`
+      : window.location.href;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+    setShowShareMenu(false);
+  };
+
   return (
     <div
-      onClick={handleCardClick}
-      className={`p-3 rounded-lg border ${styles.bg} ${styles.border} hover:bg-muted/50 transition-all cursor-pointer ${
+      className={`p-3 rounded-lg border ${styles.bg} ${styles.border} hover:bg-muted/50 transition-all ${
         isNew ? 'animate-pulse ring-2 ring-purple-500/50' : ''
       }`}
     >
-      <div className="flex items-center gap-2">
-        {/* User Avatar */}
-        <button type="button" onClick={handleUserClick} className="flex-shrink-0">
-          <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500">
-            {item.user.avatarUrl ? (
-              <img src={item.user.avatarUrl} alt={item.user.username} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold">
-                {item.user.username[0].toUpperCase()}
-              </div>
+      {/* Main Content - Clickable */}
+      <div onClick={handleCardClick} className="cursor-pointer">
+        <div className="flex items-center gap-2">
+          {/* User Avatar */}
+          <button type="button" onClick={handleUserClick} className="flex-shrink-0">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-purple-500 to-pink-500">
+              {item.user.avatarUrl ? (
+                <img src={item.user.avatarUrl} alt={item.user.username} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold">
+                  {item.user.username[0].toUpperCase()}
+                </div>
+              )}
+            </div>
+          </button>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button type="button" onClick={handleUserClick} className="font-medium text-white text-sm hover:text-purple-400 transition-colors">
+                {item.user.displayName || item.user.username}
+              </button>
+              <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${styles.iconBg}`}>
+                {getIcon()}
+                {item.title}
+              </span>
+            </div>
+            <p className="text-muted-foreground text-xs mt-0.5 truncate">{item.description}</p>
+          </div>
+
+          {/* Meta */}
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+            <span className="text-[10px] text-muted-foreground">
+              {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: es })}
+            </span>
+            {item.metadata?.amount && item.metadata.amount > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] text-yellow-500">
+                <Flame className="w-3 h-3" />
+                {item.metadata.amount.toLocaleString()} AP
+              </span>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Interaction Bar */}
+      <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
+        {/* Like */}
+        <button
+          type="button"
+          onClick={handleLike}
+          className={`flex items-center gap-1 text-xs transition-colors ${
+            item.user_liked ? 'text-red-400' : 'text-muted-foreground hover:text-red-400'
+          }`}
+        >
+          <Heart className={`w-4 h-4 ${item.user_liked ? 'fill-current' : ''}`} />
+          <span>{item.likes_count || 0}</span>
         </button>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <button type="button" onClick={handleUserClick} className="font-medium text-white text-sm hover:text-purple-400 transition-colors">
-              {item.user.displayName || item.user.username}
-            </button>
-            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] ${styles.iconBg}`}>
-              {getIcon()}
-              {item.title}
-            </span>
-          </div>
-          <p className="text-muted-foreground text-xs mt-0.5 truncate">{item.description}</p>
-        </div>
+        {/* Comments */}
+        <button
+          type="button"
+          onClick={handleCommentsClick}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-400 transition-colors"
+        >
+          <MessageCircle className="w-4 h-4" />
+          <span>{item.comments_count || 0}</span>
+        </button>
 
-        {/* Meta */}
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
-          <span className="text-[10px] text-muted-foreground">
-            {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true, locale: es })}
-          </span>
-          {item.metadata?.amount && item.metadata.amount > 0 && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-yellow-500">
-              <Flame className="w-3 h-3" />
-              {item.metadata.amount.toLocaleString()} AP
-            </span>
+        {/* Share */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={handleShareClick}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-purple-400 transition-colors"
+          >
+            <Share2 className="w-4 h-4" />
+          </button>
+
+          {showShareMenu && (
+            <div
+              className="absolute bottom-full right-0 mb-2 bg-card border border-border rounded-lg shadow-xl z-50 min-w-[140px] py-1"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={shareToClipboard}
+                className="w-full px-3 py-1.5 text-left text-xs hover:bg-muted flex items-center gap-2"
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                Copiar enlace
+              </button>
+              <button
+                onClick={shareToTwitter}
+                className="w-full px-3 py-1.5 text-left text-xs hover:bg-muted flex items-center gap-2"
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                X (Twitter)
+              </button>
+              <button
+                onClick={shareToWhatsApp}
+                className="w-full px-3 py-1.5 text-left text-xs hover:bg-muted flex items-center gap-2"
+              >
+                <svg className="w-3 h-3" fill="#25D366" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
+              </button>
+            </div>
           )}
         </div>
+
+        {/* Bookmark */}
+        <button
+          type="button"
+          onClick={handleBookmark}
+          className={`flex items-center gap-1 text-xs transition-colors ${
+            item.user_bookmarked ? 'text-yellow-400' : 'text-muted-foreground hover:text-yellow-400'
+          }`}
+        >
+          {item.user_bookmarked ? (
+            <BookMarked className="w-4 h-4" />
+          ) : (
+            <Bookmark className="w-4 h-4" />
+          )}
+          <span>{item.bookmarks_count || 0}</span>
+        </button>
+
+        {/* Views */}
+        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Eye className="w-4 h-4" />
+          <span>{item.views_count || 0}</span>
+        </span>
       </div>
     </div>
   );
@@ -434,6 +604,63 @@ export function ActivityFeed() {
     }
   };
 
+  // Interaction handlers
+  const handleLike = async (activityId: string) => {
+    try {
+      const res = await fetch(`/api/feed/activities/${activityId}/like`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setItems(prev => prev.map(item =>
+          item.id === activityId
+            ? {
+                ...item,
+                user_liked: data.liked,
+                likes_count: (item.likes_count || 0) + (data.liked ? 1 : -1),
+              }
+            : item
+        ));
+        toast.success(data.liked ? 'Te gusta' : 'Ya no te gusta');
+      }
+    } catch (error) {
+      toast.error('Error al dar like');
+    }
+  };
+
+  const handleBookmark = async (activityId: string) => {
+    try {
+      const res = await fetch(`/api/feed/activities/${activityId}/bookmark`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setItems(prev => prev.map(item =>
+          item.id === activityId
+            ? {
+                ...item,
+                user_bookmarked: data.bookmarked,
+                bookmarks_count: (item.bookmarks_count || 0) + (data.bookmarked ? 1 : -1),
+              }
+            : item
+        ));
+        toast.success(data.bookmarked ? 'Guardado' : 'Eliminado de guardados');
+      }
+    } catch (error) {
+      toast.error('Error al guardar');
+    }
+  };
+
+  const handleOpenComments = (activityId: string) => {
+    // For now, navigate to scenario if available
+    const item = items.find(i => i.id === activityId);
+    if (item?.metadata?.scenarioId) {
+      router.push(`/escenario/${item.metadata.scenarioId}#comments`);
+    } else {
+      toast('Comentarios no disponibles para esta actividad');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -510,7 +737,14 @@ export function ActivityFeed() {
             <>
               {isExpanded ? (
                 displayedItems.map((item) => (
-                  <FeedItemCard key={item.id} item={item} isNew={newItemIds.has(item.id)} />
+                  <FeedItemCard
+                    key={item.id}
+                    item={item}
+                    isNew={newItemIds.has(item.id)}
+                    onLike={handleLike}
+                    onBookmark={handleBookmark}
+                    onOpenComments={handleOpenComments}
+                  />
                 ))
               ) : (
                 displayedItems.map((item) => (

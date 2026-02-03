@@ -78,6 +78,10 @@ export async function GET(request: NextRequest) {
         vote_type,
         outcome,
         created_at,
+        likes_count,
+        comments_count,
+        bookmarks_count,
+        views_count,
         users:user_id (
           id,
           username,
@@ -112,7 +116,7 @@ export async function GET(request: NextRequest) {
       // Query without user join
       let simpleQuery = supabase
         .from('feed_activities')
-        .select('id, type, title, description, icon, user_id, scenario_id, scenario_title, amount, vote_type, outcome, created_at')
+        .select('id, type, title, description, icon, user_id, scenario_id, scenario_title, amount, vote_type, outcome, created_at, likes_count, comments_count, bookmarks_count, views_count')
         .order('created_at', { ascending: false });
 
       if (filterType && filterType !== 'all') {
@@ -218,6 +222,11 @@ export async function GET(request: NextRequest) {
           voteType: activity.vote_type || undefined,
           outcome: activity.outcome,
         },
+        // Interaction counts
+        likes_count: activity.likes_count || 0,
+        comments_count: activity.comments_count || 0,
+        bookmarks_count: activity.bookmarks_count || 0,
+        views_count: activity.views_count || 0,
       };
     });
 
