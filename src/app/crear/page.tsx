@@ -53,7 +53,7 @@ export default function CrearPage() {
   const [category, setCategory] = useState<ScenarioCategory>("otros");
   const [dueDate, setDueDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Estados para detección de duplicados
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   const [similarScenarios, setSimilarScenarios] = useState<SimilarScenario[]>([]);
@@ -106,10 +106,10 @@ export default function CrearPage() {
     setCheckingDuplicates(true);
     try {
       const result = await duplicateDetectionService.checkForDuplicates(title, description);
-      
+
       setSimilarScenarios(result.similarScenarios);
       setIsDuplicate(result.isDuplicate);
-      
+
       if (result.similarScenarios.length > 0) {
         setShowDuplicateWarning(true);
       }
@@ -180,7 +180,7 @@ export default function CrearPage() {
       );
 
       toast.success(t('create.success'));
-      
+
       // Limpiar formulario
       setTitle("");
       setDescription("");
@@ -206,29 +206,29 @@ export default function CrearPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-black via-apocalypse-ash to-black text-zinc-50">
+    <main className="min-h-screen bg-background text-foreground">
       <Navbar />
       <section className="mx-auto max-w-3xl px-4 py-8">
-        <h1 className="text-2xl font-bold text-zinc-50">
+        <h1 className="text-2xl font-bold text-foreground">
           {t('create.title')}
         </h1>
-        <p className="mt-1 text-xs text-zinc-400">
+        <p className="mt-1 text-xs text-muted-foreground">
           {t('create.subtitle')}
         </p>
 
         <form
           onSubmit={handleSubmit}
-          className="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 text-sm"
+          className="mt-6 space-y-4 rounded-2xl border border-border bg-card p-4 text-sm"
         >
           {/* Título */}
           <div className="space-y-1">
-            <label className="text-xs text-zinc-300">{t('create.scenarioTitle')}</label>
+            <label className="text-xs text-muted-foreground">{t('create.scenarioTitle')}</label>
             <div className="relative">
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isLoading}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 pr-10 text-sm text-zinc-100 outline-none ring-0 placeholder:text-zinc-500 focus:border-amber-500 disabled:opacity-50"
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2 pr-10 text-sm text-foreground outline-none ring-0 placeholder:text-muted-foreground focus:border-amber-500 disabled:opacity-50"
                 placeholder={t('create.titlePlaceholder')}
               />
               {checkingDuplicates && (
@@ -238,7 +238,7 @@ export default function CrearPage() {
               )}
             </div>
             {title.length > 0 && title.length < 10 && (
-              <p className="text-[10px] text-zinc-500">
+              <p className="text-[10px] text-muted-foreground">
                 {t('create.minCharsHint')}
               </p>
             )}
@@ -258,14 +258,14 @@ export default function CrearPage() {
                   }`} />
                   <div>
                     <h3 className={`font-semibold ${
-                      isDuplicate ? 'text-red-400' : 'text-amber-400'
+                      isDuplicate ? 'text-red-500 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'
                     }`}>
                       {isDuplicate
                         ? `🚫 ${t('create.duplicates.cannotCreate')}`
                         : t('create.duplicates.similarFound')}
                     </h3>
                     <p className={`text-xs mt-1 ${
-                      isDuplicate ? 'text-red-200/80' : 'text-amber-200/80'
+                      isDuplicate ? 'text-red-600 dark:text-red-200/80' : 'text-amber-700 dark:text-amber-200/80'
                     }`}>
                       {isDuplicate
                         ? t('create.duplicates.duplicateBlocked')
@@ -277,7 +277,7 @@ export default function CrearPage() {
                   <button
                     type="button"
                     onClick={() => setShowDuplicateWarning(false)}
-                    className="text-zinc-400 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -290,27 +290,27 @@ export default function CrearPage() {
                     key={scenario.id}
                     className={`p-3 rounded-lg cursor-pointer transition-all ${
                       isDuplicate
-                        ? 'bg-zinc-900/50 hover:bg-zinc-800/70 border border-transparent hover:border-purple-500/50'
-                        : 'bg-zinc-900/50'
+                        ? 'bg-muted/50 hover:bg-muted border border-transparent hover:border-purple-500/50'
+                        : 'bg-muted/50'
                     }`}
                     onClick={() => isDuplicate && handleGoToExistingScenario(scenario.id)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-zinc-100 truncate">
+                        <p className="text-sm font-medium text-foreground truncate">
                           {scenario.title}
                         </p>
-                        <p className="text-xs text-zinc-400 truncate mt-0.5">
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
                           {scenario.description?.slice(0, 60)}...
                         </p>
                       </div>
                       <div className="flex items-center gap-2 ml-3">
                         <span className={`text-xs font-bold px-2 py-1 rounded ${
                           scenario.similarity >= 70
-                            ? 'bg-red-500/20 text-red-400'
+                            ? 'bg-red-500/20 text-red-500 dark:text-red-400'
                             : scenario.similarity > 60
-                              ? 'bg-amber-500/20 text-amber-400'
-                              : 'bg-zinc-700 text-zinc-300'
+                              ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                              : 'bg-muted text-muted-foreground'
                         }`}>
                           {scenario.similarity}%
                         </span>
@@ -318,8 +318,8 @@ export default function CrearPage() {
                     </div>
                     {/* Info de robo */}
                     {isDuplicate && (
-                      <div className="mt-2 pt-2 border-t border-zinc-700/50 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                      <div className="mt-2 pt-2 border-t border-border flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>👑</span>
                           <span>Holder: {scenario.holder_username ? (
                             <button
@@ -328,16 +328,16 @@ export default function CrearPage() {
                                 e.stopPropagation();
                                 router.push(`/perfil/${scenario.holder_username}`);
                               }}
-                              className="text-purple-400 hover:text-purple-300 hover:underline"
+                              className="text-purple-500 dark:text-purple-400 hover:text-purple-400 dark:hover:text-purple-300 hover:underline"
                             >
                               @{scenario.holder_username}
                             </button>
                           ) : (
-                            <span className="text-zinc-500">Dueño original</span>
+                            <span className="text-muted-foreground">Dueño original</span>
                           )}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs">
-                          <span className="text-yellow-400 font-bold">⚡ {scenario.current_price || 11} AP</span>
+                          <span className="text-yellow-500 dark:text-yellow-400 font-bold">⚡ {scenario.current_price || 11} AP</span>
                         </div>
                       </div>
                     )}
@@ -349,30 +349,30 @@ export default function CrearPage() {
                 <div className="mt-4 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/40 rounded-xl">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg">🎯</span>
-                    <h4 className="text-sm font-bold text-white">¡Este escenario ya existe!</h4>
+                    <h4 className="text-sm font-bold text-foreground">¡Este escenario ya existe!</h4>
                   </div>
-                  <p className="text-xs text-green-200/80 mb-3">
+                  <p className="text-xs text-green-700 dark:text-green-200/80 mb-3">
                     Participa en el escenario existente robándolo al holder actual.
                   </p>
-                  <div className="bg-zinc-900/50 rounded-lg p-3 mb-3">
+                  <div className="bg-muted/50 rounded-lg p-3 mb-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-zinc-400">Holder actual</p>
+                        <p className="text-xs text-muted-foreground">Holder actual</p>
                         {similarScenarios[0]?.holder_username ? (
                           <button
                             type="button"
                             onClick={() => router.push(`/perfil/${similarScenarios[0].holder_username}`)}
-                            className="text-sm font-medium text-purple-400 hover:text-purple-300 hover:underline"
+                            className="text-sm font-medium text-purple-500 dark:text-purple-400 hover:text-purple-400 dark:hover:text-purple-300 hover:underline"
                           >
                             @{similarScenarios[0].holder_username}
                           </button>
                         ) : (
-                          <p className="text-sm font-medium text-zinc-500">Creador original</p>
+                          <p className="text-sm font-medium text-muted-foreground">Creador original</p>
                         )}
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-zinc-400">Precio actual</p>
-                        <p className="text-lg font-bold text-yellow-400">{similarScenarios[0]?.current_price || 11} AP</p>
+                        <p className="text-xs text-muted-foreground">Precio actual</p>
+                        <p className="text-lg font-bold text-yellow-500 dark:text-yellow-400">{similarScenarios[0]?.current_price || 11} AP</p>
                       </div>
                     </div>
                   </div>
@@ -384,7 +384,7 @@ export default function CrearPage() {
                     <span>⚡</span>
                     Robar escenario por {similarScenarios[0]?.current_price || 11} AP
                   </button>
-                  <p className="text-[10px] text-zinc-500 text-center mt-2">
+                  <p className="text-[10px] text-muted-foreground text-center mt-2">
                     Haz clic para ir al escenario y robarlo
                   </p>
                 </div>
@@ -395,7 +395,7 @@ export default function CrearPage() {
                   {/* Opción de robar el escenario similar */}
                   {similarScenarios.length > 0 && (
                     <div className="p-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg">
-                      <p className="text-xs text-purple-200/80 mb-2">
+                      <p className="text-xs text-purple-700 dark:text-purple-200/80 mb-2">
                         ¿Te gusta este escenario? ¡Róbalo en lugar de crear uno nuevo!
                       </p>
                       <button
@@ -416,7 +416,7 @@ export default function CrearPage() {
                       setSimilarScenarios([]);
                       setShowDuplicateWarning(false);
                     }}
-                    className="w-full px-3 py-2 text-xs bg-amber-600 hover:bg-amber-500 text-black font-medium rounded-lg transition-colors"
+                    className="w-full px-3 py-2 text-xs bg-amber-500 hover:bg-amber-400 text-black font-medium rounded-lg transition-colors"
                   >
                     {t('create.duplicates.changeScenario')}
                   </button>
@@ -427,7 +427,7 @@ export default function CrearPage() {
 
           {/* Indicador de que pasó la verificación */}
           {title.length >= 10 && !checkingDuplicates && similarScenarios.length === 0 && (
-            <div className="flex items-center gap-2 text-green-400 text-xs">
+            <div className="flex items-center gap-2 text-green-500 dark:text-green-400 text-xs">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               {t('create.uniqueTitle')}
             </div>
@@ -435,12 +435,12 @@ export default function CrearPage() {
 
           {/* Descripción */}
           <div className="space-y-1">
-            <label className="text-xs text-zinc-300">{t('scenarios.create.description')}</label>
+            <label className="text-xs text-muted-foreground">{t('scenarios.create.description')}</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={isLoading}
-              className="min-h-[120px] w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 placeholder:text-zinc-500 focus:border-amber-500 disabled:opacity-50"
+              className="min-h-[120px] w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none ring-0 placeholder:text-muted-foreground focus:border-amber-500 disabled:opacity-50"
               placeholder={t('create.descriptionPlaceholder')}
             />
           </div>
@@ -448,12 +448,12 @@ export default function CrearPage() {
           {/* Categoría y fecha límite */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-1">
-              <label className="text-xs text-zinc-300">{t('scenarios.create.category')}</label>
+              <label className="text-xs text-muted-foreground">{t('scenarios.create.category')}</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as ScenarioCategory)}
                 disabled={isLoading}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -464,7 +464,7 @@ export default function CrearPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs text-zinc-300">
+              <label className="text-xs text-muted-foreground">
                 {t('create.deadlineLabel')}
               </label>
               <input
@@ -473,21 +473,21 @@ export default function CrearPage() {
                 onChange={handleDateChange}
                 disabled={isLoading}
                 min={getMinDate()}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900/70 px-3 py-2 text-sm text-zinc-100 outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
+                className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground outline-none ring-0 focus:border-amber-500 disabled:opacity-50"
               />
-              <p className="mt-1 text-[10px] text-zinc-500">
+              <p className="mt-1 text-[10px] text-muted-foreground">
                 {t('create.deadlineHint')}
               </p>
             </div>
           </div>
 
           {/* Info del costo */}
-          <div className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent px-3 py-3 text-xs text-amber-100">
+          <div className="rounded-xl border border-amber-500/30 dark:border-amber-500/20 bg-amber-100 dark:bg-gradient-to-r dark:from-amber-500/10 dark:via-amber-500/5 dark:to-transparent px-3 py-3 text-xs text-amber-800 dark:text-amber-100">
             <p className="font-medium">
               {t('create.creationCost')}:{" "}
               <span className="font-semibold">{t('create.freeForNow')}</span>
             </p>
-            <p className="mt-1 text-[11px] text-amber-100/80">
+            <p className="mt-1 text-[11px] text-amber-700 dark:text-amber-100/80">
               {t('create.rewardInfo')}
             </p>
           </div>
@@ -496,7 +496,7 @@ export default function CrearPage() {
           <button
             type="submit"
             disabled={isLoading || !title || !description || !dueDate || isDuplicate}
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-6 py-2 text-sm font-semibold text-black shadow-lg shadow-amber-500/30 transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-2 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-amber-500/30 transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
