@@ -532,7 +532,13 @@ export default function ExplorarPage() {
                           {CATEGORIES.map((cat) => (
                             <button
                               key={cat.key}
-                              onClick={() => setSelectedCategory(cat.value)}
+                              onClick={() => {
+                                setSelectedCategory(cat.value);
+                                // Scroll to results section
+                                setTimeout(() => {
+                                  document.getElementById('todos-los-escenarios')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }, 100);
+                              }}
                               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                 selectedCategory === cat.value
                                   ? 'bg-purple-500 text-white'
@@ -552,7 +558,13 @@ export default function ExplorarPage() {
                           {SORT_OPTIONS.map((option) => (
                             <button
                               key={option.value}
-                              onClick={() => setSortBy(option.value)}
+                              onClick={() => {
+                                setSortBy(option.value);
+                                // Scroll to results section
+                                setTimeout(() => {
+                                  document.getElementById('todos-los-escenarios')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                }, 100);
+                              }}
                               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                 sortBy === option.value
                                   ? 'bg-purple-500 text-white'
