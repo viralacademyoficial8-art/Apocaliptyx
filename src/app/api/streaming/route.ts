@@ -420,6 +420,18 @@ export async function POST(request: NextRequest) {
 
           console.log(`Notified ${followerIds.length} followers about stream start`);
         }
+
+        // Create feed activity for live stream
+        await supabase
+          .from('feed_activities')
+          .insert({
+            type: 'live_stream',
+            title: '¡En vivo ahora!',
+            description: title || 'Transmisión en vivo',
+            icon: '🔴',
+            user_id: user.id,
+            created_at: new Date().toISOString(),
+          });
       } catch (notifyError) {
         // No fallar si las notificaciones fallan, el stream ya fue creado
         console.error('Error sending stream notifications:', notifyError);

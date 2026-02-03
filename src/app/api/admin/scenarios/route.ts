@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { notificationsService } from "@/services/notifications.service";
 
 const supabase = () => getSupabaseAdmin();
 
@@ -172,6 +173,13 @@ export async function PATCH(request: NextRequest) {
 
     updateData.updated_at = new Date().toISOString();
 
+    // Get scenario info before updating
+    const { data: scenarioData } = await supabase()
+      .from("scenarios")
+      .select("title, creator_id")
+      .eq("id", scenarioId)
+      .single();
+
     const { error } = await supabase()
       .from("scenarios")
       .update(updateData)
@@ -180,6 +188,69 @@ export async function PATCH(request: NextRequest) {
     if (error) {
       console.error("Error updating scenario:", error);
       return NextResponse.json({ error: "Error al actualizar escenario" }, { status: 500 });
+    }
+
+    // Send notifications when scenario is resolved
+    if (action === "resolve" && result && scenarioData) {
+      try {
+        // Get all predictions for this scenario
+        const { data: predictions } = await supabase()
+          .from("predictions")
+          .select("user_id, prediction, amount")
+          .eq("scenario_id", scenarioId);
+
+        if (predictions && predictions.length > 0) {
+          const winningPrediction = result.toUpperCase();
+
+          // Send notifications to all participants
+          for (const pred of predictions) {
+            const won = pred.prediction === winningPrediction;
+            const amount = pred.amount || 0;
+
+            if (won) {
+              await notificationsService.notifyPredictionWon(
+                pred.user_id,
+                scenarioData.title,
+                amount * 2, // Approximate winnings
+                scenarioId
+              );
+            } else {
+              await notificationsService.notifyPredictionLost(
+                pred.user_id,
+                scenarioData.title,
+                amount,
+                scenarioId
+              );
+            }
+          }
+        }
+
+        // Notify the creator about resolution
+        if (scenarioData.creator_id) {
+          await notificationsService.notifyScenarioResolved(
+            scenarioData.creator_id,
+            scenarioData.title,
+            result.toUpperCase() === 'YES' ? 'Sí se cumplió' : 'No se cumplió',
+            scenarioId
+          );
+        }
+
+        // Create feed activity for resolution
+        await supabase()
+          .from("feed_activities")
+          .insert({
+            type: 'scenario_resolved',
+            title: result.toUpperCase() === 'YES' ? '¡Escenario cumplido!' : 'Escenario no cumplido',
+            description: scenarioData.title,
+            icon: result.toUpperCase() === 'YES' ? '✅' : '❌',
+            user_id: scenarioData.creator_id,
+            scenario_id: scenarioId,
+            scenario_title: scenarioData.title,
+          });
+      } catch (notifError) {
+        console.error("Error sending resolution notifications:", notifError);
+        // Don't fail the request, notifications are secondary
+      }
     }
 
     return NextResponse.json({ success: true });

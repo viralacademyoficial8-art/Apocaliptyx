@@ -2,6 +2,7 @@
 // Gamification Service - Ranks, Missions, Achievements, Streaks
 
 import { getSupabaseBrowser } from '@/lib/supabase-client';
+import { notificationsService } from '@/services/notifications.service';
 
 // ==================== TYPES ====================
 
@@ -500,6 +501,30 @@ export const gamificationService = {
           achievement_points: getSupabaseBrowser().rpc('increment_value', { x: achievement.points })
         })
         .eq('id', userId);
+
+      // Send notification for achievement unlock
+      try {
+        await notificationsService.create({
+          userId,
+          type: 'achievement_unlocked',
+          title: '¡Logro desbloqueado!',
+          message: `Has desbloqueado el logro: ${achievement.name_es || achievement.name}`,
+          data: { achievementId: achievement.id, points: achievement.points },
+        });
+
+        // Create feed activity
+        await getSupabaseBrowser()
+          .from('feed_activities')
+          .insert({
+            type: 'achievement',
+            title: '¡Nuevo logro!',
+            description: achievement.name_es || achievement.name,
+            icon: achievement.icon || '🏆',
+            user_id: userId,
+          });
+      } catch (notifyError) {
+        console.error('Error sending achievement notification:', notifyError);
+      }
     }
 
     return { unlocked: isUnlocked };
