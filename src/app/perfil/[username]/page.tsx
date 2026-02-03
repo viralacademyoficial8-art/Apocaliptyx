@@ -431,21 +431,14 @@ export default function PublicProfilePage() {
     if (!profile?.id) return;
 
     if (activeTab === 'stolen') {
-      // Obtener escenarios robados desde scenario_steal_history
-      const { data: steals, error } = await supabase
+      // Paso 1: Obtener historial de robos
+      const { data: steals, error: stealsError } = await supabase
         .from('scenario_steal_history')
         .select(`
           id,
           stolen_at,
           price_paid,
-          scenario:scenarios (
-            id,
-            title,
-            category,
-            total_pool,
-            participant_count,
-            status
-          ),
+          scenario_id,
           victim:users!scenario_steal_history_victim_id_fkey (
             username
           )
@@ -453,10 +446,35 @@ export default function PublicProfilePage() {
         .eq('thief_id', profile.id)
         .order('stolen_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching stolen scenarios:', error);
+      if (stealsError) {
+        console.error('Error fetching stolen scenarios:', stealsError);
+        setStolenScenarios([]);
+        return;
       }
-      setStolenScenarios(steals || []);
+
+      if (!steals || steals.length === 0) {
+        setStolenScenarios([]);
+        return;
+      }
+
+      // Paso 2: Obtener datos ACTUALES de los escenarios
+      const scenarioIds = steals.map(s => s.scenario_id);
+      const { data: scenarios, error: scenariosError } = await supabase
+        .from('scenarios')
+        .select('id, title, category, total_pool, participant_count, status')
+        .in('id', scenarioIds);
+
+      if (scenariosError) {
+        console.error('Error fetching scenario details:', scenariosError);
+      }
+
+      // Combinar datos
+      const combinedData = steals.map(steal => ({
+        ...steal,
+        scenario: scenarios?.find(s => s.id === steal.scenario_id) || null
+      }));
+
+      setStolenScenarios(combinedData);
     }
     if (activeTab === 'scenarios') {
       const data = await publicProfileService.getCreatedScenarios(profile.id);
