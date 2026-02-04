@@ -29,6 +29,10 @@ export interface Database {
           total_predictions: number;
           correct_predictions: number;
           total_earnings: number;
+          // Wallet stats
+          ap_coins_purchased: number;
+          ap_coins_earned: number;
+          ap_coins_spent: number;
           created_at: string;
           updated_at: string;
         };
@@ -49,6 +53,9 @@ export interface Database {
           total_predictions?: number;
           correct_predictions?: number;
           total_earnings?: number;
+          ap_coins_purchased?: number;
+          ap_coins_earned?: number;
+          ap_coins_spent?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -69,6 +76,9 @@ export interface Database {
           total_predictions?: number;
           correct_predictions?: number;
           total_earnings?: number;
+          ap_coins_purchased?: number;
+          ap_coins_earned?: number;
+          ap_coins_spent?: number;
           updated_at?: string;
         };
       };
@@ -529,6 +539,78 @@ export interface Database {
           price_paid?: number;
           is_active?: boolean;
           updated_at?: string;
+        };
+      };
+      wallet_transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          transaction_type: 'PURCHASE' | 'SCENARIO_PAYOUT' | 'SCENARIO_STEAL' | 'SCENARIO_PROTECT' | 'ITEM_PURCHASE' | 'REFUND' | 'ADMIN_ADJUSTMENT' | 'BONUS' | 'PREDICTION_BET' | 'PREDICTION_WIN';
+          amount: number;
+          balance_after: number;
+          reference_type: string | null;
+          reference_id: string | null;
+          description: string | null;
+          metadata: Record<string, unknown>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          transaction_type: 'PURCHASE' | 'SCENARIO_PAYOUT' | 'SCENARIO_STEAL' | 'SCENARIO_PROTECT' | 'ITEM_PURCHASE' | 'REFUND' | 'ADMIN_ADJUSTMENT' | 'BONUS' | 'PREDICTION_BET' | 'PREDICTION_WIN';
+          amount: number;
+          balance_after: number;
+          reference_type?: string | null;
+          reference_id?: string | null;
+          description?: string | null;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Update: {
+          transaction_type?: 'PURCHASE' | 'SCENARIO_PAYOUT' | 'SCENARIO_STEAL' | 'SCENARIO_PROTECT' | 'ITEM_PURCHASE' | 'REFUND' | 'ADMIN_ADJUSTMENT' | 'BONUS' | 'PREDICTION_BET' | 'PREDICTION_WIN';
+          amount?: number;
+          balance_after?: number;
+          reference_type?: string | null;
+          reference_id?: string | null;
+          description?: string | null;
+          metadata?: Record<string, unknown>;
+        };
+      };
+      scenario_payouts: {
+        Row: {
+          id: string;
+          scenario_id: string;
+          recipient_id: string;
+          payout_amount: number;
+          theft_pool_at_resolution: number;
+          scenario_result: 'YES' | 'NO';
+          was_fulfilled: boolean;
+          wallet_transaction_id: string | null;
+          status: 'PENDING' | 'COMPLETED' | 'FAILED';
+          created_at: string;
+          processed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          scenario_id: string;
+          recipient_id: string;
+          payout_amount: number;
+          theft_pool_at_resolution: number;
+          scenario_result: 'YES' | 'NO';
+          was_fulfilled: boolean;
+          wallet_transaction_id?: string | null;
+          status?: 'PENDING' | 'COMPLETED' | 'FAILED';
+          created_at?: string;
+          processed_at?: string | null;
+        };
+        Update: {
+          payout_amount?: number;
+          theft_pool_at_resolution?: number;
+          scenario_result?: 'YES' | 'NO';
+          was_fulfilled?: boolean;
+          wallet_transaction_id?: string | null;
+          status?: 'PENDING' | 'COMPLETED' | 'FAILED';
+          processed_at?: string | null;
         };
       };
     };

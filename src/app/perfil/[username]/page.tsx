@@ -10,6 +10,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { publicProfileService, PublicProfile } from '@/services/publicProfile.service';
 import { chatService } from '@/services/chat.service';
+import { walletService, WalletStats, ScenarioPayout } from '@/services/wallet.service';
 import { getSupabaseBrowser } from '@/lib/supabase-client';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -50,6 +51,10 @@ import {
   Heart,
   MessageSquare,
   ChevronDown,
+  Wallet,
+  BadgeCheck,
+  XCircle,
+  Coins,
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -76,7 +81,7 @@ const REPORT_REASONS = [
   { id: 'other', label: 'Otro motivo' },
 ];
 
-type TabType = 'general' | 'stolen' | 'scenarios' | 'activity' | 'guardados' | 'holder';
+type TabType = 'general' | 'stolen' | 'scenarios' | 'activity' | 'guardados' | 'holder' | 'fulfilled' | 'unfulfilled' | 'wallet';
 
 export default function PublicProfilePage() {
   const params = useParams();
@@ -116,6 +121,12 @@ export default function PublicProfilePage() {
   const [followingList, setFollowingList] = useState<any[]>([]);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
   const [loadingFollowing, setLoadingFollowing] = useState(false);
+
+  // Estados para wallet y escenarios resueltos
+  const [walletStats, setWalletStats] = useState<WalletStats | null>(null);
+  const [fulfilledScenarios, setFulfilledScenarios] = useState<ScenarioPayout[]>([]);
+  const [unfulfilledScenarios, setUnfulfilledScenarios] = useState<ScenarioPayout[]>([]);
+  const [walletLoading, setWalletLoading] = useState(false);
 
   // Estados para menú de opciones
   const [isBlocked, setIsBlocked] = useState(false);
@@ -510,7 +521,24 @@ export default function PublicProfilePage() {
       }
       setScenariosHeldLoading(false);
     }
-  }, [profile?.id, activeTab, supabase]);
+    // Cargar escenarios cumplidos
+    if (activeTab === 'fulfilled') {
+      const data = await walletService.getFulfilledScenarios(profile.id);
+      setFulfilledScenarios(data);
+    }
+    // Cargar escenarios no cumplidos
+    if (activeTab === 'unfulfilled') {
+      const data = await walletService.getUnfulfilledScenarios(profile.id);
+      setUnfulfilledScenarios(data);
+    }
+    // Cargar wallet stats
+    if (activeTab === 'wallet' && isOwnProfile) {
+      setWalletLoading(true);
+      const stats = await walletService.getWalletStats(profile.id);
+      setWalletStats(stats);
+      setWalletLoading(false);
+    }
+  }, [profile?.id, activeTab, supabase, isOwnProfile]);
 
   useEffect(() => {
     loadProfile();
@@ -918,8 +946,13 @@ export default function PublicProfilePage() {
               { id: 'stolen', label: 'Escenarios Robados', icon: Skull },
               { id: 'scenarios', label: 'Escenarios', icon: Zap },
               { id: 'holder', label: 'Holder Actual', icon: Crown },
+              { id: 'fulfilled', label: 'Cumplidos', icon: BadgeCheck },
+              { id: 'unfulfilled', label: 'No Cumplidos', icon: XCircle },
               { id: 'activity', label: 'Actividad', icon: Eye },
-              ...(isOwnProfile ? [{ id: 'guardados', label: 'Guardados', icon: Bookmark }] : []),
+              ...(isOwnProfile ? [
+                { id: 'wallet', label: 'Monedero', icon: Wallet },
+                { id: 'guardados', label: 'Guardados', icon: Bookmark },
+              ] : []),
             ].map((tab) => {
               const Icon = tab.icon;
               return (
@@ -1189,6 +1222,184 @@ export default function PublicProfilePage() {
                     </button>
                   )}
                 </>
+              )}
+            </div>
+          )}
+
+          {/* Escenarios Cumplidos */}
+          {activeTab === 'fulfilled' && (
+            <div className="space-y-4">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <BadgeCheck className="w-5 h-5 text-green-400" />
+                Escenarios Cumplidos
+              </h3>
+              {fulfilledScenarios.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <BadgeCheck className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No hay escenarios cumplidos aún</p>
+                  <p className="text-sm mt-2">Los escenarios que se cumplan aparecerán aquí</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {fulfilledScenarios.map((payout) => (
+                    <Link
+                      key={payout.id}
+                      href={`/escenario/${payout.scenario_id}`}
+                      className="bg-card/50 border border-green-500/30 rounded-xl p-4 hover:border-green-500/50 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+                          {payout.scenario?.category || 'General'}
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full flex items-center gap-1">
+                          <BadgeCheck className="w-3 h-3" />
+                          Cumplido
+                        </span>
+                      </div>
+                      <h4 className="font-medium mt-2 line-clamp-2">{payout.scenario?.title || 'Escenario'}</h4>
+                      <div className="flex items-center gap-4 mt-3 text-sm">
+                        <span className="flex items-center gap-1 text-green-400 font-semibold">
+                          <Coins className="w-4 h-4" />
+                          +{payout.payout_amount.toLocaleString()} AP
+                        </span>
+                        <span className="text-muted-foreground">
+                          Pool: {payout.theft_pool_at_resolution.toLocaleString()} AP
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {formatDistanceToNow(new Date(payout.created_at), { addSuffix: true, locale: es })}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Escenarios No Cumplidos */}
+          {activeTab === 'unfulfilled' && (
+            <div className="space-y-4">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-400" />
+                Escenarios No Cumplidos
+              </h3>
+              {unfulfilledScenarios.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <XCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No hay escenarios no cumplidos</p>
+                  <p className="text-sm mt-2">Los escenarios que no se cumplan aparecerán aquí</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {unfulfilledScenarios.map((payout) => (
+                    <Link
+                      key={payout.id}
+                      href={`/escenario/${payout.scenario_id}`}
+                      className="bg-card/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+                          {payout.scenario?.category || 'General'}
+                        </span>
+                        <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded-full flex items-center gap-1">
+                          <XCircle className="w-3 h-3" />
+                          No Cumplido
+                        </span>
+                      </div>
+                      <h4 className="font-medium mt-2 line-clamp-2">{payout.scenario?.title || 'Escenario'}</h4>
+                      <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Flame className="w-4 h-4" />
+                          Pool: {payout.theft_pool_at_resolution.toLocaleString()} AP
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {formatDistanceToNow(new Date(payout.created_at), { addSuffix: true, locale: es })}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Monedero (Wallet) - Solo visible para el propio perfil */}
+          {activeTab === 'wallet' && isOwnProfile && (
+            <div className="space-y-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Wallet className="w-5 h-5 text-yellow-400" />
+                Monedero de AP Coins
+              </h3>
+
+              {walletLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+                </div>
+              ) : walletStats ? (
+                <>
+                  {/* Balance Principal */}
+                  <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-6 text-center">
+                    <p className="text-sm text-muted-foreground mb-2">Saldo Disponible</p>
+                    <p className="text-4xl font-bold text-yellow-400 flex items-center justify-center gap-2">
+                      <Coins className="w-8 h-8" />
+                      {walletStats.available_balance.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">AP Coins</p>
+                  </div>
+
+                  {/* Estadísticas del Wallet */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
+                      <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <TrendingUp className="w-5 h-5 text-blue-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-blue-400">{walletStats.ap_coins_purchased.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">AP Compradas</p>
+                    </div>
+
+                    <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
+                      <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <Trophy className="w-5 h-5 text-green-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-green-400">{walletStats.ap_coins_earned.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">AP Ganadas</p>
+                    </div>
+
+                    <div className="bg-card/50 border border-border rounded-xl p-4 text-center">
+                      <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-red-500/20 flex items-center justify-center">
+                        <Flame className="w-5 h-5 text-red-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-red-400">{walletStats.ap_coins_spent.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">AP Gastadas</p>
+                    </div>
+                  </div>
+
+                  {/* Fórmula */}
+                  <div className="bg-card/50 border border-border rounded-xl p-4">
+                    <p className="text-sm text-muted-foreground text-center">
+                      <span className="text-blue-400">{walletStats.ap_coins_purchased.toLocaleString()}</span>
+                      {' + '}
+                      <span className="text-green-400">{walletStats.ap_coins_earned.toLocaleString()}</span>
+                      {' - '}
+                      <span className="text-red-400">{walletStats.ap_coins_spent.toLocaleString()}</span>
+                      {' = '}
+                      <span className="text-yellow-400 font-bold">{walletStats.available_balance.toLocaleString()} AP</span>
+                    </p>
+                  </div>
+
+                  {/* Botón para comprar más */}
+                  <Link
+                    href="/tienda"
+                    className="block w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-center rounded-xl font-medium transition-all"
+                  >
+                    Comprar más AP Coins
+                  </Link>
+                </>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Wallet className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No se pudo cargar la información del monedero</p>
+                </div>
               )}
             </div>
           )}
