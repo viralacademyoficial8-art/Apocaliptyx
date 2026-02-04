@@ -113,30 +113,8 @@ export async function POST(request: NextRequest) {
         .eq('id', userData.id);
     }
 
-    // Get scenario title for feed activity
-    const { data: scenarioInfo } = await supabase()
-      .from('scenarios')
-      .select('title')
-      .eq('id', scenarioId)
-      .single();
-
-    // Create feed activity for protection
-    try {
-      await supabase()
-        .from('feed_activities')
-        .insert({
-          type: 'scenario_protected',
-          title: '¡Escenario protegido!',
-          description: scenarioInfo?.title || 'Escenario',
-          icon: '🛡️',
-          user_id: userData.id,
-          scenario_id: scenarioId,
-          scenario_title: scenarioInfo?.title,
-        });
-    } catch (feedError) {
-      console.error('Error creating feed activity for protection:', feedError);
-      // Don't fail the request
-    }
+    // Nota: La actividad del feed se crea automáticamente via trigger de la BD
+    // (feed_on_scenario_protected) cuando se inserta el shield en scenario_shields
 
     return NextResponse.json({
       success: true,
