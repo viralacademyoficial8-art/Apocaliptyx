@@ -39,8 +39,8 @@ export default function RootLayout({
     <html lang="es" className="dark" data-accent="red" suppressHydrationWarning>
       <head>
         {/* Favicon */}
-        <link rel="icon" href="/icons/favicon.ico" sizes="48x48" />
-        <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/icons/favicon-32x32.png" sizes="32x32" type="image/png" />
+        <link rel="icon" href="/icons/favicon-96x96.png" sizes="96x96" type="image/png" />
         {/* PWA Meta Tags */}
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
