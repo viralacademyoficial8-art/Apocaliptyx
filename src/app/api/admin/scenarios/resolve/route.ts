@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    if (!userData || !['ADMIN', 'SUPER_ADMIN'].includes(userData.role)) {
+    const userRole = (userData as { role: string } | null)?.role;
+    if (!userRole || !['ADMIN', 'SUPER_ADMIN'].includes(userRole)) {
       return NextResponse.json({ error: 'No tienes permisos para esta acción' }, { status: 403 });
     }
 
