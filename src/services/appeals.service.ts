@@ -72,8 +72,8 @@ export const appealsService = {
       }
 
       // Verificar que no existe una apelación pendiente del mismo usuario
-      const { data: existingAppeal } = await supabase
-        .from('scenario_appeals')
+      const { data: existingAppeal } = await (supabase
+        .from('scenario_appeals') as any)
         .select('id')
         .eq('scenario_id', input.scenarioId)
         .eq('user_id', input.userId)
@@ -85,8 +85,8 @@ export const appealsService = {
       }
 
       // Verificar ventana de apelación (48 horas por defecto)
-      const { data: config } = await supabase
-        .from('oracle_config')
+      const { data: config } = await (supabase
+        .from('oracle_config') as any)
         .select('value')
         .eq('key', 'appeal_window_hours')
         .single();
@@ -107,8 +107,8 @@ export const appealsService = {
       }
 
       // Crear apelación
-      const { data: appeal, error } = await supabase
-        .from('scenario_appeals')
+      const { data: appeal, error } = await (supabase
+        .from('scenario_appeals') as any)
         .insert({
           scenario_id: input.scenarioId,
           user_id: input.userId,
@@ -148,8 +148,8 @@ export const appealsService = {
 
     try {
       // Obtener apelación
-      const { data: appeal } = await supabase
-        .from('scenario_appeals')
+      const { data: appeal } = await (supabase
+        .from('scenario_appeals') as any)
         .select('*, scenario:scenarios(id, title, status, result)')
         .eq('id', input.appealId)
         .single();
@@ -165,8 +165,8 @@ export const appealsService = {
       }
 
       // Actualizar apelación
-      const { error: updateError } = await supabase
-        .from('scenario_appeals')
+      const { error: updateError } = await (supabase
+        .from('scenario_appeals') as any)
         .update({
           status: input.status,
           reviewed_by: input.reviewerId,
@@ -226,8 +226,8 @@ export const appealsService = {
   async getUserAppeals(userId: string): Promise<Appeal[]> {
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase
-      .from('scenario_appeals')
+    const { data, error } = await (supabase
+      .from('scenario_appeals') as any)
       .select(`
         *,
         scenario:scenarios (
@@ -254,8 +254,8 @@ export const appealsService = {
   async getAllAppeals(status?: string): Promise<Appeal[]> {
     const supabase = getSupabaseClient();
 
-    let query = supabase
-      .from('scenario_appeals')
+    let query = (supabase
+      .from('scenario_appeals') as any)
       .select(`
         *,
         scenario:scenarios (
@@ -295,8 +295,8 @@ export const appealsService = {
   async getById(appealId: string): Promise<Appeal | null> {
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase
-      .from('scenario_appeals')
+    const { data, error } = await (supabase
+      .from('scenario_appeals') as any)
       .select(`
         *,
         scenario:scenarios (
@@ -331,8 +331,8 @@ export const appealsService = {
   async markAsReviewing(appealId: string): Promise<{ success: boolean; error?: string }> {
     const supabase = getSupabaseClient();
 
-    const { error } = await supabase
-      .from('scenario_appeals')
+    const { error } = await (supabase
+      .from('scenario_appeals') as any)
       .update({
         status: 'reviewing',
         updated_at: new Date().toISOString(),
