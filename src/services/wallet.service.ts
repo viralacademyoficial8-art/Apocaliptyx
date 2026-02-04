@@ -189,7 +189,7 @@ export const walletService = {
       return [];
     }
 
-    return (data || []).map(item => ({
+    return ((data || []) as any[]).map(item => ({
       ...item,
       scenario: Array.isArray(item.scenario) ? item.scenario[0] : item.scenario,
     }));
@@ -220,7 +220,7 @@ export const walletService = {
       return [];
     }
 
-    return (data || []).map(item => ({
+    return ((data || []) as any[]).map(item => ({
       ...item,
       scenario: Array.isArray(item.scenario) ? item.scenario[0] : item.scenario,
     }));
@@ -359,7 +359,7 @@ export const walletService = {
       return [];
     }
 
-    return (data || []).map(item => ({
+    return ((data || []) as any[]).map(item => ({
       ...item,
       scenario: Array.isArray(item.scenario) ? item.scenario[0] : item.scenario,
     }));
