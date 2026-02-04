@@ -145,7 +145,7 @@ export const walletService = {
   ): Promise<{ success: boolean; transaction_id?: string; new_balance?: number; error?: string }> {
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase.rpc('record_wallet_transaction', {
+    const { data, error } = await (supabase.rpc as any)('record_wallet_transaction', {
       p_user_id: userId,
       p_type: type,
       p_amount: amount,
@@ -243,7 +243,7 @@ export const walletService = {
   }> {
     const supabase = getSupabaseClient();
 
-    const { data, error } = await supabase.rpc('process_scenario_payout', {
+    const { data, error } = await (supabase.rpc as any)('process_scenario_payout', {
       p_scenario_id: scenarioId,
       p_result: result,
     });
