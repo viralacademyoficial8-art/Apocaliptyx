@@ -55,15 +55,17 @@ export const appealsService = {
 
     try {
       // Verificar que el escenario existe y está resuelto
-      const { data: scenario } = await supabase
+      const { data: scenarioData } = await supabase
         .from('scenarios')
         .select('id, status, result, resolved_at')
         .eq('id', input.scenarioId)
         .single();
 
-      if (!scenario) {
+      if (!scenarioData) {
         return { success: false, error: 'Escenario no encontrado' };
       }
+
+      const scenario = scenarioData as { id: string; status: string; result: string | null; resolved_at: string | null };
 
       if (scenario.status !== 'RESOLVED') {
         return { success: false, error: 'Solo se pueden apelar escenarios resueltos' };
@@ -89,7 +91,8 @@ export const appealsService = {
         .eq('key', 'appeal_window_hours')
         .single();
 
-      const appealWindowHours = config ? parseInt(config.value) : 48;
+      const configData = config as { value: string } | null;
+      const appealWindowHours = configData ? parseInt(configData.value) : 48;
       const resolvedAt = new Date(scenario.resolved_at);
       const windowEnd = new Date(resolvedAt.getTime() + appealWindowHours * 60 * 60 * 1000);
 
@@ -149,7 +152,9 @@ export const appealsService = {
         return { success: false, error: 'Apelación no encontrada' };
       }
 
-      if (appeal.status !== 'pending' && appeal.status !== 'reviewing') {
+      const appealData = appeal as any;
+
+      if (appealData.status !== 'pending' && appealData.status !== 'reviewing') {
         return { success: false, error: 'Esta apelación ya fue procesada' };
       }
 
@@ -172,7 +177,7 @@ export const appealsService = {
 
       // Si se aprobó, actualizar el escenario y reprocesar pago
       if (input.status === 'approved' && input.newResult) {
-        const scenario = appeal.scenario as any;
+        const scenario = appealData.scenario as any;
 
         // Actualizar resultado del escenario
         await supabase
@@ -195,7 +200,7 @@ export const appealsService = {
         await supabase
           .from('scenarios')
           .update({ appeal_status: input.status })
-          .eq('id', appeal.scenario_id);
+          .eq('id', appealData.scenario_id);
       }
 
       return { success: true };
