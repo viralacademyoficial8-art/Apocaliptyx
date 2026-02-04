@@ -190,8 +190,8 @@ export const oracleService = {
         console.log(`[Oracle] Confidence too low (${verificationResult.confidence}), marking for manual review`);
 
         // Marcar para revisión manual
-        await supabase
-          .from('scenarios')
+        await (supabase
+          .from('scenarios') as any)
           .update({
             ai_verification_result: verificationResult,
             ai_verification_date: new Date().toISOString(),
@@ -215,8 +215,8 @@ export const oracleService = {
       console.error(`[Oracle] Error verifying scenario ${scenario.id}:`, error);
 
       // Registrar el error
-      await supabase
-        .from('verification_logs')
+      await (supabase
+        .from('verification_logs') as any)
         .insert({
           scenario_id: scenario.id,
           search_query: scenario.title,
@@ -311,7 +311,7 @@ export const oracleService = {
 
     try {
       // Registrar verificación manual
-      await supabase.from('verification_logs').insert({
+      await (supabase.from('verification_logs') as any).insert({
         scenario_id: scenarioId,
         search_query: 'MANUAL_VERIFICATION',
         verification_result: result === 'YES' ? 'fulfilled' : 'not_fulfilled',
@@ -346,8 +346,8 @@ export const oracleService = {
   async getConfig(): Promise<Record<string, any>> {
     const supabase = getSupabaseClient();
 
-    const { data } = await supabase
-      .from('oracle_config')
+    const { data } = await (supabase
+      .from('oracle_config') as any)
       .select('key, value');
 
     if (!data) return {};
@@ -368,8 +368,8 @@ export const oracleService = {
   ): Promise<{ success: boolean; error?: string }> {
     const supabase = getSupabaseClient();
 
-    const { error } = await supabase
-      .from('oracle_config')
+    const { error } = await (supabase
+      .from('oracle_config') as any)
       .upsert({
         key,
         value: JSON.stringify(value),
