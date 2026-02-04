@@ -33,6 +33,7 @@ import {
   MessageCircle,
   Film,
   Mail,
+  Brain,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -110,6 +111,7 @@ const allMenuItems: MenuSection[] = [
   {
     title: 'Sistema',
     items: [
+      { href: '/admin/oracle', label: 'Oráculo IA', icon: Brain, permission: 'admin.settings.view' },
       { href: '/admin/configuracion', label: 'Configuración', icon: Settings, permission: 'admin.settings.view' },
       { href: '/admin/logs', label: 'Logs', icon: ScrollText, permission: 'admin.logs.view' },
     ],
