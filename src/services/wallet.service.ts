@@ -72,12 +72,19 @@ export const walletService = {
       return null;
     }
 
+    const walletData = data as {
+      ap_coins: number | null;
+      ap_coins_purchased: number | null;
+      ap_coins_earned: number | null;
+      ap_coins_spent: number | null;
+    };
+
     return {
-      ap_coins: data.ap_coins || 0,
-      ap_coins_purchased: data.ap_coins_purchased || 0,
-      ap_coins_earned: data.ap_coins_earned || 0,
-      ap_coins_spent: data.ap_coins_spent || 0,
-      available_balance: data.ap_coins || 0,
+      ap_coins: walletData.ap_coins || 0,
+      ap_coins_purchased: walletData.ap_coins_purchased || 0,
+      ap_coins_earned: walletData.ap_coins_earned || 0,
+      ap_coins_spent: walletData.ap_coins_spent || 0,
+      available_balance: walletData.ap_coins || 0,
     };
   },
 
