@@ -124,8 +124,8 @@ export const appealsService = {
       }
 
       // Actualizar estado de apelación en escenario
-      await supabase
-        .from('scenarios')
+      await (supabase
+        .from('scenarios') as any)
         .update({ appeal_status: 'pending' })
         .eq('id', input.scenarioId);
 
@@ -186,8 +186,8 @@ export const appealsService = {
         const scenario = appealData.scenario as any;
 
         // Actualizar resultado del escenario
-        await supabase
-          .from('scenarios')
+        await (supabase
+          .from('scenarios') as any)
           .update({
             result: input.newResult,
             appeal_status: 'approved',
@@ -203,8 +203,8 @@ export const appealsService = {
         }
       } else {
         // Actualizar estado de apelación en escenario
-        await supabase
-          .from('scenarios')
+        await (supabase
+          .from('scenarios') as any)
           .update({ appeal_status: input.status })
           .eq('id', appealData.scenario_id);
       }
