@@ -93,6 +93,12 @@ export const appealsService = {
 
       const configData = config as { value: string } | null;
       const appealWindowHours = configData ? parseInt(configData.value) : 48;
+
+      // Verificar que tiene fecha de resolución
+      if (!scenario.resolved_at) {
+        return { success: false, error: 'El escenario no tiene fecha de resolución' };
+      }
+
       const resolvedAt = new Date(scenario.resolved_at);
       const windowEnd = new Date(resolvedAt.getTime() + appealWindowHours * 60 * 60 * 1000);
 
