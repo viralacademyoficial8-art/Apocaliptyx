@@ -88,36 +88,36 @@ export async function POST(request: NextRequest) {
     if (holderId) {
       if (resultData.was_fulfilled && resultData.payout_amount && resultData.payout_amount > 0) {
         // Notification for fulfilled scenario
-        await notificationsService.create(
-          holderId,
-          'scenario_resolved',
-          `¡Felicitaciones! Tu escenario "${scenario.title}" se ha cumplido`,
-          `Has recibido ${resultData.payout_amount.toLocaleString()} AP Coins como recompensa por ser el último holder.`,
-          `/escenario/${scenario_id}`,
-          {
+        await notificationsService.create({
+          userId: holderId,
+          type: 'scenario_resolved',
+          title: `¡Felicitaciones! Tu escenario "${scenario.title}" se ha cumplido`,
+          message: `Has recibido ${resultData.payout_amount.toLocaleString()} AP Coins como recompensa por ser el último holder.`,
+          linkUrl: `/escenario/${scenario_id}`,
+          data: {
             scenario_id,
             scenario_title: scenario.title,
             result,
             payout_amount: resultData.payout_amount,
             was_fulfilled: true,
-          }
-        );
+          },
+        });
       } else {
         // Notification for unfulfilled scenario
-        await notificationsService.create(
-          holderId,
-          'scenario_resolved',
-          `Tu escenario "${scenario.title}" no se cumplió`,
-          `El escenario ha sido marcado como no cumplido. El pool acumulado permanece en el sistema.`,
-          `/escenario/${scenario_id}`,
-          {
+        await notificationsService.create({
+          userId: holderId,
+          type: 'scenario_resolved',
+          title: `Tu escenario "${scenario.title}" no se cumplió`,
+          message: `El escenario ha sido marcado como no cumplido. El pool acumulado permanece en el sistema.`,
+          linkUrl: `/escenario/${scenario_id}`,
+          data: {
             scenario_id,
             scenario_title: scenario.title,
             result,
             payout_amount: 0,
             was_fulfilled: false,
-          }
-        );
+          },
+        });
       }
     }
 
