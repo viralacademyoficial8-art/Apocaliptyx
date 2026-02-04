@@ -36,15 +36,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Get scenario info before resolution
-    const { data: scenario, error: scenarioError } = await supabase
+    const { data: scenarioData, error: scenarioError } = await supabase
       .from('scenarios')
       .select('*, current_holder:users!scenarios_current_holder_id_fkey(id, username)')
       .eq('id', scenario_id)
       .single();
 
-    if (scenarioError || !scenario) {
+    if (scenarioError || !scenarioData) {
       return NextResponse.json({ error: 'Escenario no encontrado' }, { status: 404 });
     }
+
+    const scenario = scenarioData as {
+      id: string;
+      title: string;
+      status: string;
+      theft_pool: number;
+      current_holder?: { id: string; username: string };
+    };
 
     if (scenario.status === 'RESOLVED') {
       return NextResponse.json({ error: 'El escenario ya ha sido resuelto' }, { status: 400 });
