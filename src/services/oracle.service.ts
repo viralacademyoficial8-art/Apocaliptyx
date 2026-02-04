@@ -175,7 +175,7 @@ export const oracleService = {
 
             await notificationsService.create({
               userId: recipientId,
-              type: verificationResult.fulfilled ? 'scenario_won' : 'scenario_lost',
+              type: verificationResult.fulfilled ? 'prediction_won' : 'prediction_lost',
               title: verificationResult.fulfilled ? '¡Apocalipsis Cumplido!' : 'Escenario Finalizado',
               message: notificationMessage,
               data: {
