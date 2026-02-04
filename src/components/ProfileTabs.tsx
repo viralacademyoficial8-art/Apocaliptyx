@@ -19,6 +19,8 @@ type ProfileTabsProps = {
 
 // Helper para convertir ScenarioFromDB al formato que espera ScenarioCard
 function mapScenarioFromDB(s: ScenarioFromDB): any {
+  // Usar theft_pool si está disponible, sino total_pool como fallback
+  const poolValue = s.theft_pool || s.total_pool || 0;
   return {
     id: s.id,
     creatorId: s.creator_id,
@@ -28,8 +30,8 @@ function mapScenarioFromDB(s: ScenarioFromDB): any {
     category: s.category.toLowerCase(),
     dueDate: s.resolution_date,
     creationCost: s.min_bet,
-    currentPrice: s.total_pool,
-    totalPot: s.total_pool,
+    currentPrice: poolValue,
+    totalPot: poolValue,
     status: s.status.toLowerCase(),
     createdAt: s.created_at,
     updatedAt: new Date(s.updated_at),

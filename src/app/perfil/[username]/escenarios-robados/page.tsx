@@ -44,6 +44,7 @@ interface StolenScenario {
     description?: string;
     category: string;
     total_pool: number;
+    theft_pool?: number;
     participant_count: number;
     yes_pool?: number;
     no_pool?: number;
@@ -225,8 +226,8 @@ function AccordionItem({
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <Trophy className="w-4 h-4 text-yellow-400 mx-auto mb-1" />
-                <p className="text-lg font-bold text-foreground">{steal.scenario?.total_pool?.toLocaleString() || 0}</p>
-                <p className="text-xs text-muted-foreground">Pool Total</p>
+                <p className="text-lg font-bold text-foreground">{(steal.scenario?.theft_pool || steal.scenario?.total_pool || 0).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">AP en juego</p>
               </div>
               <div className="bg-muted/50 rounded-lg p-3 text-center">
                 <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
@@ -367,6 +368,7 @@ export default function EscenariosRobadosPage() {
             description,
             category,
             total_pool,
+            theft_pool,
             participant_count,
             yes_pool,
             no_pool,

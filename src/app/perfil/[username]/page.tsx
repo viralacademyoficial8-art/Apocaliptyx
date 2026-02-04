@@ -461,7 +461,7 @@ export default function PublicProfilePage() {
       const scenarioIds = steals.map(s => s.scenario_id);
       const { data: scenarios, error: scenariosError } = await supabase
         .from('scenarios')
-        .select('id, title, category, total_pool, participant_count, status')
+        .select('id, title, category, total_pool, theft_pool, participant_count, status')
         .in('id', scenarioIds);
 
       if (scenariosError) {
@@ -1030,7 +1030,7 @@ export default function PublicProfilePage() {
                       <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1 text-emerald-400">
                           <Flame className="w-4 h-4" />
-                          {steal.scenario?.total_pool?.toLocaleString() || 0} AP
+                          {(steal.scenario?.theft_pool || steal.scenario?.total_pool || 0).toLocaleString()} AP
                         </span>
                         <span>{steal.scenario?.participant_count || 0} participantes</span>
                       </div>
@@ -1068,7 +1068,7 @@ export default function PublicProfilePage() {
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1 text-emerald-400">
                           <Flame className="w-4 h-4" />
-                          {scenario.total_pool?.toLocaleString() || 0} AP
+                          {(scenario.theft_pool || scenario.total_pool || 0).toLocaleString()} AP
                         </span>
                         <span>{scenario.participant_count || 0} participantes</span>
                       </div>
@@ -1158,7 +1158,7 @@ export default function PublicProfilePage() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1 text-emerald-400">
                             <Flame className="w-4 h-4" />
-                            {scenario.total_pool?.toLocaleString() || 0} AP
+                            {(scenario.theft_pool || scenario.total_pool || 0).toLocaleString()} AP
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
