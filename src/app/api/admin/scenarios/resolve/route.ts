@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call the RPC function to process the payout
-    const { data: payoutResult, error: payoutError } = await supabase.rpc('process_scenario_payout', {
+    const { data: payoutResult, error: payoutError } = await (supabase.rpc as any)('process_scenario_payout', {
       p_scenario_id: scenario_id,
       p_result: result,
     });
