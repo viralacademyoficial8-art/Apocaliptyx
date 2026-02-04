@@ -287,7 +287,14 @@ export const walletService = {
       };
     }
 
-    const active = (data || [])
+    const summaryData = (data || []) as {
+      coin_type: string;
+      category: string;
+      total_amount: number;
+      description: string;
+    }[];
+
+    const active = summaryData
       .filter(item => item.coin_type === 'active')
       .map(item => ({
         category: item.category,
@@ -295,7 +302,7 @@ export const walletService = {
         description: item.description || '',
       }));
 
-    const passive = (data || [])
+    const passive = summaryData
       .filter(item => item.coin_type === 'passive')
       .map(item => ({
         category: item.category,
