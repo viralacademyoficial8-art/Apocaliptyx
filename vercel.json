@@ -3,6 +3,10 @@
     {
       "path": "/api/scenarios/auto-feature",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/verify-scenarios",
+      "schedule": "0 0 * * *"
     }
   ]
 }

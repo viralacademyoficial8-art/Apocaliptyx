@@ -147,6 +147,37 @@ export default function AdminEscenariosPage() {
     setActionLoading(null);
   };
 
+  // Resolver escenario con pago al holder
+  const handleResolveScenario = async (scenarioId: string, result: 'YES' | 'NO') => {
+    const confirmMessage = result === 'YES'
+      ? '¿Resolver como CUMPLIDO? El holder recibirá el pool acumulado.'
+      : '¿Resolver como NO CUMPLIDO? No se realizará pago al holder.';
+
+    if (!confirm(confirmMessage)) return;
+
+    setActionLoading(scenarioId);
+    try {
+      const response = await fetch('/api/admin/scenarios/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario_id: scenarioId, result }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert(data.message);
+        loadScenarios();
+      } else {
+        alert(data.error || 'Error al resolver el escenario');
+      }
+    } catch (error) {
+      console.error('Error resolving scenario:', error);
+      alert('Error al resolver el escenario');
+    }
+    setActionLoading(null);
+  };
+
   const handleDelete = async (scenarioId: string) => {
     if (!confirm('¿Estás seguro de eliminar este escenario? Esta acción no se puede deshacer.')) {
       return;
@@ -369,9 +400,13 @@ export default function AdminEscenariosPage() {
                                 <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
                                 Marcar Activo
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'RESOLVED')}>
-                                <CheckCircle className="w-4 h-4 mr-2 text-blue-400" />
-                                Marcar Resuelto
+                              <DropdownMenuItem onClick={() => handleResolveScenario(scenario.id, 'YES')}>
+                                <CheckCircle className="w-4 h-4 mr-2 text-green-400" />
+                                Resolver: SÍ Cumplido ✅
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleResolveScenario(scenario.id, 'NO')}>
+                                <XCircle className="w-4 h-4 mr-2 text-red-400" />
+                                Resolver: NO Cumplido ❌
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleChangeStatus(scenario.id, 'CANCELLED')}>
                                 <XCircle className="w-4 h-4 mr-2 text-muted-foreground" />
