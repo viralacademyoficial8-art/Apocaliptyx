@@ -426,26 +426,19 @@ export default function PublicProfilePage() {
     }
   }, [profile?.id, loadScenariosHeldCount]);
 
-  // Cargar datos adicionales según tab
+  // Cargar datos adicionales según tab - siempre carga datos frescos
   const loadTabData = useCallback(async () => {
     if (!profile?.id) return;
 
-    if (activeTab === 'stolen' && stolenScenarios.length === 0) {
-      // Obtener escenarios robados desde scenario_steal_history
-      const { data: steals, error } = await supabase
+    if (activeTab === 'stolen') {
+      // Paso 1: Obtener historial de robos
+      const { data: steals, error: stealsError } = await supabase
         .from('scenario_steal_history')
         .select(`
           id,
           stolen_at,
           price_paid,
-          scenario:scenarios (
-            id,
-            title,
-            category,
-            total_pool,
-            participant_count,
-            status
-          ),
+          scenario_id,
           victim:users!scenario_steal_history_victim_id_fkey (
             username
           )
@@ -453,23 +446,71 @@ export default function PublicProfilePage() {
         .eq('thief_id', profile.id)
         .order('stolen_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching stolen scenarios:', error);
+      if (stealsError) {
+        console.error('Error fetching stolen scenarios:', stealsError);
+        setStolenScenarios([]);
+        return;
       }
-      setStolenScenarios(steals || []);
+
+      if (!steals || steals.length === 0) {
+        setStolenScenarios([]);
+        return;
+      }
+
+      // Paso 2: Obtener datos ACTUALES de los escenarios (consulta separada sin caché)
+      const scenarioIds = steals.map(s => s.scenario_id);
+      const { data: scenarios, error: scenariosError } = await supabase
+        .from('scenarios')
+        .select('id, title, category, total_pool, participant_count, status')
+        .in('id', scenarioIds);
+
+      if (scenariosError) {
+        console.error('Error fetching scenario details:', scenariosError);
+      }
+
+      // Combinar datos con los valores actuales
+      const combinedData = steals.map(steal => ({
+        ...steal,
+        scenario: scenarios?.find(s => s.id === steal.scenario_id) || null
+      }));
+
+      console.log('Loaded stolen scenarios with fresh data:', combinedData);
+      setStolenScenarios(combinedData);
     }
-    if (activeTab === 'scenarios' && scenarios.length === 0) {
-      const data = await publicProfileService.getCreatedScenarios(profile.id);
-      setScenarios(data);
+    if (activeTab === 'scenarios') {
+      // Consulta directa para datos frescos
+      const { data, error } = await supabase
+        .from('scenarios')
+        .select('*')
+        .eq('creator_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (!error) {
+        console.log('Loaded created scenarios with fresh data:', data);
+        setScenarios(data || []);
+      }
     }
-    if (activeTab === 'activity' && activity.length === 0) {
+    if (activeTab === 'activity') {
       const data = await publicProfileService.getActivity(profile.id);
       setActivity(data);
     }
-    if (activeTab === 'holder' && scenariosHeld.length === 0) {
-      loadScenariosHeld(profile.id);
+    if (activeTab === 'holder') {
+      // Consulta directa para datos frescos
+      const { data, error } = await supabase
+        .from('scenarios')
+        .select('*')
+        .eq('current_holder_id', profile.id)
+        .eq('status', 'ACTIVE')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        console.log('Loaded holder scenarios with fresh data:', data);
+        setScenariosHeld(data);
+      }
+      setScenariosHeldLoading(false);
     }
-  }, [profile?.id, activeTab, stolenScenarios.length, scenarios.length, activity.length, scenariosHeld.length, loadScenariosHeld]);
+  }, [profile?.id, activeTab, supabase]);
 
   useEffect(() => {
     loadProfile();
@@ -987,8 +1028,8 @@ export default function PublicProfilePage() {
                       </div>
                       <h4 className="font-medium mt-2 line-clamp-2">{steal.scenario?.title || 'Escenario eliminado'}</h4>
                       <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Flame className="w-4 h-4 text-yellow-500" />
+                        <span className="flex items-center gap-1 text-emerald-400">
+                          <Flame className="w-4 h-4" />
                           {steal.scenario?.total_pool?.toLocaleString() || 0} AP
                         </span>
                         <span>{steal.scenario?.participant_count || 0} participantes</span>
@@ -1025,7 +1066,10 @@ export default function PublicProfilePage() {
                       </span>
                       <h4 className="font-medium mt-2 line-clamp-2">{scenario.title}</h4>
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                        <span>{scenario.total_pool?.toLocaleString() || 0} AP</span>
+                        <span className="flex items-center gap-1 text-emerald-400">
+                          <Flame className="w-4 h-4" />
+                          {scenario.total_pool?.toLocaleString() || 0} AP
+                        </span>
                         <span>{scenario.participant_count || 0} participantes</span>
                       </div>
                     </Link>
@@ -1112,8 +1156,8 @@ export default function PublicProfilePage() {
                         </div>
                         <h4 className="font-semibold text-foreground mb-2 line-clamp-2">{scenario.title}</h4>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Flame className="w-4 h-4 text-yellow-400" />
+                          <span className="flex items-center gap-1 text-emerald-400">
+                            <Flame className="w-4 h-4" />
                             {scenario.total_pool?.toLocaleString() || 0} AP
                           </span>
                           <span className="flex items-center gap-1">
