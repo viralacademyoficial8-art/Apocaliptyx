@@ -741,7 +741,7 @@ function ScenarioCard({ scenario }: { scenario: ScenarioData }) {
     >
       {/* Category & badges */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+        <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full uppercase">
           {scenario.category}
         </span>
         {scenario.is_featured && (

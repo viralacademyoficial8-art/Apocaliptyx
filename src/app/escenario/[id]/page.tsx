@@ -503,7 +503,7 @@ export default function EscenarioPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+            <span className="text-xs px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full uppercase">
               {scenario.category}
             </span>
             {scenario.is_featured && (
