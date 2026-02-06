@@ -4,29 +4,31 @@
 -- Problema: El pool no suma la cantidad completa del robo
 --
 -- Mecánica correcta:
--- - Etapa 0: La casa (Apocalyptix) pone 10 AP iniciales -> pool = 10
--- - Etapa 1: Creador crea escenario, costo 0 -> pool = 10
--- - Etapa 2: Robador 1, costo 10 AP -> pool = 20 (10 + 10)
--- - Etapa 3: Robador 2, costo 11 AP -> pool = 31 (20 + 11)
--- - Etapa 4: Robador 3, costo 12 AP -> pool = 43 (31 + 12)
+-- - Creador crea escenario, costo 0 -> pool = 10 (la casa Apocalyptix pone 10 AP iniciales)
+-- - Robo 1, costo 11 AP -> pool = 21 (10 + 11)
+-- - Robo 2, costo 12 AP -> pool = 33 (21 + 12)
+-- - Robo 3, costo 13 AP -> pool = 46 (33 + 13)
+-- - Robo 4, costo 14 AP -> pool = 60 (46 + 14)
 -- - Y así sucesivamente... (+1 AP por cada robo)
 --
--- Fórmula precio: precio_robo = 10 + steal_count
--- (Robo 1 cuando steal_count=0: 10, Robo 2 cuando steal_count=1: 11, etc.)
+-- Fórmula precio: precio_robo = 10 + numero_de_robo = 11 + steal_count
+-- (Robo 1 cuando steal_count=0: 11, Robo 2 cuando steal_count=1: 12, etc.)
 
 -- ============================================
 -- FUNCIÓN: calculate_steal_price (CORREGIDA)
 -- Calcula el precio del robo basado en steal_count
+-- Fórmula: 10 + numero_de_robo = 11 + steal_count
 -- ============================================
 CREATE OR REPLACE FUNCTION calculate_steal_price(p_steal_count INTEGER)
 RETURNS INTEGER AS $$
 BEGIN
-    -- Precio base 10 + número de robos previos
-    -- Robo 1 (steal_count=0): 10
-    -- Robo 2 (steal_count=1): 11
-    -- Robo 3 (steal_count=2): 12
+    -- Precio = 10 + numero_de_robo (donde numero_de_robo = steal_count + 1)
+    -- Robo 1 (steal_count=0): 11 AP
+    -- Robo 2 (steal_count=1): 12 AP
+    -- Robo 3 (steal_count=2): 13 AP
+    -- Robo 4 (steal_count=3): 14 AP
     -- etc.
-    RETURN 10 + p_steal_count;
+    RETURN 11 + p_steal_count;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
@@ -220,7 +222,7 @@ BEGIN
     -- Actualizar escenario con holder inicial y pool inicial
     UPDATE scenarios SET
         current_holder_id = NEW.creator_id,
-        current_price = calculate_steal_price(0), -- Precio del primer robo: 10
+        current_price = calculate_steal_price(0), -- Precio del primer robo: 11 AP
         theft_pool = 10,  -- Pool inicial de la casa
         can_be_stolen = TRUE
     WHERE id = NEW.id;
@@ -254,6 +256,6 @@ UPDATE scenarios
 SET current_price = calculate_steal_price(steal_count)
 WHERE current_price != calculate_steal_price(steal_count);
 
-COMMENT ON FUNCTION calculate_steal_price IS 'Calcula el precio del robo: 10 + steal_count (Robo 1=10, Robo 2=11, etc.)';
+COMMENT ON FUNCTION calculate_steal_price IS 'Calcula el precio del robo: 11 + steal_count (Robo 1=11, Robo 2=12, etc.)';
 COMMENT ON FUNCTION steal_scenario IS 'Ejecuta el robo: TODO el costo va al pool, no hay pago a víctimas';
 COMMENT ON FUNCTION initialize_scenario_holding IS 'Inicializa escenario con pool de 10 AP (la casa)';
