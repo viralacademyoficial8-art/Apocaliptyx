@@ -1094,7 +1094,7 @@ export default function PublicProfilePage() {
                       href={`/escenario/${scenario.id}`}
                       className="bg-card/50 border border-border rounded-lg p-4 hover:border-purple-500/50 transition-colors"
                     >
-                      <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full">
+                      <span className="text-xs px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full uppercase">
                         {scenario.category}
                       </span>
                       <h4 className="font-medium mt-2 line-clamp-2">{scenario.title}</h4>
@@ -1171,7 +1171,7 @@ export default function PublicProfilePage() {
                         className="bg-card/50 border border-red-500/30 rounded-xl p-4 hover:border-red-500/50 transition-all"
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
+                          <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground uppercase">
                             {scenario.category}
                           </span>
                           {scenario.creator_id !== scenario.current_holder_id && (
