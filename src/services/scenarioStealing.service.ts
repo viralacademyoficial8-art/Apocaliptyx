@@ -78,11 +78,14 @@ class ScenarioStealingService {
 
   /**
    * Calcula el precio del próximo robo
+   * Fórmula: 10 + steal_count
+   * Robo 1 (steal_count=0): 10 AP
+   * Robo 2 (steal_count=1): 11 AP
+   * Robo 3 (steal_count=2): 12 AP
+   * etc.
    */
   calculateStealPrice(stealCount: number): number {
-    // Base price 10, +1 por cada robo previo
-    // Robo 1: 11, Robo 2: 12, etc.
-    return 10 + stealCount + 1;
+    return 10 + stealCount;
   }
 
   /**
