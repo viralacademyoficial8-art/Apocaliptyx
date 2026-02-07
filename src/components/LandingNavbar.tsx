@@ -84,17 +84,17 @@ export function LandingNavbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 safe-area-left safe-area-right">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Logo */}
+            {/* Logo - cambia según el tema */}
             <Link
               href="/"
               className="flex items-center gap-2 group"
             >
               <Image
-                src="/apocaliptyx-logo.png"
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
                 alt="Apocaliptyx"
-                width={180}
-                height={50}
-                className="h-8 sm:h-10 w-auto"
+                width={resolvedTheme === 'dark' ? 180 : 220}
+                height={resolvedTheme === 'dark' ? 50 : 60}
+                className={resolvedTheme === 'dark' ? "h-8 sm:h-10 w-auto" : "h-10 sm:h-12 w-auto"}
                 priority
               />
             </Link>

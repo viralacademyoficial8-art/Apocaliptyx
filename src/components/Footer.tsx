@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useMemo, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/components/ThemeProvider';
 import {
   Twitter,
   Instagram,
@@ -324,6 +325,7 @@ interface PublicStats {
 
 export function Footer() {
   const { language } = useLanguage();
+  const { resolvedTheme } = useTheme();
   const t = useMemo(() => getDict(language), [language]);
   const currentYear = new Date().getFullYear();
 
@@ -409,11 +411,11 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
-                src="/apocaliptyx-logo.png"
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
                 alt="Apocaliptyx"
-                width={160}
-                height={45}
-                className="h-12 w-auto"
+                width={resolvedTheme === 'dark' ? 160 : 200}
+                height={resolvedTheme === 'dark' ? 45 : 55}
+                className={resolvedTheme === 'dark' ? "h-12 w-auto" : "h-14 w-auto"}
               />
             </Link>
 
@@ -603,6 +605,7 @@ export function Footer() {
  */
 export function FooterCompact() {
   const { language } = useLanguage();
+  const { resolvedTheme } = useTheme();
   const t = useMemo(() => getDict(language), [language]);
 
   const currentYear = new Date().getFullYear();
@@ -613,11 +616,11 @@ export function FooterCompact() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/apocaliptyx-logo.png"
+              src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
               alt="Apocaliptyx"
-              width={120}
-              height={35}
-              className="h-8 w-auto"
+              width={resolvedTheme === 'dark' ? 120 : 160}
+              height={resolvedTheme === 'dark' ? 35 : 45}
+              className={resolvedTheme === 'dark' ? "h-8 w-auto" : "h-10 w-auto"}
             />
           </Link>
 
