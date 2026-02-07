@@ -84,7 +84,7 @@ export function Navbar() {
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <Image
-                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Diseño_sin_título__46_-removebg-preview.png"}
                 alt="Apocaliptyx"
                 width={resolvedTheme === 'dark' ? 140 : 180}
                 height={resolvedTheme === 'dark' ? 40 : 50}

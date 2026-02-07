@@ -90,7 +90,7 @@ export function LandingNavbar() {
               className="flex items-center gap-2 group"
             >
               <Image
-                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Diseño_sin_título__46_-removebg-preview.png"}
                 alt="Apocaliptyx"
                 width={resolvedTheme === 'dark' ? 180 : 220}
                 height={resolvedTheme === 'dark' ? 50 : 60}
