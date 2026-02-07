@@ -92,7 +92,7 @@ export function TradeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowLeftRight className="w-5 h-5 text-purple-400" />

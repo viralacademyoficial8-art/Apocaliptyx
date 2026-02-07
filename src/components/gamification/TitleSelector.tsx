@@ -80,7 +80,7 @@ export function TitleSelector({
           )}
         </button>
       </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-lg max-h-[80vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Crown className="w-5 h-5 text-yellow-400" />

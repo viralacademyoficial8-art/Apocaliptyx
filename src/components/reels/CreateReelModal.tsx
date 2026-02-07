@@ -97,7 +97,7 @@ export function CreateReelModal({ onCreateReel }: CreateReelModalProps) {
           Crear Reel
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-lg">
+      <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Video className="w-5 h-5 text-purple-400" />

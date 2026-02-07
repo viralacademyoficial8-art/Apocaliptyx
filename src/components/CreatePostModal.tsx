@@ -81,7 +81,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border max-w-lg">
+      <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg">
         {/* Header simple (sin DialogHeader / DialogTitle) */}
         <div className="mb-4">
           <h2 className="text-xl font-bold">Crear publicación</h2>

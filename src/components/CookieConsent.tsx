@@ -67,14 +67,14 @@ export function CookieConsent() {
     <div className="fixed inset-0 z-[9999] flex items-end justify-center sm:items-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
-        <div className="p-6 pb-4 border-b border-border">
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-border">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-purple-500/20 rounded-xl">
                 <Cookie className="w-6 h-6 text-purple-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Tu Privacidad Importa</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-white">Tu Privacidad Importa</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">Configuracion de cookies</p>
               </div>
             </div>
@@ -89,7 +89,7 @@ export function CookieConsent() {
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <p className="text-foreground text-sm leading-relaxed mb-4">
             Usamos cookies para mejorar tu experiencia, analizar el trafico y personalizar contenido.
             Puedes aceptar todas las cookies, solo las necesarias, o personalizar tu seleccion.
@@ -115,7 +115,7 @@ export function CookieConsent() {
 
           {/* Cookie Details */}
           {showDetails && (
-            <div className="space-y-3 mb-6 animate-in slide-in-from-top-2 duration-200">
+            <div className="space-y-3 mb-6 max-h-[40vh] sm:max-h-[50vh] overflow-y-auto pr-1 animate-in slide-in-from-top-2 duration-200">
               {cookieTypes.map((type) => {
                 const Icon = type.icon;
                 const isEnabled = type.required || customPreferences[type.key];

@@ -411,7 +411,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
-                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Diseño_sin_título__46_-removebg-preview.png"}
                 alt="Apocaliptyx"
                 width={resolvedTheme === 'dark' ? 160 : 200}
                 height={resolvedTheme === 'dark' ? 45 : 55}
@@ -616,7 +616,7 @@ export function FooterCompact() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
+              src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Diseño_sin_título__46_-removebg-preview.png"}
               alt="Apocaliptyx"
               width={resolvedTheme === 'dark' ? 120 : 160}
               height={resolvedTheme === 'dark' ? 35 : 45}
