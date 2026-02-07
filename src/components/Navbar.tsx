@@ -78,13 +78,13 @@ export function Navbar() {
       <nav className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border safe-area-top">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 safe-area-left safe-area-right">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
+            {/* Logo - cambia según el tema */}
             <Link
               href={isLoggedIn ? "/explorar" : "/"}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <Image
-                src="/apocaliptyx-logo.png"
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
                 alt="Apocaliptyx"
                 width={140}
                 height={40}

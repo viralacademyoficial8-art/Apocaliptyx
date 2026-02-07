@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useMemo, useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/components/ThemeProvider';
 import {
   Twitter,
   Instagram,
@@ -324,6 +325,7 @@ interface PublicStats {
 
 export function Footer() {
   const { language } = useLanguage();
+  const { resolvedTheme } = useTheme();
   const t = useMemo(() => getDict(language), [language]);
   const currentYear = new Date().getFullYear();
 
@@ -409,7 +411,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
-                src="/apocaliptyx-logo.png"
+                src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
                 alt="Apocaliptyx"
                 width={160}
                 height={45}
@@ -603,6 +605,7 @@ export function Footer() {
  */
 export function FooterCompact() {
   const { language } = useLanguage();
+  const { resolvedTheme } = useTheme();
   const t = useMemo(() => getDict(language), [language]);
 
   const currentYear = new Date().getFullYear();
@@ -613,7 +616,7 @@ export function FooterCompact() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="/apocaliptyx-logo.png"
+              src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
               alt="Apocaliptyx"
               width={120}
               height={35}
