@@ -3229,7 +3229,7 @@ function ForoContent() {
           if (!open) setDeletingCommentId(null);
         }
       }}>
-        <DialogContent className="bg-card border-border max-w-sm">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-sm">
           <div className="flex flex-col items-center text-center py-4">
             {/* Icon */}
             <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4 animate-pulse">
@@ -3288,7 +3288,7 @@ function ForoContent() {
           if (!open) setDeletingPostId(null);
         }
       }}>
-        <DialogContent className="bg-card border-border max-w-sm">
+        <DialogContent className="bg-card border-border w-[95vw] sm:max-w-sm">
           <div className="flex flex-col items-center text-center py-4">
             {/* Icon */}
             <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mb-4 animate-pulse">

@@ -95,7 +95,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
     });
 
     return (
-      <div className={isReply ? "ml-12 mt-3" : ""}>
+      <div className={isReply ? "ml-6 sm:ml-12 mt-3" : ""}>
         <div className="flex gap-3">
           <Avatar
             className="w-8 h-8 cursor-pointer"

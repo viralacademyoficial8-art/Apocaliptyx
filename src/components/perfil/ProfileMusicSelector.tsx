@@ -81,7 +81,7 @@ export function ProfileMusicSelector({
           {currentMusic ? 'Cambiar música' : 'Agregar música'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-md">
+      <DialogContent className="bg-card border-border w-[95vw] sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Música del perfil</DialogTitle>
         </DialogHeader>

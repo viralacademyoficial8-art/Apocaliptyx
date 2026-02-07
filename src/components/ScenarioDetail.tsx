@@ -647,7 +647,7 @@ export function ScenarioDetail({ scenario }: ScenarioDetailProps) {
 
           {/* Shield Modal */}
           <Dialog open={showShieldModal} onOpenChange={setShowShieldModal}>
-            <DialogContent className="bg-card border-border max-w-md">
+            <DialogContent className="bg-card border-border w-[95vw] sm:max-w-md">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2 text-xl">
                   <Shield className="w-6 h-6 text-blue-400" />

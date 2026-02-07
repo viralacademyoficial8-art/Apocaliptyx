@@ -226,7 +226,7 @@ export function CreateCommunityModal({ onCreateCommunity }: CreateCommunityModal
           Crear comunidad
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Crear nueva comunidad</DialogTitle>
         </DialogHeader>
