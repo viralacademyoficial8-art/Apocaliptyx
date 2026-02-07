@@ -413,9 +413,9 @@ export function Footer() {
               <Image
                 src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
                 alt="Apocaliptyx"
-                width={160}
-                height={45}
-                className="h-12 w-auto"
+                width={resolvedTheme === 'dark' ? 160 : 200}
+                height={resolvedTheme === 'dark' ? 45 : 55}
+                className={resolvedTheme === 'dark' ? "h-12 w-auto" : "h-14 w-auto"}
               />
             </Link>
 
@@ -618,9 +618,9 @@ export function FooterCompact() {
             <Image
               src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
               alt="Apocaliptyx"
-              width={120}
-              height={35}
-              className="h-8 w-auto"
+              width={resolvedTheme === 'dark' ? 120 : 160}
+              height={resolvedTheme === 'dark' ? 35 : 45}
+              className={resolvedTheme === 'dark' ? "h-8 w-auto" : "h-10 w-auto"}
             />
           </Link>
 

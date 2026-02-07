@@ -92,9 +92,9 @@ export function LandingNavbar() {
               <Image
                 src={resolvedTheme === 'dark' ? "/apocaliptyx-logo.png" : "/Gemini_Generated_Image_41smo441smo441sm-removebg-preview.png"}
                 alt="Apocaliptyx"
-                width={180}
-                height={50}
-                className="h-8 sm:h-10 w-auto"
+                width={resolvedTheme === 'dark' ? 180 : 220}
+                height={resolvedTheme === 'dark' ? 50 : 60}
+                className={resolvedTheme === 'dark' ? "h-8 sm:h-10 w-auto" : "h-10 sm:h-12 w-auto"}
                 priority
               />
             </Link>
